@@ -1,0 +1,362 @@
+@import "../scss/icons.scss";
+@import "../scss/config/minimal/bootstrap.scss";
+@import "../scss/config/minimal/app.scss";
+@import "../scss/config/minimal/custom.scss";
+@import"./shepherd.css";
+@import "./mermaid.min.css";
+
+//RTL 
+// @import "../scss/rtl/components-rtl";
+// @import "../scss/rtl/layouts-rtl";
+// @import "../scss/rtl/plugins-rtl";
+// @import "../scss/rtl/pages-rtl";
+
+
+//Rigthsidebar offcanvas
+.offcanvas-header-dark {
+  .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
+}
+
+body {
+  * {
+    outline: none;
+  }
+}
+
+.noUi-horizontal .noUi-handle {
+  height: 16px !important;
+  width: 16px !important;
+  border-radius: 50% !important;
+  right: -10px !important;
+  top: -7px !important;
+}
+
+.noUi-connect {
+  background: #25a0e2 !important;
+
+  .noUi-horizontal {
+    height: 2px !important;
+  }
+}
+
+.noUi-handle {
+  background: #25a0e2 !important;
+  border: 2px solid var(--vz-card-bg) !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.noUi-target {
+  background: #fafafa !important;
+  border-radius: 4px !important;
+  border: 1px solid #d3d3d3 !important;
+  background-color: var(--vz-light) !important;
+  border-color: var(--vz-light) !important;
+  box-shadow: none !important;
+  height: 4px !important;
+}
+
+.dropzone .dz-message {
+  text-align: center;
+}
+
+// //Calendar
+.fc-direction-ltr .fc-daygrid-event.fc-event-end,
+.fc-direction-rtl .fc-daygrid-event.fc-event-start {
+  padding: 5px !important;
+  font-size: 12px !important;
+  margin-right: 2px;
+}
+
+.fc-event {
+  border: none !important;
+}
+
+@include media-breakpoint-down(sm) {
+  .fc-toolbar {
+    display: block !important;
+    text-align: center;
+
+    .fc-left,
+    .fc-right,
+    .fc-center {
+      float: none;
+      display: block;
+      clear: both;
+      margin: 10px 0;
+    }
+  }
+
+  .fc {
+    .fc-toolbar {
+      >* {
+        >* {
+          float: none;
+        }
+      }
+    }
+  }
+
+  .fc-today-button {
+    display: none;
+  }
+}
+
+.flatpickr-calendar.open {
+  z-index: 1090 !important;
+}
+
+.upcoming-scheduled .flatpickr-input[readonly] {
+  display: none;
+}
+
+.ql-container.ql-snow {
+  height: 250px;
+}
+
+.rangeslider-horizontal .rangeslider__fill {
+  background-color: #25a0e2 !important;
+}
+
+// .Toastify__toast{
+//   min-height: 43px !important;
+//   max-height: 43px !important;
+// }
+
+
+@each $color,
+$value in $theme-colors {
+  .simplebar-track-#{$color} {
+    .simplebar-scrollbar:before {
+      background: $value !important;
+    }
+  }
+}
+
+//authentication
+#tsparticles {
+  canvas {
+    position: absolute !important;
+  }
+}
+
+// chat
+.chat-conversation .chat-list .message-box-drop {
+  .nav-btn {
+    font-size: 18px;
+    padding: 4px;
+    color: $gray-600;
+  }
+}
+
+.chatwidgets {
+  height: 250px !important;
+}
+
+[data-layout="horizontal"] .chat-conversation {
+  &.chatwidgets {
+    height: 250px !important;
+  }
+}
+
+// landing page
+.process-card {
+  .process-arrow-img {
+    left: auto;
+    right: 75%;
+    transform: scaleX(-1);
+  }
+}
+
+.icon-effect {
+  &::before {
+    left: auto;
+    right: 0;
+  }
+}
+
+.alert-msg-show {
+  right: 24px;
+  top: 40px;
+  z-index: 1005;
+}
+
+// Emoji Picker
+
+.pickerEmoji {
+  position: absolute;
+  bottom: -50px;
+  left: 10%;
+  transform: translateX(-50%);
+}
+
+// Toast
+.Toastify {
+  .Toastify__toast {
+    min-height: 43px;
+  }
+
+  .Toastify__close-button {
+    top: 6px;
+  }
+
+  .Toastify__close-button--light {
+    color: $light;
+  }
+}
+
+// Tranfer List
+
+.rdl-filter,
+.rdl-control {
+  background-color: $input-bg;
+  border: 1px solid $input-border-color !important;
+  color: $input-color !important;
+}
+
+.rdl-move {
+  background: var(--#{$prefix}light) !important;
+  border: 1px solid var(--#{$prefix}light) !important;
+  color: var(--#{$prefix}body-color) !important;
+}
+
+.react-dual-listbox {
+
+  input:disabled,
+  select:disabled {
+    background-color: $input-disabled-bg !important;
+    border: 1px solid $input-border-color !important;
+  }
+}
+
+.css-26l3qy-menu {
+  background-color: var(--#{$prefix}gray-200) !important;
+  border-color: var(--#{$prefix}border-color) !important;
+}
+
+.css-1n7v3ny-option {
+  background-color: var(--#{$prefix}gray-300) !important;
+  border-color: var(--#{$prefix}border-color) !important;
+}
+
+/* Change the white to any color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--#{$prefix}input-bg) inset !important;
+  background-color: var(--#{$prefix}input-bg) !important;
+  color: var(--#{$prefix}body-color) !important;
+  -webkit-text-fill-color: var(--#{$prefix}body-color) !important;
+}
+
+
+//datatables
+.kbunWL,
+.ddeqMG {
+
+  .cFDtZf,
+  .efrTRK {
+    color: $table-color;
+  }
+
+  :is(.kdYplh, .dUdLgu) {
+    background-color: var(--#{$prefix}secondary-bg);
+    border-bottom-color: var(--#{$prefix}border-color);
+  }
+
+  .dUdLgu {
+    color: $table-color;
+
+    &:not(:last-of-type) {
+      border-bottom-color: var(--#{$prefix}border-color);
+    }
+  }
+}
+
+.card-body {
+  .fjmwMg {
+    color: $table-color;
+    background-color: var(--#{$prefix}secondary-bg);
+    border-top-color: var(--#{$prefix}border-color);
+
+    .flbsZw {
+      color: $table-color;
+      fill: $table-color;
+
+      &:disabled {
+        color: var(--#{$prefix}tertiary-color);
+        fill: var(--#{$prefix}tertiary-color);
+      }
+    }
+  }
+}
+
+//react select
+.css-b62m3t-container {
+  .css-13cymwt-control {
+    background-color: var(--#{$prefix}secondary-bg);
+    color: var(--#{$prefix}body-color);
+    border-color: var(--#{$prefix}border-color);
+
+    &:hover,
+    &:focus {
+      border-color: var(--#{$prefix}primary);
+    }
+
+    .css-1p3m7a8-multiValue {
+      color: var(--#{$prefix}white);
+      background-color: var(--#{$prefix}primary);
+
+      .css-wsp0cs-MultiValueGeneric {
+        color: var(--#{$prefix}white);
+      }
+
+      .css-1u9des2-indicatorSeparator {
+        border-color: var(--#{$prefix}border-color);
+      }
+    }
+  }
+
+  :is(.css-qbdosj-Input, .css-1dimb5e-singleValue) {
+    color: var(--#{$prefix}body-color);
+  }
+
+  .css-t3ipsp-control {
+    background-color: var(--#{$prefix}secondary-bg);
+    color: var(--#{$prefix}body-color);
+    border-color: var(--#{$prefix}border-color);
+
+    .css-1p3m7a8-multiValue {
+      color: var(--#{$prefix}white);
+      background-color: var(--#{$prefix}primary);
+
+      .css-wsp0cs-MultiValueGeneric {
+        color: var(--#{$prefix}white);
+      }
+
+      .css-1u9des2-indicatorSeparator {
+        border-color: var(--#{$prefix}border-color);
+      }
+    }
+  }
+
+  .css-1nmdiq5-menu {
+    background-color: var(--#{$prefix}secondary-bg);
+    color: var(--#{$prefix}body-color);
+    border-color: var(--#{$prefix}border-color);
+
+    .css-d7l1ni-option {
+      color: $white;
+      background-color: var(--#{$prefix}primary);
+
+      &:hover,
+      &:active,
+      &:focus {
+        background-color: var(--#{$prefix}primary);
+      }
+    }
+  }
+}
