@@ -1,18 +1,39 @@
-# React + Vite
+# SADAR Finance Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend untuk SADAR Finance.
 
-Currently, two official plugins are available:
+## Styling
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Project ini memakai kombinasi:
 
-## React Compiler
+- Bootstrap 5, Reactstrap, dan Sass dari template dashboard.
+- Tailwind CSS v4 untuk landing page SADAR Finance.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+Entry Tailwind ada di:
 
-Note: This will impact Vite dev & build performances.
+```txt
+src/tailwind.css
+```
 
-## Expanding the ESLint configuration
+Tailwind di-load dari:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```txt
+src/main.jsx
+```
+
+Landing page SADAR Finance ada di:
+
+```txt
+src/pages/Landing/OnePage/index.jsx
+```
+
+Styling landing page ditulis langsung sebagai utility class Tailwind di `className`, jadi file CSS lama `sadarLanding.css` tidak dipakai lagi.
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
+```

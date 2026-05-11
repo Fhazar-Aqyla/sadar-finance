@@ -82,7 +82,7 @@ Project ini berbeda dari dashboard data science standalone. Repository ini berfo
 | Komponen | Teknologi |
 | --- | --- |
 | **Frontend** | React, Vite, React Router, Redux Toolkit |
-| **UI & Styling** | Bootstrap 5, Reactstrap, Sass, Remix Icon, Boxicons |
+| **UI & Styling** | Bootstrap 5, Reactstrap, Sass, Tailwind CSS, Remix Icon, Boxicons |
 | **Charts & Visualization** | ApexCharts, Chart.js, ECharts |
 | **Backend** | Node.js, Express.js |
 | **Database** | PostgreSQL |
@@ -307,7 +307,8 @@ sadar-finance/
 │   │   ├── slices/         # Redux slices dan thunk
 │   │   ├── config.js       # Konfigurasi API/frontend
 │   │   ├── App.jsx         # Root component
-│   │   └── main.jsx        # Entry point React
+│   │   ├── main.jsx        # Entry point React
+│   │   └── tailwind.css    # Tailwind CSS entry
 │   ├── package.json        # Dependency frontend
 │   └── vite.config.js      # Konfigurasi Vite
 ├── notebooks/              # Notebook eksperimen data/ML

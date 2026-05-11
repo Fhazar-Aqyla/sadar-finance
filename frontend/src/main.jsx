@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 
+import './tailwind.css'
 // Velzon template styles
 import './assets/scss/themes.scss'
 
@@ -13,7 +14,9 @@ if (typeof globalThis.global === 'undefined') {
   globalThis.global = globalThis
 }
 
-if (process.env.REACT_APP_DEFAULTAUTH === 'fake') {
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? 'fake'
+
+if (defaultAuth === 'fake') {
   fakeBackend()
 }
 
