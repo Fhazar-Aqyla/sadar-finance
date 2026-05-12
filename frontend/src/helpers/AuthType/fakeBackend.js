@@ -129,6 +129,32 @@ const fakeBackend = () => {
     });
   });
 
+  mock.onPost(url.POST_FAKE_LOGIN).reply(config => {
+    const user = JSON.parse(config["data"]);
+    const validUser = users.filter(
+      usr => usr.email === user.email && usr.password === user.password
+    );
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (validUser["length"] === 1) {
+          resolve([200, {
+            status: "success",
+            data: {
+              ...validUser[0],
+              accessToken,
+            },
+          }]);
+        } else {
+          resolve([200, {
+            status: "error",
+            message: "Username and password are invalid. Please enter correct username and password",
+          }]);
+        }
+      });
+    });
+  });
+
   mock.onPost("/post-jwt-profile").reply(config => {
     const user = JSON.parse(config["data"]);
 

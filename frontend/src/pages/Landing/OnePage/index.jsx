@@ -54,7 +54,7 @@ const faqs = [
   },
 ];
 
-const shellClass = "mx-auto w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
+const shellClass = "mx-auto w-[min(calc(100%_-_96px),1360px)] max-lg:w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
 const headingClass =
   "font-['Plus_Jakarta_Sans',sans-serif] font-extrabold tracking-normal text-[#0C3954]";
 const sectionHeadingClass = `${headingClass} m-0 text-[40px] leading-[1.18] max-md:text-[32px] max-sm:text-[28px]`;
@@ -75,7 +75,7 @@ const OnePage = () => {
   return (
     <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#EEF5FF]`}>
       <header className="sticky top-0 z-50 bg-[#EEF5FF]/95 shadow-[0_1px_0_rgba(12,57,84,0.06)] backdrop-blur">
-        <div className={`${shellClass} flex min-h-[78px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
+        <div className={`${shellClass} flex min-h-[86px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
           <Link to="/" aria-label="SADAR Finance" className="inline-flex shrink-0 items-center no-underline">
             <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
           </Link>
@@ -135,14 +135,14 @@ const OnePage = () => {
         )}
       </header>
 
-      <section id="home" className="relative overflow-hidden pb-[170px] pt-[84px] max-lg:pb-[148px] max-md:pt-12">
-        <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
-          <div className="pt-10 max-lg:pt-0">
-            <h1 className={`${headingClass} m-0 text-[46px] leading-[1.12] max-sm:text-[36px]`}>
+      <section id="home" className="relative overflow-hidden pb-[190px] pt-[96px] max-lg:pb-[148px] max-md:pt-12">
+        <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-20 max-xl:gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
+          <div className="pt-14 max-xl:pt-10 max-lg:pt-0">
+            <h1 className={`${headingClass} m-0 text-[56px] leading-[1.12] max-xl:text-[50px] max-sm:text-[36px]`}>
               Pantau Uangmu
               <span className="block text-[#64AB88]">Bangun Masa Depanmu</span>
             </h1>
-            <p className="mb-6 mt-4 max-w-[505px] text-[13px] leading-6 text-[#333333]">
+            <p className="mb-7 mt-5 max-w-[560px] text-[16px] leading-8 text-[#333333] max-xl:text-[14px] max-xl:leading-7">
               Pantau, analisis, dan pahami pengeluaranmu dengan bantuan cerdas agar kamu bisa
               menghindari pengeluaran berlebihan dan lebih mengontrol keuangan.
             </p>
@@ -163,10 +163,10 @@ const OnePage = () => {
             </div>
           </div>
 
-          <div className="h-[380px] rounded-[18px] bg-[#D9D9D9] shadow-[0_8px_14px_rgba(51,51,51,0.28)] max-lg:h-[320px] max-sm:h-[240px]" />
+          <div className="h-[475px] rounded-[18px] bg-[#D9D9D9] shadow-[0_8px_14px_rgba(51,51,51,0.28)] max-xl:h-[420px] max-lg:h-[320px] max-sm:h-[240px]" />
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[245px] max-md:h-[170px]" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[265px] max-md:h-[170px]" aria-hidden="true">
           <svg
             className="absolute inset-0 h-full w-full"
             viewBox="0 0 1440 260"
