@@ -160,17 +160,7 @@ const Login = (props) => {
                                                     </Button>
                                                 </div>
 
-                                                <div className="mt-4 text-center">
-                                                    <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title">Masuk dengan</h5>
-                                                    </div>
-                                                    <div>
-                                                        <Button color="primary" className="btn-icon me-1" type="button"><i className="ri-facebook-fill fs-16"></i></Button>
-                                                        <Button color="danger" className="btn-icon me-1" type="button"><i className="ri-google-fill fs-16"></i></Button>
-                                                        <Button color="dark" className="btn-icon me-1" type="button"><i className="ri-github-fill fs-16"></i></Button>
-                                                        <Button color="info" className="btn-icon" type="button"><i className="ri-twitter-fill fs-16"></i></Button>
-                                                    </div>
-                                                </div>
+
                                             </Form>
                                         </div>
 

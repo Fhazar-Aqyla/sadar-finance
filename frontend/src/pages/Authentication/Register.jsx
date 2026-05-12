@@ -205,17 +205,7 @@ const Register = () => {
                                                     <button className="btn btn-success w-100" type="submit">Daftar</button>
                                                 </div>
 
-                                                <div className="mt-4 text-center">
-                                                    <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title text-muted">Daftar dengan</h5>
-                                                    </div>
-                                                    <div>
-                                                        <button type="button" className="btn btn-primary btn-icon waves-effect waves-light me-1"><i className="ri-facebook-fill fs-16"></i></button>
-                                                        <button type="button" className="btn btn-danger btn-icon waves-effect waves-light me-1"><i className="ri-google-fill fs-16"></i></button>
-                                                        <button type="button" className="btn btn-dark btn-icon waves-effect waves-light me-1"><i className="ri-github-fill fs-16"></i></button>
-                                                        <button type="button" className="btn btn-info btn-icon waves-effect waves-light"><i className="ri-twitter-fill fs-16"></i></button>
-                                                    </div>
-                                                </div>
+
                                             </Form>
                                         </div>
                                 <div className="mt-5 text-center">
