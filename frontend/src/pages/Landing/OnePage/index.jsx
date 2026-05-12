@@ -28,7 +28,7 @@ const navItems = [
   { label: "Fitur", href: "#features" },
   { label: "Manfaat", href: "#benefits" },
   { label: "Cara Kerja", href: "#how-it-works" },
-  { label: "Tanya Jawab", href: "#faq" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 const faqs = [
@@ -85,7 +85,7 @@ const OnePage = () => {
               <a
                 key={item.href}
                 href={item.href}
-                className="group relative py-2 text-[12px] font-semibold !text-[#1E9BE0] no-underline transition hover:!text-[#0C3954]"
+                className="group relative py-2 text-[12px] font-semibold !text-[#0C3954] no-underline transition hover:!text-[#124170]"
               >
                 {item.label}
                 <span className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-[#64AB88] transition duration-300 group-hover:scale-x-100" />
@@ -94,7 +94,7 @@ const OnePage = () => {
           </nav>
 
           <div className="flex shrink-0 items-center gap-3">
-            <Link to="/login" className="text-[12px] font-semibold !text-[#1E9BE0] no-underline hover:!text-[#0C3954]">
+            <Link to="/login" className="text-[12px] font-semibold !text-[#0C3954] no-underline hover:!text-[#124170]">
               Masuk
             </Link>
             <Link to="/register" className={`${primaryButtonClass} min-w-[118px] max-sm:hidden`}>
@@ -119,7 +119,7 @@ const OnePage = () => {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#1E9BE0] no-underline hover:bg-white hover:!text-[#0C3954]"
+                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#0C3954] no-underline hover:bg-white hover:!text-[#124170]"
               >
                 {item.label}
               </a>
@@ -233,13 +233,13 @@ const OnePage = () => {
             </p>
           </div>
 
-          <div className="mx-auto mt-20 grid max-w-[1060px] grid-cols-[220px_240px_240px_240px] items-end justify-center gap-10 max-xl:grid-cols-[210px_225px_225px_220px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-16 max-sm:grid-cols-1">
-            <div className="pb-10 text-right max-lg:order-3 max-lg:text-center max-sm:order-none max-sm:pb-0">
-              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.55] text-[#64AB88] max-md:text-[21px]`}>
-                Keputusan Finansial
+          <div className="mx-auto mt-16 grid max-w-[1100px] grid-cols-[250px_240px_240px_250px] items-end justify-center gap-10 max-xl:grid-cols-[235px_225px_225px_235px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-14 max-sm:grid-cols-1">
+            <div className="pb-9 text-right max-lg:order-3 max-lg:text-center max-sm:order-none max-sm:pb-0">
+              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.22] text-[#64AB88] max-md:text-[21px]`}>
+                <span className="block whitespace-nowrap">Keputusan Finansial</span>
                 <span className="block">Jadi Lebih Cerdas</span>
               </h3>
-              <p className="ml-auto mt-5 max-w-[230px] text-[13px] leading-7 text-[#333333] max-lg:mx-auto">
+              <p className="ml-auto mt-3 max-w-[230px] text-[13px] leading-6 text-[#333333] max-lg:mx-auto">
                 Wawasan otomatis membantu kamu memahami kebiasaanmu.
               </p>
             </div>
@@ -262,12 +262,12 @@ const OnePage = () => {
               />
             </div>
 
-            <div className="pb-10 text-left max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-left max-sm:order-none max-sm:pt-0">
-              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.55] max-md:text-[21px]`}>
-                Lebih Tahu Kemana
+            <div className="pb-9 text-left max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-center max-sm:order-none max-sm:pt-0">
+              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.22] max-md:text-[21px]`}>
+                <span className="block whitespace-nowrap">Lebih Tahu Kemana</span>
                 <span className="block">Uangmu Pergi</span>
               </h3>
-              <p className="mt-5 max-w-[240px] text-[13px] leading-7 text-[#333333]">
+              <p className="mt-3 max-w-[240px] text-[13px] leading-6 text-[#333333] max-lg:mx-auto">
                 Lihat semua pengeluaranmu dengan jelas dan tanpa tebakan.
               </p>
             </div>
@@ -344,7 +344,7 @@ const OnePage = () => {
       <section id="faq" className="py-20 max-md:py-14">
         <div className={`${shellClass} max-w-[860px]`}>
           <div className="mx-auto max-w-[640px] text-center">
-            <span className={sectionBadgeClass}>Tanya Jawab</span>
+            <span className={sectionBadgeClass}>FAQ</span>
             <h2 className={`${sectionHeadingClass} text-center`}>
               Masih ada Pertanyaan? Kami Punya Jawabannya
             </h2>
