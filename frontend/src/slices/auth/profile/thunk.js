@@ -6,18 +6,19 @@ import { postFakeProfile, postJwtProfile } from "../../../helpers/fakebackend_he
 import { profileSuccess, profileError, resetProfileFlagChange } from "./reducer";
 
 const fireBaseBackend = getFirebaseBackend();
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
 
 export const editProfile = (user) => async (dispatch) => {
     try {
         let response;
 
-        if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+        if (defaultAuth === "firebase") {
             response = fireBaseBackend.editProfileAPI(
                 user.username,
                 user.idx
             );
 
-        } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
+        } else if (defaultAuth === "jwt") {
 
             response = postJwtProfile(
                 {
@@ -26,7 +27,7 @@ export const editProfile = (user) => async (dispatch) => {
                 }
             );
 
-        } else if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
+        } else if (defaultAuth === "fake") {
             response = postFakeProfile(user);
         }
 

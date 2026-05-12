@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { Row, Col, Alert, Card, CardBody, Container, FormFeedback, Input, Label, Form } from "reactstrap";
+import { Row, Col, Alert, Card, Container, FormFeedback, Input, Label, Form } from "reactstrap";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
@@ -17,8 +17,7 @@ import { userForgetPassword } from "../../slices/thunks";
 
 // import images
 // import profile from "../../assets/images/bg.png";
-import logoLight from "../../assets/images/logo-light.png";
-import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
+import AuthSlider from "../AuthenticationInner/authCarousel";
 import { createSelector } from "reselect";
 
 const ForgetPasswordPage = props => {
@@ -32,7 +31,7 @@ const ForgetPasswordPage = props => {
       email: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string().required("Please Enter Your Email"),
+      email: Yup.string().email("Format email belum valid").required("Email wajib diisi"),
     }),
     onSubmit: (values) => {
       dispatch(userForgetPassword(values, props.history));
@@ -53,102 +52,106 @@ const ForgetPasswordPage = props => {
   } = useSelector(selectLayoutProperties);
 
 
-document.title="Reset Password | Velzon - React Admin & Dashboard Template";
+document.title="Reset Password | SADAR Finance";
 
   return (
-    <ParticlesAuth>
-      <div className="auth-page-content">
+    <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+      <div className="bg-overlay"></div>
+      <div className="auth-page-content overflow-hidden pt-lg-5">
         <Container>
           <Row>
             <Col lg={12}>
-              <div className="text-center mt-sm-5 mb-4 text-white-50">
-                <div>
-                  <Link to="/" className="d-inline-block auth-logo">
-                    <img src={logoLight} alt="" height="20" />
-                  </Link>
-                </div>
-                <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
-              </div>
-            </Col>
-          </Row>
+              <Card className="overflow-hidden border-0 m-0">
+                <Row className="g-0">
+                  <AuthSlider />
 
-          <Row className="justify-content-center">
-            <Col md={8} lg={6} xl={5}>
-              <Card className="mt-4">
+                  <Col lg={6}>
+                    <div className="p-lg-5 p-4">
+                      <div>
+                        <h5 className="text-primary">Lupa password?</h5>
+                        <p className="text-muted">Masukkan email akun untuk menerima instruksi reset.</p>
 
-                <CardBody className="p-4">
-                  <div className="text-center mt-2">
-                    <h5 className="text-primary">Forgot Password?</h5>
-                    <p className="text-muted">Reset password with velzon</p>
+                        <lord-icon
+                          src="https://cdn.lordicon.com/rhvddzym.json"
+                          trigger="loop"
+                          colors="primary:#00bd9d"
+                          className="avatar-xl"
+                          style={{ width: "120px", height: "120px" }}
+                        >
+                        </lord-icon>
 
-                    <lord-icon
-                      src="https://cdn.lordicon.com/rhvddzym.json"
-                      trigger="loop"
-                      colors="primary:#00bd9d"
-                      className="avatar-xl"
-                      style={{ width: "120px", height: "120px" }}
-                      >
-                    </lord-icon>
+                      </div>
 
-                  </div>
-
-                  <Alert className="border-0 alert-warning text-center mb-2 mx-2" role="alert">
-                    Enter your email and instructions will be sent to you!
-                  </Alert>
-                  <div className="p-2">
-                    {forgetError && forgetError ? (
-                      <Alert color="danger" style={{ marginTop: "13px" }}>
-                        {forgetError}
+                      <Alert className="border-0 alert-warning text-center mb-2 mx-2" role="alert">
+                        Link reset akan dikirim ke email yang terhubung dengan akun SADAR.
                       </Alert>
-                    ) : null}
-                    {forgetSuccessMsg ? (
-                      <Alert color="success" style={{ marginTop: "13px" }}>
-                        {forgetSuccessMsg}
-                      </Alert>
-                    ) : null}
-                    <Form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        validation.handleSubmit();
-                        return false;
-                      }}
-                    >
-                      <div className="mb-4">
-                        <Label className="form-label">Email</Label>
-                        <Input
-                          name="email"
-                          className="form-control"
-                          placeholder="Enter email"
-                          type="email"
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          value={validation.values.email || ""}
-                          invalid={
-                            validation.touched.email && validation.errors.email ? true : false
-                          }
-                        />
-                        {validation.touched.email && validation.errors.email ? (
-                          <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
+                      <div className="p-2">
+                        {forgetError && forgetError ? (
+                          <Alert color="danger" style={{ marginTop: "13px" }}>
+                            {forgetError}
+                          </Alert>
                         ) : null}
+                        {forgetSuccessMsg ? (
+                          <Alert color="success" style={{ marginTop: "13px" }}>
+                            {forgetSuccessMsg}
+                          </Alert>
+                        ) : null}
+                        <Form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            validation.handleSubmit();
+                            return false;
+                          }}
+                        >
+                          <div className="mb-4">
+                            <Label className="form-label">Email</Label>
+                            <Input
+                              name="email"
+                              className="form-control"
+                              placeholder="nama@email.com"
+                              type="email"
+                              onChange={validation.handleChange}
+                              onBlur={validation.handleBlur}
+                              value={validation.values.email || ""}
+                              invalid={
+                                validation.touched.email && validation.errors.email ? true : false
+                              }
+                            />
+                            {validation.touched.email && validation.errors.email ? (
+                              <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
+                            ) : null}
+                          </div>
+
+                          <div className="text-center mt-4">
+                            <button className="btn btn-success w-100" type="submit">Kirim Link Reset</button>
+                          </div>
+                        </Form>
                       </div>
 
-                      <div className="text-center mt-4">
-                        <button className="btn btn-success w-100" type="submit">Send Reset Link</button>
+                      <div className="mt-5 text-center">
+                        <p className="mb-0">Sudah ingat password? <Link to="/login" className="fw-semibold text-primary text-decoration-underline">Kembali masuk</Link></p>
                       </div>
-                    </Form>
-                  </div>
-                </CardBody>
+
+                    </div>
+                  </Col>
+                </Row>
               </Card>
-
-              <div className="mt-4 text-center">
-                <p className="mb-0">Wait, I remember my password... <Link to="/login" className="fw-semibold text-primary text-decoration-underline"> Click here </Link> </p>
-              </div>
-
             </Col>
           </Row>
         </Container>
       </div>
-    </ParticlesAuth>
+      <footer className="footer">
+        <Container>
+          <Row>
+            <Col lg={12}>
+              <div className="text-center">
+                <p className="mb-0">&copy; {new Date().getFullYear()} SADAR Finance. Bantu kamu lebih sadar mengatur uang.</p>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </footer>
+    </div>
   );
 };
 

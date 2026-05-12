@@ -4,7 +4,7 @@ import withRouter from '../../Components/Common/withRouter';
 const ParticlesAuth = ({ children }) => {
     return (
         <React.Fragment>
-            <div className="auth-page-wrapper pt-5">
+            <div className="auth-page-wrapper sadar-auth-wrapper pt-5">
                 <div className="auth-one-bg-position auth-one-bg" id="auth-particles">
 
                     <div className="bg-overlay"></div>
@@ -24,7 +24,7 @@ const ParticlesAuth = ({ children }) => {
                         <div className="row">
                             <div className="col-lg-12">
                                 <div className="text-center">
-                                    <p className="mb-0 text-muted">&copy; {new Date().getFullYear()} Velzon. Crafted with <i className="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                    <p className="mb-0 text-muted">&copy; {new Date().getFullYear()} SADAR Finance. Bantu kamu lebih sadar mengatur uang.</p>
                                 </div>
                             </div>
                         </div>

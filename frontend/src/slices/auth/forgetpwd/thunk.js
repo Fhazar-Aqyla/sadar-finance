@@ -9,17 +9,18 @@ import {
 } from "../../../helpers/fakebackend_helper";
 
 const fireBaseBackend = getFirebaseBackend();
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
 
 export const userForgetPassword = (user, history) => async (dispatch) => {
   try {
       let response;
-      if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+      if (defaultAuth === "firebase") {
 
           response = fireBaseBackend.forgetPassword(
               user.email
           )
 
-      } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
+      } else if (defaultAuth === "jwt") {
           response = postJwtForgetPwd(
               user.email
           )

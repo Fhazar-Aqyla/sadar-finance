@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Row, Col, CardBody, Card, Alert, Container, Input, Label, Form, FormFeedback } from "reactstrap";
+import { Row, Col, Card, Alert, Container, Input, Label, Form, FormFeedback } from "reactstrap";
 
 // Formik Validation
 import * as Yup from "yup";
@@ -17,8 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 //import images 
-import logoLight from "../../assets/images/logo-light.png";
-import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
+import AuthSlider from "../AuthenticationInner/authCarousel";
 import { createSelector } from "reselect";
 
 const Register = () => {
@@ -36,12 +35,12 @@ const Register = () => {
             confirm_password: ''
         },
         validationSchema: Yup.object({
-            email: Yup.string().required("Please Enter Your Email"),
-            first_name: Yup.string().required("Please Enter Your Username"),
-            password: Yup.string().required("Please enter your password"),
+            email: Yup.string().email("Format email belum valid").required("Email wajib diisi"),
+            first_name: Yup.string().required("Nama wajib diisi"),
+            password: Yup.string().min(6, "Password minimal 6 karakter").required("Password wajib diisi"),
             confirm_password: Yup.string()
-                .oneOf([Yup.ref("password")], "Passwords do not match")
-                .required("Please confirm your password"),
+                .oneOf([Yup.ref("password")], "Konfirmasi password tidak sama")
+                .required("Konfirmasi password wajib diisi"),
         }),
         onSubmit: (values) => {
             dispatch(registerUser(values));
@@ -76,34 +75,25 @@ const Register = () => {
 
     }, [dispatch, success, error, history]);
 
-    document.title = "Basic SignUp | Velzon - React Admin & Dashboard Template";
+    document.title = "Daftar | SADAR Finance";
 
     return (
         <React.Fragment>
-            <ParticlesAuth>
-                <div className="auth-page-content">
+            <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+                <div className="bg-overlay"></div>
+                <div className="auth-page-content overflow-hidden pt-lg-5">
                     <Container>
                         <Row>
                             <Col lg={12}>
-                                <div className="text-center mt-sm-5 mb-4 text-white-50">
-                                    <div>
-                                        <Link to="/" className="d-inline-block auth-logo">
-                                            <img src={logoLight} alt="" height="20" />
-                                        </Link>
-                                    </div>
-                                    <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
-                                </div>
-                            </Col>
-                        </Row>
+                                <Card className="sadar-auth-card overflow-hidden border-0 m-0">
+                                    <Row className="g-0">
+                                        <AuthSlider />
 
-                        <Row className="justify-content-center">
-                            <Col md={8} lg={6} xl={5}>
-                                <Card className="mt-4">
-
-                                    <CardBody className="p-4">
-                                        <div className="text-center mt-2">
-                                            <h5 className="text-primary">Create New Account</h5>
-                                            <p className="text-muted">Get your free velzon account now</p>
+                                        <Col lg={6} className="sadar-auth-form-panel">
+                                            <div className="w-100 p-lg-5 p-4">
+                                        <div>
+                                            <h5 className="text-primary">Buat akun SADAR</h5>
+                                            <p className="text-muted">Siapkan dashboard keuangan pribadimu dalam beberapa langkah.</p>
                                         </div>
                                         <div className="p-2 mt-4">
                                             <Form
@@ -116,17 +106,17 @@ const Register = () => {
 
                                                 {success && success ? (
                                                     <>
-                                                        {toast("Your Redirect To Login Page...", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
+                                                        {toast("Akun berhasil dibuat. Mengarahkan ke halaman masuk...", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
                                                         <ToastContainer autoClose={2000} limit={1} />
                                                         <Alert color="success">
-                                                            Register User Successfully and Your Redirect To Login Page...
+                                                            Akun berhasil dibuat. Kamu akan diarahkan ke halaman masuk.
                                                         </Alert>
                                                     </>
                                                 ) : null}
 
                                                 {error && error ? (
                                                     <Alert color="danger"><div>
-                                                        Email has been Register Before, Please Use Another Email Address... </div></Alert>
+                                                        Email sudah terdaftar. Gunakan email lain. </div></Alert>
                                                 ) : null}
 
                                                 <div className="mb-3">
@@ -135,7 +125,7 @@ const Register = () => {
                                                         id="email"
                                                         name="email"
                                                         className="form-control"
-                                                        placeholder="Enter email address"
+                                                        placeholder="nama@email.com"
                                                         type="email"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
@@ -150,11 +140,11 @@ const Register = () => {
 
                                                 </div>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="username" className="form-label">Username <span className="text-danger">*</span></Label>
+                                                    <Label htmlFor="username" className="form-label">Nama <span className="text-danger">*</span></Label>
                                                     <Input
                                                         name="first_name"
                                                         type="text"
-                                                        placeholder="Enter username"
+                                                        placeholder="Nama lengkap"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
                                                         value={validation.values.first_name || ""}
@@ -173,7 +163,7 @@ const Register = () => {
                                                     <Input
                                                         name="password"
                                                         type="password"
-                                                        placeholder="Enter Password"
+                                                        placeholder="Minimal 6 karakter"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
                                                         value={validation.values.password || ""}
@@ -192,7 +182,7 @@ const Register = () => {
                                                     <Input
                                                         name="confirm_password"
                                                         type="password"
-                                                        placeholder="Confirm Password"
+                                                        placeholder="Ulangi password"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
                                                         value={validation.values.confirm_password || ""}
@@ -207,41 +197,53 @@ const Register = () => {
                                                 </div>
 
                                                 <div className="mb-4">
-                                                    <p className="mb-0 fs-12 text-muted fst-italic">By registering you agree to the Velzon
-                                                        <Link to="#" className="text-primary text-decoration-underline fst-normal fw-medium">Terms of Use</Link></p>
+                                                    <p className="mb-0 fs-12 text-muted fst-italic">Dengan mendaftar, kamu menyetujui
+                                                        <Link to="/term-conditions" className="text-primary text-decoration-underline fst-normal fw-medium"> ketentuan penggunaan SADAR Finance</Link>.</p>
                                                 </div>
 
                                                 <div className="mt-4">
-                                                    <button className="btn btn-success w-100" type="submit">Sign Up</button>
+                                                    <button className="btn btn-success w-100" type="submit">Daftar</button>
                                                 </div>
 
                                                 <div className="mt-4 text-center">
                                                     <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title text-muted">Create account with</h5>
+                                                        <h5 className="fs-13 mb-4 title text-muted">Daftar dengan</h5>
                                                     </div>
-
                                                     <div>
-                                                        <button type="button" className="btn btn-primary btn-icon waves-effect waves-light"><i className="ri-facebook-fill fs-16"></i></button>{" "}
-                                                        <button type="button" className="btn btn-danger btn-icon waves-effect waves-light"><i className="ri-google-fill fs-16"></i></button>{" "}
-                                                        <button type="button" className="btn btn-dark btn-icon waves-effect waves-light"><i className="ri-github-fill fs-16"></i></button>{" "}
+                                                        <button type="button" className="btn btn-primary btn-icon waves-effect waves-light me-1"><i className="ri-facebook-fill fs-16"></i></button>
+                                                        <button type="button" className="btn btn-danger btn-icon waves-effect waves-light me-1"><i className="ri-google-fill fs-16"></i></button>
+                                                        <button type="button" className="btn btn-dark btn-icon waves-effect waves-light me-1"><i className="ri-github-fill fs-16"></i></button>
                                                         <button type="button" className="btn btn-info btn-icon waves-effect waves-light"><i className="ri-twitter-fill fs-16"></i></button>
                                                     </div>
                                                 </div>
                                             </Form>
                                         </div>
-                                    </CardBody>
-                                </Card>
-                                <div className="mt-4 text-center">
-                                    <p className="mb-0">Already have an account ? <Link to="/login" className="fw-semibold text-primary text-decoration-underline"> Signin </Link> </p>
+                                <div className="mt-5 text-center">
+                                    <p className="mb-0">Sudah punya akun? <Link to="/login" className="fw-semibold text-primary text-decoration-underline">Masuk</Link></p>
                                 </div>
+
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </Card>
                             </Col>
                         </Row>
                     </Container>
                 </div>
-            </ParticlesAuth>
+                <footer className="footer">
+                    <Container>
+                        <Row>
+                            <Col lg={12}>
+                                <div className="text-center">
+                                    <p className="mb-0">&copy; {new Date().getFullYear()} SADAR Finance. Bantu kamu lebih sadar mengatur uang.</p>
+                                </div>
+                            </Col>
+                        </Row>
+                    </Container>
+                </footer>
+            </div>
         </React.Fragment>
     );
 };
 
 export default Register;
-

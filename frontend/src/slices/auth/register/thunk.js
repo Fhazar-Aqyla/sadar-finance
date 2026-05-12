@@ -15,19 +15,21 @@ import {
 
 // initialize relavant method of both Auth
 const fireBaseBackend = getFirebaseBackend();
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
+const hasApiUrl = Boolean(import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL);
 
 // Is user register successfull then direct plot user in redux.
 export const registerUser = (user) => async (dispatch) => {
   try {
     let response;
 
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+    if (defaultAuth === "firebase") {
       response = fireBaseBackend.registerUser(user.email, user.password);
       // yield put(registerUserSuccessful(response));
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
+    } else if (defaultAuth === "jwt") {
       response = postJwtRegister('/post-jwt-register', user);
       // yield put(registerUserSuccessful(response));
-    } else if (process.env.REACT_APP_API_URL) {
+    } else if (defaultAuth === "fake" || hasApiUrl) {
       response = postFakeRegister(user);
       const data = await response;
 

@@ -7,23 +7,26 @@ import {
 
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
+const hasApiUrl = Boolean(import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL);
+
 export const loginUser = (user, history) => async (dispatch) => {
 
   try {
     let response;
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+    if (defaultAuth === "firebase") {
       let fireBaseBackend = getFirebaseBackend();
       response = fireBaseBackend.loginUser(
         user.email,
         user.password
       );
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
+    } else if (defaultAuth === "jwt") {
       response = postJwtLogin({
         email: user.email,
         password: user.password
       });
 
-    } else if (process.env.REACT_APP_API_URL) {
+    } else if (defaultAuth === "fake" || hasApiUrl) {
       response = postFakeLogin({
         email: user.email,
         password: user.password,
@@ -34,7 +37,7 @@ export const loginUser = (user, history) => async (dispatch) => {
 
     if (data) {
       sessionStorage.setItem("authUser", JSON.stringify(data));
-      if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
+      if (defaultAuth === "fake") {
         var finallogin = JSON.stringify(data);
         finallogin = JSON.parse(finallogin)
         data = finallogin.data;
@@ -58,7 +61,7 @@ export const logoutUser = () => async (dispatch) => {
   try {
     sessionStorage.removeItem("authUser");
     let fireBaseBackend = getFirebaseBackend();
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+    if (defaultAuth === "firebase") {
       const response = fireBaseBackend.logout;
       dispatch(logoutUserSuccess(response));
     } else {
@@ -74,7 +77,7 @@ export const socialLogin = (type, history) => async (dispatch) => {
   try {
     let response;
 
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+    if (defaultAuth === "firebase") {
       const fireBaseBackend = getFirebaseBackend();
       response = fireBaseBackend.socialLoginUser(type);
     }

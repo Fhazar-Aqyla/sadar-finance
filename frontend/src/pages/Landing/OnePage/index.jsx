@@ -69,20 +69,25 @@ const faqs = [
   },
 ];
 
+const navItems = [
+  { label: "Beranda", href: "#home" },
+  { label: "Fitur", href: "#features" },
+  { label: "Manfaat", href: "#benefits" },
+  { label: "Cara Kerja", href: "#how-it-works" },
+  { label: "FAQ", href: "#faq" },
+];
+
 const shellClass = "mx-auto w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
 const headingClass =
   "font-['Plus_Jakarta_Sans',sans-serif] font-extrabold tracking-normal text-[#0C3954]";
 const sectionHeadingClass = `${headingClass} m-0 text-[40px] leading-tight max-md:text-[32px] max-sm:text-[28px]`;
 const bodyClass = "font-['Inter',sans-serif] text-[#333333]";
 const primaryButtonClass =
-  "inline-flex min-h-9 items-center justify-center rounded-md bg-[#0C3954] px-5 text-[12px] font-bold text-[#F8F9FA] no-underline shadow-[0_10px_22px_rgba(12,57,84,0.18)] transition hover:-translate-y-0.5 hover:bg-[#124170] hover:text-[#F8F9FA]";
-
-const BentoPlaceholder = ({ className = "" }) => (
-  <div className={`rounded-none bg-[#D9D9D9] ${className}`} aria-hidden="true" />
-);
+  "inline-flex min-h-9 items-center justify-center rounded-md bg-[#0C3954] px-5 text-[12px] font-bold !text-white no-underline shadow-[0_10px_22px_rgba(12,57,84,0.18)] transition hover:-translate-y-0.5 hover:bg-[#124170] hover:!text-white";
 
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.title = "SADAR Finance | Smart Finance Management";
@@ -90,22 +95,68 @@ const OnePage = () => {
 
   return (
     <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#EEF5FF]`}>
-      <header className={`${shellClass} flex h-16 items-center justify-between`}>
-        <Link to="/" aria-label="SADAR Finance" className="inline-flex items-center no-underline">
-          <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
-        </Link>
+      <header className="sticky top-0 z-50 bg-[#EEF5FF]/95 shadow-[0_1px_0_rgba(12,57,84,0.06)] backdrop-blur">
+        <div className={`${shellClass} flex min-h-[78px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
+          <Link to="/" aria-label="SADAR Finance" className="inline-flex shrink-0 items-center no-underline">
+            <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
+          </Link>
 
-        <div className="flex items-center gap-5">
-          <Link to="/login" className="text-[11px] font-semibold text-[#333333] no-underline hover:text-[#0C3954]">
-            Masuk
-          </Link>
-          <Link to="/register" className={primaryButtonClass}>
-            Mulai Sekarang
-          </Link>
+          <nav className="hidden items-center justify-center gap-8 lg:flex" aria-label="Menu landing page">
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="group relative py-2 text-[12px] font-semibold !text-[#1E9BE0] no-underline transition hover:!text-[#0C3954]"
+              >
+                {item.label}
+                <span className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-[#64AB88] transition duration-300 group-hover:scale-x-100" />
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex shrink-0 items-center gap-5">
+            <Link to="/login" className="text-[12px] font-semibold !text-[#1E9BE0] no-underline hover:!text-[#0C3954]">
+              Masuk
+            </Link>
+            <Link to="/register" className={`${primaryButtonClass} min-w-[168px] max-sm:hidden`}>
+              Mulai Sekarang
+            </Link>
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border-0 bg-[#0C3954] text-[#F8F9FA] lg:hidden"
+              aria-label="Buka menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <i className={`${isMobileMenuOpen ? "ri-close-line" : "ri-menu-line"} text-xl`} aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
+
+        {isMobileMenuOpen && (
+          <nav className={`${shellClass} grid gap-1 pb-4 lg:hidden`} aria-label="Menu landing page mobile">
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#1E9BE0] no-underline hover:bg-white hover:!text-[#0C3954]"
+              >
+                {item.label}
+              </a>
+            ))}
+            <Link
+              to="/register"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`${primaryButtonClass} mt-2 w-full sm:hidden`}
+            >
+              Mulai Sekarang
+            </Link>
+          </nav>
+        )}
       </header>
 
-      <section className="relative overflow-hidden pb-[170px] pt-[84px] max-lg:pb-[148px] max-md:pt-12">
+      <section id="home" className="relative overflow-hidden pb-[170px] pt-[84px] max-lg:pb-[148px] max-md:pt-12">
         <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
           <div className="pt-10 max-lg:pt-0">
             <h1 className={`${headingClass} m-0 text-[46px] leading-[1.05] max-sm:text-[36px]`}>
@@ -270,42 +321,38 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section className="py-20 max-md:py-14" aria-label="Preview fitur SADAR">
-        <div className={`${shellClass} max-w-[940px]`}>
-          <div className="grid h-[520px] grid-cols-12 grid-rows-3 gap-3.5 max-md:h-auto max-md:grid-cols-2 max-md:grid-rows-none">
-            <BentoPlaceholder className="col-span-5 max-md:col-span-1 max-md:h-32" />
-            <BentoPlaceholder className="col-span-5 max-md:col-span-1 max-md:h-32" />
-            <BentoPlaceholder className="col-span-2 row-span-2 max-md:col-span-2 max-md:h-48" />
-            <BentoPlaceholder className="col-span-4 max-md:col-span-1 max-md:h-32" />
-            <BentoPlaceholder className="col-span-6 max-md:col-span-1 max-md:h-32" />
-            <BentoPlaceholder className="col-span-4 max-md:col-span-1 max-md:h-32" />
-            <BentoPlaceholder className="col-span-3 max-md:col-span-1 max-md:h-32" />
-            <BentoPlaceholder className="col-span-5 max-md:col-span-2 max-md:h-32" />
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" className="py-24 max-md:py-16">
-        <div className={`${shellClass} max-w-[780px]`}>
+      <section id="faq" className="py-20 max-md:py-14">
+        <div className={`${shellClass} max-w-[760px]`}>
           <h2 className={`${sectionHeadingClass} text-center`}>
             Masih ada Pertanyaan? Kami Punya Jawabannya
           </h2>
 
-          <div className="mt-16 grid gap-5">
+          <div className="mt-10 grid gap-4">
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
 
               return (
-                <article key={faq.question} className="overflow-hidden rounded-md bg-white">
+                <article
+                  key={faq.question}
+                  className={`overflow-hidden rounded-[14px] bg-white shadow-[0_12px_30px_rgba(12,57,84,0.06)] transition ${
+                    isOpen ? "border border-[#9DCCE6] bg-[#F4FAFF]" : "border border-transparent"
+                  }`}
+                >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                    className="flex min-h-10 w-full items-center justify-between border-0 bg-transparent px-5 text-left text-[12px] font-bold text-[#333333]"
+                    className="flex min-h-[64px] w-full items-center justify-between gap-5 border-0 bg-transparent px-6 py-4 text-left text-[20px] font-extrabold leading-snug text-[#1D2430] max-sm:min-h-[56px] max-sm:px-4 max-sm:text-[15px]"
                   >
                     <span>{faq.question}</span>
-                    <i className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-lg text-[#333333]`} aria-hidden="true"></i>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[#1D2430] shadow-[0_4px_12px_rgba(12,57,84,0.08)]">
+                      <i className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-[20px]`} aria-hidden="true"></i>
+                    </span>
                   </button>
-                  {isOpen && <p className="m-0 px-5 pb-4 text-[11px] leading-5 text-[#808080]">{faq.answer}</p>}
+                  {isOpen && (
+                    <p className="m-0 max-w-[680px] px-6 pb-6 text-[15px] leading-7 text-[#808891] max-sm:px-4 max-sm:text-[13px] max-sm:leading-6">
+                      {faq.answer}
+                    </p>
+                  )}
                 </article>
               );
             })}

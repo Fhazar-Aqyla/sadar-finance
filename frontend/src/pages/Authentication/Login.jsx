@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardBody, Col, Container, Input, Label, Row, Button, Form, FormFeedback, Alert, Spinner } from 'reactstrap';
-import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
+import { Card, Col, Container, Input, Label, Row, Button, Form, FormFeedback, Alert, Spinner } from 'reactstrap';
+import AuthSlider from "../AuthenticationInner/authCarousel";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
@@ -12,9 +12,8 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // actions
-import { loginUser, socialLogin, resetLoginFlag } from "../../slices/thunks";
+import { loginUser, resetLoginFlag } from "../../slices/thunks";
 
-import logoLight from "../../assets/images/logo-light.png";
 import { createSelector } from 'reselect';
 //import images
 
@@ -41,8 +40,9 @@ const Login = (props) => {
 
     useEffect(() => {
         if (user && user) {
-            const updatedUserData = process.env.REACT_APP_DEFAULTAUTH === "firebase" ? user.multiFactor.user.email : user.user.email;
-            const updatedUserPassword = process.env.REACT_APP_DEFAULTAUTH === "firebase" ? "" : user.user.confirm_password;
+            const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
+            const updatedUserData = defaultAuth === "firebase" ? user.multiFactor.user.email : user.user.email;
+            const updatedUserPassword = defaultAuth === "firebase" ? "" : user.user.confirm_password;
             setUserLogin({
                 email: updatedUserData,
                 password: updatedUserPassword
@@ -55,30 +55,17 @@ const Login = (props) => {
         enableReinitialize: true,
 
         initialValues: {
-            email: userLogin.email || "admin@themesbrand.com" || '',
-            password: userLogin.password || "123456" || '',
+            email: userLogin.email || '',
+            password: userLogin.password || '',
         },
         validationSchema: Yup.object({
-            email: Yup.string().required("Please Enter Your Email"),
-            password: Yup.string().required("Please Enter Your Password"),
+            email: Yup.string().email("Format email belum valid").required("Email wajib diisi"),
+            password: Yup.string().required("Password wajib diisi"),
         }),
         onSubmit: (values) => {
             dispatch(loginUser(values, props.router.navigate));
         }
     });
-
-    const signIn = type => {
-        dispatch(socialLogin(type, props.router.navigate));
-    };
-
-    //handleTwitterLoginResponse
-    // const twitterResponse = e => {}
-
-    //for facebook and google authentication
-    const socialResponse = type => {
-        signIn(type);
-    };
-
 
     useEffect(() => {
         if (errorMsg) {
@@ -88,32 +75,24 @@ const Login = (props) => {
         }
     }, [dispatch, errorMsg]);
 
-    document.title = "Basic SignIn | Velzon - React Admin & Dashboard Template";
+    document.title = "Masuk | SADAR Finance";
     return (
         <React.Fragment>
-            <ParticlesAuth>
-                <div className="auth-page-content">
+            <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+                <div className="bg-overlay"></div>
+                <div className="auth-page-content overflow-hidden pt-lg-5">
                     <Container>
                         <Row>
                             <Col lg={12}>
-                                <div className="text-center mt-sm-5 mb-4 text-white-50">
-                                    <div>
-                                        <Link to="/" className="d-inline-block auth-logo">
-                                            <img src={logoLight} alt="" height="20" />
-                                        </Link>
-                                    </div>
-                                    <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
-                                </div>
-                            </Col>
-                        </Row>
+                                <Card className="sadar-auth-card overflow-hidden border-0 m-0">
+                                    <Row className="g-0">
+                                        <AuthSlider />
 
-                        <Row className="justify-content-center">
-                            <Col md={8} lg={6} xl={5}>
-                                <Card className="mt-4">
-                                    <CardBody className="p-4">
-                                        <div className="text-center mt-2">
-                                            <h5 className="text-primary">Welcome Back !</h5>
-                                            <p className="text-muted">Sign in to continue to Velzon.</p>
+                                        <Col lg={6} className="sadar-auth-form-panel">
+                                            <div className="w-100 p-lg-5 p-4">
+                                        <div>
+                                            <h5 className="text-primary">Selamat datang kembali</h5>
+                                            <p className="text-muted">Masuk untuk lanjut memantau kondisi keuanganmu.</p>
                                         </div>
                                         {error && error ? (<Alert color="danger"> {error} </Alert>) : null}
                                         <div className="p-2 mt-4">
@@ -130,7 +109,7 @@ const Login = (props) => {
                                                     <Input
                                                         name="email"
                                                         className="form-control"
-                                                        placeholder="Enter email"
+                                                        placeholder="nama@email.com"
                                                         type="email"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
@@ -155,7 +134,7 @@ const Login = (props) => {
                                                             value={validation.values.password || ""}
                                                             type={passwordShow ? "text" : "password"}
                                                             className="form-control pe-5"
-                                                            placeholder="Enter Password"
+                                                            placeholder="Masukkan password"
                                                             onChange={validation.handleChange}
                                                             onBlur={validation.handleBlur}
                                                             invalid={
@@ -171,59 +150,54 @@ const Login = (props) => {
 
                                                 <div className="form-check">
                                                     <Input className="form-check-input" type="checkbox" value="" id="auth-remember-check" />
-                                                    <Label className="form-check-label" htmlFor="auth-remember-check">Remember me</Label>
+                                                    <Label className="form-check-label" htmlFor="auth-remember-check">Ingat saya</Label>
                                                 </div>
 
                                                 <div className="mt-4">
                                                     <Button color="success" disabled={error ? null : loading ? true : false} className="btn btn-success w-100" type="submit">
                                                         {loading ? <Spinner size="sm" className='me-2'> Loading... </Spinner> : null}
-                                                        Sign In
+                                                        Masuk
                                                     </Button>
                                                 </div>
 
                                                 <div className="mt-4 text-center">
                                                     <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title">Sign In with</h5>
+                                                        <h5 className="fs-13 mb-4 title">Masuk dengan</h5>
                                                     </div>
                                                     <div>
-                                                        <Link
-                                                            to="#"
-                                                            className="btn btn-primary btn-icon me-1"
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                socialResponse("facebook");
-                                                            }}
-                                                            >
-                                                            <i className="ri-facebook-fill fs-16" />
-                                                        </Link>
-                                                        <Link
-                                                            to="#"
-                                                            className="btn btn-danger btn-icon me-1"
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                socialResponse("google");
-                                                            }}
-                                                            >
-                                                            <i className="ri-google-fill fs-16" />
-                                                        </Link>
-                                                        <Button color="dark" className="btn-icon"><i className="ri-github-fill fs-16"></i></Button>{" "}
-                                                        <Button color="info" className="btn-icon"><i className="ri-twitter-fill fs-16"></i></Button>
+                                                        <Button color="primary" className="btn-icon me-1" type="button"><i className="ri-facebook-fill fs-16"></i></Button>
+                                                        <Button color="danger" className="btn-icon me-1" type="button"><i className="ri-google-fill fs-16"></i></Button>
+                                                        <Button color="dark" className="btn-icon me-1" type="button"><i className="ri-github-fill fs-16"></i></Button>
+                                                        <Button color="info" className="btn-icon" type="button"><i className="ri-twitter-fill fs-16"></i></Button>
                                                     </div>
                                                 </div>
                                             </Form>
                                         </div>
-                                    </CardBody>
-                                </Card>
 
-                                <div className="mt-4 text-center">
-                                    <p className="mb-0">Don't have an account ? <Link to="/register" className="fw-semibold text-primary text-decoration-underline"> Signup </Link> </p>
+                                <div className="mt-5 text-center">
+                                    <p className="mb-0">Belum punya akun? <Link to="/register" className="fw-semibold text-primary text-decoration-underline">Daftar sekarang</Link></p>
                                 </div>
 
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </Card>
                             </Col>
                         </Row>
                     </Container>
                 </div>
-            </ParticlesAuth>
+                <footer className="footer">
+                    <Container>
+                        <Row>
+                            <Col lg={12}>
+                                <div className="text-center">
+                                    <p className="mb-0">&copy; {new Date().getFullYear()} SADAR Finance. Bantu kamu lebih sadar mengatur uang.</p>
+                                </div>
+                            </Col>
+                        </Row>
+                    </Container>
+                </footer>
+            </div>
         </React.Fragment>
     );
 };
