@@ -31,16 +31,4 @@ export default defineConfig({
       'react-flatpickr-original': path.resolve(__dirname, 'node_modules/react-flatpickr/build/index.js'),
     },
   },
-  esbuild: {
-    loader: 'jsx',
-    include: /src[\\/].*\.[jt]sx?$/,
-    exclude: [],
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      loader: {
-        '.js': 'jsx',
-      },
-    },
-  },
 })

@@ -1,71 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
 
 const features = [
   {
-    title: "Smart Transaction Input",
-    description:
-      "Scan struk atau input manual, semua langsung tercatat tanpa ribet.",
+    title: "Input Transaksi Cerdas",
+    description: "Catat pemasukan dan pengeluaran harian dengan cepat, rapi, dan mudah ditinjau ulang.",
   },
   {
-    title: "Behavior Insight",
-    description:
-      "Pantau pengeluaranmu lewat grafik dan ringkasan yang mudah dipahami.",
+    title: "Wawasan Pengeluaran Otomatis",
+    description: "SADAR membaca pola transaksi lalu menampilkan rangkuman yang membantu kamu mengambil keputusan.",
   },
   {
-    title: "Auto Insight Dashboard",
-    description:
-      "Temukan pola pengeluaran dan kebiasaan yang sering tidak kamu sadari.",
+    title: "Penjaga Anggaran",
+    description: "Tetapkan batas anggaran dan dapatkan sinyal lebih awal saat pengeluaran mulai mendekati batas.",
   },
   {
-    title: "Smart Alert & Score",
-    description:
-      "Dapatkan alert finansial dan peringatan saat pengeluaran mulai berlebihan.",
-  },
-];
-
-const steps = [
-  {
-    title: "Catat Transaksi dengan Mudah Tanpa Ribet",
-    description:
-      "Catat setiap pemasukan dan pengeluaran dengan cepat melalui input manual atau scan struk.",
-  },
-  {
-    title: "Pantau, Analisis, dan Pahami Keuanganmu",
-    description:
-      "Lihat ringkasan keuanganmu secara real-time yang membantu kamu memahami pola pengeluaran dan kebiasaan finansialmu.",
-  },
-  {
-    title: "Kontrol Pengeluaran dan Kondisi Finansial",
-    description:
-      "Gunakan insight untuk mengatur budget untuk menghindari overspending dan membangun kondisi keuangan yang lebih sehat.",
-  },
-];
-
-const faqs = [
-  {
-    question: "Catat transaksi dengan mudah tanpa ribet",
-    answer:
-      "Kamu bisa mencatat pemasukan dan pengeluaran secara manual, lalu memantau ringkasannya dari dashboard.",
-  },
-  {
-    question: "Apakah SADAR bisa membaca struk?",
-    answer:
-      "Ya, SADAR menyiapkan flow upload struk dan OCR sebagai dasar pencatatan otomatis.",
-  },
-  {
-    question: "Bagaimana SADAR membantu mengontrol pengeluaran?",
-    answer:
-      "SADAR menampilkan insight, alert, dan health score agar pola pengeluaran lebih mudah dievaluasi.",
-  },
-  {
-    question: "Apakah SADAR cocok untuk keuangan pribadi?",
-    answer:
-      "Cocok. Fitur akun, pemasukan, transaksi, budget, dan insight dibuat untuk pemantauan finansial harian.",
+    title: "Skor Kesehatan Keuangan",
+    description: "Lihat gambaran kesehatan finansial dari arus kas, kebiasaan belanja, dan progres tabungan.",
   },
 ];
 
@@ -74,23 +28,48 @@ const navItems = [
   { label: "Fitur", href: "#features" },
   { label: "Manfaat", href: "#benefits" },
   { label: "Cara Kerja", href: "#how-it-works" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Tanya Jawab", href: "#faq" },
+];
+
+const faqs = [
+  {
+    question: "Apa itu SADAR Finance?",
+    answer: "SADAR Finance adalah aplikasi manajemen keuangan personal untuk mencatat transaksi, membaca pola pengeluaran, dan memberi wawasan agar kamu lebih sadar saat mengatur uang.",
+  },
+  {
+    question: "Apakah SADAR bisa mengelompokkan transaksi otomatis?",
+    answer: "Bisa. Data transaksi dapat dibantu kecerdasan buatan untuk masuk ke kategori seperti makan, transportasi, belanja, tagihan, dan tabungan.",
+  },
+  {
+    question: "Apakah cocok untuk mahasiswa dan pekerja?",
+    answer: "Cocok. SADAR dirancang untuk kebutuhan harian, mulai dari memantau uang saku, gaji bulanan, anggaran kategori, sampai progres tabungan.",
+  },
+  {
+    question: "Apakah saya bisa mengatur batas anggaran?",
+    answer: "Bisa. Kamu dapat menentukan batas untuk kategori tertentu agar pengeluaran lebih mudah dipantau setiap bulan.",
+  },
+  {
+    question: "Apakah data keuangan saya aman?",
+    answer: "Data keuangan dibuat untuk dikelola secara pribadi dan hanya digunakan untuk membantu pencatatan, ringkasan, dan analisis di akunmu.",
+  },
 ];
 
 const shellClass = "mx-auto w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
 const headingClass =
   "font-['Plus_Jakarta_Sans',sans-serif] font-extrabold tracking-normal text-[#0C3954]";
-const sectionHeadingClass = `${headingClass} m-0 text-[40px] leading-tight max-md:text-[32px] max-sm:text-[28px]`;
+const sectionHeadingClass = `${headingClass} m-0 text-[40px] leading-[1.18] max-md:text-[32px] max-sm:text-[28px]`;
 const bodyClass = "font-['Inter',sans-serif] text-[#333333]";
 const primaryButtonClass =
-  "inline-flex min-h-9 items-center justify-center rounded-md bg-[#0C3954] px-5 text-[12px] font-bold !text-white no-underline shadow-[0_10px_22px_rgba(12,57,84,0.18)] transition hover:-translate-y-0.5 hover:bg-[#124170] hover:!text-white";
+  "inline-flex min-h-8 items-center justify-center rounded-md bg-[#0C3954] px-4 text-[11px] font-bold !text-white no-underline shadow-[0_10px_22px_rgba(12,57,84,0.18)] transition hover:-translate-y-0.5 hover:bg-[#124170] hover:!text-white";
+const sectionBadgeClass =
+  "mb-5 inline-flex min-h-7 items-center justify-center rounded-full border border-[#DDE6EF] bg-white px-6 text-[12px] font-bold text-[#0C3954] shadow-[0_4px_14px_rgba(12,57,84,0.05)]";
 
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "SADAR Finance | Smart Finance Management";
+    document.title = "SADAR Finance | Manajemen Keuangan Cerdas";
   }, []);
 
   return (
@@ -114,11 +93,11 @@ const OnePage = () => {
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-5">
+          <div className="flex shrink-0 items-center gap-3">
             <Link to="/login" className="text-[12px] font-semibold !text-[#1E9BE0] no-underline hover:!text-[#0C3954]">
               Masuk
             </Link>
-            <Link to="/register" className={`${primaryButtonClass} min-w-[168px] max-sm:hidden`}>
+            <Link to="/register" className={`${primaryButtonClass} min-w-[118px] max-sm:hidden`}>
               Mulai Sekarang
             </Link>
             <button
@@ -159,13 +138,13 @@ const OnePage = () => {
       <section id="home" className="relative overflow-hidden pb-[170px] pt-[84px] max-lg:pb-[148px] max-md:pt-12">
         <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
           <div className="pt-10 max-lg:pt-0">
-            <h1 className={`${headingClass} m-0 text-[46px] leading-[1.05] max-sm:text-[36px]`}>
-              Track Your Money
-              <span className="block text-[#64AB88]">Build Your Future</span>
+            <h1 className={`${headingClass} m-0 text-[46px] leading-[1.12] max-sm:text-[36px]`}>
+              Pantau Uangmu
+              <span className="block text-[#64AB88]">Bangun Masa Depanmu</span>
             </h1>
-            <p className="mb-7 mt-8 max-w-[505px] text-[13px] leading-6 text-[#333333]">
-              Pantau, analisis, dan pahami pengeluaranmu dengan AI agar kamu bisa
-              menghindari overspending dan lebih mengontrol keuangan.
+            <p className="mb-6 mt-4 max-w-[505px] text-[13px] leading-6 text-[#333333]">
+              Pantau, analisis, dan pahami pengeluaranmu dengan bantuan cerdas agar kamu bisa
+              menghindari pengeluaran berlebihan dan lebih mengontrol keuangan.
             </p>
             <div className="flex items-center gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
               <Link to="/register" className={primaryButtonClass}>
@@ -174,12 +153,12 @@ const OnePage = () => {
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex min-h-9 items-center gap-2 text-[12px] font-semibold text-[#0C3954] no-underline"
+                className="inline-flex min-h-8 items-center gap-2 text-[11px] font-semibold text-[#0C3954] no-underline"
               >
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#0C3954]">
                   <i className="ri-play-fill text-[10px]" aria-hidden="true"></i>
                 </span>
-                Lihat Demo
+                Lihat Cara Kerja
               </a>
             </div>
           </div>
@@ -213,16 +192,17 @@ const OnePage = () => {
       <section id="features" className="relative z-10 py-24 max-md:py-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[680px] text-center">
+            <span className={sectionBadgeClass}>Fitur SADAR</span>
             <h2 className={sectionHeadingClass}>
               Lebih dari Sekadar <span className="text-[#64AB88]">Mencatat Keuangan</span>
             </h2>
-            <p className="mx-auto mt-3 max-w-[440px] text-[12px] leading-6 text-[#333333]">
+            <p className="mx-auto mt-4 max-w-[440px] text-[13px] leading-6 text-[#333333]">
               Semua dirancang untuk membantumu lebih sadar, lebih terkontrol,
               dan lebih bijak dalam mengelola uangmu secara lebih efektif.
             </p>
           </div>
 
-          <div className="mx-auto mt-[58px] grid max-w-[940px] grid-cols-2 gap-8 max-md:grid-cols-1">
+          <div className="mx-auto mt-[58px] grid max-w-[940px] grid-cols-2 gap-7 max-md:grid-cols-1">
             {features.map((feature) => (
               <article
                 key={feature.title}
@@ -243,11 +223,12 @@ const OnePage = () => {
       <section id="benefits" className="pb-24 pt-8 max-md:pb-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[760px] text-center">
+            <span className={sectionBadgeClass}>Manfaat</span>
             <h2 className={sectionHeadingClass}>
               Dengan <span className="text-[#64AB88]">SADAR</span>, Kamu Bisa
             </h2>
-            <p className="mx-auto mt-5 max-w-[650px] text-[16px] leading-8 text-[#333333]">
-              Dari pencatatan transaksi hingga insight otomatis, semua dirancang
+            <p className="mx-auto mt-4 max-w-[600px] text-[14px] leading-7 text-[#333333]">
+              Dari pencatatan transaksi hingga wawasan otomatis, semua dirancang
               untuk membantu kamu memahami dan mengontrol keuanganmu dengan lebih baik.
             </p>
           </div>
@@ -259,7 +240,7 @@ const OnePage = () => {
                 <span className="block">Jadi Lebih Cerdas</span>
               </h3>
               <p className="ml-auto mt-5 max-w-[230px] text-[13px] leading-7 text-[#333333] max-lg:mx-auto">
-                Insight otomatis membantu kamu memahami kebiasaanmu.
+                Wawasan otomatis membantu kamu memahami kebiasaanmu.
               </p>
             </div>
 
@@ -296,60 +277,102 @@ const OnePage = () => {
 
       <section id="how-it-works" className="py-24 max-md:py-16">
         <div className={shellClass}>
-          <div className="mx-auto max-w-[420px] text-center">
-            <h2 className={`${sectionHeadingClass} leading-[1.45]`}>
-              Cara Mudah
-              <span className="block">Mengelola Keuanganmu</span>
+          <div className="mx-auto max-w-[640px] text-center">
+            <span className={sectionBadgeClass}>Cara Kerja</span>
+            <h2 className={sectionHeadingClass}>
+              Cara SADAR Membantu
+              <span className="block text-[#64AB88]">Keuanganmu Tetap Terkontrol</span>
             </h2>
+            <p className="mx-auto mt-4 max-w-[500px] text-[13px] leading-6 text-[#6B7280]">
+              Alurnya dibuat sederhana: kamu mencatat, SADAR merapikan data, lalu wawasan dan peringatan muncul saat kamu perlu ambil keputusan.
+            </p>
           </div>
 
-          <div className="mt-24 grid grid-cols-3 gap-12 max-md:mt-14 max-md:grid-cols-1">
-            {steps.map((step, index) => (
-              <article key={step.title} className="text-center">
-                <div className="mx-auto mb-8 flex h-[58px] w-[58px] items-center justify-center rounded-md bg-[#0C3954] font-['Plus_Jakarta_Sans',sans-serif] text-[28px] font-extrabold text-[#F8F9FA]">
-                  {index + 1}
-                </div>
-                <h3 className={`${headingClass} mx-auto max-w-[260px] text-[15px] leading-6 text-[#333333]`}>
-                  {step.title}
-                </h3>
-                <p className="mx-auto mt-5 max-w-[270px] text-[11px] leading-5 text-[#333333]">
-                  {step.description}
+          <div className="mt-10 grid auto-rows-[minmax(178px,auto)] grid-cols-3 gap-4 max-lg:auto-rows-auto max-lg:grid-cols-2 max-sm:grid-cols-1">
+            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 01</span>
+                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Catat transaksi harian</h3>
+                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
+                  Masukkan pemasukan dan pengeluaran tanpa format rumit. SADAR menangkap nominal, catatan, dan waktunya.
                 </p>
-              </article>
-            ))}
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 02</span>
+                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Data dirapikan otomatis</h3>
+                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
+                  Transaksi dipetakan ke kategori yang tepat, lalu saldo dan histori bulanan ikut diperbarui.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 03</span>
+                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Anggaran dijaga langsung</h3>
+                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
+                  Batas tiap kategori dipantau, jadi kamu tahu kapan harus mulai mengurangi pengeluaran.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative col-span-2 overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)] max-sm:col-span-1">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 04</span>
+                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Pola keuangan mulai kebaca</h3>
+                <p className="mt-2 max-w-[430px] text-[12px] leading-5 text-[#7A8795]">
+                  Tampilan dasbor membantu kamu melihat arus kas, lonjakan pengeluaran, dan progres tabungan dalam satu pandangan.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 05</span>
+                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Wawasan jadi aksi</h3>
+                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
+                  SADAR memberi ringkasan kondisi, peringatan, dan rekomendasi kecil untuk keputusan berikutnya.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
       <section id="faq" className="py-20 max-md:py-14">
-        <div className={`${shellClass} max-w-[760px]`}>
-          <h2 className={`${sectionHeadingClass} text-center`}>
-            Masih ada Pertanyaan? Kami Punya Jawabannya
-          </h2>
+        <div className={`${shellClass} max-w-[860px]`}>
+          <div className="mx-auto max-w-[640px] text-center">
+            <span className={sectionBadgeClass}>Tanya Jawab</span>
+            <h2 className={`${sectionHeadingClass} text-center`}>
+              Masih ada Pertanyaan? Kami Punya Jawabannya
+            </h2>
+          </div>
 
-          <div className="mt-10 grid gap-4">
+          <div className="mt-9 grid gap-3">
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
 
               return (
                 <article
                   key={faq.question}
-                  className={`overflow-hidden rounded-[14px] bg-white shadow-[0_12px_30px_rgba(12,57,84,0.06)] transition ${
-                    isOpen ? "border border-[#9DCCE6] bg-[#F4FAFF]" : "border border-transparent"
+                  className={`overflow-hidden rounded-[12px] bg-white shadow-[0_8px_22px_rgba(12,57,84,0.045)] transition ${
+                    isOpen ? "border border-[#9DCCE6] bg-[#F4FAFF]" : "border border-[#E4ECF3]"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                    className="flex min-h-[64px] w-full items-center justify-between gap-5 border-0 bg-transparent px-6 py-4 text-left text-[20px] font-extrabold leading-snug text-[#1D2430] max-sm:min-h-[56px] max-sm:px-4 max-sm:text-[15px]"
+                    className="flex min-h-[56px] w-full items-center justify-between gap-4 border-0 bg-transparent px-5 py-3 text-left text-[16px] font-extrabold leading-snug text-[#1D2430] max-sm:min-h-[52px] max-sm:px-4 max-sm:text-[14px]"
                   >
                     <span>{faq.question}</span>
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[#1D2430] shadow-[0_4px_12px_rgba(12,57,84,0.08)]">
-                      <i className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-[20px]`} aria-hidden="true"></i>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[#1D2430] shadow-[0_4px_10px_rgba(12,57,84,0.06)]">
+                      <i className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-[18px]`} aria-hidden="true"></i>
                     </span>
                   </button>
                   {isOpen && (
-                    <p className="m-0 max-w-[680px] px-6 pb-6 text-[15px] leading-7 text-[#808891] max-sm:px-4 max-sm:text-[13px] max-sm:leading-6">
+                    <p className="m-0 max-w-[720px] px-5 pb-5 text-[13px] leading-6 text-[#667085] max-sm:px-4 max-sm:text-[12px] max-sm:leading-6">
                       {faq.answer}
                     </p>
                   )}
