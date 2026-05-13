@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import AnimatedTextCycle from "@/Components/ui/animated-text-cycle";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
@@ -140,7 +141,14 @@ const OnePage = () => {
           <div className="pt-14 max-xl:pt-10 max-lg:pt-0">
             <h1 className={`${headingClass} m-0 text-[56px] leading-[1.12] max-xl:text-[50px] max-sm:text-[36px]`}>
               Pantau Uangmu
-              <span className="block text-[#64AB88]">Bangun Masa Depanmu</span>
+              <span className="block text-[#64AB88]">
+                Bangun{" "}
+                <AnimatedTextCycle
+                  words={["Masa Depanmu", "Keuanganmu", "Tabunganmu", "Impianmu"]}
+                  interval={3000}
+                  className="text-[#64AB88]"
+                />
+              </span>
             </h1>
             <p className="mb-7 mt-5 max-w-[560px] text-[16px] leading-8 text-[#333333] max-xl:text-[14px] max-xl:leading-7">
               Pantau, analisis, dan pahami pengeluaranmu dengan bantuan cerdas agar kamu bisa
@@ -258,7 +266,7 @@ const OnePage = () => {
               <img
                 src={boyLaptop}
                 alt="Pengguna SADAR memakai laptop"
-                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-lg:h-[568px] max-lg:origin-bottom max-lg:scale-x-[1.08] max-md:h-[390px]"
+                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-lg:h-[568px] max-lg:origin-bottom max-lg:scale-x-[4.50] max-md:h-[390px]"
               />
             </div>
 

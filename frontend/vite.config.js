@@ -26,6 +26,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, 'src'),
       'react-countup': path.resolve(__dirname, 'src/Components/Common/CountUp.jsx'),
       'react-flatpickr': path.resolve(__dirname, 'src/Components/Common/Flatpickr.jsx'),
       'react-flatpickr-original': path.resolve(__dirname, 'node_modules/react-flatpickr/build/index.js'),
