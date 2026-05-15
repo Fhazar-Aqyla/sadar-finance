@@ -4,15 +4,15 @@ import { Col } from "reactstrap";
 
 const financeQuotes = [
   {
-    quote: "Do not save what is left after spending, but spend what is left after saving.",
+    quote: "Jangan menabung dari sisa pengeluaran, tetapi keluarkan dari sisa setelah menabung.",
     author: "Warren Buffett",
   },
   {
-    quote: "A budget is telling your money where to go instead of wondering where it went.",
+    quote: "Anggaran adalah cara memberi arah pada uang, bukan menebak ke mana uang pergi.",
     author: "Dave Ramsey",
   },
   {
-    quote: "An investment in knowledge pays the best interest.",
+    quote: "Investasi pada pengetahuan selalu memberi imbal hasil terbaik.",
     author: "Benjamin Franklin",
   },
 ];
@@ -41,7 +41,7 @@ export function AuthPage() {
         <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#082D43] via-[#082D43]/78 to-transparent" />
 
         <div className="relative z-10 flex w-full flex-col">
-          <div className="mt-auto max-w-[560px] pb-12 max-lg:pb-2">
+          <div className="max-w-[560px] pt-12 max-lg:pt-4">
             <AnimatePresence mode="wait" initial={false}>
               <motion.blockquote
                 key={activeQuote.author}
@@ -76,6 +76,7 @@ function FloatingPaths({ position }: { position: number }) {
     } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
       684 - i * 5 * position
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
     width: 0.5 + i * 0.03,
   }));
 
@@ -85,7 +86,6 @@ function FloatingPaths({ position }: { position: number }) {
         className="h-full w-full text-[#D7F4E7]"
         viewBox="0 0 696 316"
         fill="none"
-        preserveAspectRatio="xMidYMid slice"
       >
         <title>Background Paths</title>
         {paths.map((path) => (
@@ -94,15 +94,15 @@ function FloatingPaths({ position }: { position: number }) {
             d={path.d}
             stroke="currentColor"
             strokeWidth={path.width}
-            strokeOpacity={0.045 + path.id * 0.008}
-            initial={{ pathLength: 0.3, opacity: 0.5 }}
+            strokeOpacity={0.1 + path.id * 0.03}
+            initial={{ pathLength: 0.3, opacity: 0.6 }}
             animate={{
               pathLength: 1,
-              opacity: [0.16, 0.46, 0.16],
+              opacity: [0.3, 0.6, 0.3],
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 20 + path.id * 0.22,
+              duration: 20 + Math.random() * 10,
               repeat: Number.POSITIVE_INFINITY,
               ease: "linear",
             }}
