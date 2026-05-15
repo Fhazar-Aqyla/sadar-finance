@@ -16,6 +16,7 @@ import { loginUser, resetLoginFlag } from "../../slices/thunks";
 
 import { createSelector } from 'reselect';
 //import images
+import sadarLogo from "../../assets/images/landing/sadar-logo.png";
 
 const Login = (props) => {
     const dispatch = useDispatch();
@@ -89,6 +90,9 @@ const Login = (props) => {
                                         <AuthSlider />
 
                                         <Col lg={6} className="sadar-auth-form-panel">
+                                            <Link to="/" aria-label="SADAR Finance" className="sadar-auth-panel-logo">
+                                                <img src={sadarLogo} alt="SADAR Finance" />
+                                            </Link>
                                             <div className="w-100 p-lg-5 p-4">
                                         <div>
                                             <h5 className="text-primary">Selamat datang kembali</h5>
@@ -124,9 +128,6 @@ const Login = (props) => {
                                                 </div>
 
                                                 <div className="mb-3">
-                                                    <div className="float-end">
-                                                        <Link to="/forgot-password" className="text-muted">Forgot password?</Link>
-                                                    </div>
                                                     <Label className="form-label" htmlFor="password-input">Password</Label>
                                                     <div className="position-relative auth-pass-inputgroup mb-3">
                                                         <Input
@@ -148,9 +149,12 @@ const Login = (props) => {
                                                     </div>
                                                 </div>
 
-                                                <div className="form-check">
-                                                    <Input className="form-check-input" type="checkbox" value="" id="auth-remember-check" />
-                                                    <Label className="form-check-label" htmlFor="auth-remember-check">Ingat saya</Label>
+                                                <div className="d-flex align-items-center justify-content-between gap-3">
+                                                    <div className="form-check mb-0">
+                                                        <Input className="form-check-input" type="checkbox" value="" id="auth-remember-check" />
+                                                        <Label className="form-check-label" htmlFor="auth-remember-check">Ingat saya</Label>
+                                                    </div>
+                                                    <Link to="/forgot-password" className="text-muted">Forgot password?</Link>
                                                 </div>
 
                                                 <div className="mt-4">

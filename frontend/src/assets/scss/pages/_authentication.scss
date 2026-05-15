@@ -100,6 +100,8 @@
 
 .sadar-auth-cover {
     background: linear-gradient(120deg, #0bb9a8 0%, #2c9be0 100%);
+    overflow: hidden;
+    padding: 0 !important;
 
     > .bg-overlay {
         background-image:
@@ -111,26 +113,63 @@
         opacity: 0.65;
     }
 
+    .auth-page-content {
+        height: 100vh;
+        padding: 0 !important;
+    }
+
+    .container {
+        max-width: 100%;
+        height: 100%;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .container > .row,
+    .container > .row > [class*="col-"] {
+        height: 100%;
+    }
+
     .card {
-        border-radius: 8px;
+        border-radius: 0;
         box-shadow: 0 22px 60px rgba(12, 57, 84, 0.18);
     }
 
     .sadar-auth-card {
-        height: 720px;
+        height: 100vh;
+        min-height: 100vh;
 
         > .row {
             height: 100%;
         }
     }
 
+    @media (min-width: 992px) {
+        .sadar-auth-card {
+            > .row {
+                flex-direction: row-reverse;
+            }
+        }
+
+        .sadar-auth-form-panel {
+            flex: 0 0 40%;
+            max-width: 40%;
+        }
+
+        .sadar-auth-visual-panel {
+            flex: 0 0 60%;
+            max-width: 60%;
+        }
+    }
+
     .sadar-auth-form-panel {
         display: flex;
         align-items: center;
+        position: relative;
         min-height: 0;
 
         > div {
-            max-width: 480px;
+            max-width: 560px;
             margin: 0 auto;
         }
 
@@ -164,23 +203,36 @@
         }
     }
 
+    .sadar-auth-panel-logo {
+        position: absolute;
+        top: 46px;
+        left: 46px;
+        display: inline-flex;
+        padding: 0;
+
+        img {
+            height: 34px;
+            width: auto;
+        }
+    }
+
     .text-primary,
     a.text-primary {
         color: #0c3954 !important;
     }
 
     .btn-success {
-        --#{$prefix}btn-bg: #0bb9a8;
-        --#{$prefix}btn-border-color: #0bb9a8;
-        --#{$prefix}btn-hover-bg: #0c3954;
-        --#{$prefix}btn-hover-border-color: #0c3954;
+        --#{$prefix}btn-bg: #0c3954;
+        --#{$prefix}btn-border-color: #0c3954;
+        --#{$prefix}btn-hover-bg: #124170;
+        --#{$prefix}btn-hover-border-color: #124170;
         --#{$prefix}btn-active-bg: #0c3954;
         --#{$prefix}btn-active-border-color: #0c3954;
     }
 
     .sadar-auth-slider {
-        height: 720px;
-        min-height: 720px;
+        height: 100vh;
+        min-height: 100vh;
         background-image: url("../../images/bg-auth.jpg");
         background-position: center;
         background-size: cover;
@@ -207,12 +259,28 @@
     }
 
     @media (max-width: 991.98px) {
+        overflow: auto;
+
+        .auth-page-content,
+        .container,
+        .container > .row,
+        .container > .row > [class*="col-"] {
+            height: auto;
+            min-height: 100vh;
+        }
+
         .sadar-auth-card {
             height: auto;
+            min-height: 100vh;
         }
 
         .sadar-auth-form-panel {
             display: block;
+        }
+
+        .sadar-auth-panel-logo {
+            position: static;
+            margin: 1.5rem 1.5rem 0;
         }
 
         .sadar-auth-slider {

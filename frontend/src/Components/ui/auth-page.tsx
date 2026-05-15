@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Col } from "reactstrap";
-
-import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 
 const financeQuotes = [
   {
@@ -34,7 +31,7 @@ export function AuthPage() {
   const activeQuote = financeQuotes[quoteIndex];
 
   return (
-    <Col lg={6}>
+    <Col lg={6} className="sadar-auth-visual-panel">
       <div className="relative flex h-full min-h-[720px] overflow-hidden bg-[#0C3954] p-10 text-white max-lg:min-h-[320px] max-lg:p-6">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(100,171,136,0.20),transparent_20rem),radial-gradient(circle_at_76%_18%,rgba(44,155,224,0.18),transparent_18rem),linear-gradient(180deg,#124170_0%,#0C3954_46%,#082D43_100%)]" />
         <div className="absolute inset-0 opacity-65">
@@ -44,16 +41,6 @@ export function AuthPage() {
         <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#082D43] via-[#082D43]/78 to-transparent" />
 
         <div className="relative z-10 flex w-full flex-col">
-          <div className="flex items-center">
-            <Link
-              to="/"
-              aria-label="SADAR Finance"
-              className="inline-flex rounded-lg bg-white px-4 py-3 shadow-[0_12px_26px_rgba(4,28,42,0.18)]"
-            >
-              <img src={sadarLogo} alt="SADAR Finance" className="h-[25px] w-auto" />
-            </Link>
-          </div>
-
           <div className="mt-auto max-w-[560px] pb-12 max-lg:pb-2">
             <AnimatePresence mode="wait" initial={false}>
               <motion.blockquote

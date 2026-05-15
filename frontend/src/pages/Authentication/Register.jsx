@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 //import images 
 import AuthSlider from "../AuthenticationInner/authCarousel";
+import sadarLogo from "../../assets/images/landing/sadar-logo.png";
 import { createSelector } from "reselect";
 
 const Register = () => {
@@ -90,6 +91,9 @@ const Register = () => {
                                         <AuthSlider />
 
                                         <Col lg={6} className="sadar-auth-form-panel">
+                                            <Link to="/" aria-label="SADAR Finance" className="sadar-auth-panel-logo">
+                                                <img src={sadarLogo} alt="SADAR Finance" />
+                                            </Link>
                                             <div className="w-100 p-lg-5 p-4">
                                         <div>
                                             <h5 className="text-primary">Buat akun SADAR</h5>
