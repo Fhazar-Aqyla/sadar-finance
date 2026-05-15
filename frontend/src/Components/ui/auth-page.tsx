@@ -17,6 +17,9 @@ const financeQuotes = [
   },
 ];
 
+const pathAnimationStartedAt = Date.now();
+const getPathDuration = (index: number) => 20 + ((index * 7) % 10);
+
 export function AuthPage() {
   const [quoteIndex, setQuoteIndex] = useState(0);
 
@@ -41,7 +44,7 @@ export function AuthPage() {
         <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#082D43] via-[#082D43]/78 to-transparent" />
 
         <div className="relative z-10 flex w-full flex-col">
-          <div className="max-w-[560px] pt-12 max-lg:pt-4">
+          <div className="max-w-[680px] pt-12 max-lg:max-w-[560px] max-lg:pt-4">
             <AnimatePresence mode="wait" initial={false}>
               <motion.blockquote
                 key={activeQuote.author}
@@ -51,10 +54,10 @@ export function AuthPage() {
                 exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
                 transition={{ duration: 0.42, ease: "easeOut" }}
               >
-                <p className="m-0 text-[19px] font-medium leading-[1.55] tracking-normal text-white/92 max-xl:text-[18px] max-lg:text-[16px]">
+                <p className="m-0 text-[24px] font-semibold leading-[1.45] tracking-normal text-white/92 max-xl:text-[22px] max-lg:text-[18px]">
                   &ldquo;{activeQuote.quote}&rdquo;
                 </p>
-                <footer className="mt-4 font-mono text-[13px] font-bold text-white/86">
+                <footer className="mt-5 font-mono text-[15px] font-bold text-white/86 max-lg:text-[13px]">
                   ~ {activeQuote.author}
                 </footer>
               </motion.blockquote>
@@ -67,6 +70,7 @@ export function AuthPage() {
 }
 
 function FloatingPaths({ position }: { position: number }) {
+  const elapsedSeconds = (Date.now() - pathAnimationStartedAt) / 1000;
   const paths = Array.from({ length: 36 }, (_, i) => ({
     id: i,
     d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
@@ -77,6 +81,7 @@ function FloatingPaths({ position }: { position: number }) {
       684 - i * 5 * position
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
     color: `rgba(15,23,42,${0.1 + i * 0.03})`,
+    duration: getPathDuration(i),
     width: 0.5 + i * 0.03,
   }));
 
@@ -95,14 +100,15 @@ function FloatingPaths({ position }: { position: number }) {
             stroke="currentColor"
             strokeWidth={path.width}
             strokeOpacity={0.1 + path.id * 0.03}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
+            initial={false}
             animate={{
               pathLength: 1,
               opacity: [0.3, 0.6, 0.3],
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 20 + Math.random() * 10,
+              duration: path.duration,
+              delay: -(elapsedSeconds % path.duration),
               repeat: Number.POSITIVE_INFINITY,
               ease: "linear",
             }}
@@ -112,3 +118,4 @@ function FloatingPaths({ position }: { position: number }) {
     </div>
   );
 }
+

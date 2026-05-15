@@ -46,6 +46,10 @@ const primaryButtonClass =
   "inline-flex min-h-8 items-center justify-center rounded-md bg-[#0C3954] px-4 text-[11px] font-bold !text-white no-underline shadow-[0_10px_22px_rgba(12,57,84,0.18)] transition hover:-translate-y-0.5 hover:bg-[#124170] hover:!text-white";
 const sectionBadgeClass =
   "mb-5 inline-flex min-h-7 items-center justify-center rounded-full border border-[#DDE6EF] bg-white px-6 text-[12px] font-bold text-[#0C3954] shadow-[0_4px_14px_rgba(12,57,84,0.05)]";
+const cardClass =
+  "rounded-[28px] border border-[#DDE8F2] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.09)]";
+const compactCardClass =
+  "relative overflow-hidden rounded-[14px] border border-[#DDE8F2] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.08)]";
 
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
@@ -56,8 +60,8 @@ const OnePage = () => {
   }, []);
 
   return (
-    <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#EEF5FF]`}>
-      <header className="sticky top-0 z-50 bg-[#EEF5FF]/95 shadow-[0_1px_0_rgba(12,57,84,0.06)] backdrop-blur">
+    <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#F8FBFF]`}>
+      <header className="sticky top-0 z-50 bg-white/95 shadow-[0_1px_0_rgba(12,57,84,0.06)] backdrop-blur">
         <div className={`${shellClass} flex min-h-[86px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
           <Link to="/" aria-label="SADAR Finance" className="inline-flex shrink-0 items-center no-underline">
             <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
@@ -102,7 +106,7 @@ const OnePage = () => {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#0C3954] no-underline hover:bg-white hover:!text-[#124170]"
+                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#0C3954] no-underline hover:bg-[#F8FBFF] hover:!text-[#124170]"
               >
                 {item.label}
               </a>
@@ -118,7 +122,7 @@ const OnePage = () => {
         )}
       </header>
 
-      <section id="home" className="relative overflow-hidden pb-[190px] pt-[96px] max-lg:pb-[148px] max-md:pt-12">
+      <section id="home" className="relative overflow-hidden bg-white pb-[190px] pt-[96px] max-lg:pb-[148px] max-md:pt-12">
         <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-20 max-xl:gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
           <div className="pt-14 max-xl:pt-10 max-lg:pt-0">
             <h1 className={`${headingClass} m-0 text-[56px] leading-[1.12] max-xl:text-[50px] max-sm:text-[36px]`}>
@@ -165,7 +169,7 @@ const OnePage = () => {
             <path
               d="M0 102C110 76 210 48 318 34C430 19 552 38 670 34C792 30 900 5 1016 6C1144 7 1247 36 1366 18C1396 13 1420 4 1440 -6V260H0V102Z"
               fill="#64AB88"
-              fillOpacity="0.35"
+              fillOpacity="0.16"
             />
             <path
               d="M0 118C104 91 222 55 328 44C454 31 558 52 680 50C800 48 896 22 1010 22C1132 22 1252 54 1368 34C1398 29 1423 19 1440 10V260H0V118Z"
@@ -179,7 +183,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="about" className="relative z-10 py-24 max-md:py-16">
+      <section id="about" className="relative z-10 bg-[#F8FBFF] py-24 max-md:py-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[980px] py-12 text-center max-md:py-8">
             <span className={sectionBadgeClass}>Tentang SADAR</span>
@@ -192,7 +196,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="features" className="relative z-10 py-24 max-md:py-16">
+      <section id="features" className="relative z-10 bg-[#F8FBFF] py-24 max-md:py-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[680px] text-center">
             <span className={sectionBadgeClass}>Fitur SADAR</span>
@@ -207,7 +211,7 @@ const OnePage = () => {
 
           <div className="mx-auto mt-11 grid max-w-[1080px] gap-3">
             <div className="grid grid-cols-[0.82fr_1.28fr] gap-3 max-lg:grid-cols-1">
-              <article className="min-h-[318px] rounded-[28px] border border-[#E5EDF5] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.055)]">
+              <article className={`${cardClass} min-h-[318px]`}>
                 <div className="mb-14 h-[102px] rounded-[22px] border border-dashed border-[#D5E2EF] bg-[#FBFDFF]" />
                 <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Input Transaksi Cerdas</h3>
                 <p className="mt-3 mb-0 max-w-[280px] text-[12px] leading-5 text-[#667585]">
@@ -215,7 +219,7 @@ const OnePage = () => {
                 </p>
               </article>
 
-              <article className="min-h-[318px] rounded-[28px] border border-[#E5EDF5] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.055)]">
+              <article className={`${cardClass} min-h-[318px]`}>
                 <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Wawasan Pengeluaran Otomatis</h3>
                 <p className="mt-3 mb-0 max-w-[300px] text-[12px] leading-5 text-[#667585]">
                   SADAR membaca pola transaksi lalu menampilkan ringkasan yang membantu kamu mengambil keputusan.
@@ -225,7 +229,7 @@ const OnePage = () => {
             </div>
 
             <div className="grid grid-cols-[1.28fr_0.82fr] gap-3 max-lg:grid-cols-1">
-              <article className="min-h-[318px] rounded-[28px] border border-[#E5EDF5] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.055)]">
+              <article className={`${cardClass} min-h-[318px]`}>
                 <div className="mx-auto mb-14 h-[96px] max-w-[560px] rounded-[18px] border border-[#E5EDF5] bg-[#FBFDFF] shadow-[0_12px_28px_rgba(12,57,84,0.04)]" />
                 <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Penjaga Anggaran</h3>
                 <p className="mt-3 mb-0 max-w-[520px] text-[12px] leading-5 text-[#667585]">
@@ -233,7 +237,7 @@ const OnePage = () => {
                 </p>
               </article>
 
-              <article className="min-h-[318px] rounded-[28px] border border-[#E5EDF5] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.055)]">
+              <article className={`${cardClass} min-h-[318px]`}>
                 <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Skor Kesehatan Keuangan</h3>
                 <p className="mt-3 mb-0 max-w-[320px] text-[12px] leading-5 text-[#667585]">
                   Lihat gambaran kondisi finansial dari arus kas, kebiasaan belanja, dan progres tabungan.
@@ -245,7 +249,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="benefits" className="pb-24 pt-8 max-md:pb-16">
+      <section id="benefits" className="bg-white pb-24 pt-8 max-md:pb-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[760px] text-center">
             <span className={sectionBadgeClass}>Manfaat</span>
@@ -300,7 +304,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="how-it-works" className="py-24 max-md:py-16">
+      <section id="how-it-works" className="bg-[#F8FBFF] py-24 max-md:py-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[640px] text-center">
             <span className={sectionBadgeClass}>Cara Kerja</span>
@@ -314,7 +318,7 @@ const OnePage = () => {
           </div>
 
           <div className="mt-10 grid auto-rows-[minmax(178px,auto)] grid-cols-3 gap-4 max-lg:auto-rows-auto max-lg:grid-cols-2 max-sm:grid-cols-1">
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 01</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Catat transaksi harian</h3>
@@ -324,7 +328,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 02</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Data dirapikan otomatis</h3>
@@ -334,7 +338,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 03</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Anggaran dijaga langsung</h3>
@@ -344,7 +348,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative col-span-2 overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)] max-sm:col-span-1">
+            <div className={`${compactCardClass} col-span-2 max-sm:col-span-1`}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 04</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Pola keuangan mulai kebaca</h3>
@@ -354,7 +358,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 05</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Wawasan jadi aksi</h3>
@@ -366,7 +370,7 @@ const OnePage = () => {
           </div>
         </div>
       </section>
-      <section id="faq" className="py-20 max-md:py-14">
+      <section id="faq" className="bg-[#F8FBFF] py-20 max-md:py-14">
         <div className={`${shellClass} max-w-[860px]`}>
           <div className="mx-auto max-w-[640px] text-center">
             <span className={sectionBadgeClass}>FAQ</span>
@@ -382,7 +386,7 @@ const OnePage = () => {
               return (
                 <article
                   key={faq.question}
-                  className={`overflow-hidden rounded-[12px] bg-white shadow-[0_8px_22px_rgba(12,57,84,0.045)] transition ${
+                  className={`overflow-hidden rounded-[12px] bg-white shadow-[0_10px_26px_rgba(12,57,84,0.075)] transition ${
                     isOpen ? "border border-[#9DCCE6] bg-[#F4FAFF]" : "border border-[#E4ECF3]"
                   }`}
                 >
