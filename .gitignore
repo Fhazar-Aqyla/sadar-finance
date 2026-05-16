@@ -6,8 +6,10 @@ node_modules/
 !*.env.example  
 
 venv/
+.venv/
 __pycache__/
 *.pyc
+tmp_uploads/
 *.log
 dist/
 build/

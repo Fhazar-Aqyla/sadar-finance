@@ -91,7 +91,7 @@ Project ini berbeda dari dashboard data science standalone. Repository ini berfo
 | **Upload File** | Multer |
 | **Security** | Helmet, CORS, Express Rate Limit |
 | **API Docs** | Swagger / OpenAPI |
-| **AI Service Scaffold** | Python service folder (`ai/`) |
+| **AI Service** | Flask, Pytesseract, Pillow, NLP regex/heuristic parser |
 
 ---
 
@@ -187,9 +187,13 @@ Frontend berjalan di alamat yang ditampilkan Vite, biasanya:
 http://localhost:5173
 ```
 
-### 4. Setup AI Service (Opsional)
+### 4. Setup AI Service OCR + NLP (Opsional untuk Demo, Direkomendasikan untuk Fitur AI)
 
-Folder `ai/` sudah disiapkan sebagai tempat service Python, model, preprocessing, dan inference. Jika service AI dikembangkan, gunakan alur berikut:
+Folder `ai/` berisi service Python untuk:
+
+- OCR image preprocessing dan ekstraksi teks dari struk menggunakan Pytesseract.
+- NLP processing untuk mengekstraksi merchant, tanggal, item, total transaksi, mata uang, dan kategori transaksi dari teks OCR.
+- Endpoint REST agar backend dapat mengirim file hasil upload ke AI service.
 
 ```bash
 cd ai
@@ -199,7 +203,21 @@ pip install -r requirements.txt
 python app.py
 ```
 
-> Catatan: saat README ini dibuat, file `ai/app.py` dan `ai/requirements.txt` masih berupa scaffold kosong.
+AI service berjalan di:
+
+```txt
+http://localhost:5000
+```
+
+Endpoint AI utama:
+
+```txt
+GET  /health
+POST /ocr
+POST /nlp/receipt
+```
+
+> Catatan: Pytesseract membutuhkan aplikasi Tesseract OCR terpasang di sistem. Jika AI service belum berjalan, backend tetap menyimpan scan dan memakai fallback hasil parsing simulasi agar alur demo tidak crash.
 
 ---
 

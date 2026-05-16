@@ -465,6 +465,7 @@ const Navdata = () => {
           parentId: "apps",
           stateVariables: isCrypto,
           childItems: [
+            { id: 0, label: "Input Transaksi", link: "/transactions/input" },
             { id: 1, label: "Transactions", link: "/apps-crypto-transactions" },
             { id: 2, label: "Buy & Sell", link: "/apps-crypto-buy-sell" },
             { id: 3, label: "Orders", link: "/apps-crypto-orders" },

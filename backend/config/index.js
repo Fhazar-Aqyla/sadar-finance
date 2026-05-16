@@ -3,7 +3,9 @@
  * All environment variables are validated and exported from here.
  */
 
-require('dotenv').config();
+const path = require('path');
+
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 const config = {
   env: process.env.NODE_ENV || 'development',
@@ -14,7 +16,7 @@ const config = {
     port: parseInt(process.env.DB_PORT, 10) || 5432,
     database: process.env.DB_NAME || 'sadar_finance',
     user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '',
+    password: String(process.env.DB_PASSWORD ?? ''),
   },
 
   jwt: {

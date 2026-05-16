@@ -245,6 +245,7 @@ import SlopeCharts from "../pages/Charts/ApexCharts/SlopeCharts";
 import BlogListView from "../pages/Pages/Blogs/ListView";
 import BlogGridView from "../pages/Pages/Blogs/GridView";
 import PageBlogOverview from "../pages/Pages/Blogs/Overview";
+import TransactionInput from "../pages/Sadar/TransactionInput";
 
 const authProtectedRoutes = [
   { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
@@ -319,6 +320,7 @@ const authProtectedRoutes = [
   { path: "/apps-tickets-details", component: <TicketsDetails /> },
 
   //transactions
+  { path: "/transactions/input", component: <TransactionInput /> },
   { path: "/apps-crypto-transactions", component: <Transactions /> },
   { path: "/apps-crypto-buy-sell", component: <BuySell /> },
   { path: "/apps-crypto-orders", component: <CryproOrder /> },
