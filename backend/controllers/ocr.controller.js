@@ -109,4 +109,50 @@ const getScans = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { uploadReceipt, getScan, getScans };
+/**
+ * @swagger
+ * /api/v1/ocr/{id}/confirm-transaction:
+ *   post:
+ *     tags: [OCR]
+ *     summary: Create a transaction from a completed OCR scan
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               accountId:
+ *                 type: string
+ *                 format: uuid
+ *               categoryGroup:
+ *                 type: string
+ *               transactionDate:
+ *                 type: string
+ *                 format: date-time
+ *               description:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Transaction created and linked to OCR scan
+ */
+const confirmTransaction = asyncHandler(async (req, res) => {
+  const result = await ocrService.confirmTransaction(req.params.id, req.user.id, req.body);
+  return created(res, {
+    data: result,
+    message: 'Transaction created from OCR scan successfully',
+  });
+});
+
+module.exports = { uploadReceipt, getScan, getScans, confirmTransaction };
