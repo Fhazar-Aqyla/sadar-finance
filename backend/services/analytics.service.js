@@ -6,6 +6,7 @@
 const transactionRepository = require('../repositories/transaction.repository');
 const incomeRepository = require('../repositories/income.repository');
 const analyticsRepository = require('../repositories/analytics.repository');
+const aiClient = require('./aiClient.service');
 
 class AnalyticsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -14,9 +15,24 @@ class AnalyticsService {
 
   /**
    * Categorize a transaction description using AI.
-   * In production, calls the Python ML service.
    */
   async categorize(userId, { text, transactionId }) {
+    try {
+      const result = await aiClient.categorize({ text, transactionId });
+      return {
+        ...result,
+        source: 'ai-service',
+      };
+    } catch (err) {
+      return {
+        ...this._categorizeWithRules(text, transactionId),
+        source: 'rule-based-fallback',
+        fallbackReason: err.message,
+      };
+    }
+  }
+
+  _categorizeWithRules(text, transactionId) {
     // Simulated AI categorization based on keywords
     const categoryMap = {
       'food|makan|resto|cafe|coffee|indomaret|alfamart|warung': 'Food & Dining',
@@ -108,8 +124,44 @@ class AnalyticsService {
       });
     }
 
+    const topCategories = expenseSummary.slice(0, 5).map((c) => ({
+      categoryGroup: c.category_group || 'Uncategorized',
+      total: parseFloat(c.total),
+      count: c.count,
+      percentage: totalExpense > 0
+        ? parseFloat((parseFloat(c.total) / totalExpense * 100).toFixed(1))
+        : 0,
+    }));
+
+    let insightsToSave = insightEntries;
+    let insightSource = 'rule-based';
+    let insightModelVersion = 'v1.0-rule-based';
+    let insightFallbackReason = null;
+
+    try {
+      const aiInsights = await aiClient.generateInsights({
+        periodStart,
+        periodEnd,
+        totalIncome,
+        totalExpense,
+        netSavings: totalIncome - totalExpense,
+        savingsRate,
+        spendingTrend,
+        topCategories,
+      });
+
+      if (aiInsights.insights.length > 0) {
+        insightsToSave = aiInsights.insights;
+        insightSource = 'ai-service';
+        insightModelVersion = aiInsights.modelVersion;
+      }
+    } catch (err) {
+      insightSource = 'rule-based-fallback';
+      insightFallbackReason = err.message;
+    }
+
     // Save insights to DB
-    const savedInsights = await analyticsRepository.createManyInsights(userId, insightEntries);
+    const savedInsights = await analyticsRepository.createManyInsights(userId, insightsToSave);
 
     return {
       periodStart,
@@ -119,15 +171,11 @@ class AnalyticsService {
       netSavings: totalIncome - totalExpense,
       savingsRate,
       spendingTrend,
-      topCategories: expenseSummary.slice(0, 5).map((c) => ({
-        categoryGroup: c.category_group || 'Uncategorized',
-        total: parseFloat(c.total),
-        count: c.count,
-        percentage: totalExpense > 0
-          ? parseFloat((parseFloat(c.total) / totalExpense * 100).toFixed(1))
-          : 0,
-      })),
+      topCategories,
       insights: savedInsights,
+      insightSource,
+      insightModelVersion,
+      ...(insightFallbackReason ? { insightFallbackReason } : {}),
     };
   }
 

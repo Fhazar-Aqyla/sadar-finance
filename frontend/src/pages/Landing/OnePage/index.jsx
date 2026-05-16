@@ -1,34 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import AnimatedTextCycle from "@/Components/ui/animated-text-cycle";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
-
-const features = [
-  {
-    title: "Input Transaksi Cerdas",
-    description: "Catat pemasukan dan pengeluaran harian dengan cepat, rapi, dan mudah ditinjau ulang.",
-  },
-  {
-    title: "Wawasan Pengeluaran Otomatis",
-    description: "SADAR membaca pola transaksi lalu menampilkan rangkuman yang membantu kamu mengambil keputusan.",
-  },
-  {
-    title: "Penjaga Anggaran",
-    description: "Tetapkan batas anggaran dan dapatkan sinyal lebih awal saat pengeluaran mulai mendekati batas.",
-  },
-  {
-    title: "Skor Kesehatan Keuangan",
-    description: "Lihat gambaran kesehatan finansial dari arus kas, kebiasaan belanja, dan progres tabungan.",
-  },
-];
 
 const navItems = [
   { label: "Beranda", href: "#home" },
   { label: "Fitur", href: "#features" },
   { label: "Manfaat", href: "#benefits" },
   { label: "Cara Kerja", href: "#how-it-works" },
-  { label: "Tanya Jawab", href: "#faq" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 const faqs = [
@@ -54,15 +36,19 @@ const faqs = [
   },
 ];
 
-const shellClass = "mx-auto w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
+const shellClass = "mx-auto w-[min(calc(100%_-_96px),1360px)] max-lg:w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
 const headingClass =
-  "font-['Plus_Jakarta_Sans',sans-serif] font-extrabold tracking-normal text-[#0C3954]";
+  "font-['Plus_Jakarta_Sans',sans-serif] font-extrabold tracking-normal !text-[#0C3954]";
 const sectionHeadingClass = `${headingClass} m-0 text-[40px] leading-[1.18] max-md:text-[32px] max-sm:text-[28px]`;
 const bodyClass = "font-['Inter',sans-serif] text-[#333333]";
 const primaryButtonClass =
   "inline-flex min-h-8 items-center justify-center rounded-md bg-[#0C3954] px-4 text-[11px] font-bold !text-white no-underline shadow-[0_10px_22px_rgba(12,57,84,0.18)] transition hover:-translate-y-0.5 hover:bg-[#124170] hover:!text-white";
 const sectionBadgeClass =
   "mb-5 inline-flex min-h-7 items-center justify-center rounded-full border border-[#DDE6EF] bg-white px-6 text-[12px] font-bold text-[#0C3954] shadow-[0_4px_14px_rgba(12,57,84,0.05)]";
+const cardClass =
+  "rounded-[28px] border border-[#DDE8F2] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.09)]";
+const compactCardClass =
+  "relative overflow-hidden rounded-[14px] border border-[#DDE8F2] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.08)]";
 
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
@@ -73,9 +59,9 @@ const OnePage = () => {
   }, []);
 
   return (
-    <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#EEF5FF]`}>
-      <header className="sticky top-0 z-50 bg-[#EEF5FF]/95 shadow-[0_1px_0_rgba(12,57,84,0.06)] backdrop-blur">
-        <div className={`${shellClass} flex min-h-[78px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
+    <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#F8FBFF]`}>
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#DDE8F2] bg-white shadow-[0_10px_30px_rgba(12,57,84,0.08)]">
+        <div className={`${shellClass} flex min-h-[86px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
           <Link to="/" aria-label="SADAR Finance" className="inline-flex shrink-0 items-center no-underline">
             <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
           </Link>
@@ -85,7 +71,7 @@ const OnePage = () => {
               <a
                 key={item.href}
                 href={item.href}
-                className="group relative py-2 text-[12px] font-semibold !text-[#1E9BE0] no-underline transition hover:!text-[#0C3954]"
+                className="group relative py-2 text-[12px] font-semibold !text-[#0C3954] no-underline transition hover:!text-[#124170]"
               >
                 {item.label}
                 <span className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-[#64AB88] transition duration-300 group-hover:scale-x-100" />
@@ -94,7 +80,7 @@ const OnePage = () => {
           </nav>
 
           <div className="flex shrink-0 items-center gap-3">
-            <Link to="/login" className="text-[12px] font-semibold !text-[#1E9BE0] no-underline hover:!text-[#0C3954]">
+            <Link to="/login" className="text-[12px] font-semibold !text-[#0C3954] no-underline hover:!text-[#124170]">
               Masuk
             </Link>
             <Link to="/register" className={`${primaryButtonClass} min-w-[118px] max-sm:hidden`}>
@@ -119,7 +105,7 @@ const OnePage = () => {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#1E9BE0] no-underline hover:bg-white hover:!text-[#0C3954]"
+                className="rounded-md px-3 py-2 text-[13px] font-semibold !text-[#0C3954] no-underline hover:bg-[#F8FBFF] hover:!text-[#124170]"
               >
                 {item.label}
               </a>
@@ -135,14 +121,21 @@ const OnePage = () => {
         )}
       </header>
 
-      <section id="home" className="relative overflow-hidden pb-[170px] pt-[84px] max-lg:pb-[148px] max-md:pt-12">
-        <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
-          <div className="pt-10 max-lg:pt-0">
-            <h1 className={`${headingClass} m-0 text-[46px] leading-[1.12] max-sm:text-[36px]`}>
+      <section id="home" className="relative overflow-hidden bg-white pb-[190px] pt-[182px] max-lg:pb-[148px] max-md:pt-[116px]">
+        <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-20 max-xl:gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
+          <div className="pt-14 max-xl:pt-10 max-lg:pt-0">
+            <h1 className={`${headingClass} m-0 text-[56px] leading-[1.12] max-xl:text-[50px] max-sm:text-[36px]`}>
               Pantau Uangmu
-              <span className="block text-[#64AB88]">Bangun Masa Depanmu</span>
+              <span className="block !text-[#64AB88]">
+                Bangun{" "}
+                <AnimatedTextCycle
+                  words={["Masa Depanmu", "Keuanganmu", "Tabunganmu", "Impianmu"]}
+                  interval={3000}
+                  className="!text-[#64AB88]"
+                />
+              </span>
             </h1>
-            <p className="mb-6 mt-4 max-w-[505px] text-[13px] leading-6 text-[#333333]">
+            <p className="mb-7 mt-5 max-w-[560px] text-[16px] leading-8 text-[#333333] max-xl:text-[14px] max-xl:leading-7">
               Pantau, analisis, dan pahami pengeluaranmu dengan bantuan cerdas agar kamu bisa
               menghindari pengeluaran berlebihan dan lebih mengontrol keuangan.
             </p>
@@ -163,10 +156,10 @@ const OnePage = () => {
             </div>
           </div>
 
-          <div className="h-[380px] rounded-[18px] bg-[#D9D9D9] shadow-[0_8px_14px_rgba(51,51,51,0.28)] max-lg:h-[320px] max-sm:h-[240px]" />
+          <div className="h-[475px] rounded-[18px] bg-[#D9D9D9] shadow-[0_8px_14px_rgba(51,51,51,0.28)] max-xl:h-[420px] max-lg:h-[320px] max-sm:h-[240px]" />
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[245px] max-md:h-[170px]" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[265px] max-md:h-[170px]" aria-hidden="true">
           <svg
             className="absolute inset-0 h-full w-full"
             viewBox="0 0 1440 260"
@@ -175,7 +168,7 @@ const OnePage = () => {
             <path
               d="M0 102C110 76 210 48 318 34C430 19 552 38 670 34C792 30 900 5 1016 6C1144 7 1247 36 1366 18C1396 13 1420 4 1440 -6V260H0V102Z"
               fill="#64AB88"
-              fillOpacity="0.35"
+              fillOpacity="0.16"
             />
             <path
               d="M0 118C104 91 222 55 328 44C454 31 558 52 680 50C800 48 896 22 1010 22C1132 22 1252 54 1368 34C1398 29 1423 19 1440 10V260H0V118Z"
@@ -189,12 +182,12 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="features" className="relative z-10 py-24 max-md:py-16">
+      <section id="features" className="relative z-10 bg-[#F8FBFF] py-24 max-md:py-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[680px] text-center">
             <span className={sectionBadgeClass}>Fitur SADAR</span>
             <h2 className={sectionHeadingClass}>
-              Lebih dari Sekadar <span className="text-[#64AB88]">Mencatat Keuangan</span>
+              Lebih dari Sekadar <span className="!text-[#64AB88]">Mencatat Keuangan</span>
             </h2>
             <p className="mx-auto mt-4 max-w-[440px] text-[13px] leading-6 text-[#333333]">
               Semua dirancang untuk membantumu lebih sadar, lebih terkontrol,
@@ -202,30 +195,52 @@ const OnePage = () => {
             </p>
           </div>
 
-          <div className="mx-auto mt-[58px] grid max-w-[940px] grid-cols-2 gap-7 max-md:grid-cols-1">
-            {features.map((feature) => (
-              <article
-                key={feature.title}
-                className="min-h-[218px] rounded-xl bg-white px-8 py-9 shadow-[0_1px_0_rgba(12,57,84,0.08)]"
-              >
-                <h3 className={`${headingClass} m-0 text-[17px] leading-snug text-[#333333]`}>
-                  {feature.title}
-                </h3>
-                <p className="mt-4 max-w-[300px] text-[11px] leading-5 text-[#333333]">
-                  {feature.description}
+          <div className="mx-auto mt-11 grid max-w-[1080px] gap-3">
+            <div className="grid grid-cols-[0.82fr_1.28fr] gap-3 max-lg:grid-cols-1">
+              <article className={`${cardClass} min-h-[318px]`}>
+                <div className="mb-14 h-[102px] rounded-[22px] border border-dashed border-[#D5E2EF] bg-[#FBFDFF]" />
+                <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Input Transaksi Cerdas</h3>
+                <p className="mt-3 mb-0 max-w-[280px] text-[12px] leading-5 text-[#667585]">
+                  Catat pemasukan dan pengeluaran harian dengan cepat, rapi, dan mudah ditinjau ulang.
                 </p>
               </article>
-            ))}
+
+              <article className={`${cardClass} min-h-[318px]`}>
+                <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Wawasan Pengeluaran Otomatis</h3>
+                <p className="mt-3 mb-0 max-w-[300px] text-[12px] leading-5 text-[#667585]">
+                  SADAR membaca pola transaksi lalu menampilkan ringkasan yang membantu kamu mengambil keputusan.
+                </p>
+                <div className="mt-10 h-[104px] rounded-[18px] border border-[#E5EDF5] bg-[#FBFDFF] shadow-[0_12px_28px_rgba(12,57,84,0.04)]" />
+              </article>
+            </div>
+
+            <div className="grid grid-cols-[1.28fr_0.82fr] gap-3 max-lg:grid-cols-1">
+              <article className={`${cardClass} min-h-[318px]`}>
+                <div className="mx-auto mb-14 h-[96px] max-w-[560px] rounded-[18px] border border-[#E5EDF5] bg-[#FBFDFF] shadow-[0_12px_28px_rgba(12,57,84,0.04)]" />
+                <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Penjaga Anggaran</h3>
+                <p className="mt-3 mb-0 max-w-[520px] text-[12px] leading-5 text-[#667585]">
+                  Tetapkan batas anggaran dan dapatkan sinyal lebih awal saat pengeluaran mulai mendekati batas.
+                </p>
+              </article>
+
+              <article className={`${cardClass} min-h-[318px]`}>
+                <h3 className={`${headingClass} m-0 text-[17px] leading-snug`}>Skor Kesehatan Keuangan</h3>
+                <p className="mt-3 mb-0 max-w-[320px] text-[12px] leading-5 text-[#667585]">
+                  Lihat gambaran kondisi finansial dari arus kas, kebiasaan belanja, dan progres tabungan.
+                </p>
+                <div className="mt-10 h-[118px] rounded-[18px] border border-[#E5EDF5] bg-[#FBFDFF]" />
+              </article>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="benefits" className="pb-24 pt-8 max-md:pb-16">
+      <section id="benefits" className="bg-white pb-24 pt-8 max-md:pb-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[760px] text-center">
             <span className={sectionBadgeClass}>Manfaat</span>
             <h2 className={sectionHeadingClass}>
-              Dengan <span className="text-[#64AB88]">SADAR</span>, Kamu Bisa
+              Dengan <span className="!text-[#64AB88]">SADAR</span>, Kamu Bisa
             </h2>
             <p className="mx-auto mt-4 max-w-[600px] text-[14px] leading-7 text-[#333333]">
               Dari pencatatan transaksi hingga wawasan otomatis, semua dirancang
@@ -233,13 +248,13 @@ const OnePage = () => {
             </p>
           </div>
 
-          <div className="mx-auto mt-20 grid max-w-[1060px] grid-cols-[220px_240px_240px_240px] items-end justify-center gap-10 max-xl:grid-cols-[210px_225px_225px_220px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-16 max-sm:grid-cols-1">
-            <div className="pb-10 text-right max-lg:order-3 max-lg:text-center max-sm:order-none max-sm:pb-0">
-              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.55] text-[#64AB88] max-md:text-[21px]`}>
-                Keputusan Finansial
+          <div className="mx-auto mt-16 grid max-w-[1100px] grid-cols-[250px_240px_240px_250px] items-end justify-center gap-10 max-xl:grid-cols-[235px_225px_225px_235px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-14 max-sm:grid-cols-1">
+            <div className="pb-9 text-right max-lg:order-3 max-lg:text-center max-sm:order-none max-sm:pb-0">
+              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.22] !text-[#64AB88] max-md:text-[21px]`}>
+                <span className="block whitespace-nowrap">Keputusan Finansial</span>
                 <span className="block">Jadi Lebih Cerdas</span>
               </h3>
-              <p className="ml-auto mt-5 max-w-[230px] text-[13px] leading-7 text-[#333333] max-lg:mx-auto">
+              <p className="ml-auto mt-3 max-w-[230px] text-[13px] leading-6 text-[#333333] max-lg:mx-auto">
                 Wawasan otomatis membantu kamu memahami kebiasaanmu.
               </p>
             </div>
@@ -258,16 +273,16 @@ const OnePage = () => {
               <img
                 src={boyLaptop}
                 alt="Pengguna SADAR memakai laptop"
-                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-lg:h-[568px] max-lg:origin-bottom max-lg:scale-x-[1.08] max-md:h-[390px]"
+                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-lg:h-[568px] max-lg:origin-bottom max-lg:scale-x-[4.50] max-md:h-[390px]"
               />
             </div>
 
-            <div className="pb-10 text-left max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-left max-sm:order-none max-sm:pt-0">
-              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.55] max-md:text-[21px]`}>
-                Lebih Tahu Kemana
+            <div className="pb-9 text-left max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-center max-sm:order-none max-sm:pt-0">
+              <h3 className={`${headingClass} m-0 text-[22px] leading-[1.22] max-md:text-[21px]`}>
+                <span className="block whitespace-nowrap">Lebih Tahu Kemana</span>
                 <span className="block">Uangmu Pergi</span>
               </h3>
-              <p className="mt-5 max-w-[240px] text-[13px] leading-7 text-[#333333]">
+              <p className="mt-3 max-w-[240px] text-[13px] leading-6 text-[#333333] max-lg:mx-auto">
                 Lihat semua pengeluaranmu dengan jelas dan tanpa tebakan.
               </p>
             </div>
@@ -275,13 +290,13 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="how-it-works" className="py-24 max-md:py-16">
+      <section id="how-it-works" className="bg-[#F8FBFF] pb-28 pt-24 max-md:pb-20 max-md:pt-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[640px] text-center">
             <span className={sectionBadgeClass}>Cara Kerja</span>
             <h2 className={sectionHeadingClass}>
               Cara SADAR Membantu
-              <span className="block text-[#64AB88]">Keuanganmu Tetap Terkontrol</span>
+              <span className="block !text-[#64AB88]">Keuanganmu Tetap Terkontrol</span>
             </h2>
             <p className="mx-auto mt-4 max-w-[500px] text-[13px] leading-6 text-[#6B7280]">
               Alurnya dibuat sederhana: kamu mencatat, SADAR merapikan data, lalu wawasan dan peringatan muncul saat kamu perlu ambil keputusan.
@@ -289,7 +304,7 @@ const OnePage = () => {
           </div>
 
           <div className="mt-10 grid auto-rows-[minmax(178px,auto)] grid-cols-3 gap-4 max-lg:auto-rows-auto max-lg:grid-cols-2 max-sm:grid-cols-1">
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 01</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Catat transaksi harian</h3>
@@ -299,7 +314,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 02</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Data dirapikan otomatis</h3>
@@ -309,7 +324,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 03</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Anggaran dijaga langsung</h3>
@@ -319,7 +334,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative col-span-2 overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)] max-sm:col-span-1">
+            <div className={`${compactCardClass} col-span-2 max-sm:col-span-1`}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 04</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Pola keuangan mulai kebaca</h3>
@@ -329,7 +344,7 @@ const OnePage = () => {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[14px] border border-[#DDE6EF] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.045)]">
+            <div className={compactCardClass}>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 05</span>
                 <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Wawasan jadi aksi</h3>
@@ -341,10 +356,10 @@ const OnePage = () => {
           </div>
         </div>
       </section>
-      <section id="faq" className="py-20 max-md:py-14">
+      <section id="faq" className="bg-[#F8FBFF] pb-36 pt-0 max-md:pb-24 max-md:pt-0">
         <div className={`${shellClass} max-w-[860px]`}>
           <div className="mx-auto max-w-[640px] text-center">
-            <span className={sectionBadgeClass}>Tanya Jawab</span>
+            <span className={sectionBadgeClass}>FAQ</span>
             <h2 className={`${sectionHeadingClass} text-center`}>
               Masih ada Pertanyaan? Kami Punya Jawabannya
             </h2>
@@ -357,17 +372,17 @@ const OnePage = () => {
               return (
                 <article
                   key={faq.question}
-                  className={`overflow-hidden rounded-[12px] bg-white shadow-[0_8px_22px_rgba(12,57,84,0.045)] transition ${
+                  className={`overflow-hidden rounded-[12px] bg-white shadow-[0_10px_26px_rgba(12,57,84,0.075)] transition ${
                     isOpen ? "border border-[#9DCCE6] bg-[#F4FAFF]" : "border border-[#E4ECF3]"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                    className="flex min-h-[56px] w-full items-center justify-between gap-4 border-0 bg-transparent px-5 py-3 text-left text-[16px] font-extrabold leading-snug text-[#1D2430] max-sm:min-h-[52px] max-sm:px-4 max-sm:text-[14px]"
+                    className="flex min-h-[56px] w-full items-center justify-between gap-4 border-0 bg-transparent px-5 py-3 text-left text-[16px] font-extrabold leading-snug !text-[#0C3954] max-sm:min-h-[52px] max-sm:px-4 max-sm:text-[14px]"
                   >
                     <span>{faq.question}</span>
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[#1D2430] shadow-[0_4px_10px_rgba(12,57,84,0.06)]">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white !text-[#0C3954] shadow-[0_4px_10px_rgba(12,57,84,0.06)]">
                       <i className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-[18px]`} aria-hidden="true"></i>
                     </span>
                   </button>
@@ -383,7 +398,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section className="pb-[130px] pt-12 max-md:pb-20">
+      <section className="pb-[130px] pt-0 max-md:pb-20 max-md:pt-0">
         <div className={shellClass}>
           <div className="min-h-[360px] rounded-xl bg-[#124170] max-md:min-h-[240px]" />
         </div>

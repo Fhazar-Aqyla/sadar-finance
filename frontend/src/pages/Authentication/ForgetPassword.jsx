@@ -18,6 +18,7 @@ import { userForgetPassword } from "../../slices/thunks";
 // import images
 // import profile from "../../assets/images/bg.png";
 import AuthSlider from "../AuthenticationInner/authCarousel";
+import sadarLogo from "../../assets/images/landing/sadar-logo.png";
 import { createSelector } from "reselect";
 
 const ForgetPasswordPage = props => {
@@ -61,12 +62,15 @@ document.title="Reset Password | SADAR Finance";
         <Container>
           <Row>
             <Col lg={12}>
-              <Card className="overflow-hidden border-0 m-0">
+              <Card className="sadar-auth-card overflow-hidden border-0 m-0">
                 <Row className="g-0">
                   <AuthSlider />
 
-                  <Col lg={6}>
-                    <div className="p-lg-5 p-4">
+                  <Col lg={6} className="sadar-auth-form-panel">
+                    <Link to="/" aria-label="SADAR Finance" className="sadar-auth-panel-logo">
+                      <img src={sadarLogo} alt="SADAR Finance" />
+                    </Link>
+                    <div className="w-100 p-lg-5 p-4">
                       <div>
                         <h5 className="text-primary">Lupa password?</h5>
                         <p className="text-muted">Masukkan email akun untuk menerima instruksi reset.</p>

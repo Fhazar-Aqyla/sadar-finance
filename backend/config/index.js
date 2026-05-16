@@ -26,6 +26,8 @@ const config = {
 
   ai: {
     serviceUrl: process.env.AI_SERVICE_URL || 'http://localhost:5000',
+    timeoutMs: parseInt(process.env.AI_SERVICE_TIMEOUT_MS, 10) || 10000,
+    mockMode: process.env.AI_MOCK_MODE === 'true',
   },
 
   rateLimit: {
