@@ -7,7 +7,6 @@ import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
 
 const navItems = [
   { label: "Beranda", href: "#home" },
-  { label: "Tentang", href: "#about" },
   { label: "Fitur", href: "#features" },
   { label: "Manfaat", href: "#benefits" },
   { label: "Cara Kerja", href: "#how-it-works" },
@@ -61,7 +60,7 @@ const OnePage = () => {
 
   return (
     <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#F8FBFF]`}>
-      <header className="sticky top-0 z-50 bg-white/95 shadow-[0_1px_0_rgba(12,57,84,0.06)] backdrop-blur">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#DDE8F2] bg-white shadow-[0_10px_30px_rgba(12,57,84,0.08)]">
         <div className={`${shellClass} flex min-h-[86px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
           <Link to="/" aria-label="SADAR Finance" className="inline-flex shrink-0 items-center no-underline">
             <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
@@ -122,7 +121,7 @@ const OnePage = () => {
         )}
       </header>
 
-      <section id="home" className="relative overflow-hidden bg-white pb-[190px] pt-[96px] max-lg:pb-[148px] max-md:pt-12">
+      <section id="home" className="relative overflow-hidden bg-white pb-[190px] pt-[182px] max-lg:pb-[148px] max-md:pt-[116px]">
         <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-20 max-xl:gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
           <div className="pt-14 max-xl:pt-10 max-lg:pt-0">
             <h1 className={`${headingClass} m-0 text-[56px] leading-[1.12] max-xl:text-[50px] max-sm:text-[36px]`}>
@@ -180,19 +179,6 @@ const OnePage = () => {
               fill="#0C3954"
             />
           </svg>
-        </div>
-      </section>
-
-      <section id="about" className="relative z-10 bg-[#F8FBFF] py-24 max-md:py-16">
-        <div className={shellClass}>
-          <div className="mx-auto max-w-[980px] py-12 text-center max-md:py-8">
-            <span className={sectionBadgeClass}>Tentang SADAR</span>
-            <p className="mx-auto mt-8 mb-0 max-w-[920px] text-[30px] font-normal leading-[1.48] tracking-normal text-[#0C3954] max-lg:text-[26px] max-md:mt-6 max-md:text-[20px] max-md:leading-[1.55]">
-              SADAR adalah ruang sederhana untuk memahami uangmu dengan lebih jernih:
-              mencatat transaksi, melihat pola pengeluaran, dan mengambil keputusan finansial
-              yang lebih tenang tanpa merasa tenggelam dalam angka.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -304,7 +290,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section id="how-it-works" className="bg-[#F8FBFF] py-24 max-md:py-16">
+      <section id="how-it-works" className="bg-[#F8FBFF] pb-28 pt-24 max-md:pb-20 max-md:pt-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[640px] text-center">
             <span className={sectionBadgeClass}>Cara Kerja</span>
@@ -370,7 +356,7 @@ const OnePage = () => {
           </div>
         </div>
       </section>
-      <section id="faq" className="bg-[#F8FBFF] py-20 max-md:py-14">
+      <section id="faq" className="bg-[#F8FBFF] pb-36 pt-0 max-md:pb-24 max-md:pt-0">
         <div className={`${shellClass} max-w-[860px]`}>
           <div className="mx-auto max-w-[640px] text-center">
             <span className={sectionBadgeClass}>FAQ</span>
@@ -412,7 +398,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section className="pb-[130px] pt-12 max-md:pb-20">
+      <section className="pb-[130px] pt-0 max-md:pb-20 max-md:pt-0">
         <div className={shellClass}>
           <div className="min-h-[360px] rounded-xl bg-[#124170] max-md:min-h-[240px]" />
         </div>
