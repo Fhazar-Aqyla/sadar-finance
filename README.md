@@ -103,7 +103,42 @@ Pastikan perangkat sudah memiliki:
 - **npm** sebagai package manager.
 - **PostgreSQL** untuk database backend.
 - **Git** untuk clone repository.
-- **Python 3.8+** hanya jika ingin mengembangkan service AI di folder `ai/`.
+- **Python 3.8+** untuk menjalankan service AI di folder `ai/`.
+- **Tesseract OCR** untuk fitur upload struk/OCR gambar.
+
+### Instalasi Tesseract OCR
+
+Fitur OCR membutuhkan aplikasi Tesseract OCR yang terpasang di sistem, bukan hanya package Python `pytesseract`.
+
+Windows:
+
+```powershell
+winget install --id UB-Mannheim.TesseractOCR -e
+```
+
+Lokasi default Windows biasanya:
+
+```txt
+C:\Program Files\Tesseract-OCR\tesseract.exe
+```
+
+Jika Tesseract belum terbaca dari PATH, isi `ai/.env`:
+
+```env
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+```
+
+Verifikasi:
+
+```bash
+tesseract --version
+```
+
+Atau dari folder `ai/`:
+
+```bash
+python -c "from inference.ocr import pytesseract; print(pytesseract.get_tesseract_version())"
+```
 
 ---
 
@@ -187,7 +222,7 @@ Frontend berjalan di alamat yang ditampilkan Vite, biasanya:
 http://localhost:5173
 ```
 
-### 4. Setup AI Service OCR + NLP (Opsional untuk Demo, Direkomendasikan untuk Fitur AI)
+### 4. Setup AI Service OCR + NLP (Wajib untuk Fitur Upload OCR)
 
 Folder `ai/` berisi service Python untuk:
 
@@ -200,6 +235,7 @@ cd ai
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
+copy .env.example .env
 python app.py
 ```
 
@@ -217,11 +253,19 @@ POST /ocr
 POST /nlp/receipt
 ```
 
-> Catatan: Pytesseract membutuhkan aplikasi Tesseract OCR terpasang di sistem. Jika AI service belum berjalan, backend tetap menyimpan scan dan memakai fallback hasil parsing simulasi agar alur demo tidak crash.
+Tes health check:
+
+```bash
+curl http://localhost:5000/health
+```
+
+> Catatan: frontend halaman `Catat Keuangan` akan langsung memanggil AI service di `http://localhost:5000/ocr`. Jadi terminal `python app.py` harus tetap berjalan saat mencoba tombol **Proses OCR**.
 
 ---
 
 ## 🚀 Cara Menjalankan Project
+
+Untuk menjalankan fitur lengkap dashboard + input transaksi + OCR, gunakan 3 terminal:
 
 ### Backend API
 
@@ -253,6 +297,27 @@ Buka:
 
 ```txt
 http://localhost:5173
+```
+
+Halaman utama:
+
+```txt
+Dashboard:        http://localhost:5173/dashboard
+Input Transaksi:  http://localhost:5173/transactions/input
+```
+
+### AI OCR Service
+
+```bash
+cd ai
+venv\Scripts\activate
+python app.py
+```
+
+AI service harus menampilkan:
+
+```txt
+Running on http://127.0.0.1:5000
 ```
 
 ### Build Frontend
@@ -359,6 +424,54 @@ sadar-finance/
 
 ---
 
+## OCR Troubleshooting
+
+Jika tombol **Proses OCR** gagal:
+
+1. Pastikan AI service sedang berjalan.
+
+```bash
+cd ai
+python app.py
+```
+
+2. Pastikan health check AI sukses.
+
+```bash
+curl http://localhost:5000/health
+```
+
+3. Pastikan Tesseract terpasang dan terbaca.
+
+```bash
+python -c "from inference.ocr import pytesseract; print(pytesseract.get_tesseract_version())"
+```
+
+4. Jika muncul error Tesseract not found, isi `ai/.env`.
+
+```env
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+```
+
+5. Restart AI service setelah mengubah `.env`.
+
+6. Pastikan backend `.env` mengarah ke AI service.
+
+```env
+AI_SERVICE_URL=http://localhost:5000
+AI_MOCK_MODE=false
+```
+
+7. Jika menggunakan fallback backend OCR, pastikan user sudah login karena endpoint backend `/api/v1/ocr/upload` memakai JWT.
+
+Contoh gambar struk untuk testing OCR:
+
+```txt
+data/sadar-ocr-clean-receipt.png
+```
+
+---
+
 ## 👨‍💻 Author
 
 ### SADAR Finance Team
@@ -385,6 +498,6 @@ sadar-finance/
 
 ## 📝 Additional Information
 
-- **Last Updated**: May 11, 2026
+- **Last Updated**: May 17, 2026
 - **Version**: 1.0.0
 - **License**: ISC
