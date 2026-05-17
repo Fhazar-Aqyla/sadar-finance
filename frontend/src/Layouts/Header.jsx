@@ -2,20 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Dropdown, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
 
-//import images
-import logoSm from "../assets/images/logo-sm.png";
-import logoDark from "../assets/images/logo-dark.png";
-import logoLight from "../assets/images/logo-light.png";
-
 //import Components
 import SearchOption from '../Components/Common/SearchOption';
-import LanguageDropdown from '../Components/Common/LanguageDropdown';
-import WebAppsDropdown from '../Components/Common/WebAppsDropdown';
-import MyCartDropdown from '../Components/Common/MyCartDropdown';
-import FullScreenDropdown from '../Components/Common/FullScreenDropdown';
 import NotificationDropdown from '../Components/Common/NotificationDropdown';
 import ProfileDropdown from '../Components/Common/ProfileDropdown';
-import LightDark from '../Components/Common/LightDark';
 
 import { changeSidebarVisibility } from '../slices/thunks';
 import { useSelector, useDispatch } from "react-redux";
@@ -74,24 +64,24 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
             <header id="page-topbar" className={headerClass}>
                 <div className="layout-width">
                     <div className="navbar-header">
-                        <div className="d-flex">
+                        <div className="d-flex align-items-center flex-grow-1 min-width-0 sadar-topbar-left">
 
                             <div className="navbar-brand-box horizontal-logo">
                                 <Link to="/" className="logo logo-dark">
                                     <span className="logo-sm">
-                                        <img src={logoSm} alt="" height="22" />
+                                        <span className="fw-bold text-primary fs-18">S</span>
                                     </span>
                                     <span className="logo-lg">
-                                        <img src={logoDark} alt="" height="17" />
+                                        <span className="fw-bold text-primary fs-18">SADAR Finance</span>
                                     </span>
                                 </Link>
 
                                 <Link to="/" className="logo logo-light">
                                     <span className="logo-sm">
-                                        <img src={logoSm} alt="" height="22" />
+                                        <span className="fw-bold text-white fs-18">S</span>
                                     </span>
                                     <span className="logo-lg">
-                                        <img src={logoLight} alt="" height="17" />
+                                        <span className="fw-bold text-white fs-18">SADAR Finance</span>
                                     </span>
                                 </Link>
                             </div>
@@ -112,7 +102,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                             <SearchOption />
                         </div>
 
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center sadar-topbar-actions">
 
                             <Dropdown isOpen={search} toggle={toogleSearch} className="d-md-none topbar-head-dropdown header-item">
                                 <DropdownToggle type="button" tag="button" className="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle">
@@ -122,7 +112,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <Form className="p-3">
                                         <div className="form-group m-0">
                                             <div className="input-group">
-                                                <input type="text" className="form-control" placeholder="Search ..."
+                                                <input type="text" className="form-control" placeholder="Cari transaksi..."
                                                     aria-label="Recipient's username" />
                                                 <button className="btn btn-primary" type="submit"><i
                                                     className="mdi mdi-magnify"></i></button>
@@ -132,28 +122,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 </DropdownMenu>
                             </Dropdown>
 
-                            {/* LanguageDropdown */}
-                            <LanguageDropdown />
-
-                            {/* WebAppsDropdown */}
-                            <WebAppsDropdown />
-
-                            {/* MyCartDropdwon */}
-                            <MyCartDropdown />
-
-                            {/* FullScreenDropdown */}
-                            <FullScreenDropdown />
-
-                            {/* Dark/Light Mode set */}
-                            <LightDark
-                                layoutMode={layoutModeType}
-                                onChangeLayoutMode={onChangeLayoutMode}
-                            />
-
-                            {/* NotificationDropdown */}
                             <NotificationDropdown />
-
-                            {/* ProfileDropdown */}
                             <ProfileDropdown />
                         </div>
                     </div>

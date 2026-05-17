@@ -1,0 +1,397 @@
+.sadar-dashboard {
+  background: #f6f8fb;
+  color: #172033;
+}
+
+.sadar-dashboard .container-fluid {
+  max-width: 1480px;
+}
+
+.sadar-dashboard .card {
+  border: 1px solid #e7ebf2;
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
+}
+
+.sadar-dashboard .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 72px;
+  padding: 1.15rem 1.25rem 0.6rem;
+  background: transparent;
+  border-bottom: 0;
+}
+
+.sadar-dashboard .card-title {
+  color: #172033;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.sadar-dashboard .text-muted {
+  color: #6b7280 !important;
+}
+
+.sadar-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid #e4e9f2;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+}
+
+.sadar-overview-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 178px;
+}
+
+.sadar-eyebrow {
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.sadar-overview h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.sadar-overview p {
+  max-width: 620px;
+  margin: 0.65rem 0 0;
+  color: #64748b;
+  font-size: 0.98rem;
+}
+
+.sadar-overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.sadar-ghost-btn {
+  color: #334155;
+  border-color: #e2e8f0;
+  background: #f8fafc;
+}
+
+.sadar-score-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.15rem;
+  border: 1px solid #e5edf7;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.sadar-score-panel strong {
+  display: block;
+  margin-top: 0.2rem;
+  color: #0f172a;
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.sadar-section-label {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sadar-score-icon {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #198754;
+  background: #e9f8ef;
+  font-size: 1.45rem;
+}
+
+.sadar-score-panel p {
+  margin-top: 0.9rem;
+  font-size: 0.88rem;
+}
+
+.metric-card {
+  min-height: 148px;
+}
+
+.metric-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.metric-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.metric-icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1.2rem;
+}
+
+.metric-card h2 {
+  margin: 1.05rem 0 0.25rem;
+  color: #0f172a;
+  font-size: 1.22rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.metric-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.dashboard-panel .card-body {
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.sadar-progress {
+  height: 8px;
+  margin-top: 1rem;
+  border-radius: 999px;
+  background-color: #e8edf5;
+}
+
+.sadar-table-wrap {
+  border: 1px solid #edf1f6;
+  border-radius: 8px;
+}
+
+.sadar-table {
+  min-width: 760px;
+}
+
+.sadar-table thead th {
+  padding: 0.85rem 1rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 1px solid #edf1f6;
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.sadar-table tbody td {
+  padding: 0.9rem 1rem;
+  color: #475569;
+  border-color: #edf1f6;
+}
+
+.sadar-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.sadar-table-action {
+  color: #334155;
+  border-color: #e2e8f0;
+  background: #f8fafc;
+}
+
+.sadar-account-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sadar-account-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  border: 1px solid #edf1f6;
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.sadar-account-item strong {
+  color: #0f172a;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.sadar-account-mark {
+  width: 10px;
+  height: 36px;
+  flex: 0 0 10px;
+  border-radius: 999px;
+}
+
+.sadar-side-stack {
+  display: grid;
+  gap: 1rem;
+  height: 100%;
+}
+
+.sadar-side-stack .card {
+  margin-bottom: 0;
+}
+
+.insight-card,
+.alert-card {
+  min-height: 0;
+}
+
+.insight-card .card-body,
+.alert-card .card-body {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+}
+
+.insight-card h5,
+.alert-card h5 {
+  margin: 0;
+  color: #172033;
+  font-weight: 700;
+}
+
+.insight-card p,
+.alert-card p {
+  margin: 0;
+  color: #64748b;
+}
+
+.insight-card span,
+.alert-card span {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.sadar-note-icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1.15rem;
+}
+
+.sadar-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.sadar-action-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e7ebf2;
+  border-radius: 8px;
+  background: #fbfcfe;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sadar-action-link i {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 1199.98px) {
+  .sadar-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .sadar-score-panel {
+    min-height: 150px;
+  }
+
+  .sadar-quick-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .sadar-dashboard .page-title-right {
+    display: none;
+  }
+
+  .sadar-overview {
+    padding: 1rem;
+  }
+
+  .sadar-overview-main {
+    min-height: auto;
+  }
+
+  .sadar-overview h1 {
+    font-size: 1.55rem;
+  }
+
+  .sadar-overview-actions,
+  .sadar-overview-actions .btn,
+  .sadar-quick-actions {
+    width: 100%;
+  }
+
+  .sadar-overview-actions .btn {
+    justify-content: center;
+  }
+
+  .sadar-quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .sadar-dashboard .card-header {
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .sadar-table-wrap {
+    margin-right: -0.25rem;
+    margin-left: -0.25rem;
+    border-radius: 6px;
+  }
+
+  .sadar-account-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .sadar-account-item strong {
+    width: 100%;
+    padding-left: 1.45rem;
+  }
+}

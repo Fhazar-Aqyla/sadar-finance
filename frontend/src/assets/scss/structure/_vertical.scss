@@ -27,31 +27,47 @@
 .navbar-menu {
     width: var(--#{$prefix}vertical-menu-width);
     z-index: $vertical-menu-z-index;
-    background: var(--#{$prefix}vertical-menu-bg);
-    border-right: 1px solid var(--#{$prefix}vertical-menu-border);
+    background: #f7fbff;
+    border-right: 1px solid #e5edf7;
     bottom: 0;
     margin-top: 0;
     position: fixed;
     top: 0;
-    box-shadow: var(--#{$prefix}vertical-menu-box-shadow);
+    box-shadow: none;
     padding: 0 0 calc(#{$header-height} + 25px) 0;
     transition: all .1s ease-out;
 
     .navbar-nav {
+        gap: 0.15rem;
+        padding: 0.25rem 0.85rem 1.25rem;
+
         .nav-link {
             display: flex;
             align-items: center;
-            padding: $vertical-menu-item-padding-y $vertical-menu-item-padding-x;
-            color: var(--#{$prefix}vertical-menu-item-color);
-            font-size: $vertical-menu-item-font-size;
-            font-family: $vertical-menu-item-font-family;
+            min-height: 42px;
+            padding: 0.58rem 0.78rem;
+            color: #64748b;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-family: $font-family-primary;
+            font-weight: 600;
+            letter-spacing: 0;
+            transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 
             &.active {
-                color: var(--#{$prefix}vertical-menu-item-active-color);
+                color: #0c3954;
+                background-color: #ffffff;
+                box-shadow: 0 10px 24px rgba(12, 57, 84, 0.08);
+
+                .icon-dual {
+                    color: #0c3954;
+                    fill: rgba(100, 171, 136, 0.16);
+                }
             }
 
             &:hover {
-                color: var(--#{$prefix}vertical-menu-item-hover-color);
+                color: #0c3954;
+                background-color: rgba(255, 255, 255, 0.62);
             }
 
             i {
@@ -63,22 +79,28 @@
 
             svg {
                 width: 18px;
-                margin-right: 0.665rem;
-                color: var(--#{$prefix}vertical-menu-item-color);
+                height: 18px;
+                margin-right: 0.72rem;
+                color: #64748b;
+                stroke-width: 2.15;
             }
 
             .badge {
                 margin-left: auto;
                 margin-right: -2px;
                 z-index: 1;
+                padding: 0.28rem 0.5rem;
+                border-radius: 999px;
+                font-size: 0.66rem;
+                font-weight: 700;
             }
 
             &:hover {
-                color: var(--#{$prefix}vertical-menu-item-hover-color);
+                color: #0c3954;
 
                 .icon-dual {
-                    color: var(--#{$prefix}vertical-menu-item-hover-color);
-                    fill: rgba($primary, 0.16);
+                    color: #0c3954;
+                    fill: rgba(100, 171, 136, 0.16);
                 }
             }
 
@@ -191,8 +213,9 @@
 }
 
 .navbar-brand-box {
-    padding: 0 1.3rem;
-    text-align: center;
+    height: $header-height;
+    padding: 0 1.45rem;
+    text-align: left;
     transition: all .1s ease-out;
 
     @media (max-width: 767.98px) {
@@ -877,15 +900,16 @@
 }
 
 .menu-title {
-    letter-spacing: .05em;
+    margin-top: 0.8rem;
+    letter-spacing: .04em;
     cursor: default;
-    font-size: 11px;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    color: var(--#{$prefix}vertical-menu-title-color);
-    font-weight: $font-weight-semibold;
+    color: #94a3b8;
+    font-weight: 700;
 
     span {
-        padding: 12px 20px;
+        padding: 0.75rem 0.78rem 0.42rem;
         display: inline-block;
     }
 

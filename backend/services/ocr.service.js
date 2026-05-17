@@ -8,8 +8,8 @@
 const ocrRepository = require("../repositories/ocr.repository");
 const config = require("../config");
 const aiClient = require("./aiClient.service");
-const analyticsService = require("../analytics.service");
-const transactionService = require("../transaction.service");
+const analyticsService = require("./analytics.service");
+const transactionService = require("./transaction.service");
 const { NotFoundError, BadRequestError } = require("../utils/errors");
 
 class OcrService {
