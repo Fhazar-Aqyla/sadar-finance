@@ -26,6 +26,7 @@
     -ms-flex-pack: justify;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     margin: 0 auto;
     height: $header-height;
     padding: 0 $grid-gutter-width 0 calc(#{$grid-gutter-width} * 0.5)
@@ -76,6 +77,80 @@
     .user-name-text {
         color: var(--#{$prefix}header-item-color);
     }
+}
+
+.sadar-topbar-left {
+    gap: 0.5rem;
+}
+
+.sadar-topbar-actions {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+}
+
+.sadar-app-search {
+    width: min(420px, 38vw);
+    min-width: 260px;
+
+    .position-relative {
+        width: 100%;
+    }
+
+    .form-control {
+        height: 42px;
+        border: 1px solid var(--#{$prefix}border-color);
+        border-radius: 8px;
+        background-color: var(--#{$prefix}body-bg);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+        &:focus {
+            border-color: rgba(var(--#{$prefix}primary-rgb), 0.45);
+            box-shadow: 0 0 0 3px rgba(var(--#{$prefix}primary-rgb), 0.08);
+        }
+    }
+
+    span.search-widget-icon {
+        line-height: 42px;
+    }
+}
+
+.sadar-notification {
+    .btn-topbar {
+        border-radius: 8px !important;
+    }
+}
+
+.sadar-profile {
+    margin-left: 0.35rem;
+    border-left: 0;
+
+    @media (min-width: 768px) {
+        background-color: transparent;
+    }
+
+    .btn {
+        height: 46px;
+        padding: 0 0.85rem;
+        border: 1px solid var(--#{$prefix}border-color);
+        border-radius: 8px;
+        background-color: var(--#{$prefix}body-bg);
+    }
+
+    .btn:hover,
+    .btn:focus,
+    &.show .btn {
+        background-color: var(--#{$prefix}header-item-bg);
+    }
+
+    .header-profile-user {
+        height: 34px;
+        width: 34px;
+        border: 2px solid var(--#{$prefix}border-color);
+    }
+}
+
+.min-width-0 {
+    min-width: 0;
 }
 
 /* Search */

@@ -38,7 +38,7 @@ const faqs = [
 
 const shellClass = "mx-auto w-[min(calc(100%_-_96px),1360px)] max-lg:w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
 const headingClass =
-  "font-['Plus_Jakarta_Sans',sans-serif] font-extrabold tracking-normal !text-[#0C3954]";
+  "font-['Plus_Jakarta_Sans',sans-serif] !font-extrabold tracking-normal !text-[#0C3954]";
 const sectionHeadingClass = `${headingClass} m-0 text-[40px] leading-[1.18] max-md:text-[32px] max-sm:text-[28px]`;
 const bodyClass = "font-['Inter',sans-serif] text-[#333333]";
 const primaryButtonClass =
@@ -131,7 +131,7 @@ const OnePage = () => {
                 <AnimatedTextCycle
                   words={["Masa Depanmu", "Keuanganmu", "Tabunganmu", "Impianmu"]}
                   interval={3000}
-                  className="!text-[#64AB88]"
+                  className="!font-extrabold !text-[#64AB88]"
                 />
               </span>
             </h1>

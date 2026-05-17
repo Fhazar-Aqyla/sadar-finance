@@ -10,6 +10,8 @@ import Dashboardjob from "../pages/Dashboardjob/index"
 import DashboardCrypto from "../pages/DashboardCrypto";
 import DashboardProject from "../pages/DashboardProject";
 import DashboardNFT from "../pages/DashboardNFT";
+import SadarDashboard from "../pages/SadarDashboard";
+import SadarPlaceholder from "../pages/SadarPlaceholder";
 
 //Calendar
 import MonthGrid from "../pages/Calendar/MonthGrid";
@@ -250,9 +252,13 @@ import TransactionInput from "../pages/Sadar/TransactionInput";
 const authProtectedRoutes = [
   { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
-  { path: "/dashboard", component: <DashboardEcommerce /> },
+  { path: "/dashboard", component: <SadarDashboard /> },
+  { path: "/catat-keuangan", component: <SadarPlaceholder /> },
+  { path: "/behavior-insight", component: <SadarPlaceholder /> },
+  { path: "/financial-score", component: <SadarPlaceholder /> },
+  { path: "/profile-account", component: <SadarPlaceholder /> },
   { path: "/dashboard-jobs", component: <Dashboardjob /> },
-  { path: "/index", component: <DashboardEcommerce /> },
+  { path: "/index", component: <SadarDashboard /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
   { path: "/dashboard-projects", component: <DashboardProject /> },
   { path: "/dashboard-nft", component: <DashboardNFT /> },

@@ -1,11 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar-react";
-//import logo
-import logoSm from "../assets/images/logo-sm.png";
-import logoDark from "../assets/images/logo-dark.png";
-import logoLight from "../assets/images/logo-light.png";
-
 //Import Components
 import VerticalLayout from "./VerticalLayouts";
 import TwoColumnLayout from "./TwoColumnLayout";
@@ -39,19 +34,19 @@ const Sidebar = ({ layoutType }) => {
         <div className="navbar-brand-box">
           <Link to="/" className="logo logo-dark">
             <span className="logo-sm">
-              <img src={logoSm} alt="" height="22" />
+              <span className="fw-bold text-primary fs-18">S</span>
             </span>
             <span className="logo-lg">
-              <img src={logoDark} alt="" height="17" />
+              <span className="fw-bold text-primary fs-18">SADAR Finance</span>
             </span>
           </Link>
 
           <Link to="/" className="logo logo-light">
             <span className="logo-sm">
-              <img src={logoSm} alt="" height="22" />
+              <span className="fw-bold text-white fs-18">S</span>
             </span>
             <span className="logo-lg">
-              <img src={logoLight} alt="" height="17" />
+              <span className="fw-bold text-white fs-18">SADAR Finance</span>
             </span>
           </Link>
           <button
