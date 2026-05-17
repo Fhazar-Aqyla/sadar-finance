@@ -7,8 +7,11 @@ import pytesseract
 
 
 TESSERACT_CMD = os.getenv("TESSERACT_CMD")
+WINDOWS_TESSERACT_CMD = Path(r"C:\Program Files\Tesseract-OCR\tesseract.exe")
 if TESSERACT_CMD:
     pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
+elif WINDOWS_TESSERACT_CMD.exists():
+    pytesseract.pytesseract.tesseract_cmd = str(WINDOWS_TESSERACT_CMD)
 
 
 def preprocess_image(image_path: str) -> Image.Image:
