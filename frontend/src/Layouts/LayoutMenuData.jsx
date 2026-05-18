@@ -17,7 +17,7 @@ const Navdata = () => {
       id: "catat-keuangan",
       label: "Catat Keuangan",
       icon: <FeatherIcon icon="edit-3" className="icon-dual" />,
-      link: "/transactions/input",
+      link: "/catat-keuangan",
     },
     {
       id: "behavior-insight",
@@ -30,10 +30,6 @@ const Navdata = () => {
       label: "Financial Score",
       icon: <FeatherIcon icon="bar-chart-2" className="icon-dual" />,
       link: "/financial-score",
-    },
-    {
-      label: "Tools",
-      isHeader: true,
     },
     {
       id: "profile-account",

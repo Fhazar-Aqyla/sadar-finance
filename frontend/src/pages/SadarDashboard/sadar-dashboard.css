@@ -1,6 +1,10 @@
 .sadar-dashboard {
   background: #f6f8fb;
   color: #172033;
+  --sadar-primary: #1e3a8a;
+  --sadar-teal: #14b8a6;
+  --sadar-success: #22c55e;
+  --sadar-warning: #f59e0b;
 }
 
 .sadar-dashboard .container-fluid {
@@ -9,7 +13,7 @@
 
 .sadar-dashboard .card {
   border: 1px solid #e7ebf2;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
 }
 
@@ -41,7 +45,7 @@
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid #e4e9f2;
-  border-radius: 8px;
+  border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
 }
@@ -88,22 +92,14 @@
   background: #f8fafc;
 }
 
-.sadar-score-panel {
+.sadar-overview-note {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 0.9rem;
   padding: 1.15rem;
   border: 1px solid #e5edf7;
-  border-radius: 8px;
-  background: #f8fbff;
-}
-
-.sadar-score-panel strong {
-  display: block;
-  margin-top: 0.2rem;
-  color: #0f172a;
-  font-size: 2.35rem;
-  line-height: 1;
+  border-radius: 12px;
+  background: #fffbeb;
 }
 
 .sadar-section-label {
@@ -114,20 +110,9 @@
   text-transform: uppercase;
 }
 
-.sadar-score-icon {
-  width: 46px;
-  height: 46px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: #198754;
-  background: #e9f8ef;
-  font-size: 1.45rem;
-}
-
-.sadar-score-panel p {
-  margin-top: 0.9rem;
+.sadar-overview-note p {
+  margin: 0.25rem 0 0;
+  color: #475569;
   font-size: 0.88rem;
 }
 
@@ -160,8 +145,44 @@
   flex: 0 0 38px;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1.2rem;
+}
+
+.metric-icon.bg-primary-subtle,
+.sadar-dashboard .bg-primary-subtle {
+  background-color: rgba(30, 58, 138, 0.1) !important;
+}
+
+.metric-icon.text-primary,
+.sadar-dashboard .text-primary {
+  color: var(--sadar-primary) !important;
+}
+
+.metric-icon.bg-success-subtle {
+  background-color: rgba(34, 197, 94, 0.11) !important;
+}
+
+.metric-icon.text-success {
+  color: var(--sadar-success) !important;
+}
+
+.metric-icon.bg-warning-subtle,
+.sadar-dashboard .bg-warning-subtle {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+}
+
+.metric-icon.text-warning,
+.sadar-dashboard .text-warning {
+  color: var(--sadar-warning) !important;
+}
+
+.bg-teal-subtle {
+  background-color: rgba(20, 184, 166, 0.12) !important;
+}
+
+.text-teal {
+  color: var(--sadar-teal) !important;
 }
 
 .metric-card h2 {
@@ -180,6 +201,165 @@
 
 .dashboard-panel .card-body {
   padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.cashflow-chart-body {
+  padding-top: 0.35rem !important;
+}
+
+.cashflow-chart-body .apexcharts-tooltip {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+}
+
+.sadar-chart-legend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  color: #64748b;
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sadar-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 3px;
+}
+
+.legend-income {
+  background: var(--sadar-success);
+}
+
+.legend-expense {
+  background: var(--sadar-primary);
+}
+
+.category-chart-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 330px;
+  padding-top: 0.4rem !important;
+}
+
+.category-chart-body .apexcharts-canvas {
+  margin: 0 auto;
+}
+
+.category-chart-wrap {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.category-center-label {
+  position: absolute;
+  top: 40.5%;
+  left: 50%;
+  z-index: 2;
+  max-width: 132px;
+  transform: translate(-50%, -50%);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.category-center-label.is-visible {
+  opacity: 1;
+}
+
+.category-chart-body .apexcharts-pie-series path {
+  opacity: 1 !important;
+  stroke: #ffffff !important;
+  stroke-width: 4px !important;
+}
+
+.category-chart-body .apexcharts-pie circle,
+.category-chart-body .apexcharts-pie line {
+  stroke: transparent !important;
+}
+
+.category-chart-body .apexcharts-datalabel-label,
+.category-chart-body .apexcharts-datalabel-value {
+  fill: var(--sadar-primary) !important;
+  font-weight: 800 !important;
+  dominant-baseline: middle;
+}
+
+.expense-trend-header {
+  align-items: flex-start;
+  padding: 1.35rem 1.35rem 0;
+}
+
+.expense-trend-header .card-title {
+  color: #222936;
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+
+.expense-period-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--sadar-teal);
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.expense-period-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1.5px solid var(--sadar-teal);
+  border-radius: 50%;
+  color: var(--sadar-teal);
+  background: #ffffff;
+  font-size: 1.35rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.expense-period-btn:hover,
+.expense-period-btn:focus {
+  border-color: #0f766e;
+  color: #0f766e;
+  background: #f0fdfa;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.14);
+}
+
+.expense-trend-body {
+  padding: 0.65rem 1rem 1.1rem 0.8rem;
+}
+
+.expense-trend-body .apexcharts-tooltip {
+  border: 1px solid #d6ecf8;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.expense-trend-body .apexcharts-xaxis-label,
+.expense-trend-body .apexcharts-yaxis-label {
+  letter-spacing: 0;
 }
 
 .sadar-progress {
@@ -225,34 +405,6 @@
   background: #f8fafc;
 }
 
-.sadar-account-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.sadar-account-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.85rem;
-  border: 1px solid #edf1f6;
-  border-radius: 8px;
-  background: #fbfcfe;
-}
-
-.sadar-account-item strong {
-  color: #0f172a;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.sadar-account-mark {
-  width: 10px;
-  height: 36px;
-  flex: 0 0 10px;
-  border-radius: 999px;
-}
-
 .sadar-side-stack {
   display: grid;
   gap: 1rem;
@@ -273,6 +425,7 @@
   display: grid;
   align-content: start;
   gap: 0.5rem;
+  min-height: 142px;
 }
 
 .insight-card h5,
@@ -294,13 +447,17 @@
   font-size: 0.84rem;
 }
 
+.alert-card .sadar-progress {
+  margin: 0.65rem 0 0.45rem;
+}
+
 .sadar-note-icon {
   width: 38px;
   height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1.15rem;
 }
 
@@ -318,14 +475,22 @@
   min-height: 48px;
   padding: 0.75rem 1rem;
   border: 1px solid #e7ebf2;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #fbfcfe;
   font-weight: 700;
   text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
 }
 
 .sadar-action-link i {
   font-size: 1.1rem;
+}
+
+.sadar-action-link:hover,
+.sadar-action-link:focus {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 1199.98px) {
@@ -333,8 +498,8 @@
     grid-template-columns: 1fr;
   }
 
-  .sadar-score-panel {
-    min-height: 150px;
+  .sadar-overview-note {
+    align-items: flex-start;
   }
 
   .sadar-quick-actions {
@@ -379,19 +544,28 @@
     min-height: 0;
   }
 
+  .sadar-chart-legend {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .expense-trend-header {
+    gap: 0.85rem;
+  }
+
+  .expense-trend-header .card-title {
+    font-size: 1.08rem;
+  }
+
+  .expense-period-control {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
   .sadar-table-wrap {
     margin-right: -0.25rem;
     margin-left: -0.25rem;
     border-radius: 6px;
   }
 
-  .sadar-account-item {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .sadar-account-item strong {
-    width: 100%;
-    padding-left: 1.45rem;
-  }
 }

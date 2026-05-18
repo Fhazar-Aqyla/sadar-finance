@@ -253,7 +253,7 @@ const authProtectedRoutes = [
   { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
   { path: "/dashboard", component: <SadarDashboard /> },
-  { path: "/catat-keuangan", component: <SadarPlaceholder /> },
+  { path: "/catat-keuangan", component: <TransactionInput /> },
   { path: "/behavior-insight", component: <SadarPlaceholder /> },
   { path: "/financial-score", component: <SadarPlaceholder /> },
   { path: "/profile-account", component: <SadarPlaceholder /> },

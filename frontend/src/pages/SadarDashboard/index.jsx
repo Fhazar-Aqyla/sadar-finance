@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import {
@@ -26,46 +26,40 @@ const rupiah = (value) =>
 
 const summaryCards = [
   {
-    label: "Total saldo",
+    label: "Total Saldo",
     value: rupiah(18450000),
     helper: "3 rekening aktif",
     icon: "ri-wallet-3-line",
     tone: "primary",
   },
   {
-    label: "Pemasukan",
+    label: "Pemasukan Bulan Ini",
     value: rupiah(8200000),
     helper: "+12% dari bulan lalu",
     icon: "ri-arrow-down-circle-line",
     tone: "success",
   },
   {
-    label: "Pengeluaran",
+    label: "Pengeluaran Bulan Ini",
     value: rupiah(5150000),
     helper: "63% dari pemasukan",
     icon: "ri-arrow-up-circle-line",
-    tone: "danger",
+    tone: "warning",
   },
   {
-    label: "Sisa budget",
+    label: "Sisa Budget",
     value: rupiah(2350000),
     helper: "Aman untuk 12 hari",
     icon: "ri-pie-chart-2-line",
-    tone: "info",
+    tone: "teal",
   },
   {
-    label: "Transaksi",
-    value: "128",
+    label: "Jumlah Transaksi",
+    value: "128 transaksi",
     helper: "34 minggu ini",
     icon: "ri-receipt-line",
     tone: "secondary",
   },
-];
-
-const accountBalances = [
-  { name: "Mandiri Payroll", amount: 10250000, meta: "Utama", tone: "primary" },
-  { name: "BCA Everyday", amount: 5830000, meta: "Harian", tone: "success" },
-  { name: "E-wallet", amount: 2370000, meta: "Pocket", tone: "info" },
 ];
 
 const cashflowSeries = [
@@ -76,11 +70,13 @@ const cashflowSeries = [
 const expenseTrendSeries = [
   {
     name: "Pengeluaran",
-    data: [280, 310, 295, 420, 380, 350, 610, 330, 310, 455, 390, 365],
+    data: [1600, 2400, 1950, 3600, 2900, 5200, 4100, 2600, 4700, 3900, 5750, 4300],
   },
 ];
 
+const categoryLabels = ["Makanan", "Transportasi", "Belanja", "Hiburan", "Lainnya"];
 const categorySeries = [32, 21, 18, 14, 15];
+const categoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#94a3b8"];
 
 const recentTransactions = [
   {
@@ -93,7 +89,7 @@ const recentTransactions = [
   },
   {
     name: "Gaji bulanan",
-    category: "Income",
+    category: "Pemasukan",
     account: "Mandiri Payroll",
     date: "15 Mei 2026",
     amount: 8200000,
@@ -151,102 +147,254 @@ const chartBaseOptions = {
 
 const cashflowOptions = {
   ...chartBaseOptions,
-  colors: ["#2563eb", "#ef4444"],
+  chart: {
+    ...chartBaseOptions.chart,
+    id: "sadar-cashflow-chart",
+    parentHeightOffset: 0,
+  },
+  colors: ["#22C55E", "#1E3A8A"],
   plotOptions: {
     bar: {
-      borderRadius: 5,
-      columnWidth: "38%",
+      borderRadius: 8,
+      borderRadiusApplication: "end",
+      columnWidth: "34%",
+      dataLabels: {
+        position: "top",
+      },
     },
+  },
+  fill: {
+    opacity: 0.94,
+  },
+  grid: {
+    borderColor: "#edf2f7",
+    strokeDashArray: 4,
+    padding: {
+      top: 4,
+      right: 8,
+      bottom: 0,
+      left: 8,
+    },
+  },
+  legend: {
+    show: false,
   },
   xaxis: {
     categories: ["Des", "Jan", "Feb", "Mar", "Apr", "Mei"],
     axisBorder: { show: false },
     axisTicks: { show: false },
-    labels: { style: { colors: "#64748b" } },
+    labels: {
+      offsetY: 6,
+      style: {
+        colors: "#64748b",
+        fontSize: "12px",
+        fontWeight: 600,
+      },
+    },
   },
   yaxis: {
+    min: 0,
+    max: 10,
+    tickAmount: 5,
     labels: {
-      style: { colors: "#64748b" },
+      offsetX: -4,
+      style: {
+        colors: "#64748b",
+        fontSize: "12px",
+        fontWeight: 600,
+      },
       formatter: (value) => `${value} jt`,
+    },
+  },
+  tooltip: {
+    shared: true,
+    intersect: false,
+    marker: { show: true },
+    y: {
+      formatter: (value) => rupiah(value * 1000000),
+    },
+  },
+  states: {
+    hover: {
+      filter: {
+        type: "lighten",
+        value: 0.05,
+      },
+    },
+    active: {
+      filter: {
+        type: "none",
+      },
     },
   },
 };
 
 const trendOptions = {
   ...chartBaseOptions,
-  colors: ["#0f766e"],
+  colors: ["#14B8A6"],
+  chart: {
+    ...chartBaseOptions.chart,
+    id: "sadar-expense-trend-chart",
+    sparkline: { enabled: false },
+    parentHeightOffset: 0,
+  },
   stroke: {
-    width: 3,
+    width: 2.5,
     curve: "smooth",
+  },
+  markers: {
+    size: 4.5,
+    colors: ["#14B8A6"],
+    strokeColors: "#ffffff",
+    strokeWidth: 2,
+    hover: { size: 6 },
   },
   fill: {
     type: "gradient",
     gradient: {
-      shadeIntensity: 1,
-      opacityFrom: 0.18,
+      type: "vertical",
+      shadeIntensity: 0,
+      gradientToColors: ["#ccfbf1"],
+      opacityFrom: 0.55,
       opacityTo: 0.03,
-      stops: [0, 90, 100],
+      stops: [0, 72, 100],
+    },
+  },
+  grid: {
+    show: false,
+    padding: {
+      top: 6,
+      right: 18,
+      bottom: 10,
+      left: 20,
     },
   },
   xaxis: {
-    categories: ["5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"],
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-    labels: { style: { colors: "#64748b" } },
+    categories: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"],
+    tickPlacement: "between",
+    axisBorder: {
+      show: true,
+      color: "#d7dee8",
+      height: 1,
+    },
+    axisTicks: {
+      show: true,
+      color: "#172033",
+      height: 4,
+    },
+    labels: {
+      offsetY: 8,
+      style: {
+        colors: "#596374",
+        fontSize: "13px",
+        fontWeight: 600,
+      },
+    },
   },
   yaxis: {
+    min: 0,
+    max: 7000,
+    tickAmount: 7,
     labels: {
-      style: { colors: "#64748b" },
-      formatter: (value) => `${value} rb`,
+      offsetX: -4,
+      style: {
+        colors: "#687385",
+        fontSize: "13px",
+        fontWeight: 700,
+      },
+      formatter: (value) => Math.round(value).toLocaleString("id-ID"),
+    },
+    axisBorder: {
+      show: true,
+      color: "#d7dee8",
+    },
+    axisTicks: {
+      show: true,
+      color: "#172033",
+      width: 4,
     },
   },
   tooltip: {
+    marker: { show: false },
     y: {
-      formatter: (value) => `${value.toLocaleString("id-ID")} ribu`,
+      formatter: (value) => rupiah(value * 1000),
     },
   },
 };
 
-const categoryOptions = {
+const createCategoryOptions = (setActiveCategory) => ({
   chart: {
+    id: "sadar-category-chart",
     type: "donut",
     fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    toolbar: { show: false },
+    events: {
+      dataPointMouseEnter: (_event, _chartContext, config) => {
+        setActiveCategory({
+          label: categoryLabels[config.dataPointIndex] || "",
+          color: categoryColors[config.dataPointIndex] || "#1E3A8A",
+        });
+      },
+      dataPointSelection: (_event, _chartContext, config) => {
+        setActiveCategory({
+          label: categoryLabels[config.dataPointIndex] || "",
+          color: categoryColors[config.dataPointIndex] || "#1E3A8A",
+        });
+      },
+    },
   },
-  labels: ["Makanan", "Transportasi", "Belanja", "Hiburan", "Lainnya"],
-  colors: ["#2563eb", "#0f766e", "#f59e0b", "#ef4444", "#94a3b8"],
+  labels: categoryLabels,
+  colors: categoryColors,
+  fill: {
+    colors: categoryColors,
+    opacity: 1,
+  },
   legend: {
     position: "bottom",
     fontSize: "12px",
     itemMargin: { horizontal: 8, vertical: 4 },
   },
   dataLabels: { enabled: false },
-  stroke: { width: 0 },
+  stroke: {
+    width: 4,
+    colors: ["#ffffff"],
+  },
   plotOptions: {
     pie: {
       donut: {
         size: "72%",
         labels: {
-          show: true,
+          show: false,
+          name: {
+            show: false,
+            color: "#1E3A8A",
+            fontSize: "18px",
+            fontWeight: 800,
+            offsetY: 6,
+          },
+          value: {
+            show: false,
+          },
           total: {
-            show: true,
-            label: "Terbesar",
-            formatter: () => "Makanan",
+            show: false,
           },
         },
       },
     },
   },
-};
+});
 
 const actionLinks = [
-  { label: "Tambah transaksi", icon: "ri-add-circle-line", link: "/catat-keuangan", color: "primary" },
-  { label: "Tambah income", icon: "ri-bank-card-line", link: "/catat-keuangan", color: "success" },
-  { label: "Insight", icon: "ri-lightbulb-flash-line", link: "/behavior-insight", color: "info" },
-  { label: "Financial score", icon: "ri-speed-up-line", link: "/financial-score", color: "warning" },
+  { label: "Tambah Transaksi", icon: "ri-add-circle-line", link: "/catat-keuangan", color: "primary" },
+  { label: "Tambah Income", icon: "ri-bank-card-line", link: "/catat-keuangan", color: "success" },
+  { label: "Lihat Insight", icon: "ri-lightbulb-flash-line", link: "/behavior-insight", color: "teal" },
+  { label: "Lihat Financial Score", icon: "ri-speed-up-line", link: "/financial-score", color: "warning" },
 ];
 
 const SadarDashboard = () => {
   document.title = "Dashboard | SADAR Finance";
+  const [activeCategory, setActiveCategory] = useState({ label: "", color: "#1E3A8A" });
+  const categoryOptions = useMemo(() => createCategoryOptions(setActiveCategory), []);
 
   return (
     <div className="page-content sadar-dashboard">
@@ -259,30 +407,26 @@ const SadarDashboard = () => {
               Ringkasan Mei 2026
             </Badge>
             <h1>Halo, Aqyla</h1>
-            <p>Saldo masih sehat, tapi budget makanan perlu dijaga sampai akhir minggu.</p>
+            <p>Yuk lihat kondisi keuanganmu hari ini.</p>
             <div className="sadar-overview-actions">
-              <Button color="primary">
+              <Button color="primary" tag={Link} to="/catat-keuangan">
                 <i className="ri-add-line align-bottom me-1"></i>
-                Tambah transaksi
+                Tambah Transaksi
               </Button>
-              <Button color="light" className="sadar-ghost-btn">
-                <i className="ri-file-list-3-line align-bottom me-1"></i>
-                Review budget
+              <Button color="light" className="sadar-ghost-btn" tag={Link} to="/behavior-insight">
+                <i className="ri-lightbulb-flash-line align-bottom me-1"></i>
+                Lihat Insight
               </Button>
             </div>
           </div>
-          <div className="sadar-score-panel">
-            <div className="d-flex align-items-center justify-content-between gap-3">
-              <div>
-                <span className="sadar-section-label">Financial score</span>
-                <strong>82</strong>
-              </div>
-              <span className="sadar-score-icon">
-                <i className="ri-shield-check-line"></i>
-              </span>
+          <div className="sadar-overview-note">
+            <span className="sadar-note-icon bg-warning-subtle text-warning">
+              <i className="ri-alert-line"></i>
+            </span>
+            <div>
+              <span className="sadar-section-label">Smart Alert</span>
+              <p>Budget makanan sudah mencapai 80%. Jaga ritme belanja sampai akhir minggu.</p>
             </div>
-            <Progress value={82} color="success" className="sadar-progress" />
-            <p>Stabil. Pertahankan rasio pengeluaran di bawah 70% pemasukan.</p>
           </div>
         </section>
 
@@ -313,9 +457,19 @@ const SadarDashboard = () => {
                   <h4 className="card-title mb-1">Cashflow bulanan</h4>
                   <p className="text-muted mb-0">Pemasukan dan pengeluaran 6 bulan terakhir</p>
                 </div>
+                <div className="sadar-chart-legend" aria-label="Legenda cashflow">
+                  <span>
+                    <i className="legend-dot legend-income"></i>
+                    Pemasukan
+                  </span>
+                  <span>
+                    <i className="legend-dot legend-expense"></i>
+                    Pengeluaran
+                  </span>
+                </div>
               </CardHeader>
-              <CardBody>
-                <ReactApexChart options={cashflowOptions} series={cashflowSeries} type="bar" height={312} />
+              <CardBody className="cashflow-chart-body">
+                <ReactApexChart options={cashflowOptions} series={cashflowSeries} type="bar" height={292} />
               </CardBody>
             </Card>
           </Col>
@@ -323,87 +477,20 @@ const SadarDashboard = () => {
             <Card className="h-100 dashboard-panel">
               <CardHeader>
                 <div>
-                  <h4 className="card-title mb-1">Kategori pengeluaran</h4>
+                  <h4 className="card-title mb-1">Kategori Pengeluaran</h4>
                   <p className="text-muted mb-0">Distribusi bulan ini</p>
                 </div>
               </CardHeader>
-              <CardBody>
-                <ReactApexChart options={categoryOptions} series={categorySeries} type="donut" height={312} />
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row className="g-3 mt-1">
-          <Col xl={8}>
-            <Card className="dashboard-panel">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Transaksi terakhir</h4>
-                  <p className="text-muted mb-0">Aktivitas rekening terbaru</p>
-                </div>
-                <Button color="light" size="sm" className="sadar-table-action">
-                  Lihat semua
-                </Button>
-              </CardHeader>
-              <CardBody className="pt-0">
-                <div className="table-responsive sadar-table-wrap">
-                  <Table className="align-middle mb-0 sadar-table">
-                    <thead>
-                      <tr>
-                        <th>Transaksi</th>
-                        <th>Kategori</th>
-                        <th>Rekening</th>
-                        <th>Tanggal</th>
-                        <th className="text-end">Nominal</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentTransactions.map((transaction) => (
-                        <tr key={`${transaction.name}-${transaction.date}`}>
-                          <td>
-                            <div className="fw-semibold text-dark">{transaction.name}</div>
-                          </td>
-                          <td>{transaction.category}</td>
-                          <td>{transaction.account}</td>
-                          <td>{transaction.date}</td>
-                          <td className={`text-end fw-semibold ${transaction.amount > 0 ? "text-success" : "text-danger"}`}>
-                            {transaction.amount > 0 ? "+" : "-"}
-                            {rupiah(Math.abs(transaction.amount))}
-                          </td>
-                          <td>
-                            <Badge color={transaction.amount > 0 ? "success" : "secondary"} className={`bg-${transaction.amount > 0 ? "success" : "secondary"}-subtle text-${transaction.amount > 0 ? "success" : "secondary"}`}>
-                              {transaction.status}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-          <Col xl={4}>
-            <Card className="dashboard-panel h-100">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Saldo rekening</h4>
-                  <p className="text-muted mb-0">Total dana per account</p>
-                </div>
-              </CardHeader>
-              <CardBody className="sadar-account-list">
-                {accountBalances.map((account) => (
-                  <div className="sadar-account-item" key={account.name}>
-                    <span className={`sadar-account-mark bg-${account.tone}`}></span>
-                    <div className="flex-grow-1">
-                      <div className="fw-semibold text-dark">{account.name}</div>
-                      <small className="text-muted">{account.meta}</small>
-                    </div>
-                    <strong>{rupiah(account.amount)}</strong>
+              <CardBody className="category-chart-body">
+                <div className="category-chart-wrap" onMouseLeave={() => setActiveCategory({ label: "", color: "#1E3A8A" })}>
+                  <ReactApexChart key="sadar-category-chart" options={categoryOptions} series={categorySeries} type="donut" height={312} />
+                  <div
+                    className={`category-center-label ${activeCategory.label ? "is-visible" : ""}`}
+                    style={{ color: activeCategory.color }}
+                  >
+                    {activeCategory.label}
                   </div>
-                ))}
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -412,14 +499,14 @@ const SadarDashboard = () => {
         <Row className="g-3 mt-1">
           <Col xl={8}>
             <Card className="h-100 dashboard-panel">
-              <CardHeader>
+              <CardHeader className="expense-trend-header">
                 <div>
-                  <h4 className="card-title mb-1">Tren pengeluaran</h4>
-                  <p className="text-muted mb-0">Pantau lonjakan transaksi harian</p>
+                  <h4 className="card-title mb-1">Tren Pengeluaran</h4>
+                  <p className="text-muted mb-0">Pantau pola pengeluaran bulanan</p>
                 </div>
               </CardHeader>
-              <CardBody>
-                <ReactApexChart options={trendOptions} series={expenseTrendSeries} type="area" height={292} />
+              <CardBody className="expense-trend-body">
+                <ReactApexChart options={trendOptions} series={expenseTrendSeries} type="area" height={300} />
               </CardBody>
             </Card>
           </Col>
@@ -427,10 +514,10 @@ const SadarDashboard = () => {
             <div className="sadar-side-stack">
               <Card className="insight-card dashboard-panel">
                 <CardBody>
-                  <div className="sadar-note-icon bg-info-subtle text-info">
+                  <div className="sadar-note-icon bg-teal-subtle text-teal">
                     <i className="ri-lightbulb-flash-line"></i>
                   </div>
-                  <h5>Smart insight</h5>
+                  <h5>Smart Insight</h5>
                   <p>Pengeluaran makanan naik 18% dibanding minggu lalu.</p>
                   <span>Transaksi paling sering muncul di akhir pekan.</span>
                 </CardBody>
@@ -449,6 +536,55 @@ const SadarDashboard = () => {
             </div>
           </Col>
         </Row>
+
+        <Card className="dashboard-panel mt-3">
+          <CardHeader>
+            <div>
+              <h4 className="card-title mb-1">Transaksi Terbaru</h4>
+              <p className="text-muted mb-0">Preview 5 transaksi terakhir</p>
+            </div>
+            <Button color="light" size="sm" className="sadar-table-action">
+              Lihat Semua
+            </Button>
+          </CardHeader>
+          <CardBody className="pt-0">
+            <div className="table-responsive sadar-table-wrap">
+              <Table className="align-middle mb-0 sadar-table">
+                <thead>
+                  <tr>
+                    <th>Nama Transaksi</th>
+                    <th>Kategori</th>
+                    <th>Account</th>
+                    <th>Tanggal</th>
+                    <th className="text-end">Nominal</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentTransactions.map((transaction) => (
+                    <tr key={`${transaction.name}-${transaction.date}`}>
+                      <td>
+                        <div className="fw-semibold text-dark">{transaction.name}</div>
+                      </td>
+                      <td>{transaction.category}</td>
+                      <td>{transaction.account}</td>
+                      <td>{transaction.date}</td>
+                      <td className={`text-end fw-semibold ${transaction.amount > 0 ? "text-success" : "text-primary"}`}>
+                        {transaction.amount > 0 ? "+" : "-"}
+                        {rupiah(Math.abs(transaction.amount))}
+                      </td>
+                      <td>
+                        <Badge color={transaction.amount > 0 ? "success" : "secondary"} className={`bg-${transaction.amount > 0 ? "success" : "secondary"}-subtle text-${transaction.amount > 0 ? "success" : "secondary"}`}>
+                          {transaction.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          </CardBody>
+        </Card>
 
         <Card className="dashboard-panel mt-3">
           <CardBody className="sadar-quick-actions">
