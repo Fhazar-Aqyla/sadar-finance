@@ -11,18 +11,17 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api-node.themesbrand.website",
+        target: "http://localhost:3000",
         changeOrigin: true,
-        secure: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
       },
     },
   },
   define: {
     global: 'globalThis',
     'process.env.PUBLIC_URL': JSON.stringify(''),
-    'process.env.REACT_APP_DEFAULTAUTH': JSON.stringify('fake'),
-    'process.env.REACT_APP_API_URL': JSON.stringify('https://api-node.themesbrand.website'),
+    'process.env.REACT_APP_DEFAULTAUTH': JSON.stringify('sadar'),
+    'process.env.REACT_APP_API_URL': JSON.stringify('http://localhost:3000/api/v1'),
   },
   resolve: {
     alias: {

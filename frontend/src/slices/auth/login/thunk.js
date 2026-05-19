@@ -1,19 +1,59 @@
 //Include Both Helper File with needed methods
+import axios from "axios";
 import { getFirebaseBackend } from "../../../helpers/firebase_helper";
 import {
   postFakeLogin,
   postJwtLogin,
 } from "../../../helpers/fakebackend_helper";
+import { setAuthorization } from "../../../helpers/api_helper";
 
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 
-const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
-const hasApiUrl = Boolean(import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL);
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+
+const getErrorMessage = (error, fallback = "Login gagal. Coba lagi.") => {
+  if (typeof error === "string") return error;
+  return (
+    error?.response?.data?.error?.message ||
+    error?.response?.data?.message ||
+    error?.message ||
+    error?.data?.message ||
+    error?.data ||
+    fallback
+  );
+};
+
+const normalizeSadarAuth = (response) => {
+  const payload = response?.data?.data || response?.data || response;
+  return {
+    token: payload?.token,
+    user: payload?.user,
+  };
+};
 
 export const loginUser = (user, history) => async (dispatch) => {
 
   try {
     let response;
+    if (defaultAuth === "sadar") {
+      response = await axios.post(`${apiBaseUrl}/auth/login`, {
+        email: user.email,
+        password: user.password,
+      });
+
+      const data = normalizeSadarAuth(response);
+      if (!data.token) {
+        throw new Error("Response login tidak menyertakan token.");
+      }
+
+      sessionStorage.setItem("authUser", JSON.stringify(data));
+      setAuthorization(data.token);
+      dispatch(loginSuccess(data.user));
+      history('/dashboard');
+      return;
+    }
+
     if (defaultAuth === "firebase") {
       let fireBaseBackend = getFirebaseBackend();
       response = fireBaseBackend.loginUser(
@@ -26,7 +66,7 @@ export const loginUser = (user, history) => async (dispatch) => {
         password: user.password
       });
 
-    } else if (defaultAuth === "fake" || hasApiUrl) {
+    } else {
       response = postFakeLogin({
         email: user.email,
         password: user.password,
@@ -42,10 +82,14 @@ export const loginUser = (user, history) => async (dispatch) => {
         finallogin = JSON.parse(finallogin)
         data = finallogin.data;
         if (finallogin.status === "success") {
+          sessionStorage.setItem("authUser", JSON.stringify({
+            token: finallogin.data?.accessToken,
+            user: finallogin.data,
+          }));
           dispatch(loginSuccess(data));
           history('/dashboard')
         } else {
-          dispatch(apiError(finallogin));
+          dispatch(apiError(finallogin.message || "Email atau password salah."));
         }
       }else{
         dispatch(loginSuccess(data));
@@ -53,7 +97,7 @@ export const loginUser = (user, history) => async (dispatch) => {
       }
     }
   } catch (error) {
-    dispatch(apiError(error));
+    dispatch(apiError(getErrorMessage(error, "Email atau password salah.")));
   }
 };
 

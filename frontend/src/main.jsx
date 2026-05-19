@@ -14,7 +14,7 @@ if (typeof globalThis.global === 'undefined') {
   globalThis.global = globalThis
 }
 
-const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? 'fake'
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? 'sadar'
 
 if (defaultAuth === 'fake') {
   fakeBackend()

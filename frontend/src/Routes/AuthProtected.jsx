@@ -1,19 +1,15 @@
 import React from "react";
-import { Route } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const AuthProtected = (props) => {
+  const location = useLocation();
+  const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+
+  if (!authUser?.token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
   return <>{props.children}</>;
 };
 
-const AccessRoute = ({ component: Component, ...rest }) => {
-  return (
-    <Route
-      {...rest}
-      render={props => {
-        return (<> <Component {...props} /> </>);
-      }}
-    />
-  );
-};
-
-export { AuthProtected, AccessRoute };
+export { AuthProtected };

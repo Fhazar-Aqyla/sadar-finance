@@ -31,6 +31,7 @@ const registerSlice = createSlice({
     },
     apiErrorChange(state, action){
       state.error = action.payload;
+      state.registrationError = action.payload;
       state.loading = false;
       state.isUserLogout = false;
     }

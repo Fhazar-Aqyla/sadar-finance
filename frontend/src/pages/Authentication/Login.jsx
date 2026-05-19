@@ -5,8 +5,7 @@ import AuthSlider from "../AuthenticationInner/authCarousel";
 //redux
 import { useSelector, useDispatch } from "react-redux";
 
-import { Link } from "react-router-dom";
-import withRouter from "../../Components/Common/withRouter";
+import { Link, useNavigate } from "react-router-dom";
 // Formik validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -18,8 +17,9 @@ import { createSelector } from 'reselect';
 //import images
 import sadarLogo from "../../assets/images/landing/sadar-logo.png";
 
-const Login = (props) => {
+const Login = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const selectLayoutState = (state) => state;
     const loginpageData = createSelector(
         selectLayoutState,
@@ -35,36 +35,25 @@ const Login = (props) => {
         user, error, loading, errorMsg
     } = useSelector(loginpageData);
 
-    const [userLogin, setUserLogin] = useState([]);
     const [passwordShow, setPasswordShow] = useState(false);
 
-
-    useEffect(() => {
-        if (user && user) {
-            const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
-            const updatedUserData = defaultAuth === "firebase" ? user.multiFactor.user.email : user.user.email;
-            const updatedUserPassword = defaultAuth === "firebase" ? "" : user.user.confirm_password;
-            setUserLogin({
-                email: updatedUserData,
-                password: updatedUserPassword
-            });
-        }
-    }, [user]);
+    const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
+    const loginInitialValues = {
+        email: defaultAuth === "firebase" ? user?.multiFactor?.user?.email || "" : user?.user?.email || "",
+        password: defaultAuth === "firebase" ? "" : user?.user?.confirm_password || "",
+    };
 
     const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
 
-        initialValues: {
-            email: userLogin.email || '',
-            password: userLogin.password || '',
-        },
+        initialValues: loginInitialValues,
         validationSchema: Yup.object({
             email: Yup.string().email("Format email belum valid").required("Email wajib diisi"),
             password: Yup.string().required("Password wajib diisi"),
         }),
         onSubmit: (values) => {
-            dispatch(loginUser(values, props.router.navigate));
+            dispatch(loginUser(values, navigate));
         }
     });
 
@@ -76,7 +65,10 @@ const Login = (props) => {
         }
     }, [dispatch, errorMsg]);
 
-    document.title = "Masuk | SADAR Finance";
+    useEffect(() => {
+        document.title = "Masuk | SADAR Finance";
+    }, []);
+
     return (
         <React.Fragment>
             <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
@@ -145,7 +137,9 @@ const Login = (props) => {
                                                         {validation.touched.password && validation.errors.password ? (
                                                             <FormFeedback type="invalid">{validation.errors.password}</FormFeedback>
                                                         ) : null}
-                                                        <button className="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" onClick={() => setPasswordShow(!passwordShow)} type="button" id="password-addon"><i className="ri-eye-fill align-middle"></i></button>
+                                                        <button className="btn btn-link password-toggle-btn text-decoration-none" onClick={() => setPasswordShow(!passwordShow)} type="button" id="password-addon" aria-label={passwordShow ? "Sembunyikan password" : "Tampilkan password"}>
+                                                            <i className={`${passwordShow ? "ri-eye-off-fill" : "ri-eye-fill"} align-middle`}></i>
+                                                        </button>
                                                     </div>
                                                 </div>
 
@@ -196,4 +190,4 @@ const Login = (props) => {
     );
 };
 
-export default withRouter(Login);
+export default Login;

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Alert, Container, Input, Label, Form, FormFeedback } from "reactstrap";
 
 // Formik Validation
@@ -24,6 +24,8 @@ import { createSelector } from "reselect";
 const Register = () => {
     const history = useNavigate();
     const dispatch = useDispatch();
+    const [passwordShow, setPasswordShow] = useState(false);
+    const [confirmPasswordShow, setConfirmPasswordShow] = useState(false);
 
     const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
@@ -37,8 +39,14 @@ const Register = () => {
         },
         validationSchema: Yup.object({
             email: Yup.string().email("Format email belum valid").required("Email wajib diisi"),
-            first_name: Yup.string().required("Nama wajib diisi"),
-            password: Yup.string().min(6, "Password minimal 6 karakter").required("Password wajib diisi"),
+            first_name: Yup.string().min(2, "Nama minimal 2 karakter").required("Nama wajib diisi"),
+            password: Yup.string()
+                .min(8, "Password minimal 8 karakter")
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/,
+                    "Password harus berisi huruf besar, huruf kecil, angka, dan simbol"
+                )
+                .required("Password wajib diisi"),
             confirm_password: Yup.string()
                 .oneOf([Yup.ref("password")], "Konfirmasi password tidak sama")
                 .required("Konfirmasi password wajib diisi"),
@@ -53,12 +61,13 @@ const Register = () => {
         selectLayoutState,
         (account) => ({
             success: account.success,
-            error: account.error
+            error: account.error,
+            registrationError: account.registrationError
         })
     );
     // Inside your component
     const {
-        error, success
+        error, success, registrationError
     } = useSelector(registerdatatype);
 
     useEffect(() => {
@@ -76,7 +85,9 @@ const Register = () => {
 
     }, [dispatch, success, error, history]);
 
-    document.title = "Daftar | SADAR Finance";
+    useEffect(() => {
+        document.title = "Daftar | SADAR Finance";
+    }, []);
 
     return (
         <React.Fragment>
@@ -120,7 +131,7 @@ const Register = () => {
 
                                                 {error && error ? (
                                                     <Alert color="danger"><div>
-                                                        Email sudah terdaftar. Gunakan email lain. </div></Alert>
+                                                        {registrationError || "Registrasi gagal. Periksa data dan coba lagi."} </div></Alert>
                                                 ) : null}
 
                                                 <div className="mb-3">
@@ -164,39 +175,61 @@ const Register = () => {
 
                                                 <div className="mb-3">
                                                     <Label htmlFor="userpassword" className="form-label">Password <span className="text-danger">*</span></Label>
-                                                    <Input
-                                                        name="password"
-                                                        type="password"
-                                                        placeholder="Minimal 6 karakter"
-                                                        onChange={validation.handleChange}
-                                                        onBlur={validation.handleBlur}
-                                                        value={validation.values.password || ""}
-                                                        invalid={
-                                                            validation.touched.password && validation.errors.password ? true : false
-                                                        }
-                                                    />
-                                                    {validation.touched.password && validation.errors.password ? (
-                                                        <FormFeedback type="invalid"><div>{validation.errors.password}</div></FormFeedback>
-                                                    ) : null}
+                                                    <div className="position-relative auth-pass-inputgroup">
+                                                        <Input
+                                                            id="userpassword"
+                                                            name="password"
+                                                            type={passwordShow ? "text" : "password"}
+                                                            placeholder="Minimal 8 karakter, huruf besar, angka, dan simbol"
+                                                            onChange={validation.handleChange}
+                                                            onBlur={validation.handleBlur}
+                                                            value={validation.values.password || ""}
+                                                            invalid={
+                                                                validation.touched.password && validation.errors.password ? true : false
+                                                            }
+                                                        />
+                                                        {validation.touched.password && validation.errors.password ? (
+                                                            <FormFeedback type="invalid"><div>{validation.errors.password}</div></FormFeedback>
+                                                        ) : null}
+                                                        <button
+                                                            className="btn btn-link password-toggle-btn text-decoration-none"
+                                                            onClick={() => setPasswordShow(!passwordShow)}
+                                                            type="button"
+                                                            aria-label={passwordShow ? "Sembunyikan password" : "Tampilkan password"}
+                                                        >
+                                                            <i className={`${passwordShow ? "ri-eye-off-fill" : "ri-eye-fill"} align-middle`}></i>
+                                                        </button>
+                                                    </div>
 
                                                 </div>
 
                                                 <div className="mb-2">
                                                     <Label htmlFor="confirmPassword" className="form-label">Confirm Password <span className="text-danger">*</span></Label>
-                                                    <Input
-                                                        name="confirm_password"
-                                                        type="password"
-                                                        placeholder="Ulangi password"
-                                                        onChange={validation.handleChange}
-                                                        onBlur={validation.handleBlur}
-                                                        value={validation.values.confirm_password || ""}
-                                                        invalid={
-                                                            validation.touched.confirm_password && validation.errors.confirm_password ? true : false
-                                                        }
-                                                    />
-                                                    {validation.touched.confirm_password && validation.errors.confirm_password ? (
-                                                        <FormFeedback type="invalid"><div>{validation.errors.confirm_password}</div></FormFeedback>
-                                                    ) : null}
+                                                    <div className="position-relative auth-pass-inputgroup">
+                                                        <Input
+                                                            id="confirmPassword"
+                                                            name="confirm_password"
+                                                            type={confirmPasswordShow ? "text" : "password"}
+                                                            placeholder="Ulangi password"
+                                                            onChange={validation.handleChange}
+                                                            onBlur={validation.handleBlur}
+                                                            value={validation.values.confirm_password || ""}
+                                                            invalid={
+                                                                validation.touched.confirm_password && validation.errors.confirm_password ? true : false
+                                                            }
+                                                        />
+                                                        {validation.touched.confirm_password && validation.errors.confirm_password ? (
+                                                            <FormFeedback type="invalid"><div>{validation.errors.confirm_password}</div></FormFeedback>
+                                                        ) : null}
+                                                        <button
+                                                            className="btn btn-link password-toggle-btn text-decoration-none"
+                                                            onClick={() => setConfirmPasswordShow(!confirmPasswordShow)}
+                                                            type="button"
+                                                            aria-label={confirmPasswordShow ? "Sembunyikan konfirmasi password" : "Tampilkan konfirmasi password"}
+                                                        >
+                                                            <i className={`${confirmPasswordShow ? "ri-eye-off-fill" : "ri-eye-fill"} align-middle`}></i>
+                                                        </button>
+                                                    </div>
 
                                                 </div>
 

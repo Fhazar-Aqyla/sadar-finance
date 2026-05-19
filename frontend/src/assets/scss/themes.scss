@@ -183,6 +183,89 @@ $value in $theme-colors {
   z-index: 1005;
 }
 
+.sadar-brand-logo {
+  width: 136px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.sadar-brand-logo-sm {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.sadar-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #8a94a6;
+  font-size: 0.92rem;
+  line-height: 1;
+}
+
+.sadar-footer-brand img {
+  width: 82px;
+  height: auto;
+  opacity: 0.9;
+}
+
+.sadar-footer-note {
+  color: #8a94a6;
+  font-size: 0.92rem;
+}
+
+.app-menu .navbar-brand-box .logo.logo-dark,
+.horizontal-logo .logo.logo-dark {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  height: 100% !important;
+  line-height: 1 !important;
+}
+
+.app-menu .navbar-brand-box .logo.logo-light,
+.horizontal-logo .logo.logo-light {
+  display: none !important;
+}
+
+.app-menu .navbar-brand-box .logo-lg,
+.app-menu .navbar-brand-box .logo-sm,
+.horizontal-logo .logo-lg,
+.horizontal-logo .logo-sm {
+  line-height: 1 !important;
+}
+
+.app-menu .navbar-brand-box .logo-lg,
+.horizontal-logo .logo-lg {
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.app-menu .navbar-brand-box .logo-sm,
+.horizontal-logo .logo-sm {
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.app-menu .navbar-brand-box {
+  padding: 0 1rem !important;
+  text-align: center !important;
+}
+
+.app-menu .navbar-brand-box .logo-lg {
+  display: flex !important;
+}
+
+.app-menu .navbar-brand-box .sadar-brand-logo {
+  width: 128px;
+  transform: translateY(-1px);
+}
+
 // Emoji Picker
 
 .pickerEmoji {

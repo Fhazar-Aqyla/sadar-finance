@@ -6,6 +6,7 @@ import VerticalLayout from "./VerticalLayouts";
 import TwoColumnLayout from "./TwoColumnLayout";
 import { Container } from "reactstrap";
 import HorizontalLayout from "./HorizontalLayout";
+import sadarLogo from "../assets/images/landing/sadar-logo.png";
 
 const Sidebar = ({ layoutType }) => {
 
@@ -34,19 +35,19 @@ const Sidebar = ({ layoutType }) => {
         <div className="navbar-brand-box">
           <Link to="/" className="logo logo-dark">
             <span className="logo-sm">
-              <span className="fw-bold text-primary fs-18">S</span>
+              <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo sadar-brand-logo-sm" />
             </span>
             <span className="logo-lg">
-              <span className="fw-bold text-primary fs-18">SADAR Finance</span>
+              <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo" />
             </span>
           </Link>
 
           <Link to="/" className="logo logo-light">
             <span className="logo-sm">
-              <span className="fw-bold text-white fs-18">S</span>
+              <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo sadar-brand-logo-sm" />
             </span>
             <span className="logo-lg">
-              <span className="fw-bold text-white fs-18">SADAR Finance</span>
+              <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo" />
             </span>
           </Link>
           <button

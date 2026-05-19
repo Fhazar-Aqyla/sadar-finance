@@ -94,12 +94,24 @@
 
 .sadar-overview-note {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.9rem;
+  min-height: 178px;
   padding: 1.15rem;
-  border: 1px solid #e5edf7;
+  border: 1px solid #f4dfb8;
   border-radius: 12px;
-  background: #fffbeb;
+  background: #fffaf0;
+}
+
+.sadar-overview-note .sadar-note-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.15rem;
 }
 
 .sadar-section-label {
@@ -110,10 +122,31 @@
   text-transform: uppercase;
 }
 
-.sadar-overview-note p {
-  margin: 0.25rem 0 0;
+.sadar-alert-copy {
+  padding-top: 0.05rem;
+}
+
+.sadar-overview .sadar-alert-copy p {
+  max-width: 280px;
+  margin: 0.3rem 0 0;
   color: #475569;
   font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.sadar-alert-copy a {
+  display: inline-flex;
+  margin-top: 0.75rem;
+  color: #1e3a8a;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sadar-alert-copy a:hover,
+.sadar-alert-copy a:focus {
+  color: #172554;
+  text-decoration: underline;
 }
 
 .metric-card {
@@ -183,6 +216,14 @@
 
 .text-teal {
   color: var(--sadar-teal) !important;
+}
+
+.bg-sand-subtle {
+  background-color: rgba(180, 83, 9, 0.1) !important;
+}
+
+.text-sand {
+  color: #b45309 !important;
 }
 
 .metric-card h2 {

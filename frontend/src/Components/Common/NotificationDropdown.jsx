@@ -38,7 +38,7 @@ const NotificationDropdown = () => {
           3<span className="visually-hidden">notifikasi belum dibaca</span>
         </span>
       </DropdownToggle>
-      <DropdownMenu className="dropdown-menu-lg dropdown-menu-end p-0">
+      <DropdownMenu className="dropdown-menu-end p-0 sadar-notification-menu">
         <div className="dropdown-head bg-primary bg-pattern rounded-top">
           <div className="p-3">
             <Row className="align-items-center">
@@ -52,16 +52,16 @@ const NotificationDropdown = () => {
           </div>
         </div>
 
-        <SimpleBar style={{ maxHeight: "300px" }} className="py-2 ps-2">
+        <SimpleBar style={{ maxHeight: "300px" }} className="py-2">
           {notifications.map((item) => (
-            <Link to="/dashboard" className="text-reset notification-item d-block dropdown-item position-relative" key={item.title}>
-              <div className="d-flex">
+            <Link to="/dashboard" className="text-reset notification-item sadar-notification-item d-block dropdown-item position-relative" key={item.title}>
+              <div className="d-flex align-items-start">
                 <div className="avatar-xs me-3 flex-shrink-0">
                   <span className={`avatar-title bg-${item.tone}-subtle text-${item.tone} rounded-circle fs-16`}>
                     <i className={item.icon}></i>
                   </span>
                 </div>
-                <div className="flex-grow-1">
+                <div className="flex-grow-1 min-width-0">
                   <h6 className="mt-0 mb-1 lh-base">{item.title}</h6>
                   <p className="mb-0 fs-11 fw-medium text-uppercase text-muted">
                     <i className="mdi mdi-clock-outline"></i> {item.time}

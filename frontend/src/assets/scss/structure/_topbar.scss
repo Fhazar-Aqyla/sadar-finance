@@ -118,6 +118,56 @@
     .btn-topbar {
         border-radius: 8px !important;
     }
+
+    .sadar-notification-menu {
+        width: min(340px, calc(100vw - 24px));
+        max-width: calc(100vw - 24px);
+        overflow: hidden;
+        border: 0;
+        border-radius: 8px;
+    }
+
+    .sadar-notification-menu.show {
+        position: fixed !important;
+        top: calc(#{$header-height} + 10px) !important;
+        right: 16px !important;
+        left: auto !important;
+        transform: none !important;
+    }
+
+    .sadar-notification-item {
+        padding: 0.9rem 1rem;
+        white-space: normal;
+
+        h6 {
+            color: var(--#{$prefix}body-color);
+            font-size: 0.95rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
+
+        p {
+            white-space: normal;
+        }
+
+        &:hover,
+        &:focus {
+            background-color: var(--#{$prefix}light);
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        position: static;
+
+        .sadar-notification-menu.show {
+            top: calc(#{$header-height} + 8px) !important;
+            left: 12px !important;
+            right: 12px !important;
+            width: auto;
+            transform: none !important;
+        }
+    }
 }
 
 .sadar-profile {

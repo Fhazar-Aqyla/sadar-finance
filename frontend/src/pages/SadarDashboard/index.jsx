@@ -56,9 +56,9 @@ const summaryCards = [
   {
     label: "Jumlah Transaksi",
     value: "128 transaksi",
-    helper: "34 minggu ini",
-    icon: "ri-receipt-line",
-    tone: "secondary",
+    helper: "34 transaksi minggu ini",
+    icon: "ri-file-list-3-line",
+    tone: "sand",
   },
 ];
 
@@ -423,9 +423,10 @@ const SadarDashboard = () => {
             <span className="sadar-note-icon bg-warning-subtle text-warning">
               <i className="ri-alert-line"></i>
             </span>
-            <div>
+            <div className="sadar-alert-copy">
               <span className="sadar-section-label">Smart Alert</span>
-              <p>Budget makanan sudah mencapai 80%. Jaga ritme belanja sampai akhir minggu.</p>
+              <p>Budget makanan sudah mencapai 80%. Coba tahan belanja ekstra sampai akhir minggu.</p>
+              <Link to="/behavior-insight">Lihat detail</Link>
             </div>
           </div>
         </section>

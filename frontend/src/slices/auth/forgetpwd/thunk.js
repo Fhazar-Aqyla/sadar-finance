@@ -9,11 +9,18 @@ import {
 } from "../../../helpers/fakebackend_helper";
 
 const fireBaseBackend = getFirebaseBackend();
-const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
 
-export const userForgetPassword = (user, history) => async (dispatch) => {
+export const userForgetPassword = (user) => async (dispatch) => {
   try {
       let response;
+      if (defaultAuth === "sadar") {
+          dispatch(userForgetPasswordError(
+              "Fitur reset password belum aktif. Backend SADAR belum menyediakan pengiriman email reset password."
+          ));
+          return;
+      }
+
       if (defaultAuth === "firebase") {
 
           response = fireBaseBackend.forgetPassword(

@@ -182,6 +182,12 @@
             margin-bottom: 0.35rem;
         }
 
+        .form-control.is-invalid,
+        .was-validated .form-control:invalid {
+            background-image: none;
+            padding-right: 0.9rem;
+        }
+
         .p-lg-5 {
             padding-top: 2rem !important;
             padding-bottom: 2rem !important;
@@ -314,6 +320,33 @@
 // auth-pass-inputgroup
 
 .auth-pass-inputgroup{
+    .form-control,
+    .form-control.is-invalid {
+        background-image: none;
+        padding-right: 3rem;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        z-index: 5;
+        width: 42px;
+        height: 40px;
+        padding: 0;
+        border: 0;
+        color: var(--#{$prefix}secondary-color);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover,
+        &:focus {
+            color: var(--#{$prefix}primary);
+            box-shadow: none;
+        }
+    }
+
     input[type="text"] + .btn .ri-eye-fill{
         &:before{
             content: "\ecb6";

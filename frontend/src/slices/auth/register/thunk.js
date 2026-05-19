@@ -1,4 +1,5 @@
 //Include Both Helper File with needed methods
+import axios from "axios";
 import { getFirebaseBackend } from "../../../helpers/firebase_helper";
 import {
   postFakeRegister,
@@ -15,13 +16,46 @@ import {
 
 // initialize relavant method of both Auth
 const fireBaseBackend = getFirebaseBackend();
-const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "fake";
-const hasApiUrl = Boolean(import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL);
+const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+
+const getErrorMessage = (error, fallback = "Registrasi gagal. Coba lagi.") => {
+  if (typeof error === "string") return error;
+  return (
+    error?.response?.data?.error?.message ||
+    error?.response?.data?.message ||
+    error?.message ||
+    error?.data?.message ||
+    error?.data ||
+    fallback
+  );
+};
+
+const splitFullName = (fullName = "") => {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || "SADAR",
+    lastName: parts.slice(1).join(" ") || "User",
+  };
+};
 
 // Is user register successfull then direct plot user in redux.
 export const registerUser = (user) => async (dispatch) => {
   try {
     let response;
+
+    if (defaultAuth === "sadar") {
+      const { firstName, lastName } = splitFullName(user.first_name);
+      response = await axios.post(`${apiBaseUrl}/auth/register`, {
+        firstName,
+        lastName,
+        email: user.email,
+        password: user.password,
+      });
+
+      dispatch(registerUserSuccessful(response?.data?.data || response?.data || response));
+      return;
+    }
 
     if (defaultAuth === "firebase") {
       response = fireBaseBackend.registerUser(user.email, user.password);
@@ -29,7 +63,7 @@ export const registerUser = (user) => async (dispatch) => {
     } else if (defaultAuth === "jwt") {
       response = postJwtRegister('/post-jwt-register', user);
       // yield put(registerUserSuccessful(response));
-    } else if (defaultAuth === "fake" || hasApiUrl) {
+    } else {
       response = postFakeRegister(user);
       const data = await response;
 
@@ -40,7 +74,7 @@ export const registerUser = (user) => async (dispatch) => {
       }
     }
   } catch (error) {
-    dispatch(registerUserFailed(error));
+    dispatch(registerUserFailed(getErrorMessage(error)));
   }
 };
 

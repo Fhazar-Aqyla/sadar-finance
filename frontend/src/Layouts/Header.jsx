@@ -6,6 +6,7 @@ import { Dropdown, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
 import SearchOption from '../Components/Common/SearchOption';
 import NotificationDropdown from '../Components/Common/NotificationDropdown';
 import ProfileDropdown from '../Components/Common/ProfileDropdown';
+import sadarLogo from '../assets/images/landing/sadar-logo.png';
 
 import { changeSidebarVisibility } from '../slices/thunks';
 import { useSelector, useDispatch } from "react-redux";
@@ -69,19 +70,19 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                             <div className="navbar-brand-box horizontal-logo">
                                 <Link to="/" className="logo logo-dark">
                                     <span className="logo-sm">
-                                        <span className="fw-bold text-primary fs-18">S</span>
+                                        <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo sadar-brand-logo-sm" />
                                     </span>
                                     <span className="logo-lg">
-                                        <span className="fw-bold text-primary fs-18">SADAR Finance</span>
+                                        <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo" />
                                     </span>
                                 </Link>
 
                                 <Link to="/" className="logo logo-light">
                                     <span className="logo-sm">
-                                        <span className="fw-bold text-white fs-18">S</span>
+                                        <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo sadar-brand-logo-sm" />
                                     </span>
                                     <span className="logo-lg">
-                                        <span className="fw-bold text-white fs-18">SADAR Finance</span>
+                                        <img src={sadarLogo} alt="SADAR" className="sadar-brand-logo" />
                                     </span>
                                 </Link>
                             </div>
