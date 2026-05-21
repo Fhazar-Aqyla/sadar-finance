@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 from inference.ocr import extract_text_from_image
+from inference.behavior import predict_behavior
 from preprocessing.receipt_nlp import parse_receipt_text
 
 
@@ -19,7 +20,7 @@ def health():
         {
             "success": True,
             "message": "SADAR Finance AI service is running",
-            "features": ["ocr", "nlp_receipt_extraction"],
+            "features": ["ocr", "nlp_receipt_extraction", "behavior_spike_prediction"],
         }
     )
 
@@ -57,6 +58,21 @@ def process_receipt_text():
         return jsonify({"success": False, "error": "rawText is required"}), 400
 
     return jsonify({"success": True, "data": parse_receipt_text(raw_text)})
+
+
+@app.post("/behavior/predict")
+def predict_behavior_route():
+    payload = request.get_json(silent=True) or {}
+    if "amount" not in payload:
+        return jsonify({"success": False, "error": "amount is required"}), 400
+
+    try:
+        result = predict_behavior(payload)
+        return jsonify({"success": True, "data": result})
+    except FileNotFoundError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 503
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500
 
 
 if __name__ == "__main__":

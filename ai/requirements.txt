@@ -1,5 +1,14 @@
 Flask==3.0.3
 flask-cors==4.0.1
+google-generativeai==0.8.5
+ipykernel==6.29.5
+matplotlib==3.10.7
+numpy==1.26.4
+pandas==2.2.3
 Pillow==10.4.0
 python-dotenv==1.0.1
 pytesseract==0.3.13
+scikit-learn==1.5.2
+seaborn==0.13.2
+tensorboard==2.18.0
+tensorflow==2.18.0

@@ -1,0 +1,47 @@
+{
+  "modelVersion": "behavior-spike-v1",
+  "bestModel": "mlp",
+  "target": "spike",
+  "metrics": {
+    "mlp": {
+      "accuracy": 0.9916492693110647,
+      "mae": 0.01100804004818201,
+      "precision": 0.9733333333333334,
+      "recall": 0.948051948051948,
+      "f1": 0.9605263157894737,
+      "tp": 146,
+      "tn": 1279,
+      "fp": 4,
+      "fn": 8
+    },
+    "deep_cross": {
+      "accuracy": 0.9874739039665971,
+      "mae": 0.014717311598360538,
+      "precision": 0.9146341463414634,
+      "recall": 0.974025974025974,
+      "f1": 0.9433962264150942,
+      "tp": 150,
+      "tn": 1269,
+      "fp": 14,
+      "fn": 4
+    }
+  },
+  "questThresholds": {
+    "minimumAccuracy": 0.85,
+    "maximumMae": 0.02
+  },
+  "riskThresholds": {
+    "low": 0.4,
+    "medium": 0.7
+  },
+  "budgetRule": {
+    "Needs": 0.5,
+    "Wants": 0.3,
+    "Investment": 0.2
+  },
+  "notes": [
+    "Model ini adalah Behavior Spike Detection, bukan overspending forecast bulanan.",
+    "Dataset simulasi memiliki pola label yang kuat, sehingga performa harus dijelaskan dengan hati-hati.",
+    "spending_level dan log_amount tidak dipakai untuk mengurangi risiko feature leakage."
+  ]
+}

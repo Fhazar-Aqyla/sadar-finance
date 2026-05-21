@@ -93,7 +93,7 @@
     "save": "^2.9.0",
     "simplebar-react": "^3.2.6",
     "swiper": "^12.1.4",
-    "typescript": "^6.0.3",
+    "typescript": "^5.9.3",
     "web-vitals": "^4.2.3",
     "yet-another-react-lightbox": "^3.21.6",
     "yup": "^1.4.0"
