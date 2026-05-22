@@ -169,7 +169,8 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=sadar_finance
 DB_USER=postgres
-DB_PASSWORD=your_password_here
+# Isi password PostgreSQL lokal. Jika tanpa password, biarkan kosong.
+DB_PASSWORD=
 
 JWT_SECRET=your_super_secret_jwt_key_change_in_production
 JWT_EXPIRES_IN=7d
@@ -181,9 +182,16 @@ MAX_FILE_SIZE_MB=10
 UPLOAD_DIR=uploads
 ```
 
+Pastikan database kosong `sadar_finance` sudah dibuat di PostgreSQL lokal, misalnya lewat pgAdmin atau:
+
+```bash
+createdb -U postgres sadar_finance
+```
+
 Jalankan migrasi dan seed database:
 
 ```bash
+npm run db:check
 npm run db:migrate
 npm run db:seed
 ```

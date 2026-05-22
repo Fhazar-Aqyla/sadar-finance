@@ -18,6 +18,9 @@ const config = require('./config');
 const swaggerSpec = require('./config/swagger');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
+const { query: dbQuery } = require('./config/database');
+const { error: errorResponse } = require('./utils/response');
+const { getDatabaseErrorResponse } = require('./utils/dbError');
 
 const app = express();
 
@@ -75,6 +78,26 @@ app.get('/health', (_req, res) => {
       timestamp: new Date().toISOString(),
     },
   });
+});
+
+app.get('/health/db', async (_req, res, next) => {
+  try {
+    await dbQuery('SELECT 1');
+
+    return res.json({
+      success: true,
+      message: 'PostgreSQL connection is healthy',
+      data: {
+        host: config.db.host,
+        port: config.db.port,
+        database: config.db.database,
+      },
+    });
+  } catch (err) {
+    const dbError = getDatabaseErrorResponse(err);
+    if (dbError) return errorResponse(res, dbError);
+    return next(err);
+  }
 });
 
 // ── API Routes ──────────────────────────────────────────────

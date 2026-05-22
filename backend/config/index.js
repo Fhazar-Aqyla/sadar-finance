@@ -7,6 +7,13 @@ const path = require('path');
 
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
+const rawDbPassword = process.env.DB_PASSWORD;
+const dbPassword = rawDbPassword === 'your_password_here' ? '' : String(rawDbPassword ?? '');
+
+if (rawDbPassword === 'your_password_here') {
+  console.warn('[CONFIG] DB_PASSWORD masih placeholder. Dianggap kosong; isi backend/.env dengan password PostgreSQL lokal jika user postgres memakai password.');
+}
+
 const config = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT, 10) || 3000,
@@ -16,7 +23,7 @@ const config = {
     port: parseInt(process.env.DB_PORT, 10) || 5432,
     database: process.env.DB_NAME || 'sadar_finance',
     user: process.env.DB_USER || 'postgres',
-    password: String(process.env.DB_PASSWORD ?? ''),
+    password: dbPassword,
   },
 
   jwt: {
