@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 import {
   Alert,
   Badge,
@@ -16,30 +17,40 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
-import BreadCrumb from "../../Components/Common/BreadCrumb";
+import { accounts as mockAccounts, currentUserId } from "../SadarShared/mockData";
+import "../SadarShared/sadar-pages.css";
+import "./transaction-input.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 const AI_BASE_URL = import.meta.env.VITE_AI_URL || "http://localhost:5000";
 
 const categories = [
-  { value: "food_and_beverage", label: "Food & Beverage" },
-  { value: "groceries", label: "Groceries" },
-  { value: "transportation", label: "Transportation" },
-  { value: "utilities", label: "Utilities" },
-  { value: "shopping", label: "Shopping" },
-  { value: "education", label: "Education" },
-  { value: "health", label: "Health" },
-  { value: "other", label: "Other" },
+  { value: "food_and_beverage", label: "Makanan & Minuman" },
+  { value: "groceries", label: "Belanja Bulanan" },
+  { value: "transportation", label: "Transportasi" },
+  { value: "utilities", label: "Tagihan & Utilitas" },
+  { value: "shopping", label: "Belanja" },
+  { value: "education", label: "Pendidikan" },
+  { value: "health", label: "Kesehatan" },
+  { value: "other", label: "Lainnya" },
 ];
 
 const initialForm = {
+  accountId: "acc_002",
   merchant: "",
   transactionDate: new Date().toISOString().slice(0, 10),
   categoryGroup: "other",
   amount: "",
   description: "",
   source: "manual",
+};
+
+const initialIncomeForm = {
+  accountId: "acc_002",
+  source: "",
+  amount: "",
+  date: new Date().toISOString().slice(0, 10),
+  note: "",
 };
 
 const currencyFormatter = new Intl.NumberFormat("id-ID", {
@@ -109,10 +120,13 @@ const normalizeAiOcrResult = (response) => {
 };
 
 const TransactionInput = () => {
-  document.title = "Input Transaksi | SADAR Finance";
+  document.title = "Catat Keuangan | SADAR Finance";
+  const location = useLocation();
 
+  const [entryType, setEntryType] = useState("transaction");
   const [mode, setMode] = useState("ocr");
   const [form, setForm] = useState(initialForm);
+  const [incomeForm, setIncomeForm] = useState(initialIncomeForm);
   const [receiptFile, setReceiptFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [scanResult, setScanResult] = useState(null);
@@ -133,8 +147,24 @@ const TransactionInput = () => {
     return Array.isArray(parsed?.items) ? parsed.items : [];
   }, [scanResult]);
 
+  const userAccounts = useMemo(
+    () => mockAccounts.filter((account) => account.user_id === currentUserId),
+    [],
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("type") === "income") {
+      setEntryType("income");
+    }
+  }, [location.search]);
+
   const updateForm = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const updateIncomeForm = (field, value) => {
+    setIncomeForm((current) => ({ ...current, [field]: value }));
   };
 
   const handleFileChange = (event) => {
@@ -155,6 +185,7 @@ const TransactionInput = () => {
     const description = buildDescription(merchant, parsed?.items);
 
     setForm({
+      accountId: form.accountId,
       merchant,
       transactionDate: parsed?.date || initialForm.transactionDate,
       categoryGroup: parsed?.category || "other",
@@ -259,7 +290,7 @@ const TransactionInput = () => {
     event.preventDefault();
 
     if (!form.amount || Number(form.amount) <= 0) {
-      setNotice({ color: "warning", message: "Nominal transaksi harus lebih dari 0." });
+      setNotice({ color: "warning", message: "Nominal pengeluaran harus lebih dari 0." });
       return;
     }
 
@@ -271,6 +302,7 @@ const TransactionInput = () => {
         `${API_BASE_URL}/transactions`,
         {
           categoryGroup: form.categoryGroup,
+          accountId: form.accountId,
           transactionDate: new Date(form.transactionDate).toISOString(),
           description: form.description || form.merchant,
           source: form.source,
@@ -279,99 +311,190 @@ const TransactionInput = () => {
         { headers: authHeaders() }
       );
 
-      setNotice({ color: "success", message: "Transaksi berhasil disimpan." });
+      setNotice({ color: "success", message: "Pengeluaran berhasil disimpan dan saldo account berkurang." });
       setForm({ ...initialForm, source: mode === "ocr" ? "ocr" : "manual" });
     } catch (error) {
-      setNotice({ color: "danger", message: getErrorMessage(error, "Transaksi gagal disimpan.") });
+      setNotice({ color: "danger", message: getErrorMessage(error, "Pengeluaran gagal disimpan.") });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleIncomeSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!incomeForm.amount || Number(incomeForm.amount) <= 0) {
+      setNotice({ color: "warning", message: "Jumlah pemasukan harus lebih dari 0." });
+      return;
+    }
+
+    setIsSaving(true);
+    setNotice(null);
+
+    try {
+      await axios.post(
+        `${API_BASE_URL}/incomes`,
+        {
+          accountId: incomeForm.accountId,
+          source: incomeForm.source,
+          amount: Number(incomeForm.amount),
+          date: new Date(incomeForm.date).toISOString(),
+          note: incomeForm.note,
+        },
+        { headers: authHeaders() }
+      );
+
+      setNotice({ color: "success", message: "Pemasukan berhasil dicatat dan saldo account bertambah." });
+      setIncomeForm(initialIncomeForm);
+    } catch (error) {
+      setNotice({ color: "danger", message: getErrorMessage(error, "Pemasukan gagal disimpan.") });
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="page-content">
+    <div className="page-content sadar-page sadar-transaction-page">
       <Container fluid>
-        <BreadCrumb title="Input Transaksi" pageTitle="SADAR Finance" />
-
         <Row className="g-3">
           <Col xl={4}>
-            <Card>
-              <CardHeader className="d-flex align-items-center justify-content-between">
-                <h5 className="card-title mb-0">Metode Input</h5>
-                <Badge color={mode === "ocr" ? "success" : "primary"} className="text-uppercase">
-                  {mode}
+            <div className="sadar-entry-tabs mb-3">
+              <Button
+                className={entryType === "transaction" ? "active" : ""}
+                onClick={() => {
+                  setEntryType("transaction");
+                  setNotice(null);
+                }}
+              >
+                <i className="ri-arrow-up-circle-line align-bottom me-1" />
+                Pengeluaran
+              </Button>
+              <Button
+                className={entryType === "income" ? "active" : ""}
+                onClick={() => {
+                  setEntryType("income");
+                  setNotice(null);
+                }}
+              >
+                <i className="ri-arrow-down-circle-line align-bottom me-1" />
+                Pemasukan
+              </Button>
+            </div>
+          </Col>
+        </Row>
+
+        <Row className="g-3 align-items-stretch sadar-transaction-row">
+          <Col xl={4} className="d-flex flex-column">
+            <Card className="sadar-panel sadar-input-card flex-fill">
+              <CardHeader>
+                <div>
+                  <h4 className="card-title mb-1">{entryType === "income" ? "Catat Pemasukan" : "Metode Input"}</h4>
+                  <p className="text-muted mb-0">
+                    {entryType === "income" ? "Uang masuk dicatat tanpa OCR" : "Pilih cara mencatat pengeluaran"}
+                  </p>
+                </div>
+                <Badge color={mode === "ocr" ? "success" : "primary"} className="sadar-mode-badge">
+                  {entryType === "income" ? "Pemasukan" : mode === "ocr" ? "OCR" : "Manual"}
                 </Badge>
               </CardHeader>
               <CardBody>
-                <ButtonGroup className="w-100 mb-3">
-                  <Button
-                    color={mode === "ocr" ? "success" : "light"}
-                    onClick={() => {
-                      setMode("ocr");
-                      updateForm("source", "ocr");
-                    }}
-                  >
-                    <i className="ri-scan-2-line align-bottom me-1" />
-                    Upload OCR
-                  </Button>
-                  <Button
-                    color={mode === "manual" ? "primary" : "light"}
-                    onClick={() => {
-                      setMode("manual");
-                      updateForm("source", "manual");
-                    }}
-                  >
-                    <i className="ri-edit-2-line align-bottom me-1" />
-                    Manual
-                  </Button>
-                </ButtonGroup>
-
-                {mode === "ocr" && (
-                  <div>
-                    <Label htmlFor="receipt-image" className="form-label">Gambar Struk</Label>
-                    <Input
-                      id="receipt-image"
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/heic"
-                      onChange={handleFileChange}
-                    />
-
-                    <div className="border rounded mt-3 d-flex align-items-center justify-content-center bg-light" style={{ minHeight: 260 }}>
-                      {previewUrl ? (
-                        <img
-                          src={previewUrl}
-                          alt="Preview struk"
-                          className="img-fluid rounded"
-                          style={{ maxHeight: 260, objectFit: "contain" }}
-                        />
-                      ) : (
-                        <div className="text-center text-muted">
-                          <i className="ri-upload-cloud-2-line display-5 d-block mb-2" />
-                          <span>Pilih file struk</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <Button color="success" className="w-100 mt-3" onClick={handleScan} disabled={isScanning}>
-                      {isScanning ? <Spinner size="sm" className="me-2" /> : <i className="ri-scan-line align-bottom me-1" />}
-                      Proses OCR
+                {entryType === "transaction" && (
+                  <ButtonGroup className="sadar-mode-toggle w-100 mb-3">
+                    <Button
+                      className={mode === "ocr" ? "active" : ""}
+                      onClick={() => {
+                        setMode("ocr");
+                        updateForm("source", "ocr");
+                      }}
+                    >
+                      <i className="ri-scan-2-line align-bottom me-1" />
+                      Upload OCR
                     </Button>
-                  </div>
+                    <Button
+                      className={mode === "manual" ? "active" : ""}
+                      onClick={() => {
+                        setMode("manual");
+                        updateForm("source", "manual");
+                      }}
+                    >
+                      <i className="ri-edit-2-line align-bottom me-1" />
+                      Manual
+                    </Button>
+                  </ButtonGroup>
                 )}
 
-                {mode === "manual" && (
-                  <div className="text-muted">
-                    <i className="ri-keyboard-line align-bottom me-1" />
-                    Isi detail transaksi langsung pada form.
-                  </div>
-                )}
+                <div className="sadar-method-content">
+                  {entryType === "transaction" && mode === "ocr" && (
+                    <div className="sadar-ocr-state">
+                      <Label htmlFor="receipt-image" className="form-label">Gambar Struk</Label>
+                      <Input
+                        id="receipt-image"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/heic"
+                        onChange={handleFileChange}
+                        className="d-none"
+                      />
+
+                      <Label htmlFor="receipt-image" className={`sadar-receipt-dropzone ${previewUrl ? "has-preview" : ""}`}>
+                        {previewUrl ? (
+                          <img
+                            src={previewUrl}
+                            alt="Preview struk"
+                            className="sadar-receipt-preview"
+                          />
+                        ) : (
+                          <div className="sadar-dropzone-empty">
+                            <span className="sadar-dropzone-icon">
+                              <i className="ri-upload-cloud-2-line" />
+                            </span>
+                            <strong>Upload gambar struk</strong>
+                            <span>PNG, JPG, WEBP, atau HEIC</span>
+                          </div>
+                        )}
+                      </Label>
+
+                      <div className="sadar-file-meta">
+                        <span>{receiptFile?.name || "Belum ada file dipilih"}</span>
+                        <small>{receiptFile ? `${Math.ceil(receiptFile.size / 1024)} KB` : "OCR akan mengisi form otomatis jika terbaca"}</small>
+                      </div>
+
+                      <Button className="sadar-ocr-button w-100 mt-3" onClick={handleScan} disabled={isScanning}>
+                        {isScanning ? <Spinner size="sm" className="me-2" /> : <i className="ri-scan-line align-bottom me-1" />}
+                        Proses OCR
+                      </Button>
+                    </div>
+                  )}
+
+                  {entryType === "transaction" && mode === "manual" && (
+                    <div className="sadar-manual-state">
+                      <span className="sadar-dropzone-icon">
+                        <i className="ri-keyboard-line" />
+                      </span>
+                      <strong>Input manual aktif</strong>
+                      <p>Isi detail transaksi langsung pada form di sebelah kanan.</p>
+                    </div>
+                  )}
+
+                  {entryType === "income" && (
+                    <div className="sadar-manual-state">
+                      <span className="sadar-dropzone-icon income">
+                        <i className="ri-bank-card-line" />
+                      </span>
+                      <strong>Pemasukan menambah saldo account</strong>
+                      <p>Gunakan form di sebelah kanan untuk mencatat gaji, freelance, bonus, atau pemasukan lainnya.</p>
+                    </div>
+                  )}
+                </div>
               </CardBody>
             </Card>
 
-            {scanResult && (
-              <Card>
+            {entryType === "transaction" && scanResult && (
+              <Card className="sadar-panel sadar-ocr-result mt-3">
                 <CardHeader>
-                  <h5 className="card-title mb-0">Hasil OCR</h5>
+                  <div>
+                    <h4 className="card-title mb-1">Hasil OCR</h4>
+                    <p className="text-muted mb-0">Item yang terbaca dari struk</p>
+                  </div>
                 </CardHeader>
                 <CardBody>
                   <div className="d-flex justify-content-between mb-2">
@@ -395,23 +518,45 @@ const TransactionInput = () => {
             )}
           </Col>
 
-          <Col xl={8}>
-            <Card>
+          <Col xl={8} className="d-flex">
+            <Card className="sadar-panel sadar-detail-card flex-fill">
               <CardHeader>
-                <h5 className="card-title mb-0">Detail Transaksi</h5>
+                <div>
+                  <h4 className="card-title mb-1">{entryType === "income" ? "Detail Pemasukan" : "Detail Pengeluaran"}</h4>
+                  <p className="text-muted mb-0">
+                    {entryType === "income" ? "Pilih account tujuan dan sumber pemasukan" : "Pilih account asal dan detail pengeluaran"}
+                  </p>
+                </div>
               </CardHeader>
               <CardBody>
-                {notice && <Alert color={notice.color}>{notice.message}</Alert>}
+                {notice && <Alert color={notice.color} className="sadar-notice">{notice.message}</Alert>}
 
-                <Form onSubmit={handleSubmit}>
-                  <Row className="g-3">
+                {entryType === "transaction" ? (
+                <Form onSubmit={handleSubmit} className="sadar-transaction-form">
+                  <Row className="g-3 sadar-form-row">
                     <Col md={6}>
-                      <Label htmlFor="merchant" className="form-label">Merchant</Label>
+                      <Label htmlFor="accountId" className="form-label">Account</Label>
+                      <Input
+                        id="accountId"
+                        type="select"
+                        value={form.accountId}
+                        onChange={(event) => updateForm("accountId", event.target.value)}
+                      >
+                        {userAccounts.map((account) => (
+                          <option key={account.id} value={account.id}>
+                            {account.name}
+                          </option>
+                        ))}
+                      </Input>
+                    </Col>
+
+                    <Col md={6}>
+                      <Label htmlFor="merchant" className="form-label">Nama Pengeluaran</Label>
                       <Input
                         id="merchant"
                         value={form.merchant}
                         onChange={(event) => updateForm("merchant", event.target.value)}
-                        placeholder="Contoh: Indomaret"
+                        placeholder="Contoh: Belanja Indomaret"
                       />
                     </Col>
 
@@ -450,7 +595,7 @@ const TransactionInput = () => {
                         step="100"
                         value={form.amount}
                         onChange={(event) => updateForm("amount", event.target.value)}
-                        placeholder="93000"
+                        placeholder="Contoh: 93000"
                         required
                       />
                     </Col>
@@ -463,26 +608,109 @@ const TransactionInput = () => {
                         rows={5}
                         value={form.description}
                         onChange={(event) => updateForm("description", event.target.value)}
-                        placeholder="Ringkasan transaksi"
+                        placeholder="Tambahkan catatan singkat jika diperlukan"
                       />
                     </Col>
 
-                    <Col xs={12} className="d-flex flex-wrap gap-2 justify-content-end">
+                    <Col xs={12} className="sadar-form-actions">
                       <Button
                         type="button"
-                        color="light"
+                        className="sadar-reset-button"
                         onClick={() => setForm({ ...initialForm, source: mode === "ocr" ? "ocr" : "manual" })}
                       >
                         <i className="ri-refresh-line align-bottom me-1" />
                         Reset
                       </Button>
-                      <Button type="submit" color="primary" disabled={isSaving}>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
-                        Simpan Transaksi
+                        Simpan Pengeluaran
                       </Button>
                     </Col>
                   </Row>
                 </Form>
+                ) : (
+                <Form onSubmit={handleIncomeSubmit} className="sadar-transaction-form">
+                  <Row className="g-3 sadar-form-row">
+                    <Col md={6}>
+                      <Label htmlFor="income-account" className="form-label">Account Tujuan</Label>
+                      <Input
+                        id="income-account"
+                        type="select"
+                        value={incomeForm.accountId}
+                        onChange={(event) => updateIncomeForm("accountId", event.target.value)}
+                      >
+                        {userAccounts.map((account) => (
+                          <option key={account.id} value={account.id}>
+                            {account.name}
+                          </option>
+                        ))}
+                      </Input>
+                    </Col>
+
+                    <Col md={6}>
+                      <Label htmlFor="income-date" className="form-label">Tanggal</Label>
+                      <Input
+                        id="income-date"
+                        type="date"
+                        value={incomeForm.date}
+                        onChange={(event) => updateIncomeForm("date", event.target.value)}
+                      />
+                    </Col>
+
+                    <Col md={6}>
+                      <Label htmlFor="income-source" className="form-label">Sumber Pemasukan</Label>
+                      <Input
+                        id="income-source"
+                        value={incomeForm.source}
+                        onChange={(event) => updateIncomeForm("source", event.target.value)}
+                        placeholder="Contoh: Gaji bulanan"
+                        required
+                      />
+                    </Col>
+
+                    <Col md={6}>
+                      <Label htmlFor="income-amount" className="form-label">Jumlah</Label>
+                      <Input
+                        id="income-amount"
+                        type="number"
+                        min="0"
+                        step="100"
+                        value={incomeForm.amount}
+                        onChange={(event) => updateIncomeForm("amount", event.target.value)}
+                        placeholder="Contoh: 8200000"
+                        required
+                      />
+                    </Col>
+
+                    <Col xs={12}>
+                      <Label htmlFor="income-note" className="form-label">Catatan</Label>
+                      <Input
+                        id="income-note"
+                        type="textarea"
+                        rows={5}
+                        value={incomeForm.note}
+                        onChange={(event) => updateIncomeForm("note", event.target.value)}
+                        placeholder="Tambahkan catatan singkat jika diperlukan"
+                      />
+                    </Col>
+
+                    <Col xs={12} className="sadar-form-actions">
+                      <Button
+                        type="button"
+                        className="sadar-reset-button"
+                        onClick={() => setIncomeForm(initialIncomeForm)}
+                      >
+                        <i className="ri-refresh-line align-bottom me-1" />
+                        Reset
+                      </Button>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving}>
+                        {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
+                        Simpan Pemasukan
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+                )}
               </CardBody>
             </Card>
           </Col>

@@ -9,7 +9,6 @@ import {
   Home,
   LogOut,
   Menu,
-  Search,
   User,
   X,
 } from "lucide-react";
@@ -172,28 +171,22 @@ const Sidebar = ({ className = "" }) => {
       )}
 
       <div
-        className={`app-menu navbar-menu fixed left-0 top-0 z-40 flex h-full flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 z-40 flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } ${className}`}
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/60 p-5">
+        <div className="relative flex h-[174px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
           {!isCollapsed && (
-            <Link to="/dashboard" className="flex min-w-0 items-center gap-2.5 no-underline">
-              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm">
-                <img src={sadarLogo} alt="" className="h-5 w-5 object-cover object-left" />
-              </div>
-              <div className="flex min-w-0 flex-col">
-                <img src={sadarLogo} alt="SADAR" className="h-auto w-[94px] object-contain" />
-                <span className="mt-0.5 truncate text-xs text-slate-500">Personal Finance</span>
-              </div>
+            <Link to="/dashboard" className="flex min-w-0 items-center no-underline">
+              <img src={sadarLogo} alt="SADAR" className="h-auto w-[118px] object-contain" />
             </Link>
           )}
 
           {isCollapsed && (
             <Link
               to="/dashboard"
-              className="mx-auto flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white"
+              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm"
               aria-label="SADAR Finance"
             >
               <img src={sadarLogo} alt="SADAR" className="h-6 w-6 object-cover object-left" />
@@ -202,7 +195,7 @@ const Sidebar = ({ className = "" }) => {
 
           <button
             onClick={toggleCollapse}
-            className="hidden rounded-md p-1.5 transition-all duration-200 hover:bg-slate-100 md:flex"
+            className="absolute right-5 hidden rounded-md p-1.5 transition-all duration-200 hover:bg-slate-100 md:flex"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? (
@@ -213,20 +206,7 @@ const Sidebar = ({ className = "" }) => {
           </button>
         </div>
 
-        {!isCollapsed && (
-          <div className="px-4 py-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="h-10 w-full rounded-md border border-slate-200 bg-slate-50 pl-9 pr-4 text-sm placeholder-slate-400 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-        )}
-
-        <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-2 pb-[154px]">
+        <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-10">
           <ul className="m-0 list-none space-y-0.5 p-0">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -273,8 +253,8 @@ const Sidebar = ({ className = "" }) => {
           </ul>
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white">
-          <div className={`border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "px-2 py-3" : "p-3"}`}>
+        <div className="mt-auto shrink-0 border-t border-slate-200 bg-white">
+          <div className={`h-[104px] border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "flex items-center justify-center px-2" : "flex items-center p-3"}`}>
             {!isCollapsed ? (
               <Link
                 to="/profile-account"
@@ -301,19 +281,19 @@ const Sidebar = ({ className = "" }) => {
             )}
           </div>
 
-          <div className="p-3">
+          <div className={isCollapsed ? "flex h-[84px] items-center justify-center p-3" : "flex h-[84px] items-center p-3"}>
             <Link
               to="/logout"
-              className={`group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700 ${
+              className={`group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
                 isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
               }`}
               title={isCollapsed ? "Logout" : undefined}
             >
               <div className="flex min-w-[22px] items-center justify-center">
-                <LogOut className="h-4 w-4 flex-shrink-0 text-red-500 group-hover:text-red-600" />
+                <LogOut className="h-4 w-4 flex-shrink-0 !text-red-500 group-hover:!text-red-600" />
               </div>
 
-              {!isCollapsed && <span className="text-sm">Logout</span>}
+              {!isCollapsed && <span className="text-sm !text-red-600 group-hover:!text-red-700">Logout</span>}
 
               {isCollapsed && (
                 <div className="invisible absolute left-full z-50 ml-2 whitespace-nowrap rounded bg-slate-800 px-2 py-1 text-xs text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
