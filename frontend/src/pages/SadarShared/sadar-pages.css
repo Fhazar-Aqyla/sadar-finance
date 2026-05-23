@@ -323,10 +323,26 @@
 }
 
 .sadar-score-main {
-  display: grid;
-  place-items: center;
+  display: flex;
   min-height: 320px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   text-align: center;
+}
+
+.sadar-score-heading span {
+  display: block;
+  color: #172033;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.sadar-score-heading p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.86rem;
 }
 
 .sadar-score-row > [class*="col-"] {
@@ -374,20 +390,36 @@
 }
 
 .sadar-score-number {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.25rem;
   color: var(--sadar-primary);
   font-size: 4rem;
   font-weight: 800;
   line-height: 1;
 }
 
+.sadar-score-number span {
+  margin-bottom: 0.45rem;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 750;
+}
+
 .sadar-score-status {
   display: inline-flex;
-  margin-top: 0.8rem;
   padding: 0.4rem 0.8rem;
   border-radius: 999px;
   color: var(--sadar-primary);
   background: rgba(30, 58, 138, 0.1);
   font-weight: 750;
+}
+
+.sadar-score-note {
+  max-width: 300px;
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  line-height: 1.55;
 }
 
 .sadar-budget-grid {

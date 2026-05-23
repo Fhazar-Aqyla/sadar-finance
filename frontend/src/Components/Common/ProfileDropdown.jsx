@@ -6,10 +6,18 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap
 //import images
 import avatar1 from "../../assets/images/users/avatar-1.jpg";
 
+const normalizeAccountName = (value) => {
+    const name = String(value || "").trim();
+    if (!name || name.toLowerCase() === "admin" || name.toLowerCase().includes("themesbrand")) {
+        return "Aqyla";
+    }
+    return name;
+};
+
 const ProfileDropdown = () => {
     const user = useSelector((state) => state.Profile?.user ?? {});
     const userName = useMemo(() => {
-        const fallbackName = user?.first_name || user?.username || "Aqyla";
+        const fallbackName = normalizeAccountName(user?.first_name || user?.username || "Aqyla");
         const storedUser = sessionStorage.getItem("authUser");
 
         if (!storedUser) {
@@ -19,9 +27,11 @@ const ProfileDropdown = () => {
         try {
             const authUser = JSON.parse(storedUser);
 
-            return (
+            return normalizeAccountName(
                 user?.first_name ||
                 user?.username ||
+                authUser?.user?.first_name ||
+                authUser?.user?.username ||
                 authUser?.data?.first_name ||
                 authUser?.data?.username ||
                 authUser?.first_name ||

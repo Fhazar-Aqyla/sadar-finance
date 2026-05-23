@@ -151,6 +151,10 @@ const FinancialScore = () => {
           <Col xl={4} className="d-flex">
             <Card className="sadar-panel flex-fill">
               <CardBody className="sadar-score-main">
+                <div className="sadar-score-heading">
+                  <span>Financial Score</span>
+                  <p>Ringkasan kesehatan keuangan bulan ini</p>
+                </div>
                 <ReactApexChart
                   type="radialBar"
                   height={250}
@@ -167,10 +171,13 @@ const FinancialScore = () => {
                     },
                   }}
                 />
-                <div className="sadar-score-number">{data.score}</div>
+                <div className="sadar-score-number">
+                  {data.score}
+                  <span>/100</span>
+                </div>
                 <span className="sadar-score-status">{data.status}</span>
-                <p className="text-muted mt-3 mb-0">
-                  Score internal SADAR, bukan credit score bank.
+                <p className="sadar-score-note">
+                  Skor ini membantu membaca pola pemasukan, pengeluaran, budget, dan tabunganmu.
                 </p>
               </CardBody>
             </Card>

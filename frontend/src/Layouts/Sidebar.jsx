@@ -46,6 +46,22 @@ const getInitials = (name) => {
     .toUpperCase();
 };
 
+const normalizeAccountName = (value) => {
+  const name = String(value || "").trim();
+  if (!name || name.toLowerCase() === "admin" || name.toLowerCase().includes("themesbrand")) {
+    return "Aqyla";
+  }
+  return name;
+};
+
+const normalizeAccountEmail = (value) => {
+  const email = String(value || "").trim();
+  if (!email || email.toLowerCase().includes("themesbrand")) {
+    return "aqyla@example.com";
+  }
+  return email;
+};
+
 const Sidebar = ({ className = "" }) => {
   const location = useLocation();
   const profileUser = useSelector((state) => state.Profile?.user ?? {});
@@ -57,7 +73,7 @@ const Sidebar = ({ className = "" }) => {
   const userName = useMemo(() => {
     const storedUser = getStoredUser();
 
-    return (
+    return normalizeAccountName(
       profileUser?.first_name ||
       profileUser?.username ||
       storedUser?.user?.first_name ||
@@ -75,12 +91,12 @@ const Sidebar = ({ className = "" }) => {
   const userEmail = useMemo(() => {
     const storedUser = getStoredUser();
 
-    return (
+    return normalizeAccountEmail(
       profileUser?.email ||
       storedUser?.user?.email ||
       storedUser?.data?.email ||
       storedUser?.email ||
-      "email belum tersedia"
+      "aqyla@example.com"
     );
   }, [profileUser]);
 
@@ -176,10 +192,10 @@ const Sidebar = ({ className = "" }) => {
         } ${className}`}
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
-        <div className="relative flex h-[174px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
+        <div className="relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
           {!isCollapsed && (
             <Link to="/dashboard" className="flex min-w-0 items-center no-underline">
-              <img src={sadarLogo} alt="SADAR" className="h-auto w-[118px] object-contain" />
+              <img src={sadarLogo} alt="SADAR" className="h-auto w-[104px] object-contain" />
             </Link>
           )}
 
@@ -206,8 +222,8 @@ const Sidebar = ({ className = "" }) => {
           </button>
         </div>
 
-        <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-10">
-          <ul className="m-0 list-none space-y-0.5 p-0">
+        <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-6">
+          <ul className="m-0 list-none space-y-1 p-0">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = isActiveItem(item);
@@ -254,13 +270,13 @@ const Sidebar = ({ className = "" }) => {
         </nav>
 
         <div className="mt-auto shrink-0 border-t border-slate-200 bg-white">
-          <div className={`h-[104px] border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "flex items-center justify-center px-2" : "flex items-center p-3"}`}>
+          <div className={`h-[86px] border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "flex items-center justify-center px-2" : "flex items-center p-3"}`}>
             {!isCollapsed ? (
               <Link
                 to="/profile-account"
                 className="flex items-center rounded-md bg-white px-3 py-2 no-underline transition-colors duration-200 hover:bg-slate-50"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
                   <span className="text-sm font-medium text-slate-700">{userInitials}</span>
                 </div>
                 <div className="ml-2.5 min-w-0 flex-1">
@@ -281,7 +297,7 @@ const Sidebar = ({ className = "" }) => {
             )}
           </div>
 
-          <div className={isCollapsed ? "flex h-[84px] items-center justify-center p-3" : "flex h-[84px] items-center p-3"}>
+          <div className={isCollapsed ? "flex h-[66px] items-center justify-center p-3" : "flex h-[66px] items-center p-3"}>
             <Link
               to="/logout"
               className={`group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
