@@ -14,7 +14,18 @@ import {
   Table,
 } from "reactstrap";
 
-import BreadCrumb from "../../Components/Common/BreadCrumb";
+import {
+  accounts,
+  budgets,
+  currentUserId,
+  getAccountName,
+  getUserRows,
+  groupSumBy,
+  incomes,
+  sumBy,
+  transactions,
+  userProfile,
+} from "../SadarShared/mockData";
 import "./sadar-dashboard.css";
 
 const rupiah = (value) =>
@@ -24,102 +35,8 @@ const rupiah = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const summaryCards = [
-  {
-    label: "Total Saldo",
-    value: rupiah(18450000),
-    helper: "3 rekening aktif",
-    icon: "ri-wallet-3-line",
-    tone: "primary",
-  },
-  {
-    label: "Pemasukan Bulan Ini",
-    value: rupiah(8200000),
-    helper: "+12% dari bulan lalu",
-    icon: "ri-arrow-down-circle-line",
-    tone: "success",
-  },
-  {
-    label: "Pengeluaran Bulan Ini",
-    value: rupiah(5150000),
-    helper: "63% dari pemasukan",
-    icon: "ri-arrow-up-circle-line",
-    tone: "warning",
-  },
-  {
-    label: "Sisa Budget",
-    value: rupiah(2350000),
-    helper: "Aman untuk 12 hari",
-    icon: "ri-pie-chart-2-line",
-    tone: "teal",
-  },
-  {
-    label: "Jumlah Transaksi",
-    value: "128 transaksi",
-    helper: "34 transaksi minggu ini",
-    icon: "ri-file-list-3-line",
-    tone: "sand",
-  },
-];
-
-const cashflowSeries = [
-  { name: "Pemasukan", data: [6.8, 7.2, 7.1, 8.2, 7.9, 8.2] },
-  { name: "Pengeluaran", data: [4.9, 5.4, 4.8, 5.7, 5.2, 5.15] },
-];
-
-const expenseTrendSeries = [
-  {
-    name: "Pengeluaran",
-    data: [1600, 2400, 1950, 3600, 2900, 5200, 4100, 2600, 4700, 3900, 5750, 4300],
-  },
-];
-
 const categoryLabels = ["Makanan", "Transportasi", "Belanja", "Hiburan", "Lainnya"];
-const categorySeries = [32, 21, 18, 14, 15];
 const categoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#94a3b8"];
-
-const recentTransactions = [
-  {
-    name: "Belanja bulanan",
-    category: "Makanan",
-    account: "BCA Everyday",
-    date: "16 Mei 2026",
-    amount: -425000,
-    status: "Tercatat",
-  },
-  {
-    name: "Gaji bulanan",
-    category: "Pemasukan",
-    account: "Mandiri Payroll",
-    date: "15 Mei 2026",
-    amount: 8200000,
-    status: "Masuk",
-  },
-  {
-    name: "Transport online",
-    category: "Transportasi",
-    account: "E-wallet",
-    date: "15 Mei 2026",
-    amount: -54000,
-    status: "Tercatat",
-  },
-  {
-    name: "Kopi dan makan siang",
-    category: "Makanan",
-    account: "E-wallet",
-    date: "14 Mei 2026",
-    amount: -87000,
-    status: "Tercatat",
-  },
-  {
-    name: "Langganan musik",
-    category: "Hiburan",
-    account: "Kartu Debit",
-    date: "13 Mei 2026",
-    amount: -59000,
-    status: "Tercatat",
-  },
-];
 
 const chartBaseOptions = {
   chart: {
@@ -322,7 +239,7 @@ const trendOptions = {
   },
 };
 
-const createCategoryOptions = (setActiveCategory) => ({
+const createCategoryOptions = (labels, colors, setActiveCategory) => ({
   chart: {
     id: "sadar-category-chart",
     type: "donut",
@@ -331,22 +248,22 @@ const createCategoryOptions = (setActiveCategory) => ({
     events: {
       dataPointMouseEnter: (_event, _chartContext, config) => {
         setActiveCategory({
-          label: categoryLabels[config.dataPointIndex] || "",
-          color: categoryColors[config.dataPointIndex] || "#1E3A8A",
+          label: labels[config.dataPointIndex] || "",
+          color: colors[config.dataPointIndex] || "#1E3A8A",
         });
       },
       dataPointSelection: (_event, _chartContext, config) => {
         setActiveCategory({
-          label: categoryLabels[config.dataPointIndex] || "",
-          color: categoryColors[config.dataPointIndex] || "#1E3A8A",
+          label: labels[config.dataPointIndex] || "",
+          color: colors[config.dataPointIndex] || "#1E3A8A",
         });
       },
     },
   },
-  labels: categoryLabels,
-  colors: categoryColors,
+  labels,
+  colors,
   fill: {
-    colors: categoryColors,
+    colors,
     opacity: 1,
   },
   legend: {
@@ -385,8 +302,8 @@ const createCategoryOptions = (setActiveCategory) => ({
 });
 
 const actionLinks = [
-  { label: "Tambah Transaksi", icon: "ri-add-circle-line", link: "/catat-keuangan", color: "primary" },
-  { label: "Tambah Income", icon: "ri-bank-card-line", link: "/catat-keuangan", color: "success" },
+  { label: "Tambah Pengeluaran", icon: "ri-add-circle-line", link: "/catat-keuangan", color: "primary" },
+  { label: "Tambah Pemasukan", icon: "ri-bank-card-line", link: "/catat-keuangan?type=income", color: "success" },
   { label: "Lihat Insight", icon: "ri-lightbulb-flash-line", link: "/behavior-insight", color: "teal" },
   { label: "Lihat Financial Score", icon: "ri-speed-up-line", link: "/financial-score", color: "warning" },
 ];
@@ -394,24 +311,155 @@ const actionLinks = [
 const SadarDashboard = () => {
   document.title = "Dashboard | SADAR Finance";
   const [activeCategory, setActiveCategory] = useState({ label: "", color: "#1E3A8A" });
-  const categoryOptions = useMemo(() => createCategoryOptions(setActiveCategory), []);
+
+  const dashboardData = useMemo(() => {
+    const userAccounts = getUserRows(accounts, currentUserId);
+    const userTransactions = getUserRows(transactions, currentUserId);
+    const userIncomes = getUserRows(incomes, currentUserId);
+    const userBudgets = getUserRows(budgets, currentUserId);
+    const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
+    const totalSaldo = sumBy(userAccounts, (item) => item.balance);
+    const totalIncome = sumBy(userIncomes, (item) => item.amount);
+    const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
+    const budgetLimit = sumBy(userBudgets, (item) => item.limit);
+    const budgetUsed = sumBy(userBudgets, (item) => item.used);
+    const remainingBudget = Math.max(budgetLimit - budgetUsed, 0);
+    const byCategory = groupSumBy(expenseTransactions, "category");
+    const categoryRows = categoryLabels.reduce((result, label) => {
+      result[label] = 0;
+      return result;
+    }, {});
+
+    Object.entries(byCategory).forEach(([category, amount]) => {
+      if (category in categoryRows && category !== "Lainnya") {
+        categoryRows[category] += amount;
+        return;
+      }
+      categoryRows.Lainnya += amount;
+    });
+
+    const incomeRows = userIncomes.map((income) => ({
+      id: income.id,
+      name: income.source,
+      category: "Pemasukan",
+      account: getAccountName(income.account_id),
+      date: income.date,
+      amount: income.amount,
+      status: "Masuk",
+    }));
+    const expenseRows = userTransactions.map((transaction) => ({
+      id: transaction.id,
+      name: transaction.name,
+      category: transaction.category,
+      account: getAccountName(transaction.account_id),
+      date: transaction.date,
+      amount: -transaction.amount,
+      status: transaction.status,
+    }));
+
+    const recentRows = [...incomeRows, ...expenseRows]
+      .sort((a, b) => new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`))
+      .slice(0, 5)
+      .map((item) => ({
+        ...item,
+        formattedDate: new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(`${item.date}T00:00:00`)),
+      }));
+
+    const monthlyIncome = Array.from({ length: 12 }, () => 0);
+    const monthlyExpense = Array.from({ length: 12 }, () => 0);
+
+    userIncomes.forEach((income) => {
+      const monthIndex = new Date(`${income.date}T00:00:00`).getMonth();
+      monthlyIncome[monthIndex] += income.amount;
+    });
+
+    expenseTransactions.forEach((transaction) => {
+      const monthIndex = new Date(`${transaction.date}T00:00:00`).getMonth();
+      monthlyExpense[monthIndex] += transaction.amount;
+    });
+
+    const cashflowMonthIndexes = [11, 0, 1, 2, 3, 4];
+
+    return {
+      totalSaldo,
+      totalIncome,
+      totalExpense,
+      remainingBudget,
+      transactionCount: userTransactions.length + userIncomes.length,
+      accountCount: userAccounts.length,
+      categorySeries: categoryLabels.map((label) => categoryRows[label]),
+      recentRows,
+      cashflowSeries: [
+        { name: "Pemasukan", data: cashflowMonthIndexes.map((index) => Number((monthlyIncome[index] / 1000000).toFixed(2))) },
+        { name: "Pengeluaran", data: cashflowMonthIndexes.map((index) => Number((monthlyExpense[index] / 1000000).toFixed(2))) },
+      ],
+      expenseTrendSeries: [
+        { name: "Pengeluaran", data: monthlyExpense.map((amount) => Math.round(amount / 1000)) },
+      ],
+    };
+  }, []);
+
+  const summaryCards = [
+    {
+      label: "Total Saldo",
+      value: rupiah(dashboardData.totalSaldo),
+      helper: `${dashboardData.accountCount} account aktif`,
+      icon: "ri-wallet-3-line",
+      tone: "primary",
+    },
+    {
+      label: "Pemasukan Bulan Ini",
+      value: rupiah(dashboardData.totalIncome),
+      helper: "Dari pemasukan yang tercatat",
+      icon: "ri-arrow-down-circle-line",
+      tone: "success",
+    },
+    {
+      label: "Pengeluaran Bulan Ini",
+      value: rupiah(dashboardData.totalExpense),
+      helper: `${((dashboardData.totalExpense / dashboardData.totalIncome) * 100 || 0).toFixed(1)}% dari pemasukan`,
+      icon: "ri-arrow-up-circle-line",
+      tone: "warning",
+    },
+    {
+      label: "Sisa Budget",
+      value: rupiah(dashboardData.remainingBudget),
+      helper: "Dari alokasi bulan ini",
+      icon: "ri-pie-chart-2-line",
+      tone: "teal",
+    },
+    {
+      label: "Jumlah Catatan",
+      value: `${dashboardData.transactionCount} catatan`,
+      helper: "Pemasukan dan pengeluaran",
+      icon: "ri-file-list-3-line",
+      tone: "sand",
+    },
+  ];
+
+  const categoryOptions = useMemo(
+    () => createCategoryOptions(categoryLabels, categoryColors, setActiveCategory),
+    [],
+  );
 
   return (
     <div className="page-content sadar-dashboard">
       <Container fluid>
-        <BreadCrumb title="Dashboard" pageTitle="SADAR Finance" />
-
         <section className="sadar-overview">
           <div className="sadar-overview-main">
             <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow">
               Ringkasan Mei 2026
             </Badge>
-            <h1>Halo, Aqyla</h1>
+            <h1>Halo, {userProfile.name}</h1>
             <p>Yuk lihat kondisi keuanganmu hari ini.</p>
             <div className="sadar-overview-actions">
               <Button color="primary" tag={Link} to="/catat-keuangan">
                 <i className="ri-add-line align-bottom me-1"></i>
-                Tambah Transaksi
+                Tambah Pengeluaran
+              </Button>
+              <Button color="success" tag={Link} to="/catat-keuangan?type=income">
+                <i className="ri-bank-card-line align-bottom me-1"></i>
+                Tambah Pemasukan
               </Button>
               <Button color="light" className="sadar-ghost-btn" tag={Link} to="/behavior-insight">
                 <i className="ri-lightbulb-flash-line align-bottom me-1"></i>
@@ -470,7 +518,7 @@ const SadarDashboard = () => {
                 </div>
               </CardHeader>
               <CardBody className="cashflow-chart-body">
-                <ReactApexChart options={cashflowOptions} series={cashflowSeries} type="bar" height={292} />
+                <ReactApexChart options={cashflowOptions} series={dashboardData.cashflowSeries} type="bar" height={292} />
               </CardBody>
             </Card>
           </Col>
@@ -484,7 +532,7 @@ const SadarDashboard = () => {
               </CardHeader>
               <CardBody className="category-chart-body">
                 <div className="category-chart-wrap" onMouseLeave={() => setActiveCategory({ label: "", color: "#1E3A8A" })}>
-                  <ReactApexChart key="sadar-category-chart" options={categoryOptions} series={categorySeries} type="donut" height={312} />
+                  <ReactApexChart key="sadar-category-chart" options={categoryOptions} series={dashboardData.categorySeries} type="donut" height={312} />
                   <div
                     className={`category-center-label ${activeCategory.label ? "is-visible" : ""}`}
                     style={{ color: activeCategory.color }}
@@ -507,7 +555,7 @@ const SadarDashboard = () => {
                 </div>
               </CardHeader>
               <CardBody className="expense-trend-body">
-                <ReactApexChart options={trendOptions} series={expenseTrendSeries} type="area" height={300} />
+                <ReactApexChart options={trendOptions} series={dashboardData.expenseTrendSeries} type="area" height={300} />
               </CardBody>
             </Card>
           </Col>
@@ -520,7 +568,7 @@ const SadarDashboard = () => {
                   </div>
                   <h5>Smart Insight</h5>
                   <p>Pengeluaran makanan naik 18% dibanding minggu lalu.</p>
-                  <span>Transaksi paling sering muncul di akhir pekan.</span>
+                  <span>Pengeluaran paling sering muncul di akhir pekan.</span>
                 </CardBody>
               </Card>
               <Card className="alert-card dashboard-panel">
@@ -541,10 +589,10 @@ const SadarDashboard = () => {
         <Card className="dashboard-panel mt-3">
           <CardHeader>
             <div>
-              <h4 className="card-title mb-1">Transaksi Terbaru</h4>
-              <p className="text-muted mb-0">Preview 5 transaksi terakhir</p>
+              <h4 className="card-title mb-1">Riwayat Terbaru</h4>
+              <p className="text-muted mb-0">Preview 5 catatan keuangan terakhir</p>
             </div>
-            <Button color="light" size="sm" className="sadar-table-action">
+            <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/profile-account#riwayat-transaksi">
               Lihat Semua
             </Button>
           </CardHeader>
@@ -553,7 +601,7 @@ const SadarDashboard = () => {
               <Table className="align-middle mb-0 sadar-table">
                 <thead>
                   <tr>
-                    <th>Nama Transaksi</th>
+                    <th>Nama Catatan</th>
                     <th>Kategori</th>
                     <th>Account</th>
                     <th>Tanggal</th>
@@ -562,15 +610,15 @@ const SadarDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentTransactions.map((transaction) => (
-                    <tr key={`${transaction.name}-${transaction.date}`}>
+                  {dashboardData.recentRows.map((transaction) => (
+                    <tr key={transaction.id}>
                       <td>
                         <div className="fw-semibold text-dark">{transaction.name}</div>
                       </td>
                       <td>{transaction.category}</td>
                       <td>{transaction.account}</td>
-                      <td>{transaction.date}</td>
-                      <td className={`text-end fw-semibold ${transaction.amount > 0 ? "text-success" : "text-primary"}`}>
+                      <td>{transaction.formattedDate}</td>
+                      <td className={`text-end fw-semibold ${transaction.amount > 0 ? "text-success" : "text-danger"}`}>
                         {transaction.amount > 0 ? "+" : "-"}
                         {rupiah(Math.abs(transaction.amount))}
                       </td>

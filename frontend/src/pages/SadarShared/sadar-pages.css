@@ -1,0 +1,447 @@
+.sadar-page {
+  min-height: 100%;
+  background: #f6f8fb;
+  color: #172033;
+  --sadar-primary: #1e3a8a;
+  --sadar-teal: #14b8a6;
+  --sadar-success: #22c55e;
+  --sadar-warning: #f59e0b;
+}
+
+.sadar-page .container-fluid {
+  max-width: 1480px;
+}
+
+.sadar-page .card {
+  border: 1px solid #e7ebf2;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
+}
+
+.sadar-page .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 68px;
+  padding: 1.15rem 1.25rem 0.6rem;
+  background: transparent;
+  border-bottom: 0;
+}
+
+.sadar-page .card-title {
+  color: #172033;
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.sadar-page .text-muted {
+  color: #64748b !important;
+}
+
+.sadar-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1.2rem;
+  border: 1px solid #e4e9f2;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+}
+
+.sadar-page-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.85rem;
+  font-weight: 760;
+  line-height: 1.15;
+}
+
+.sadar-page-header p {
+  max-width: 720px;
+  margin: 0.55rem 0 0;
+  color: #64748b;
+}
+
+.sadar-header-icon,
+.sadar-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.sadar-header-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+  font-size: 1.4rem;
+}
+
+.sadar-summary-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 142px;
+  padding: 1rem;
+}
+
+.sadar-summary-card {
+  height: 100%;
+}
+
+.sadar-summary-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sadar-card-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+  font-size: 1.1rem;
+}
+
+.sadar-card-icon.teal {
+  color: var(--sadar-teal);
+  background: rgba(20, 184, 166, 0.12);
+}
+
+.sadar-card-icon.warning {
+  color: var(--sadar-warning);
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.sadar-summary-card h2 {
+  margin: 1rem 0 0.3rem;
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 760;
+}
+
+.sadar-summary-card p,
+.sadar-insight-item p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.sadar-chart-card .card-body {
+  padding: 0.5rem 1rem 1.1rem;
+}
+
+.category-chart-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 330px;
+  padding-top: 0.4rem !important;
+}
+
+.category-chart-body .apexcharts-canvas {
+  margin: 0 auto;
+}
+
+.category-chart-wrap {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.category-chart-body .apexcharts-pie-series path {
+  opacity: 1 !important;
+  stroke: #ffffff !important;
+  stroke-width: 4px !important;
+}
+
+.category-chart-body .apexcharts-pie circle,
+.category-chart-body .apexcharts-pie line {
+  stroke: transparent !important;
+}
+
+.sadar-expense-trend-body {
+  padding: 0.75rem 1.25rem 1.25rem !important;
+}
+
+.sadar-panel .card-body {
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.sadar-insight-list,
+.sadar-recommend-list,
+.sadar-factor-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sadar-insight-item,
+.sadar-factor-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid #edf1f6;
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.sadar-insight-item strong,
+.sadar-factor-item strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #172033;
+}
+
+.sadar-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  margin-top: 0.42rem;
+  border-radius: 999px;
+  background: var(--sadar-teal);
+}
+
+.sadar-dot.warning {
+  background: var(--sadar-warning);
+}
+
+.sadar-empty-state {
+  padding: 1.25rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.sadar-progress {
+  height: 8px;
+  border-radius: 999px;
+  background-color: #e8edf5;
+}
+
+.sadar-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #edf1f6;
+  border-radius: 8px;
+}
+
+.sadar-table {
+  min-width: 760px;
+  margin-bottom: 0;
+}
+
+.sadar-table thead th {
+  padding: 0.85rem 1rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 1px solid #edf1f6;
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.sadar-table tbody td {
+  padding: 0.9rem 1rem;
+  color: #475569;
+  border-color: #edf1f6;
+}
+
+.sadar-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.sadar-table-action {
+  color: #334155 !important;
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+
+.sadar-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.sadar-profile-photo-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.9rem;
+  border: 1px solid #edf1f6;
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.sadar-profile-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  overflow: hidden;
+  border-radius: 999px;
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.sadar-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sadar-profile-photo-copy h5 {
+  margin: 0 0 0.15rem;
+  color: #172033;
+  font-weight: 750;
+}
+
+.sadar-profile-photo-copy p {
+  margin: 0 0 0.65rem;
+  color: #64748b;
+}
+
+.sadar-score-main {
+  display: flex;
+  min-height: 320px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.sadar-score-heading span {
+  display: block;
+  color: #172033;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.sadar-score-heading p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.sadar-score-row > [class*="col-"] {
+  display: flex;
+}
+
+.sadar-score-row .sadar-panel,
+.sadar-score-stack {
+  width: 100%;
+}
+
+.sadar-score-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.sadar-score-detail-row > [class*="col-"] {
+  display: flex;
+}
+
+.sadar-score-detail-row .sadar-panel,
+.sadar-score-detail-stack {
+  width: 100%;
+}
+
+.sadar-score-detail-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sadar-score-detail-stack .sadar-panel.flex-fill {
+  min-height: 0;
+}
+
+.sadar-score-chart-body {
+  display: flex;
+  align-items: center;
+  min-height: 340px;
+  padding: 0.75rem 1.25rem 1.25rem !important;
+}
+
+.sadar-score-chart-body > div {
+  width: 100%;
+}
+
+.sadar-score-number {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+  color: var(--sadar-primary);
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sadar-score-number span {
+  margin-bottom: 0.45rem;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.sadar-score-status {
+  display: inline-flex;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+  font-weight: 750;
+}
+
+.sadar-score-note {
+  max-width: 300px;
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.sadar-budget-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 991.98px) {
+  .sadar-form-grid,
+  .sadar-budget-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .sadar-page-header {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .sadar-page-header h1 {
+    font-size: 1.45rem;
+  }
+}

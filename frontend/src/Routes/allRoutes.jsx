@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
 //Dashboard
@@ -11,7 +11,9 @@ import DashboardCrypto from "../pages/DashboardCrypto";
 import DashboardProject from "../pages/DashboardProject";
 import DashboardNFT from "../pages/DashboardNFT";
 import SadarDashboard from "../pages/SadarDashboard";
-import SadarPlaceholder from "../pages/SadarPlaceholder";
+import SadarBehaviorInsight from "../pages/SadarBehaviorInsight";
+import SadarFinancialScore from "../pages/SadarFinancialScore";
+import SadarProfileAccount from "../pages/SadarProfileAccount";
 
 //Calendar
 import MonthGrid from "../pages/Calendar/MonthGrid";
@@ -141,10 +143,11 @@ import ReactTable from "../pages/Tables/ReactTables";
 //Icon pages
 import RemixIcons from "../pages/Icons/RemixIcons/RemixIcons";
 import BoxIcons from "../pages/Icons/BoxIcons/BoxIcons";
-import MaterialDesign from "../pages/Icons/MaterialDesign/MaterialDesign";
 import FeatherIcons from "../pages/Icons/FeatherIcons/FeatherIcons";
-import LineAwesomeIcons from "../pages/Icons/LineAwesomeIcons/LineAwesomeIcons";
 import CryptoIcons from "../pages/Icons/CryptoIcons/CryptoIcons";
+
+const MaterialDesign = lazy(() => import("../pages/Icons/MaterialDesign/MaterialDesign"));
+const LineAwesomeIcons = lazy(() => import("../pages/Icons/LineAwesomeIcons/LineAwesomeIcons"));
 
 //Maps
 import GoogleMaps from "../pages/Maps/GoogleMaps/GoogleMaps";
@@ -254,9 +257,9 @@ const authProtectedRoutes = [
   { path: "/dashboard-crm", component: <DashboardCrm /> },
   { path: "/dashboard", component: <SadarDashboard /> },
   { path: "/catat-keuangan", component: <TransactionInput /> },
-  { path: "/behavior-insight", component: <SadarPlaceholder /> },
-  { path: "/financial-score", component: <SadarPlaceholder /> },
-  { path: "/profile-account", component: <SadarPlaceholder /> },
+  { path: "/behavior-insight", component: <SadarBehaviorInsight /> },
+  { path: "/financial-score", component: <SadarFinancialScore /> },
+  { path: "/profile-account", component: <SadarProfileAccount /> },
   { path: "/dashboard-jobs", component: <Dashboardjob /> },
   { path: "/index", component: <SadarDashboard /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },

@@ -80,10 +80,11 @@ import {
 let users = [
   {
     uid: 1,
-    username: "admin",
-    role: "admin",
+    first_name: "Aqyla",
+    username: "aqyla",
+    role: "user",
     password: "123456",
-    email: "admin@themesbrand.com",
+    email: "aqyla@example.com",
   },
 ];
 

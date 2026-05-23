@@ -22,10 +22,6 @@ import logoLight from "../../../assets/images/logo-light.png";
 import logoDark from "../../../assets/images/logo-dark.png";
 import classnames from "classnames";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
-import { loadAnimation } from "lottie-web";
-import { defineElement } from "lord-icon-element";
-// register lottie and define custom element
-defineElement(loadAnimation);
 
 const FormWizard = () => {
   const [activeTab, setactiveTab] = useState(1);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route } from "react-router-dom";
 
 //Layouts
@@ -19,7 +19,7 @@ const Index = () => {
                             path={route.path}
                             element={
                                 <NonAuthLayout>
-                                    {route.component}
+                                    <Suspense fallback={null}>{route.component}</Suspense>
                                 </NonAuthLayout>
                             }
                             key={idx}
@@ -34,7 +34,9 @@ const Index = () => {
                             path={route.path}
                             element={
                                 <AuthProtected>
-                                    <VerticalLayout>{route.component}</VerticalLayout>
+                                    <VerticalLayout>
+                                        <Suspense fallback={null}>{route.component}</Suspense>
+                                    </VerticalLayout>
                                 </AuthProtected>}
                             key={idx}
                             exact={true}

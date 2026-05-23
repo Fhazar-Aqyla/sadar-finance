@@ -41,7 +41,7 @@
 
 .sadar-overview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid #e4e9f2;
@@ -55,7 +55,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  min-height: 178px;
+  min-height: 150px;
 }
 
 .sadar-eyebrow {
@@ -94,10 +94,10 @@
 
 .sadar-overview-note {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.9rem;
-  min-height: 178px;
-  padding: 1.15rem;
+  min-height: 150px;
+  padding: 1.15rem 1.35rem;
   border: 1px solid #f4dfb8;
   border-radius: 12px;
   background: #fffaf0;
@@ -127,7 +127,7 @@
 }
 
 .sadar-overview .sadar-alert-copy p {
-  max-width: 280px;
+  max-width: 360px;
   margin: 0.3rem 0 0;
   color: #475569;
   font-size: 0.88rem;

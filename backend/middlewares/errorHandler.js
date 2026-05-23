@@ -5,6 +5,7 @@
 
 const config = require('../config');
 const { error: errorResponse } = require('../utils/response');
+const { getDatabaseErrorResponse } = require('../utils/dbError');
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, _req, res, _next) => {
@@ -43,6 +44,11 @@ const errorHandler = (err, _req, res, _next) => {
       statusCode: 400,
       errorCode: 'FOREIGN_KEY_VIOLATION',
     });
+  }
+
+  const dbError = getDatabaseErrorResponse(err);
+  if (dbError) {
+    return errorResponse(res, dbError);
   }
 
   // Multer file size error
