@@ -14,7 +14,6 @@ import {
   Table,
 } from "reactstrap";
 
-import BreadCrumb from "../../Components/Common/BreadCrumb";
 import "./sadar-dashboard.css";
 
 const rupiah = (value) =>
@@ -399,8 +398,6 @@ const SadarDashboard = () => {
   return (
     <div className="page-content sadar-dashboard">
       <Container fluid>
-        <BreadCrumb title="Dashboard" pageTitle="SADAR Finance" />
-
         <section className="sadar-overview">
           <div className="sadar-overview-main">
             <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow">

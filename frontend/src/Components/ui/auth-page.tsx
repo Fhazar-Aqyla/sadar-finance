@@ -17,7 +17,6 @@ const financeQuotes = [
   },
 ];
 
-const pathAnimationStartedAt = Date.now();
 const getPathDuration = (index: number) => 20 + ((index * 7) % 10);
 
 export function AuthPage() {
@@ -70,7 +69,6 @@ export function AuthPage() {
 }
 
 function FloatingPaths({ position }: { position: number }) {
-  const elapsedSeconds = (Date.now() - pathAnimationStartedAt) / 1000;
   const paths = Array.from({ length: 36 }, (_, i) => ({
     id: i,
     d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
@@ -108,7 +106,6 @@ function FloatingPaths({ position }: { position: number }) {
             }}
             transition={{
               duration: path.duration,
-              delay: -(elapsedSeconds % path.duration),
               repeat: Number.POSITIVE_INFINITY,
               ease: "linear",
             }}
