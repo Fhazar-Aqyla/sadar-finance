@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
 //Dashboard
@@ -141,10 +141,11 @@ import ReactTable from "../pages/Tables/ReactTables";
 //Icon pages
 import RemixIcons from "../pages/Icons/RemixIcons/RemixIcons";
 import BoxIcons from "../pages/Icons/BoxIcons/BoxIcons";
-import MaterialDesign from "../pages/Icons/MaterialDesign/MaterialDesign";
 import FeatherIcons from "../pages/Icons/FeatherIcons/FeatherIcons";
-import LineAwesomeIcons from "../pages/Icons/LineAwesomeIcons/LineAwesomeIcons";
 import CryptoIcons from "../pages/Icons/CryptoIcons/CryptoIcons";
+
+const MaterialDesign = lazy(() => import("../pages/Icons/MaterialDesign/MaterialDesign"));
+const LineAwesomeIcons = lazy(() => import("../pages/Icons/LineAwesomeIcons/LineAwesomeIcons"));
 
 //Maps
 import GoogleMaps from "../pages/Maps/GoogleMaps/GoogleMaps";
