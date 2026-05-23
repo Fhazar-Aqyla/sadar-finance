@@ -457,6 +457,10 @@ const SadarDashboard = () => {
                 <i className="ri-add-line align-bottom me-1"></i>
                 Tambah Pengeluaran
               </Button>
+              <Button color="success" tag={Link} to="/catat-keuangan?type=income">
+                <i className="ri-bank-card-line align-bottom me-1"></i>
+                Tambah Pemasukan
+              </Button>
               <Button color="light" className="sadar-ghost-btn" tag={Link} to="/behavior-insight">
                 <i className="ri-lightbulb-flash-line align-bottom me-1"></i>
                 Lihat Insight
