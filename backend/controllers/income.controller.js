@@ -35,8 +35,7 @@ const deleteIncome = asyncHandler(async (req, res) => {
 });
 
 const getMonthlyTrend = asyncHandler(async (req, res) => {
-  const months = parseInt(req.query.months, 10) || 6;
-  const trend = await incomeService.getMonthlyTrend(req.user.id, months);
+  const trend = await incomeService.getMonthlyTrend(req.user.id, req.query.months);
   return success(res, { data: trend, message: 'Monthly income trend retrieved' });
 });
 

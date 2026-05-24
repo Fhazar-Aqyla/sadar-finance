@@ -38,4 +38,20 @@ const queryTransactionSchema = Joi.object({
   sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
 });
 
-module.exports = { createTransactionSchema, updateTransactionSchema, queryTransactionSchema };
+const summaryQuerySchema = Joi.object({
+  startDate: Joi.date().iso().required(),
+  endDate: Joi.date().iso().min(Joi.ref('startDate')).required()
+    .messages({ 'date.min': 'endDate must be the same as or after startDate' }),
+});
+
+const monthlyTrendQuerySchema = Joi.object({
+  months: Joi.number().integer().min(1).max(24).default(6),
+});
+
+module.exports = {
+  createTransactionSchema,
+  updateTransactionSchema,
+  queryTransactionSchema,
+  summaryQuerySchema,
+  monthlyTrendQuerySchema,
+};

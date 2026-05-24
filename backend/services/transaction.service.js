@@ -4,10 +4,12 @@
  */
 
 const transactionRepository = require('../repositories/transaction.repository');
-const { NotFoundError } = require('../utils/errors');
+const accountRepository = require('../repositories/account.repository');
+const { BadRequestError, NotFoundError } = require('../utils/errors');
 
 class TransactionService {
   async create(userId, data) {
+    await this._ensureAccountBelongsToUser(data.accountId, userId);
     return transactionRepository.create(userId, data);
   }
 
@@ -25,6 +27,7 @@ class TransactionService {
 
   async update(transactionId, userId, data) {
     await this.findById(transactionId, userId);
+    await this._ensureAccountBelongsToUser(data.accountId, userId);
     return transactionRepository.update(transactionId, userId, data);
   }
 
@@ -58,6 +61,15 @@ class TransactionService {
 
   async getMonthlyTrend(userId, months) {
     return transactionRepository.getMonthlyExpenseTrend(userId, months);
+  }
+
+  async _ensureAccountBelongsToUser(accountId, userId) {
+    if (!accountId) return;
+
+    const account = await accountRepository.findById(accountId, userId);
+    if (!account) {
+      throw new BadRequestError('Account does not exist or does not belong to the current user');
+    }
   }
 }
 

@@ -143,10 +143,10 @@ class IncomeRepository {
          COUNT(*)::integer as count
        FROM incomes
        WHERE user_id = $1
-         AND income_date >= NOW() - INTERVAL '${parseInt(months)} months'
+         AND income_date >= NOW() - ($2::int * INTERVAL '1 month')
        GROUP BY DATE_TRUNC('month', income_date)
        ORDER BY month ASC`,
-      [userId]
+      [userId, months]
     );
     return result.rows;
   }

@@ -5,13 +5,18 @@ const { Router } = require('express');
 const incomeController = require('../controllers/income.controller');
 const authenticate = require('../middlewares/authenticate');
 const validate = require('../middlewares/validate');
-const { createIncomeSchema, updateIncomeSchema, queryIncomeSchema } = require('../validators/income.validator');
+const {
+  createIncomeSchema,
+  updateIncomeSchema,
+  queryIncomeSchema,
+  monthlyTrendQuerySchema,
+} = require('../validators/income.validator');
 
 const router = Router();
 router.use(authenticate);
 
 // Aggregation routes (before /:id)
-router.get('/trend/monthly', incomeController.getMonthlyTrend);
+router.get('/trend/monthly', validate(monthlyTrendQuerySchema, 'query'), incomeController.getMonthlyTrend);
 
 // CRUD
 router.post('/', validate(createIncomeSchema), incomeController.createIncome);

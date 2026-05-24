@@ -257,8 +257,7 @@ const getSummary = asyncHandler(async (req, res) => {
  *         description: Monthly expense trend
  */
 const getMonthlyTrend = asyncHandler(async (req, res) => {
-  const months = parseInt(req.query.months, 10) || 6;
-  const trend = await transactionService.getMonthlyTrend(req.user.id, months);
+  const trend = await transactionService.getMonthlyTrend(req.user.id, req.query.months);
   return success(res, { data: trend, message: 'Monthly trend retrieved successfully' });
 });
 

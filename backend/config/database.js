@@ -6,12 +6,22 @@
 const { Pool } = require('pg');
 const config = require('./index');
 
-const pool = new Pool({
+const poolOptions = config.db.url ? {
+  connectionString: config.db.url,
+} : {
   host: config.db.host,
   port: config.db.port,
   database: config.db.database,
   user: config.db.user,
   password: String(config.db.password ?? ''),
+};
+
+if (config.db.ssl) {
+  poolOptions.ssl = { rejectUnauthorized: false };
+}
+
+const pool = new Pool({
+  ...poolOptions,
   max: 20,                     // Maximum pool size
   idleTimeoutMillis: 30000,    // Close idle clients after 30s
   connectionTimeoutMillis: 5000, // Timeout after 5s if can't connect

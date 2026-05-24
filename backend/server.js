@@ -23,6 +23,7 @@ const { error: errorResponse } = require('./utils/response');
 const { getDatabaseErrorResponse } = require('./utils/dbError');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ── Ensure upload directory exists ──────────────────────────
 const uploadDir = path.join(__dirname, config.upload.dir);
@@ -32,7 +33,20 @@ if (!fs.existsSync(uploadDir)) {
 
 // ── Global Middleware ───────────────────────────────────────
 app.use(helmet());                                      // Security headers
-app.use(cors());                                        // CORS
+app.use(cors({
+  origin(origin, callback) {
+    const allowedOrigins = config.cors.allowedOrigins;
+
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.length === 0 && config.env !== 'production') {
+      return callback(null, true);
+    }
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    return callback(null, false);
+  },
+  credentials: true,
+}));                                                    // CORS
 app.use(express.json({ limit: '10mb' }));               // Parse JSON body
 app.use(express.urlencoded({ extended: true }));         // Parse URL-encoded body
 app.use(morgan(config.env === 'production' ? 'combined' : 'dev')); // Logging
@@ -87,7 +101,9 @@ app.get('/health/db', async (_req, res, next) => {
     return res.json({
       success: true,
       message: 'PostgreSQL connection is healthy',
-      data: {
+      data: config.env === 'production' ? {
+        status: 'ok',
+      } : {
         host: config.db.host,
         port: config.db.port,
         database: config.db.database,

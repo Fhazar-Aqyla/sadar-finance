@@ -7,6 +7,14 @@ const path = require('path');
 
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
+const parseCsv = (value) => {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((item) => item.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+};
+
 const rawDbPassword = process.env.DB_PASSWORD;
 const dbPassword = rawDbPassword === 'your_password_here' ? '' : String(rawDbPassword ?? '');
 
@@ -14,21 +22,34 @@ if (rawDbPassword === 'your_password_here') {
   console.warn('[CONFIG] DB_PASSWORD masih placeholder. Dianggap kosong; isi backend/.env dengan password PostgreSQL lokal jika user postgres memakai password.');
 }
 
+const env = process.env.NODE_ENV || 'development';
+const jwtSecret = process.env.JWT_SECRET || 'default_secret_change_me';
+
+if (env === 'production' && jwtSecret === 'default_secret_change_me') {
+  throw new Error('[CONFIG] JWT_SECRET wajib di-set saat NODE_ENV=production.');
+}
+
 const config = {
-  env: process.env.NODE_ENV || 'development',
+  env,
   port: parseInt(process.env.PORT, 10) || 3000,
 
   db: {
+    url: process.env.DATABASE_URL || null,
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT, 10) || 5432,
     database: process.env.DB_NAME || 'sadar_finance',
     user: process.env.DB_USER || 'postgres',
     password: dbPassword,
+    ssl: process.env.DB_SSL === 'true' || process.env.PGSSLMODE === 'require',
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'default_secret_change_me',
+    secret: jwtSecret,
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  },
+
+  cors: {
+    allowedOrigins: parseCsv(process.env.CORS_ORIGINS || process.env.FRONTEND_URL),
   },
 
   ai: {

@@ -30,4 +30,13 @@ const queryIncomeSchema = Joi.object({
   sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
 });
 
-module.exports = { createIncomeSchema, updateIncomeSchema, queryIncomeSchema };
+const monthlyTrendQuerySchema = Joi.object({
+  months: Joi.number().integer().min(1).max(24).default(6),
+});
+
+module.exports = {
+  createIncomeSchema,
+  updateIncomeSchema,
+  queryIncomeSchema,
+  monthlyTrendQuerySchema,
+};

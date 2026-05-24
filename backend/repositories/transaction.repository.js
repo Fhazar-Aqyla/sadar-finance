@@ -190,10 +190,10 @@ class TransactionRepository {
          COUNT(*)::integer as count
        FROM transactions
        WHERE user_id = $1
-         AND transaction_date >= NOW() - INTERVAL '${parseInt(months)} months'
+         AND transaction_date >= NOW() - ($2::int * INTERVAL '1 month')
        GROUP BY DATE_TRUNC('month', transaction_date)
        ORDER BY month ASC`,
-      [userId]
+      [userId, months]
     );
     return result.rows;
   }

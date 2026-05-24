@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "SADAR Finance — Production-ready RESTful API for fintech application",
   "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
