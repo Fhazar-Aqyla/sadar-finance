@@ -5,7 +5,14 @@ const { Router } = require('express');
 const c = require('../controllers/analytics.controller');
 const authenticate = require('../middlewares/authenticate');
 const validate = require('../middlewares/validate');
-const { categorizeSchema, behaviorAnalysisSchema, overspendingSchema, healthScoreSchema, createBudgetSchema } = require('../validators/analytics.validator');
+const {
+  categorizeSchema,
+  behaviorAnalysisSchema,
+  behaviorPredictionSchema,
+  overspendingSchema,
+  healthScoreSchema,
+  createBudgetSchema,
+} = require('../validators/analytics.validator');
 
 const router = Router();
 router.use(authenticate);
@@ -15,6 +22,7 @@ router.post('/categorize', validate(categorizeSchema), c.categorize);
 
 // Behavior Analysis → insights
 router.post('/behavior', validate(behaviorAnalysisSchema), c.analyzeBehavior);
+router.post('/behavior/predict', validate(behaviorPredictionSchema), c.predictBehavior);
 
 // Overspending Prediction → alerts
 router.post('/overspending', validate(overspendingSchema), c.predictOverspending);

@@ -20,6 +20,11 @@ const analyzeBehavior = asyncHandler(async (req, res) => {
 });
 
 // Overspending Prediction → saves alerts
+const predictBehavior = asyncHandler(async (req, res) => {
+  const result = await analyticsService.predictBehavior(req.user.id, req.body);
+  return created(res, { data: result, message: 'Behavior spike prediction completed' });
+});
+
 const predictOverspending = asyncHandler(async (req, res) => {
   const result = await analyticsService.predictOverspending(req.user.id, req.body);
   return created(res, { data: result, message: 'Overspending prediction completed' });
@@ -67,7 +72,7 @@ const getLatestScore = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  categorize, analyzeBehavior, predictOverspending, calculateHealthScore,
+  categorize, analyzeBehavior, predictBehavior, predictOverspending, calculateHealthScore,
   createBudget, getLatestBudget,
   getInsights, getAlerts, getScoreHistory, getLatestScore,
 };

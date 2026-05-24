@@ -3,8 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Activity,
   BarChart3,
-  ChevronLeft,
-  ChevronRight,
   Edit3,
   Home,
   LogOut,
@@ -149,12 +147,6 @@ const Sidebar = ({ className = "" }) => {
     document.body.classList.toggle("vertical-sidebar-enable", nextOpen);
   };
 
-  const toggleCollapse = () => {
-    const nextCollapsed = !isCollapsed;
-    setIsCollapsed(nextCollapsed);
-    document.documentElement.setAttribute("data-sidebar-size", nextCollapsed ? "sm" : "lg");
-  };
-
   const handleItemClick = () => {
     if (window.innerWidth < 768) {
       setIsOpen(false);
@@ -209,17 +201,6 @@ const Sidebar = ({ className = "" }) => {
             </Link>
           )}
 
-          <button
-            onClick={toggleCollapse}
-            className="absolute right-5 hidden rounded-md p-1.5 transition-all duration-200 hover:bg-slate-100 md:flex"
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4 text-slate-500" />
-            ) : (
-              <ChevronLeft className="h-4 w-4 text-slate-500" />
-            )}
-          </button>
         </div>
 
         <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-6">

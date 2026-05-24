@@ -6,23 +6,14 @@ import {
   postJwtLogin,
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
+import { api } from "../../../config";
 
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 
 const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
-const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const apiBaseUrl = api.API_URL;
 
-const getErrorMessage = (error, fallback = "Login gagal. Coba lagi.") => {
-  if (typeof error === "string") return error;
-  return (
-    error?.response?.data?.error?.message ||
-    error?.response?.data?.message ||
-    error?.message ||
-    error?.data?.message ||
-    error?.data ||
-    fallback
-  );
-};
+const getErrorMessage = (_error, fallback = "Email atau password salah.") => fallback;
 
 const normalizeSadarAuth = (response) => {
   const payload = response?.data?.data || response?.data || response;
@@ -44,7 +35,7 @@ export const loginUser = (user, history) => async (dispatch) => {
 
       const data = normalizeSadarAuth(response);
       if (!data.token) {
-        throw new Error("Response login tidak menyertakan token.");
+        throw new Error("Login gagal.");
       }
 
       sessionStorage.setItem("authUser", JSON.stringify(data));
@@ -89,7 +80,7 @@ export const loginUser = (user, history) => async (dispatch) => {
           dispatch(loginSuccess(data));
           history('/dashboard')
         } else {
-          dispatch(apiError(finallogin.message || "Email atau password salah."));
+          dispatch(apiError("Email atau password salah."));
         }
       }else{
         dispatch(loginSuccess(data));
@@ -113,7 +104,7 @@ export const logoutUser = () => async (dispatch) => {
     }
 
   } catch (error) {
-    dispatch(apiError(error));
+    dispatch(apiError("Logout gagal."));
   }
 };
 
@@ -137,7 +128,7 @@ export const socialLogin = (type, history) => async (dispatch) => {
     }
 
   } catch (error) {
-    dispatch(apiError(error));
+    dispatch(apiError("Login gagal."));
   }
 };
 
@@ -147,6 +138,6 @@ export const resetLoginFlag = () => async (dispatch) =>{
     const response = dispatch(reset_login_flag());
     return response;
   } catch (error) {
-    dispatch(apiError(error));
+    dispatch(apiError("Login gagal."));
   }
 };

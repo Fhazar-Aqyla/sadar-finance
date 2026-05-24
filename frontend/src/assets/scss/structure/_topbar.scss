@@ -91,6 +91,7 @@
 .sadar-app-search {
     width: min(420px, 38vw);
     min-width: 260px;
+    position: relative;
 
     .position-relative {
         width: 100%;
@@ -111,6 +112,87 @@
 
     span.search-widget-icon {
         line-height: 42px;
+    }
+
+    .sadar-search-menu {
+        width: min(460px, calc(100vw - 32px));
+        max-height: min(520px, calc(100vh - #{$header-height} - 24px));
+        overflow-y: auto;
+        border: 1px solid var(--#{$prefix}border-color);
+        border-radius: 8px;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+
+        &.show {
+            display: block;
+            top: calc(100% + 8px);
+        }
+    }
+
+    .sadar-search-result {
+        display: grid;
+        grid-template-columns: 36px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.7rem 0.65rem;
+        color: var(--#{$prefix}body-color);
+        white-space: normal;
+
+        &:hover,
+        &:focus {
+            background-color: var(--#{$prefix}light);
+        }
+    }
+
+    .sadar-search-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 1.05rem;
+    }
+
+    .sadar-search-copy {
+        min-width: 0;
+    }
+
+    .sadar-search-title,
+    .sadar-search-desc {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sadar-search-title {
+        color: var(--#{$prefix}body-color);
+        font-weight: 700;
+    }
+
+    .sadar-search-desc {
+        color: var(--#{$prefix}secondary-color);
+        font-size: 0.78rem;
+    }
+
+    .sadar-search-meta {
+        color: var(--#{$prefix}secondary-color);
+        font-size: 0.72rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+}
+
+.sadar-app-search-mobile {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+
+    .sadar-search-menu {
+        position: static !important;
+        width: 100%;
+        max-height: 420px;
+        margin-top: 0.75rem;
+        transform: none !important;
     }
 }
 
@@ -173,9 +255,10 @@
 .sadar-profile {
     margin-left: 0.35rem;
     border-left: 0;
+    background-color: transparent !important;
 
     @media (min-width: 768px) {
-        background-color: transparent;
+        background-color: transparent !important;
     }
 
     .btn {
@@ -183,13 +266,13 @@
         padding: 0 0.85rem;
         border: 1px solid var(--#{$prefix}border-color);
         border-radius: 8px;
-        background-color: var(--#{$prefix}body-bg);
+        background-color: $white;
     }
 
     .btn:hover,
     .btn:focus,
     &.show .btn {
-        background-color: var(--#{$prefix}header-item-bg);
+        background-color: $white;
     }
 
     .header-profile-user {

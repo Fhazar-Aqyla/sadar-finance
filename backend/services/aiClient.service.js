@@ -61,6 +61,15 @@ class AiClientService {
     return this._normalizeInsightResult(response);
   }
 
+  async predictBehavior(payload) {
+    if (config.ai.mockMode) {
+      return this._mockBehaviorResult(payload);
+    }
+
+    const response = await this._postJson('/behavior/predict', payload);
+    return this._normalizeBehaviorResult(response);
+  }
+
   async _postJson(endpoint, payload) {
     return this._request(endpoint, {
       method: 'POST',
@@ -175,6 +184,28 @@ class AiClientService {
     };
   }
 
+  _normalizeBehaviorResult(response) {
+    const payload = this._unwrapPayload(response) || {};
+    const budgetBucket = payload.budgetBucket || payload.budget_bucket || {};
+
+    return {
+      spikeProbability: this._safeConfidence(payload.spikeProbability ?? payload.spike_probability, 0),
+      predictedSpike: Boolean(payload.predictedSpike ?? payload.predicted_spike),
+      riskLevel: payload.riskLevel || payload.risk_level || 'low',
+      categoryPrimary: payload.categoryPrimary || payload.category_primary || null,
+      budgetBucket: {
+        name: budgetBucket.name || payload.categoryPrimary || payload.category_primary || null,
+        recommendedAllocation: this._safeConfidence(
+          budgetBucket.recommendedAllocation ?? budgetBucket.recommended_allocation,
+          null
+        ),
+      },
+      modelName: payload.modelName || payload.model_name || null,
+      modelVersion: payload.modelVersion || payload.model_version || 'behavior-spike-v1',
+      recommendation: payload.recommendation || '',
+    };
+  }
+
   _safeConfidence(value, fallback = null) {
     const parsed = Number(value);
     if (Number.isNaN(parsed)) return fallback;
@@ -221,6 +252,30 @@ class AiClientService {
       alerts: [],
       recommendations: [],
       modelVersion: 'mock-insight-v1',
+    };
+  }
+
+  _mockBehaviorResult(payload) {
+    const amount = Number(payload.amount || 0);
+    const categoryPrimary = payload.categoryPrimary || payload.category_primary || payload.categoryGroup || 'Wants';
+    const probability = amount >= 1000000 ? 0.82 : amount >= 350000 ? 0.56 : 0.24;
+    const riskLevel = probability >= 0.7 ? 'high' : probability >= 0.4 ? 'medium' : 'low';
+
+    return {
+      spikeProbability: probability,
+      predictedSpike: probability >= 0.5,
+      riskLevel,
+      categoryPrimary,
+      budgetBucket: {
+        name: categoryPrimary,
+        recommendedAllocation: categoryPrimary === 'Needs' ? 0.5 : categoryPrimary === 'Investment' ? 0.2 : 0.3,
+      },
+      modelName: 'mock-behavior',
+      modelVersion: 'mock-behavior-spike-v1',
+      recommendation:
+        riskLevel === 'high'
+          ? 'Transaksi ini terlihat tinggi dibanding pola normal. Cek ulang prioritas sebelum saldo terpakai.'
+          : 'Risiko transaksi masih terkendali. Tetap catat transaksi supaya insight makin akurat.',
     };
   }
 }

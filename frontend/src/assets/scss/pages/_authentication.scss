@@ -167,6 +167,8 @@
         --sadar-auth-content-padding: 3rem;
 
         display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
         position: relative;
         min-height: 0;
@@ -189,7 +191,7 @@
         }
 
         .p-lg-5 {
-            padding-top: 2rem !important;
+            padding-top: 0 !important;
             padding-bottom: 2rem !important;
         }
 
@@ -215,15 +217,16 @@
     }
 
     .sadar-auth-panel-logo {
-        position: absolute;
-        top: 88px;
-        left: calc((100% - var(--sadar-auth-content-width)) / 2 + var(--sadar-auth-content-padding));
-        display: inline-flex;
-        padding: 0;
+        display: flex;
+        width: var(--sadar-auth-content-width);
+        max-width: var(--sadar-auth-content-width);
+        margin: 0 auto 1.5rem;
+        padding: 0 var(--sadar-auth-content-padding);
 
         img {
             height: 34px;
             width: auto;
+            flex: 0 0 auto;
         }
     }
 
@@ -288,12 +291,12 @@
         .sadar-auth-form-panel {
             display: block;
             --sadar-auth-content-width: 100%;
-            --sadar-auth-content-padding: 0px;
+            --sadar-auth-content-padding: 1.5rem;
         }
 
         .sadar-auth-panel-logo {
-            position: static;
-            margin: 1.5rem 1.5rem 0;
+            margin-top: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .sadar-auth-slider {

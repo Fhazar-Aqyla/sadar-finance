@@ -301,13 +301,6 @@ const createCategoryOptions = (labels, colors, setActiveCategory) => ({
   },
 });
 
-const actionLinks = [
-  { label: "Tambah Pengeluaran", icon: "ri-add-circle-line", link: "/catat-keuangan", color: "primary" },
-  { label: "Tambah Pemasukan", icon: "ri-bank-card-line", link: "/catat-keuangan?type=income", color: "success" },
-  { label: "Lihat Insight", icon: "ri-lightbulb-flash-line", link: "/behavior-insight", color: "teal" },
-  { label: "Lihat Financial Score", icon: "ri-speed-up-line", link: "/financial-score", color: "warning" },
-];
-
 const SadarDashboard = () => {
   document.title = "Dashboard | SADAR Finance";
   const [activeCategory, setActiveCategory] = useState({ label: "", color: "#1E3A8A" });
@@ -632,17 +625,6 @@ const SadarDashboard = () => {
                 </tbody>
               </Table>
             </div>
-          </CardBody>
-        </Card>
-
-        <Card className="dashboard-panel mt-3">
-          <CardBody className="sadar-quick-actions">
-            {actionLinks.map((action) => (
-              <Link to={action.link} className={`sadar-action-link text-${action.color}`} key={action.label}>
-                <i className={action.icon}></i>
-                <span>{action.label}</span>
-              </Link>
-            ))}
           </CardBody>
         </Card>
       </Container>

@@ -148,7 +148,7 @@ const Login = () => {
                                                         <Input className="form-check-input" type="checkbox" value="" id="auth-remember-check" />
                                                         <Label className="form-check-label" htmlFor="auth-remember-check">Ingat saya</Label>
                                                     </div>
-                                                    <Link to="/forgot-password" className="text-muted">Forgot password?</Link>
+                                                    <Link to="/forgot-password" className="text-muted">Lupa password?</Link>
                                                 </div>
 
                                                 <div className="mt-4">

@@ -19,6 +19,20 @@ const behaviorAnalysisSchema = Joi.object({
     .messages({ 'date.greater': 'periodEnd must be after periodStart' }),
 });
 
+const behaviorPredictionSchema = Joi.object({
+  amount: Joi.number().positive().precision(2).required(),
+  date: Joi.date().iso().optional(),
+  transactionDate: Joi.date().iso().optional(),
+  merchant: Joi.string().max(200).optional().allow(''),
+  categoryGroup: Joi.string().max(100).optional().allow(''),
+  categoryPrimary: Joi.string().max(100).optional().allow(''),
+  categoryDetail: Joi.string().max(100).optional().allow(''),
+  paymentMethod: Joi.string().max(100).optional().allow(''),
+  paymentMedia: Joi.string().max(100).optional().allow(''),
+  rolling7dSpending: Joi.number().min(0).optional(),
+  transactionCount: Joi.number().integer().min(1).optional(),
+});
+
 // Overspending prediction input
 const overspendingSchema = Joi.object({
   month: Joi.date().iso().required()
@@ -43,6 +57,7 @@ const createBudgetSchema = Joi.object({
 module.exports = {
   categorizeSchema,
   behaviorAnalysisSchema,
+  behaviorPredictionSchema,
   overspendingSchema,
   healthScoreSchema,
   createBudgetSchema,

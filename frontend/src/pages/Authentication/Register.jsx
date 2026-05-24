@@ -121,17 +121,17 @@ const Register = () => {
 
                                                 {success && success ? (
                                                     <>
-                                                        {toast("Akun berhasil dibuat. Mengarahkan ke halaman masuk...", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
+                                                        {toast("Akun berhasil dibuat.", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
                                                         <ToastContainer autoClose={2000} limit={1} />
                                                         <Alert color="success">
-                                                            Akun berhasil dibuat. Kamu akan diarahkan ke halaman masuk.
+                                                            Akun berhasil dibuat.
                                                         </Alert>
                                                     </>
                                                 ) : null}
 
                                                 {error && error ? (
                                                     <Alert color="danger"><div>
-                                                        {registrationError || "Registrasi gagal. Periksa data dan coba lagi."} </div></Alert>
+                                                        {registrationError || "Registrasi gagal."} </div></Alert>
                                                 ) : null}
 
                                                 <div className="mb-3">

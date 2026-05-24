@@ -97,14 +97,14 @@ const UserProfile = () => {
       idx: idx || '',
     },
     validationSchema: Yup.object({
-      first_name: Yup.string().required("Please Enter Your UserName"),
+      first_name: Yup.string().required("Nama wajib diisi"),
     }),
     onSubmit: (values) => {
       dispatch(editProfile(values));
     }
   });
 
-  document.title = "Profile | Velzon - React Admin & Dashboard Template";
+  document.title = "Profil | SADAR Finance";
   return (
     <React.Fragment>
       <div className="page-content">
@@ -112,7 +112,7 @@ const UserProfile = () => {
           <Row>
             <Col lg="12">
               {error && error ? <Alert color="danger">{error}</Alert> : null}
-              {success ? <Alert color="success">Username Updated To {userName}</Alert> : null}
+              {success ? <Alert color="success">Profil berhasil diperbarui.</Alert> : null}
 
               <Card>
                 <CardBody>
@@ -137,7 +137,7 @@ const UserProfile = () => {
             </Col>
           </Row>
 
-          <h4 className="card-title mb-4">Change User Name</h4>
+          <h4 className="card-title mb-4">Ubah Nama</h4>
 
           <Card>
             <CardBody>
@@ -150,12 +150,12 @@ const UserProfile = () => {
                 }}
               >
                 <div className="form-group">
-                  <Label className="form-label">User Name</Label>
+                  <Label className="form-label">Nama</Label>
                   <Input
                     name="first_name"
                     // value={name}
                     className="form-control"
-                    placeholder="Enter User Name"
+                    placeholder="Nama lengkap"
                     type="text"
                     onChange={validation.handleChange}
                     onBlur={validation.handleBlur}
@@ -171,7 +171,7 @@ const UserProfile = () => {
                 </div>
                 <div className="text-center mt-4">
                   <Button type="submit" color="danger">
-                    Update User Name
+                    Simpan Perubahan
                   </Button>
                 </div>
               </Form>

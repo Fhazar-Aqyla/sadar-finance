@@ -5,6 +5,7 @@ import {
   postFakeRegister,
   postJwtRegister,
 } from "../../../helpers/fakebackend_helper";
+import { api } from "../../../config";
 
 // action
 import {
@@ -17,18 +18,23 @@ import {
 // initialize relavant method of both Auth
 const fireBaseBackend = getFirebaseBackend();
 const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
-const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const apiBaseUrl = api.API_URL;
 
-const getErrorMessage = (error, fallback = "Registrasi gagal. Coba lagi.") => {
-  if (typeof error === "string") return error;
-  return (
+const getErrorMessage = (error, fallback = "Registrasi gagal.") => {
+  const message = String(
     error?.response?.data?.error?.message ||
     error?.response?.data?.message ||
     error?.message ||
     error?.data?.message ||
     error?.data ||
-    fallback
-  );
+    ""
+  ).toLowerCase();
+
+  if (message.includes("email") && (message.includes("exist") || message.includes("terdaftar") || message.includes("duplicate"))) {
+    return "Email sudah terdaftar.";
+  }
+
+  return fallback;
 };
 
 const splitFullName = (fullName = "") => {
@@ -70,7 +76,7 @@ export const registerUser = (user) => async (dispatch) => {
       if (data.message === "success") {
         dispatch(registerUserSuccessful(data));
       } else {
-        dispatch(registerUserFailed(data));
+        dispatch(registerUserFailed("Registrasi gagal."));
       }
     }
   } catch (error) {

@@ -8,7 +8,7 @@ const config = {
     APP_ID: "",
   },
   api: {
-    API_URL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:3000/api/v1" : "https://api-node.themesbrand.website"),
+    API_URL: import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1",
   }
 };
 

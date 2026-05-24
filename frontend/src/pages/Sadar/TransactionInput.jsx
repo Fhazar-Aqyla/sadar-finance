@@ -21,7 +21,7 @@ import { accounts as mockAccounts, currentUserId } from "../SadarShared/mockData
 import "../SadarShared/sadar-pages.css";
 import "./transaction-input.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
 const AI_BASE_URL = import.meta.env.VITE_AI_URL || "http://localhost:5000";
 
 const categories = [
@@ -36,7 +36,7 @@ const categories = [
 ];
 
 const initialForm = {
-  accountId: "acc_002",
+  accountId: "",
   merchant: "",
   transactionDate: new Date().toISOString().slice(0, 10),
   categoryGroup: "other",
@@ -46,7 +46,7 @@ const initialForm = {
 };
 
 const initialIncomeForm = {
-  accountId: "acc_002",
+  accountId: "",
   source: "",
   amount: "",
   date: new Date().toISOString().slice(0, 10),
@@ -64,24 +64,29 @@ const authHeaders = () => {
   return authUser?.token ? { Authorization: `Bearer ${authUser.token}` } : {};
 };
 
+const normalizeBackendAccount = (account) => ({
+  id: account.account_id,
+  name: account.account_name,
+  isMock: false,
+});
+
+const normalizeMockAccount = (account) => ({
+  id: account.id,
+  name: account.name,
+  isMock: true,
+});
+
+const getSelectedAccount = (rows, accountId) => rows.find((account) => account.id === accountId);
+
+const onlyDigits = (value) => String(value || "").replace(/\D/g, "");
+
+const formatNumberInput = (value) => {
+  const digits = onlyDigits(value);
+  return digits ? new Intl.NumberFormat("id-ID").format(Number(digits)) : "";
+};
+
 const getErrorMessage = (error, fallbackMessage) => {
-  const apiMessage = error?.response?.data?.error?.message || error?.response?.data?.error;
-  const aiMessage = error?.response?.data?.error;
-  const message = apiMessage || aiMessage || error?.message || fallbackMessage;
-
-  if (String(message).toLowerCase().includes("tesseract")) {
-    return "OCR gagal karena Tesseract belum terpasang atau belum masuk PATH. Install Tesseract OCR, lalu set TESSERACT_CMD di ai/.env.";
-  }
-
-  if (String(message).toLowerCase().includes("access token")) {
-    return "OCR gagal karena kamu belum login ke backend. Login dulu memakai akun backend, lalu coba proses OCR lagi.";
-  }
-
-  if (String(message).toLowerCase().includes("client password must be a string")) {
-    return "OCR gagal karena koneksi database backend belum benar. Isi backend/.env terutama DB_PASSWORD, lalu restart backend.";
-  }
-
-  return message;
+  return fallbackMessage;
 };
 
 const normalizeParsedData = (scan) => {
@@ -127,12 +132,18 @@ const TransactionInput = () => {
   const [mode, setMode] = useState("ocr");
   const [form, setForm] = useState(initialForm);
   const [incomeForm, setIncomeForm] = useState(initialIncomeForm);
+  const [accounts, setAccounts] = useState([]);
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
   const [receiptFile, setReceiptFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [scanResult, setScanResult] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [notice, setNotice] = useState(null);
+  const fallbackAccounts = useMemo(
+    () => mockAccounts.filter((account) => account.user_id === currentUserId).map(normalizeMockAccount),
+    [],
+  );
 
   useEffect(() => {
     return () => {
@@ -147,17 +158,68 @@ const TransactionInput = () => {
     return Array.isArray(parsed?.items) ? parsed.items : [];
   }, [scanResult]);
 
-  const userAccounts = useMemo(
-    () => mockAccounts.filter((account) => account.user_id === currentUserId),
-    [],
-  );
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get("type") === "income") {
       setEntryType("income");
     }
   }, [location.search]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchAccounts = async () => {
+      setIsLoadingAccounts(true);
+
+      try {
+        const { data } = await axios.get(`${API_BASE_URL}/accounts`, {
+          headers: authHeaders(),
+        });
+        const rows = data?.data || [];
+        const normalizedAccounts = rows.map(normalizeBackendAccount);
+
+        if (!isMounted) return;
+
+        setAccounts(normalizedAccounts.length ? normalizedAccounts : fallbackAccounts);
+
+        if (normalizedAccounts.length || fallbackAccounts.length) {
+          const availableAccounts = normalizedAccounts.length ? normalizedAccounts : fallbackAccounts;
+          const firstAccountId = availableAccounts[0].id;
+          setForm((current) => ({
+            ...current,
+            accountId: availableAccounts.some((account) => account.id === current.accountId)
+              ? current.accountId
+              : firstAccountId,
+          }));
+          setIncomeForm((current) => ({
+            ...current,
+            accountId: availableAccounts.some((account) => account.id === current.accountId)
+              ? current.accountId
+              : firstAccountId,
+          }));
+        }
+      } catch (error) {
+        if (isMounted) {
+          setAccounts(fallbackAccounts);
+          if (fallbackAccounts.length) {
+            const firstAccountId = fallbackAccounts[0].id;
+            setForm((current) => ({ ...current, accountId: current.accountId || firstAccountId }));
+            setIncomeForm((current) => ({ ...current, accountId: current.accountId || firstAccountId }));
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingAccounts(false);
+        }
+      }
+    };
+
+    fetchAccounts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fallbackAccounts]);
 
   const updateForm = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -206,7 +268,7 @@ const TransactionInput = () => {
         return scan;
       }
       if (scan?.status === "failed") {
-        throw new Error(scan?.error_message || "OCR gagal memproses gambar.");
+        throw new Error("OCR gagal.");
       }
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -225,7 +287,7 @@ const TransactionInput = () => {
     const payload = unwrapApiResponse(response);
 
     if (payload?.success === false) {
-      throw new Error(payload.error || "AI service gagal memproses OCR.");
+      throw new Error("OCR gagal.");
     }
 
     const result = normalizeAiOcrResult(response);
@@ -238,7 +300,7 @@ const TransactionInput = () => {
 
     setScanResult(scan);
     applyScanToForm(scan);
-    setNotice({ color: "success", message: "Struk berhasil dibaca dari AI service dan form sudah terisi otomatis." });
+    setNotice({ color: "success", message: "Struk berhasil dibaca." });
   };
 
   const handleScan = async () => {
@@ -268,17 +330,17 @@ const TransactionInput = () => {
         const scanId = uploadedScan?.ocr_id || uploadedScan?.id;
 
         if (!scanId) {
-          throw new Error("Response OCR tidak menyertakan ID scan.");
+          throw new Error("OCR gagal.");
         }
 
         const completedScan = await pollScanResult(scanId);
         setScanResult(completedScan);
         applyScanToForm(completedScan);
-        setNotice({ color: "success", message: "Struk berhasil dibaca dan form sudah terisi otomatis." });
+        setNotice({ color: "success", message: "Struk berhasil dibaca." });
       } catch (backendError) {
         setNotice({
           color: "danger",
-          message: getErrorMessage(aiError, getErrorMessage(backendError, "OCR gagal memproses struk.")),
+          message: getErrorMessage(aiError, getErrorMessage(backendError, "OCR gagal.")),
         });
       }
     } finally {
@@ -289,6 +351,11 @@ const TransactionInput = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!form.accountId) {
+      setNotice({ color: "warning", message: "Pilih account terlebih dahulu." });
+      return;
+    }
+
     if (!form.amount || Number(form.amount) <= 0) {
       setNotice({ color: "warning", message: "Nominal pengeluaran harus lebih dari 0." });
       return;
@@ -296,13 +363,14 @@ const TransactionInput = () => {
 
     setIsSaving(true);
     setNotice(null);
+    const selectedAccount = getSelectedAccount(accounts, form.accountId);
 
     try {
       await axios.post(
         `${API_BASE_URL}/transactions`,
         {
           categoryGroup: form.categoryGroup,
-          accountId: form.accountId,
+          accountId: selectedAccount?.isMock ? null : form.accountId,
           transactionDate: new Date(form.transactionDate).toISOString(),
           description: form.description || form.merchant,
           source: form.source,
@@ -311,8 +379,11 @@ const TransactionInput = () => {
         { headers: authHeaders() }
       );
 
-      setNotice({ color: "success", message: "Pengeluaran berhasil disimpan dan saldo account berkurang." });
-      setForm({ ...initialForm, source: mode === "ocr" ? "ocr" : "manual" });
+      setNotice({
+        color: "success",
+        message: "Pengeluaran berhasil disimpan.",
+      });
+      setForm({ ...initialForm, accountId: form.accountId, source: mode === "ocr" ? "ocr" : "manual" });
     } catch (error) {
       setNotice({ color: "danger", message: getErrorMessage(error, "Pengeluaran gagal disimpan.") });
     } finally {
@@ -323,6 +394,11 @@ const TransactionInput = () => {
   const handleIncomeSubmit = async (event) => {
     event.preventDefault();
 
+    if (!incomeForm.accountId) {
+      setNotice({ color: "warning", message: "Pilih account terlebih dahulu." });
+      return;
+    }
+
     if (!incomeForm.amount || Number(incomeForm.amount) <= 0) {
       setNotice({ color: "warning", message: "Jumlah pemasukan harus lebih dari 0." });
       return;
@@ -330,22 +406,25 @@ const TransactionInput = () => {
 
     setIsSaving(true);
     setNotice(null);
+    const selectedAccount = getSelectedAccount(accounts, incomeForm.accountId);
 
     try {
       await axios.post(
         `${API_BASE_URL}/incomes`,
         {
-          accountId: incomeForm.accountId,
+          accountId: selectedAccount?.isMock ? null : incomeForm.accountId,
           source: incomeForm.source,
           amount: Number(incomeForm.amount),
-          date: new Date(incomeForm.date).toISOString(),
-          note: incomeForm.note,
+          incomeDate: new Date(incomeForm.date).toISOString(),
         },
         { headers: authHeaders() }
       );
 
-      setNotice({ color: "success", message: "Pemasukan berhasil dicatat dan saldo account bertambah." });
-      setIncomeForm(initialIncomeForm);
+      setNotice({
+        color: "success",
+        message: "Pemasukan berhasil dicatat.",
+      });
+      setIncomeForm({ ...initialIncomeForm, accountId: incomeForm.accountId });
     } catch (error) {
       setNotice({ color: "danger", message: getErrorMessage(error, "Pemasukan gagal disimpan.") });
     } finally {
@@ -541,8 +620,14 @@ const TransactionInput = () => {
                         type="select"
                         value={form.accountId}
                         onChange={(event) => updateForm("accountId", event.target.value)}
+                        disabled={isLoadingAccounts || !accounts.length}
                       >
-                        {userAccounts.map((account) => (
+                        {!accounts.length && (
+                          <option value="">
+                            {isLoadingAccounts ? "Memuat account..." : "Belum ada account"}
+                          </option>
+                        )}
+                        {accounts.map((account) => (
                           <option key={account.id} value={account.id}>
                             {account.name}
                           </option>
@@ -590,12 +675,12 @@ const TransactionInput = () => {
                       <Label htmlFor="amount" className="form-label">Nominal</Label>
                       <Input
                         id="amount"
-                        type="number"
-                        min="0"
-                        step="100"
-                        value={form.amount}
-                        onChange={(event) => updateForm("amount", event.target.value)}
-                        placeholder="Contoh: 93000"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9.]*"
+                        value={formatNumberInput(form.amount)}
+                        onChange={(event) => updateForm("amount", onlyDigits(event.target.value))}
+                        placeholder="Contoh: 93.000"
                         required
                       />
                     </Col>
@@ -616,12 +701,12 @@ const TransactionInput = () => {
                       <Button
                         type="button"
                         className="sadar-reset-button"
-                        onClick={() => setForm({ ...initialForm, source: mode === "ocr" ? "ocr" : "manual" })}
+                        onClick={() => setForm({ ...initialForm, accountId: form.accountId, source: mode === "ocr" ? "ocr" : "manual" })}
                       >
                         <i className="ri-refresh-line align-bottom me-1" />
                         Reset
                       </Button>
-                      <Button type="submit" className="sadar-save-button" disabled={isSaving}>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
                         Simpan Pengeluaran
                       </Button>
@@ -638,8 +723,14 @@ const TransactionInput = () => {
                         type="select"
                         value={incomeForm.accountId}
                         onChange={(event) => updateIncomeForm("accountId", event.target.value)}
+                        disabled={isLoadingAccounts || !accounts.length}
                       >
-                        {userAccounts.map((account) => (
+                        {!accounts.length && (
+                          <option value="">
+                            {isLoadingAccounts ? "Memuat account..." : "Belum ada account"}
+                          </option>
+                        )}
+                        {accounts.map((account) => (
                           <option key={account.id} value={account.id}>
                             {account.name}
                           </option>
@@ -672,12 +763,12 @@ const TransactionInput = () => {
                       <Label htmlFor="income-amount" className="form-label">Jumlah</Label>
                       <Input
                         id="income-amount"
-                        type="number"
-                        min="0"
-                        step="100"
-                        value={incomeForm.amount}
-                        onChange={(event) => updateIncomeForm("amount", event.target.value)}
-                        placeholder="Contoh: 8200000"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9.]*"
+                        value={formatNumberInput(incomeForm.amount)}
+                        onChange={(event) => updateIncomeForm("amount", onlyDigits(event.target.value))}
+                        placeholder="Contoh: 8.200.000"
                         required
                       />
                     </Col>
@@ -698,12 +789,12 @@ const TransactionInput = () => {
                       <Button
                         type="button"
                         className="sadar-reset-button"
-                        onClick={() => setIncomeForm(initialIncomeForm)}
+                        onClick={() => setIncomeForm({ ...initialIncomeForm, accountId: incomeForm.accountId })}
                       >
                         <i className="ri-refresh-line align-bottom me-1" />
                         Reset
                       </Button>
-                      <Button type="submit" className="sadar-save-button" disabled={isSaving}>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
                         Simpan Pemasukan
                       </Button>

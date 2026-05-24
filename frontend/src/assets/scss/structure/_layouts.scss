@@ -32,7 +32,7 @@
         &[data-layout="vertical"] {
             @media (min-width: 768px) {
                 #layout-wrapper {
-                    min-height: 1400px;
+                    min-height: 100vh;
                 }
             }
 

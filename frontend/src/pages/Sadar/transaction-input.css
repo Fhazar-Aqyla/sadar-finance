@@ -44,10 +44,14 @@
   min-width: 0;
 }
 
+.sadar-transaction-row {
+  --sadar-transaction-card-min-height: 636px;
+}
+
 .sadar-input-card,
 .sadar-detail-card {
   width: 100%;
-  min-height: 636px;
+  min-height: var(--sadar-transaction-card-min-height);
   margin-bottom: 0;
 }
 

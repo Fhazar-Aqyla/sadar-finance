@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Dropdown, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
+import { Dropdown, DropdownMenu, DropdownToggle } from 'reactstrap';
 
 //import Components
 import SearchOption from '../Components/Common/SearchOption';
+import FullScreenDropdown from '../Components/Common/FullScreenDropdown';
+import LightDark from '../Components/Common/LightDark';
 import NotificationDropdown from '../Components/Common/NotificationDropdown';
 import ProfileDropdown from '../Components/Common/ProfileDropdown';
 import sadarLogo from '../assets/images/landing/sadar-logo.png';
@@ -110,19 +112,14 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                     <i className="bx bx-search fs-22"></i>
                                 </DropdownToggle>
                                 <DropdownMenu className="dropdown-menu-lg dropdown-menu-end p-0">
-                                    <Form className="p-3">
-                                        <div className="form-group m-0">
-                                            <div className="input-group">
-                                                <input type="text" className="form-control" placeholder="Cari transaksi..."
-                                                    aria-label="Recipient's username" />
-                                                <button className="btn btn-primary" type="submit"><i
-                                                    className="mdi mdi-magnify"></i></button>
-                                            </div>
-                                        </div>
-                                    </Form>
+                                    <div className="p-3">
+                                        <SearchOption className="sadar-app-search-mobile" autoFocus onNavigate={toogleSearch} />
+                                    </div>
                                 </DropdownMenu>
                             </Dropdown>
 
+                            <FullScreenDropdown />
+                            <LightDark layoutMode={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
                             <NotificationDropdown />
                             <ProfileDropdown />
                         </div>

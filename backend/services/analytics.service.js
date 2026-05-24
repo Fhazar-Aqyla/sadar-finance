@@ -183,6 +183,51 @@ class AnalyticsService {
   // Overspending Prediction → writes to alerts table
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+  async predictBehavior(_userId, payload) {
+    try {
+      const result = await aiClient.predictBehavior(payload);
+      return {
+        ...result,
+        source: 'ai-service',
+      };
+    } catch (err) {
+      return {
+        ...this._predictBehaviorWithRules(payload),
+        source: 'rule-based-fallback',
+        fallbackReason: err.message,
+      };
+    }
+  }
+
+  _predictBehaviorWithRules(payload) {
+    const amount = Number(payload.amount || 0);
+    const categoryPrimary = payload.categoryPrimary || payload.categoryGroup || 'Wants';
+    const rolling7dSpending = Number(payload.rolling7dSpending || amount);
+    const ratio = rolling7dSpending > 0 ? amount / rolling7dSpending : 0;
+    const spikeProbability = Math.max(
+      0.1,
+      Math.min(0.9, amount >= 1000000 ? 0.78 : amount >= 500000 || ratio >= 0.5 ? 0.55 : 0.24)
+    );
+    const riskLevel = spikeProbability >= 0.7 ? 'high' : spikeProbability >= 0.4 ? 'medium' : 'low';
+
+    return {
+      spikeProbability: parseFloat(spikeProbability.toFixed(4)),
+      predictedSpike: spikeProbability >= 0.5,
+      riskLevel,
+      categoryPrimary,
+      budgetBucket: {
+        name: categoryPrimary,
+        recommendedAllocation: categoryPrimary === 'Needs' ? 0.5 : categoryPrimary === 'Investment' ? 0.2 : 0.3,
+      },
+      modelName: 'rule-based-behavior',
+      modelVersion: 'v1.0-behavior-fallback',
+      recommendation:
+        riskLevel === 'high'
+          ? 'Transaksi ini terlihat lebih tinggi dari pola normal. Cek ulang prioritas dan sisa budget sebelum melanjutkan.'
+          : 'Risiko transaksi masih terkendali. Tetap pantau pola harian agar pengeluaran tidak melonjak.',
+    };
+  }
+
   async predictOverspending(userId, { month, budgetLimit }) {
     // Get last 3 months expense trend
     const trend = await transactionRepository.getMonthlyExpenseTrend(userId, 3);

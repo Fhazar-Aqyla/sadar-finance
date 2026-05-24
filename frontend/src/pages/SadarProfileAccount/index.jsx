@@ -28,6 +28,13 @@ import {
 } from "../SadarShared/mockData";
 import "../SadarShared/sadar-pages.css";
 
+const onlyDigits = (value) => String(value || "").replace(/\D/g, "");
+
+const formatNumberInput = (value) => {
+  const digits = onlyDigits(value);
+  return digits ? new Intl.NumberFormat("id-ID").format(Number(digits)) : "";
+};
+
 const ProfileAccount = () => {
   document.title = "Profile & Account | SADAR Finance";
   const [profile, setProfile] = useState({
@@ -260,8 +267,9 @@ const ProfileAccount = () => {
                           <div>
                             <Label>Saldo Berjalan</Label>
                             <Input
-                              type="number"
-                              value={account.balance}
+                              type="text"
+                              inputMode="numeric"
+                              value={formatNumberInput(account.balance)}
                               readOnly
                             />
                             <small className="text-muted d-block mt-1">
@@ -312,9 +320,11 @@ const ProfileAccount = () => {
                         </div>
                         <Label>Data Budget</Label>
                         <Input
-                          type="number"
-                          value={budget.limit}
-                          onChange={(event) => updateBudget(budget.category, event.target.value)}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9.]*"
+                          value={formatNumberInput(budget.limit)}
+                          onChange={(event) => updateBudget(budget.category, onlyDigits(event.target.value))}
                         />
                         <div className="d-flex justify-content-between mt-3">
                           <span className="text-muted">Terpakai</span>

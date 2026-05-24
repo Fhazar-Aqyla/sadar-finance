@@ -16,7 +16,7 @@ const getDatabaseErrorResponse = (err) => {
     return {
       statusCode: 503,
       errorCode: 'DB_PASSWORD_INVALID',
-      message: 'Koneksi PostgreSQL gagal: DB_PASSWORD di backend/.env harus berupa teks. Isi password atau kosongkan nilainya.',
+      message: 'Koneksi PostgreSQL gagal: DB_PASSWORD di backend/.env kosong atau tidak valid untuk metode auth PostgreSQL. Isi dengan password user PostgreSQL lokal.',
     };
   }
 

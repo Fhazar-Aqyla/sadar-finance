@@ -15,9 +15,7 @@ export const userForgetPassword = (user) => async (dispatch) => {
   try {
       let response;
       if (defaultAuth === "sadar") {
-          dispatch(userForgetPasswordError(
-              "Fitur reset password belum aktif. Backend SADAR belum menyediakan pengiriman email reset password."
-          ));
+          dispatch(userForgetPasswordError("Reset password belum tersedia."));
           return;
       }
 
@@ -40,11 +38,9 @@ export const userForgetPassword = (user) => async (dispatch) => {
       const data = await response;
 
       if (data) {
-          dispatch(userForgetPasswordSuccess(
-              "Reset link are sended to your mailbox, check there first"
-          ))
+          dispatch(userForgetPasswordSuccess("Link reset password berhasil dikirim."))
       }
   } catch (forgetError) {
-      dispatch(userForgetPasswordError(forgetError))
+      dispatch(userForgetPasswordError("Reset password gagal."))
   }
 }
