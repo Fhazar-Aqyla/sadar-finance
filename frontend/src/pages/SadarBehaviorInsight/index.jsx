@@ -18,7 +18,6 @@ import {
 import "../SadarShared/sadar-pages.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
-const AI_BASE_URL = import.meta.env.VITE_AI_URL || "http://127.0.0.1:5000";
 
 const authHeaders = () => {
   const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
@@ -327,7 +326,7 @@ const BehaviorInsight = () => {
       try {
         const candidate = data.behaviorCandidate;
         const { data: response } = await axios.post(
-          `${AI_BASE_URL}/behavior/predict`,
+          `${API_BASE_URL}/analytics/behavior/predict`,
           {
             amount: candidate.amount,
             date: candidate.date,

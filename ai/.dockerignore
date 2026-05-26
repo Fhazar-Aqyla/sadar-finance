@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+*.log
+logs/
+tmp_uploads/
+dataset/
+*.ipynb
