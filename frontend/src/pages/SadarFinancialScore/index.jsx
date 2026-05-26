@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import ReactApexChart from "react-apexcharts";
-import { Card, CardBody, CardHeader, Col, Container, Progress, Row } from "reactstrap";
+import { Button, ButtonGroup, Card, CardBody, CardHeader, Col, Container, Progress, Row } from "reactstrap";
 
 import {
   alerts,
@@ -23,46 +24,80 @@ const getScoreStatus = (score) => {
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-const FinancialScore = () => {
-  document.title = "Financial Score | SADAR Finance";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
 
-  const data = useMemo(() => {
-    const userTransactions = getUserRows(transactions, currentUserId);
-    const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
-    const userIncomes = getUserRows(incomes, currentUserId);
-    const userBudgets = getUserRows(budgets, currentUserId);
-    const userAlerts = getUserRows(alerts, currentUserId);
+const periodOptions = [
+  { key: "2w", label: "2 Minggu", months: 1 },
+  { key: "1m", label: "1 Bulan", months: 1 },
+  { key: "3m", label: "3 Bulan", months: 3 },
+  { key: "6m", label: "6 Bulan", months: 6 },
+  { key: "1y", label: "1 Tahun", months: 12 },
+  { key: "all", label: "Semua", months: 24 },
+];
 
-    const totalIncome = sumBy(userIncomes, (item) => item.amount);
-    const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
-    const expenseRatio = totalIncome ? (totalExpense / totalIncome) * 100 : 0;
-    const budgetUsed = sumBy(userBudgets, (item) => item.used);
-    const budgetLimit = sumBy(userBudgets, (item) => item.limit);
-    const budgetUsage = budgetLimit ? (budgetUsed / budgetLimit) * 100 : 0;
-    const budgetByGroup = groupSumBy(userTransactions, "budget_group");
-    const needsRatio = totalIncome ? ((budgetByGroup.Needs || 0) / totalIncome) * 100 : 0;
-    const wantsRatio = totalIncome ? ((budgetByGroup.Wants || 0) / totalIncome) * 100 : 0;
-    const savingsRatio = totalIncome ? ((budgetByGroup.Savings || 0) / totalIncome) * 100 : 0;
+const authHeaders = () => {
+  const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+  return authUser?.token ? { Authorization: `Bearer ${authUser.token}` } : {};
+};
 
-    const byDate = Object.values(
-      expenseTransactions.reduce((result, item) => {
-        result[item.date] = (result[item.date] || 0) + item.amount;
-        return result;
-      }, {}),
-    );
-    const dailyAverage = byDate.length ? sumBy(byDate, (item) => item) / byDate.length : 0;
-    const spikeDays = byDate.filter((amount) => amount > dailyAverage * 1.65).length;
+const toPercent = (value) => Number((value * 100).toFixed(1));
 
-    let score = 100;
-    score -= clamp(expenseRatio - 70, 0, 30) * 0.5;
-    score -= clamp(budgetUsage - 80, 0, 35) * 0.6;
-    score -= clamp(wantsRatio - 30, 0, 30) * 0.7;
-    score -= clamp(20 - savingsRatio, 0, 20) * 0.9;
-    score -= userAlerts.length * 4;
-    score -= spikeDays * 2;
-    score = Math.round(clamp(score, 0, 100));
+const getPeriodOption = (periodKey) =>
+  periodOptions.find((option) => option.key === periodKey) || periodOptions[2];
 
-    const factors = [
+const getDateValue = (item) => item.date || item.transaction_date || item.income_date || item.created_at;
+
+const getPeriodStartDate = (periodKey, rows) => {
+  if (periodKey === "all") return null;
+
+  const validDates = rows
+    .map((item) => new Date(`${getDateValue(item)}T00:00:00`))
+    .filter((date) => !Number.isNaN(date.getTime()));
+  const endDate = validDates.length
+    ? new Date(Math.max(...validDates.map((date) => date.getTime())))
+    : new Date();
+  const startDate = new Date(endDate);
+
+  if (periodKey === "2w") {
+    startDate.setDate(startDate.getDate() - 14);
+    return startDate;
+  }
+
+  startDate.setMonth(startDate.getMonth() - getPeriodOption(periodKey).months);
+  return startDate;
+};
+
+const filterRowsByPeriod = (rows, periodKey) => {
+  const startDate = getPeriodStartDate(periodKey, rows);
+  if (!startDate) return rows;
+
+  return rows.filter((item) => {
+    const value = getDateValue(item);
+    const itemDate = new Date(`${value}T00:00:00`);
+    return !Number.isNaN(itemDate.getTime()) && itemDate >= startDate;
+  });
+};
+
+const buildApiData = (healthScore) => {
+  const score = Number(healthScore?.breakdown?.overallScore ?? healthScore?.score?.score ?? 0);
+  const totalIncome = Number(healthScore?.financials?.totalIncome || 0);
+  const totalExpense = Number(healthScore?.financials?.totalExpense || 0);
+  const ratios = healthScore?.ratios || {};
+  const breakdown = healthScore?.breakdown || {};
+  const expenseRatio = toPercent(Number(ratios.expenseRatio || 0));
+  const budgetUsage = toPercent(Number(ratios.budgetUsage || 0));
+  const savingsRate = toPercent(Number(ratios.savingsRate || 0));
+  const needsRatio = toPercent(Number(ratios.needsRatio || 0));
+  const wantsRatio = toPercent(Number(ratios.wantsRatio || 0));
+  const savingsRatio = toPercent(Number(ratios.savingsRatio || 0));
+
+  return {
+    score,
+    status: healthScore?.status || getScoreStatus(score),
+    totalIncome,
+    totalExpense,
+    budgetUsage,
+    factors: [
       {
         label: "Pemasukan vs Pengeluaran",
         value: `${expenseRatio.toFixed(1)}%`,
@@ -70,7 +105,7 @@ const FinancialScore = () => {
           expenseRatio < 70
             ? "Pengeluaran masih berada di bawah pemasukan dengan ruang aman."
             : "Pengeluaran mulai tinggi dibanding pemasukan bulan ini.",
-        progress: clamp(expenseRatio, 0, 100),
+        progress: clamp(Number(breakdown.expenseScore || 0), 0, 100),
       },
       {
         label: "Budget Terpakai",
@@ -79,16 +114,16 @@ const FinancialScore = () => {
           budgetUsage >= 80
             ? "Budget mendekati batas, beberapa kategori perlu dipantau."
             : "Penggunaan budget masih relatif aman.",
-        progress: clamp(budgetUsage, 0, 100),
+        progress: clamp(Number(breakdown.budgetScore || 0), 0, 100),
       },
       {
-        label: "Konsistensi Pengeluaran",
-        value: `${spikeDays} spike`,
+        label: "Konsistensi Pencatatan",
+        value: `${Number(breakdown.consistencyScore || 0)}%`,
         description:
-          spikeDays > 0
-            ? "Ada hari dengan pengeluaran jauh lebih tinggi dari rata-rata."
-            : "Tidak ada lonjakan pengeluaran besar dalam periode ini.",
-        progress: clamp(100 - spikeDays * 18, 0, 100),
+          Number(breakdown.consistencyScore || 0) >= 60
+            ? "Data pemasukan dan transaksi cukup konsisten untuk dibaca."
+            : "Data masih perlu dicatat lebih rutin agar score makin akurat.",
+        progress: clamp(Number(breakdown.consistencyScore || 0), 0, 100),
       },
       {
         label: "Alokasi 50/30/20",
@@ -97,52 +132,195 @@ const FinancialScore = () => {
         progress: clamp(100 - Math.abs(50 - needsRatio) - Math.abs(30 - wantsRatio) - Math.abs(20 - savingsRatio), 0, 100),
       },
       {
-        label: "Alert Budget",
-        value: `${userAlerts.length} alert`,
+        label: "Rasio Tabungan",
+        value: `${savingsRate.toFixed(1)}%`,
         description:
-          userAlerts.length > 0
-            ? "Ada kategori yang mendekati batas budget."
-            : "Belum ada alert overspending aktif.",
-        progress: clamp(100 - userAlerts.length * 22, 0, 100),
+          savingsRate >= 20
+            ? "Tabungan sudah memenuhi target minimal 20%."
+            : "Tabungan belum mencapai target minimal 20%.",
+        progress: clamp(Number(breakdown.savingsScore || 0), 0, 100),
       },
-    ];
+    ],
+    insights: healthScore?.insights?.length
+      ? healthScore.insights
+      : [
+          totalExpense < totalIncome
+            ? "Pengeluaran bulan ini masih berada di bawah pemasukan."
+            : "Pengeluaran bulan ini sudah melewati pemasukan.",
+          budgetUsage >= 80
+            ? "Penggunaan budget sudah mendekati batas dan perlu dipantau."
+            : "Penggunaan budget masih berada di area aman.",
+          savingsRate < 20
+            ? "Alokasi tabungan belum mencapai 20% dari pemasukan."
+            : "Alokasi tabungan sudah mendekati prinsip 20%.",
+        ],
+    recommendations: healthScore?.recommendations?.length
+      ? healthScore.recommendations
+      : ["Review budget mingguan agar pola pengeluaran tetap stabil."],
+    ratioSeries: [needsRatio, wantsRatio, savingsRatio],
+  };
+};
 
-    const insights = [
-      totalExpense < totalIncome
-        ? "Pengeluaran bulan ini masih berada di bawah pemasukan."
-        : "Pengeluaran bulan ini sudah melewati pemasukan.",
-      budgetUsage >= 80
-        ? "Penggunaan budget sudah mendekati batas dan perlu dipantau."
-        : "Penggunaan budget masih berada di area aman.",
-      savingsRatio < 20
-        ? "Alokasi tabungan belum mencapai 20% dari pemasukan."
-        : "Alokasi tabungan sudah mendekati prinsip 20%.",
-    ];
+const buildFallbackData = (periodKey) => {
+  const userTransactions = filterRowsByPeriod(getUserRows(transactions, currentUserId), periodKey);
+  const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
+  const userIncomes = filterRowsByPeriod(getUserRows(incomes, currentUserId), periodKey);
+  const userBudgets = getUserRows(budgets, currentUserId);
+  const userAlerts = getUserRows(alerts, currentUserId);
 
-    const recommendations = [
-      wantsRatio > 30
-        ? "Kurangi pengeluaran kategori wants agar budget lebih aman."
-        : "Pertahankan porsi keinginan agar tetap di sekitar 30% dari pemasukan.",
-      savingsRatio < 20
-        ? "Sisihkan minimal 20% dari pemasukan untuk tabungan atau dana darurat."
-        : "Pertahankan kebiasaan menyisihkan dana untuk tabungan.",
-      budgetUsage >= 80
-        ? "Pantau kategori yang mendekati batas sebelum menambah transaksi baru."
-        : "Review budget mingguan agar pola pengeluaran tetap stabil.",
-    ];
+  const totalIncome = sumBy(userIncomes, (item) => item.amount);
+  const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
+  const expenseRatio = totalIncome ? (totalExpense / totalIncome) * 100 : 0;
+  const budgetUsed = sumBy(userBudgets, (item) => item.used);
+  const budgetLimit = sumBy(userBudgets, (item) => item.limit);
+  const budgetUsage = budgetLimit ? (budgetUsed / budgetLimit) * 100 : 0;
+  const budgetByGroup = groupSumBy(userTransactions, "budget_group");
+  const needsRatio = totalIncome ? ((budgetByGroup.Needs || 0) / totalIncome) * 100 : 0;
+  const wantsRatio = totalIncome ? ((budgetByGroup.Wants || 0) / totalIncome) * 100 : 0;
+  const savingsRatio = totalIncome ? ((budgetByGroup.Savings || 0) / totalIncome) * 100 : 0;
 
-    return {
-      score,
-      status: getScoreStatus(score),
-      totalIncome,
-      totalExpense,
-      budgetUsage,
-      factors,
-      insights,
-      recommendations,
-      ratioSeries: [needsRatio, wantsRatio, savingsRatio],
+  const byDate = Object.values(
+    expenseTransactions.reduce((result, item) => {
+      result[item.date] = (result[item.date] || 0) + item.amount;
+      return result;
+    }, {}),
+  );
+  const dailyAverage = byDate.length ? sumBy(byDate, (item) => item) / byDate.length : 0;
+  const spikeDays = byDate.filter((amount) => amount > dailyAverage * 1.65).length;
+
+  let score = 100;
+  score -= clamp(expenseRatio - 70, 0, 30) * 0.5;
+  score -= clamp(budgetUsage - 80, 0, 35) * 0.6;
+  score -= clamp(wantsRatio - 30, 0, 30) * 0.7;
+  score -= clamp(20 - savingsRatio, 0, 20) * 0.9;
+  score -= userAlerts.length * 4;
+  score -= spikeDays * 2;
+  score = Math.round(clamp(score, 0, 100));
+
+  const factors = [
+    {
+      label: "Pemasukan vs Pengeluaran",
+      value: `${expenseRatio.toFixed(1)}%`,
+      description:
+        expenseRatio < 70
+          ? "Pengeluaran masih berada di bawah pemasukan dengan ruang aman."
+          : "Pengeluaran mulai tinggi dibanding pemasukan bulan ini.",
+      progress: clamp(expenseRatio, 0, 100),
+    },
+    {
+      label: "Budget Terpakai",
+      value: `${budgetUsage.toFixed(1)}%`,
+      description:
+        budgetUsage >= 80
+          ? "Budget mendekati batas, beberapa kategori perlu dipantau."
+          : "Penggunaan budget masih relatif aman.",
+      progress: clamp(budgetUsage, 0, 100),
+    },
+    {
+      label: "Konsistensi Pengeluaran",
+      value: `${spikeDays} spike`,
+      description:
+        spikeDays > 0
+          ? "Ada hari dengan pengeluaran jauh lebih tinggi dari rata-rata."
+          : "Tidak ada lonjakan pengeluaran besar dalam periode ini.",
+      progress: clamp(100 - spikeDays * 18, 0, 100),
+    },
+    {
+      label: "Alokasi 50/30/20",
+      value: `${needsRatio.toFixed(0)} / ${wantsRatio.toFixed(0)} / ${savingsRatio.toFixed(0)}%`,
+      description: "Perbandingan Kebutuhan, Keinginan, dan Tabungan terhadap pemasukan bulan ini.",
+      progress: clamp(100 - Math.abs(50 - needsRatio) - Math.abs(30 - wantsRatio) - Math.abs(20 - savingsRatio), 0, 100),
+    },
+    {
+      label: "Alert Budget",
+      value: `${userAlerts.length} alert`,
+      description:
+        userAlerts.length > 0
+          ? "Ada kategori yang mendekati batas budget."
+          : "Belum ada alert overspending aktif.",
+      progress: clamp(100 - userAlerts.length * 22, 0, 100),
+    },
+  ];
+
+  const insights = [
+    totalExpense < totalIncome
+      ? "Pengeluaran bulan ini masih berada di bawah pemasukan."
+      : "Pengeluaran bulan ini sudah melewati pemasukan.",
+    budgetUsage >= 80
+      ? "Penggunaan budget sudah mendekati batas dan perlu dipantau."
+      : "Penggunaan budget masih berada di area aman.",
+    savingsRatio < 20
+      ? "Alokasi tabungan belum mencapai 20% dari pemasukan."
+      : "Alokasi tabungan sudah mendekati prinsip 20%.",
+  ];
+
+  const recommendations = [
+    wantsRatio > 30
+      ? "Kurangi pengeluaran kategori wants agar budget lebih aman."
+      : "Pertahankan porsi keinginan agar tetap di sekitar 30% dari pemasukan.",
+    savingsRatio < 20
+      ? "Sisihkan minimal 20% dari pemasukan untuk tabungan atau dana darurat."
+      : "Pertahankan kebiasaan menyisihkan dana untuk tabungan.",
+    budgetUsage >= 80
+      ? "Pantau kategori yang mendekati batas sebelum menambah transaksi baru."
+      : "Review budget mingguan agar pola pengeluaran tetap stabil.",
+  ];
+
+  return {
+    score,
+    status: getScoreStatus(score),
+    totalIncome,
+    totalExpense,
+    budgetUsage,
+    factors,
+    insights,
+    recommendations,
+    ratioSeries: [needsRatio, wantsRatio, savingsRatio],
+  };
+};
+
+const FinancialScore = () => {
+  document.title = "Financial Score | SADAR Finance";
+
+  const [healthScore, setHealthScore] = useState(null);
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState("3m");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchHealthScore = async () => {
+      const periodOption = getPeriodOption(selectedPeriod);
+      try {
+        const { data: response } = await axios.post(
+          `${API_BASE_URL}/analytics/health-score`,
+          { period: selectedPeriod, periodMonths: periodOption.months },
+          { headers: authHeaders() },
+        );
+
+        if (isMounted) {
+          setHealthScore(response?.data || null);
+          setIsUsingFallback(false);
+        }
+      } catch (_error) {
+        if (isMounted) {
+          setHealthScore(null);
+          setIsUsingFallback(true);
+        }
+      }
     };
-  }, []);
+
+    fetchHealthScore();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedPeriod]);
+
+  const data = useMemo(
+    () => (healthScore ? buildApiData(healthScore) : buildFallbackData(selectedPeriod)),
+    [healthScore, selectedPeriod],
+  );
 
   return (
     <div className="page-content sadar-page">
@@ -155,6 +333,17 @@ const FinancialScore = () => {
                   <span>Financial Score</span>
                   <p>Ringkasan kesehatan keuangan bulan ini</p>
                 </div>
+                <ButtonGroup size="sm" className="flex-wrap justify-content-center mb-3">
+                  {periodOptions.map((option) => (
+                    <Button
+                      color={selectedPeriod === option.key ? "primary" : "light"}
+                      key={option.key}
+                      onClick={() => setSelectedPeriod(option.key)}
+                    >
+                      {option.label}
+                    </Button>
+                  ))}
+                </ButtonGroup>
                 <ReactApexChart
                   type="radialBar"
                   height={250}
@@ -177,7 +366,9 @@ const FinancialScore = () => {
                 </div>
                 <span className="sadar-score-status">{data.status}</span>
                 <p className="sadar-score-note">
-                  Skor ini membantu membaca pola pemasukan, pengeluaran, budget, dan tabunganmu.
+                  {isUsingFallback
+                    ? "Skor fallback ditampilkan sementara sampai data backend tersedia."
+                    : "Skor ini membantu membaca pola pemasukan, pengeluaran, budget, dan tabunganmu."}
                 </p>
               </CardBody>
             </Card>

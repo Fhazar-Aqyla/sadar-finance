@@ -313,88 +313,189 @@ class AnalyticsService {
   // Financial Health Score → writes to scores table
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  async calculateHealthScore(userId, { periodMonths = 3 }) {
+  async calculateHealthScore(userId, { periodMonths = 3, period = '3m' }) {
     const endDate = new Date();
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - periodMonths);
+    const periodConfig = this._resolveHealthScorePeriod(period, periodMonths);
+    const startDate = new Date(endDate);
+    if (periodConfig.isAllTime) {
+      startDate.setFullYear(1970, 0, 1);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (periodConfig.days) {
+      startDate.setDate(startDate.getDate() - periodConfig.days);
+    } else {
+      startDate.setMonth(startDate.getMonth() - periodConfig.months);
+    }
 
-    const [totalExpenseData, totalIncomeData, expenseTrend, incomeTrend] = await Promise.all([
+    const [totalExpenseData, totalIncomeData, expenseTrend, incomeTrend, latestBudget, expenseSummary] = await Promise.all([
       transactionRepository.getTotalExpense(userId, startDate.toISOString(), endDate.toISOString()),
       incomeRepository.getTotalIncome(userId, startDate.toISOString(), endDate.toISOString()),
-      transactionRepository.getMonthlyExpenseTrend(userId, periodMonths),
-      incomeRepository.getMonthlyIncomeTrend(userId, periodMonths),
+      transactionRepository.getMonthlyExpenseTrend(userId, periodConfig.trendMonths),
+      incomeRepository.getMonthlyIncomeTrend(userId, periodConfig.trendMonths),
+      analyticsRepository.getLatestBudget(userId),
+      transactionRepository.getSummary(userId, startDate.toISOString(), endDate.toISOString()),
     ]);
 
     const totalIncome = parseFloat(totalIncomeData.total);
     const totalExpense = parseFloat(totalExpenseData.total);
+    const transactionCount = parseInt(totalExpenseData.count || 0, 10);
+    const incomeCount = parseInt(totalIncomeData.count || 0, 10);
+    const netSavings = totalIncome - totalExpense;
+    const budgetLimit = latestBudget
+      ? parseFloat(latestBudget.limit_amount || 0)
+      : totalIncome;
 
-    // Expense ratio score: lower expenses relative to income = better
-    const expenseRatio = totalIncome > 0 ? totalExpense / totalIncome : 1;
-    const expenseScore = Math.max(0, Math.min(100, Math.round((1 - expenseRatio) * 100 + 50)));
+    const clampScore = (value) => Math.max(0, Math.min(100, Math.round(value)));
 
-    // Savings rate score
-    const savingsRate = totalIncome > 0 ? (totalIncome - totalExpense) / totalIncome : 0;
-    const savingsScore = Math.max(0, Math.min(100, Math.round(savingsRate * 200)));
+    const getStatus = (score) => {
+      if (score <= 40) return 'Perlu Perhatian';
+      if (score <= 70) return 'Cukup Sehat';
+      return 'Sehat';
+    };
 
-    // Income consistency score
-    const incomeScore = Math.min(100, incomeTrend.length > 0
-      ? Math.round((incomeTrend.length / periodMonths) * 100)
-      : 0);
+    const toPrimaryBucket = (categoryGroup) => {
+      const text = String(categoryGroup || '').toLowerCase();
+      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa/.test(text)) return 'needs';
+      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito/.test(text)) return 'savings';
+      return 'wants';
+    };
 
-    // Tracking consistency score
+    const hasIncome = totalIncome > 0;
+    const expenseRatio = hasIncome ? totalExpense / totalIncome : totalExpense > 0 ? 1.2 : 0;
+    const savingsRate = hasIncome ? netSavings / totalIncome : 0;
+    const budgetUsage = budgetLimit > 0 ? totalExpense / budgetLimit : 0;
+
+    const expenseScore = !hasIncome
+      ? 0
+      : expenseRatio <= 0.7
+      ? 100
+      : expenseRatio <= 1
+        ? clampScore(100 - ((expenseRatio - 0.7) / 0.3) * 50)
+        : clampScore(50 - ((expenseRatio - 1) / 0.3) * 50);
+
+    const savingsScore = !hasIncome
+      ? 0
+      : savingsRate >= 0.2
+      ? 100
+      : clampScore((Math.max(savingsRate, 0) / 0.2) * 100);
+
+    const budgetScore = budgetLimit <= 0
+      ? 0
+      : budgetUsage <= 0.8
+      ? 100
+      : budgetUsage <= 1
+        ? clampScore(100 - ((budgetUsage - 0.8) / 0.2) * 40)
+        : clampScore(60 - ((budgetUsage - 1) / 0.3) * 60);
+
     const monthsWithData = new Set([
       ...expenseTrend.map((t) => new Date(t.month).toISOString().slice(0, 7)),
       ...incomeTrend.map((t) => new Date(t.month).toISOString().slice(0, 7)),
     ]).size;
-    const consistencyScore = Math.min(100, Math.round((monthsWithData / periodMonths) * 100));
+    const consistencyScore = Math.min(100, Math.round((monthsWithData / periodConfig.consistencyMonths) * 100));
 
-    // Weighted overall score
     const overallScore = Math.round(
-      incomeScore * 0.25 +
-      expenseScore * 0.25 +
-      savingsScore * 0.30 +
-      consistencyScore * 0.20
+      savingsScore * 0.35 +
+      expenseScore * 0.30 +
+      budgetScore * 0.25 +
+      consistencyScore * 0.10
     );
 
-    // Save to scores table
     const savedScore = await analyticsRepository.createScore(userId, overallScore);
 
-    // Generate insight for the score
+    const allocationTotals = expenseSummary.reduce((result, row) => {
+      const bucket = toPrimaryBucket(row.category_group);
+      result[bucket] += parseFloat(row.total || 0);
+      return result;
+    }, { needs: 0, wants: 0, savings: 0 });
+
+    const needsRatio = totalIncome > 0 ? allocationTotals.needs / totalIncome : 0;
+    const wantsRatio = totalIncome > 0 ? allocationTotals.wants / totalIncome : 0;
+    const savingsRatio = totalIncome > 0
+      ? Math.max(allocationTotals.savings, Math.max(netSavings, 0)) / totalIncome
+      : 0;
+
+    const insights = [
+      totalIncome > 0
+        ? `Pengeluaran memakai ${(expenseRatio * 100).toFixed(1)}% dari pemasukan pada periode ini.`
+        : 'Belum ada pemasukan tercatat pada periode ini, jadi score belum bisa membaca rasio income secara penuh.',
+      budgetLimit > 0
+        ? `Budget terpakai ${(budgetUsage * 100).toFixed(1)}% dari batas yang tersedia.`
+        : 'Budget belum tersedia, score memakai pemasukan sebagai batas pembanding sementara.',
+      savingsRate >= 0.2
+        ? 'Rasio tabungan sudah memenuhi target minimal 20%.'
+        : 'Rasio tabungan belum mencapai target 20%.',
+    ];
+
     const recommendations = [];
-    if (overallScore < 50) {
-      recommendations.push('Your financial health needs attention. Focus on building an emergency fund.');
-    }
-    if (savingsScore < 40) {
-      recommendations.push('Try to save at least 20% of your income. Start with small, consistent amounts.');
-    }
+    if (overallScore <= 40) recommendations.push('Prioritaskan kebutuhan utama dan tunda pengeluaran wants sampai rasio pengeluaran turun.');
+    if (expenseRatio > 0.7) recommendations.push('Usahakan total pengeluaran berada di bawah 70% dari pemasukan agar ruang tabungan lebih aman.');
+    if (budgetUsage >= 0.8) recommendations.push('Budget sudah mendekati batas, cek kategori terbesar sebelum menambah transaksi baru.');
+    if (savingsScore < 100) recommendations.push('Sisihkan minimal 20% pemasukan untuk tabungan, dana darurat, atau investasi.');
     if (consistencyScore < 60) {
-      recommendations.push('Track your transactions more regularly for better insights.');
+      recommendations.push('Catat transaksi dan pemasukan lebih rutin agar score makin akurat.');
     }
-    if (savingsRate > 0.3) {
-      recommendations.push('Great savings rate! Consider investing surplus funds for long-term growth.');
+    if (recommendations.length === 0) {
+      recommendations.push('Kondisi keuangan cukup sehat. Pertahankan alokasi 50/30/20 dan review budget mingguan.');
     }
 
     return {
       score: savedScore,
+      status: getStatus(overallScore),
       breakdown: {
         overallScore,
-        incomeScore,
-        expenseScore,
         savingsScore,
+        expenseScore,
+        budgetScore,
         consistencyScore,
+      },
+      ratios: {
+        savingsRate: parseFloat(savingsRate.toFixed(4)),
+        expenseRatio: parseFloat(expenseRatio.toFixed(4)),
+        budgetUsage: parseFloat(budgetUsage.toFixed(4)),
+        needsRatio: parseFloat(needsRatio.toFixed(4)),
+        wantsRatio: parseFloat(wantsRatio.toFixed(4)),
+        savingsRatio: parseFloat(savingsRatio.toFixed(4)),
       },
       period: {
         start: startDate.toISOString(),
         end: endDate.toISOString(),
-        months: periodMonths,
+        key: periodConfig.key,
+        label: periodConfig.label,
+        months: periodConfig.months,
+        days: periodConfig.days,
+        isAllTime: periodConfig.isAllTime,
       },
       financials: {
         totalIncome,
         totalExpense,
-        netSavings: totalIncome - totalExpense,
-        savingsRate: parseFloat((savingsRate * 100).toFixed(2)),
+        netSavings,
+        budgetLimit,
+        transactionCount,
+        incomeCount,
       },
+      insights,
       recommendations,
+    };
+  }
+
+  _resolveHealthScorePeriod(period, periodMonths) {
+    const configs = {
+      '2w': { key: '2w', label: '2 Minggu', days: 14, months: 1, trendMonths: 1, consistencyMonths: 1 },
+      '1m': { key: '1m', label: '1 Bulan', months: 1, trendMonths: 1, consistencyMonths: 1 },
+      '3m': { key: '3m', label: '3 Bulan', months: 3, trendMonths: 3, consistencyMonths: 3 },
+      '6m': { key: '6m', label: '6 Bulan', months: 6, trendMonths: 6, consistencyMonths: 6 },
+      '1y': { key: '1y', label: '1 Tahun', months: 12, trendMonths: 12, consistencyMonths: 12 },
+      all: { key: 'all', label: 'Seluruh Data', months: null, trendMonths: 24, consistencyMonths: 12, isAllTime: true },
+    };
+
+    if (configs[period]) return configs[period];
+
+    const months = Math.max(1, Math.min(24, parseInt(periodMonths, 10) || 3));
+    return {
+      key: `${months}m`,
+      label: `${months} Bulan`,
+      months,
+      trendMonths: months,
+      consistencyMonths: months,
     };
   }
 

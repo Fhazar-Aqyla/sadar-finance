@@ -43,6 +43,7 @@ const overspendingSchema = Joi.object({
 // Financial health score input
 const healthScoreSchema = Joi.object({
   periodMonths: Joi.number().integer().min(1).max(24).default(3),
+  period: Joi.string().valid('2w', '1m', '3m', '6m', '1y', 'all').optional(),
 });
 
 // Budget input (50/30/20 rule)
