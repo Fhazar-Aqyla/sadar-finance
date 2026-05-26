@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Badge,
   Button,
@@ -37,19 +38,13 @@ const formatNumberInput = (value) => {
 
 const ProfileAccount = () => {
   document.title = "Profile & Account | SADAR Finance";
-  const [profile, setProfile] = useState({
-    name: userProfile.name,
-    email: userProfile.email,
-    password: "",
-    avatar: userProfile.avatar,
-  });
+
   const [accounts, setAccounts] = useState(getUserRows(mockAccounts, currentUserId));
   const [budgetRows, setBudgetRows] = useState(getUserRows(budgets, currentUserId));
 
-  const totalIncome = useMemo(
-    () => sumBy(getUserRows(incomes, currentUserId), (item) => item.amount),
-    [],
-  );
+  const profile = userProfile;
+  const totalBalance = useMemo(() => sumBy(accounts, (account) => account.balance), [accounts]);
+  const totalIncome = useMemo(() => sumBy(getUserRows(incomes, currentUserId), (item) => item.amount), []);
 
   const budgetTargets = [
     { category: "Needs", label: "Kebutuhan", helper: "Kebutuhan utama", percent: 50 },
@@ -58,6 +53,7 @@ const ProfileAccount = () => {
   ];
 
   const accountTypes = ["Cash", "Bank", "E-wallet"];
+
   const userTransactions = useMemo(() => {
     const expenseRows = getUserRows(transactions, currentUserId).map((transaction) => ({
       id: transaction.id,
@@ -86,24 +82,11 @@ const ProfileAccount = () => {
     );
   }, []);
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setProfile((item) => ({
-      ...item,
-      avatar: URL.createObjectURL(file),
-    }));
-  };
-
   const updateAccount = (id, field, value) => {
     setAccounts((items) =>
       items.map((account) =>
         account.id === id
-          ? {
-              ...account,
-              [field]: field === "balance" ? Number(value || 0) : value,
-            }
+          ? { ...account, [field]: field === "balance" ? Number(value || 0) : value }
           : account,
       ),
     );
@@ -129,12 +112,7 @@ const ProfileAccount = () => {
   const updateBudget = (category, value) => {
     setBudgetRows((items) =>
       items.map((budget) =>
-        budget.category === category
-          ? {
-              ...budget,
-              limit: Number(value || 0),
-            }
-          : budget,
+        budget.category === category ? { ...budget, limit: Number(value || 0) } : budget,
       ),
     );
   };
@@ -143,10 +121,7 @@ const ProfileAccount = () => {
     setBudgetRows((items) =>
       items.map((budget) => {
         const target = budgetTargets.find((item) => item.category === budget.category);
-        return {
-          ...budget,
-          limit: target ? Math.round((totalIncome * target.percent) / 100) : budget.limit,
-        };
+        return { ...budget, limit: target ? Math.round((totalIncome * target.percent) / 100) : budget.limit };
       }),
     );
   };
@@ -156,70 +131,38 @@ const ProfileAccount = () => {
       <Container fluid>
         <Row className="g-3">
           <Col xl={5}>
-            <Card className="sadar-panel h-100">
-              <CardHeader>
+            <Card className="sadar-panel sadar-profile-panel h-100">
+              <CardHeader className="d-flex align-items-center justify-content-between">
                 <div>
                   <h4 className="card-title mb-1">Data Profil</h4>
-                  <p className="text-muted mb-0">Kelola identitas akun SADAR kamu</p>
+                  <p className="text-muted mb-0">Ringkasan identitas akun SADAR kamu</p>
                 </div>
+                <Button tag={Link} to="/profile-account/edit" color="light" size="sm" className="sadar-table-action" aria-label="Edit profil">
+                  <i className="ri-pencil-line align-bottom"></i>
+                </Button>
               </CardHeader>
-              <CardBody>
+              <CardBody className="sadar-profile-body">
                 <div className="sadar-profile-photo-row">
                   <div className="sadar-profile-avatar">
-                    {profile.avatar ? (
-                      <img src={profile.avatar} alt="Foto profil" />
-                    ) : (
-                      profile.name.slice(0, 1).toUpperCase()
-                    )}
+                    {profile.avatar ? <img src={profile.avatar} alt="Foto profil" /> : profile.name.slice(0, 1).toUpperCase()}
                   </div>
                   <div className="sadar-profile-photo-copy">
+                    <Badge color="primary" className="bg-primary-subtle text-primary mb-2">Personal Finance</Badge>
                     <h5>{profile.name}</h5>
                     <p>{profile.email}</p>
-                    <Input
-                      id="profile-photo"
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      className="d-none"
-                      onChange={handleAvatarChange}
-                    />
-                    <Button tag={Label} htmlFor="profile-photo" color="light" size="sm" className="sadar-table-action mb-0">
-                      <i className="ri-camera-line align-bottom me-1"></i>
-                      Ganti Foto
-                    </Button>
                   </div>
                 </div>
-                <div className="sadar-form-grid">
-                  <div>
-                    <Label htmlFor="profile-name">Nama</Label>
-                    <Input
-                      id="profile-name"
-                      value={profile.name}
-                      onChange={(event) => setProfile((item) => ({ ...item, name: event.target.value }))}
-                    />
+
+                <div className="sadar-profile-summary-grid">
+                  <div className="sadar-profile-summary-item">
+                    <span>Account</span>
+                    <strong>{accounts.length}</strong>
                   </div>
-                  <div>
-                    <Label htmlFor="profile-email">Email</Label>
-                    <Input
-                      id="profile-email"
-                      type="email"
-                      value={profile.email}
-                      onChange={(event) => setProfile((item) => ({ ...item, email: event.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-password">Password</Label>
-                    <Input
-                      id="profile-password"
-                      type="password"
-                      placeholder="Masukkan password baru"
-                      value={profile.password}
-                      onChange={(event) => setProfile((item) => ({ ...item, password: event.target.value }))}
-                    />
+                  <div className="sadar-profile-summary-item">
+                    <span>Total Saldo</span>
+                    <strong>{rupiah(totalBalance)}</strong>
                   </div>
                 </div>
-                <Button color="primary" className="mt-4">
-                  Simpan Perubahan
-                </Button>
               </CardBody>
             </Card>
           </Col>
@@ -229,52 +172,35 @@ const ProfileAccount = () => {
               <CardHeader className="d-flex align-items-center justify-content-between">
                 <div>
                   <h4 className="card-title mb-1">Kelola Account</h4>
-                  <p className="text-muted mb-0">Cash, Bank, dan E-wallet yang dipakai user</p>
+                  <p className="text-muted mb-0">Cash, bank, dan e-wallet yang kamu pakai</p>
                 </div>
                 <Button color="primary" size="sm" onClick={addAccount}>
                   <i className="ri-add-line align-bottom me-1"></i>
                   Tambah Account
                 </Button>
               </CardHeader>
-              <CardBody>
-                <div className="sadar-insight-list">
+              <CardBody className="sadar-account-body">
+                <div className="sadar-insight-list sadar-account-list">
                   {accounts.map((account) => (
-                    <div className="sadar-insight-item" key={account.id}>
+                    <div className="sadar-insight-item sadar-account-item" key={account.id}>
                       <span className="sadar-card-icon">
                         <i className={account.type === "Bank" ? "ri-bank-line" : account.type === "E-wallet" ? "ri-wallet-3-line" : "ri-cash-line"}></i>
                       </span>
-                      <div className="w-100">
-                        <div className="sadar-form-grid">
+                      <div className="sadar-account-fields">
+                        <div className="sadar-form-grid sadar-account-form-grid">
                           <div>
                             <Label>Nama Account</Label>
-                            <Input
-                              value={account.name}
-                              onChange={(event) => updateAccount(account.id, "name", event.target.value)}
-                            />
+                            <Input value={account.name} onChange={(event) => updateAccount(account.id, "name", event.target.value)} />
                           </div>
                           <div>
                             <Label>Tipe</Label>
-                            <Input
-                              type="select"
-                              value={account.type}
-                              onChange={(event) => updateAccount(account.id, "type", event.target.value)}
-                            >
-                              {accountTypes.map((type) => (
-                                <option key={type}>{type}</option>
-                              ))}
+                            <Input type="select" value={account.type} onChange={(event) => updateAccount(account.id, "type", event.target.value)}>
+                              {accountTypes.map((type) => <option key={type}>{type}</option>)}
                             </Input>
                           </div>
                           <div>
                             <Label>Saldo Berjalan</Label>
-                            <Input
-                              type="text"
-                              inputMode="numeric"
-                              value={formatNumberInput(account.balance)}
-                              readOnly
-                            />
-                            <small className="text-muted d-block mt-1">
-                              Saldo berubah dari Pemasukan dan Pengeluaran.
-                            </small>
+                            <Input type="text" inputMode="numeric" value={formatNumberInput(account.balance)} readOnly />
                           </div>
                           <div className="d-flex align-items-end justify-content-end">
                             <Button color="light" className="text-danger" onClick={() => deleteAccount(account.id)}>
@@ -300,9 +226,7 @@ const ProfileAccount = () => {
                   <h4 className="card-title mb-1">Atur Budget</h4>
                   <p className="text-muted mb-0">Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan ini.</p>
                 </div>
-                <Button color="light" onClick={applyBudgetTarget}>
-                  Terapkan 50/30/20
-                </Button>
+                <Button color="light" onClick={applyBudgetTarget}>Terapkan 50/30/20</Button>
               </CardHeader>
               <CardBody>
                 <div className="sadar-budget-grid">
@@ -318,7 +242,7 @@ const ProfileAccount = () => {
                           </div>
                           <span className="sadar-score-status">{target?.percent}%</span>
                         </div>
-                        <Label>Data Budget</Label>
+                        <Label>Batas Budget</Label>
                         <Input
                           type="text"
                           inputMode="numeric"
@@ -330,19 +254,13 @@ const ProfileAccount = () => {
                           <span className="text-muted">Terpakai</span>
                           <strong>{rupiah(budget.used)}</strong>
                         </div>
-                        <Progress
-                          value={Math.min(usage, 100)}
-                          color={usage >= 100 ? "danger" : usage >= 80 ? "warning" : "primary"}
-                          className="sadar-progress mt-2"
-                        />
+                        <Progress value={Math.min(usage, 100)} color={usage >= 100 ? "danger" : usage >= 80 ? "warning" : "primary"} className="sadar-progress mt-2" />
                         <p className="text-muted mt-2 mb-0">{usage.toFixed(1)}% dari {rupiah(budget.limit)}</p>
                       </div>
                     );
                   })}
                 </div>
-                <Button color="primary" className="mt-4">
-                  Simpan Budget
-                </Button>
+                <Button color="primary" className="mt-4">Simpan Budget</Button>
               </CardBody>
             </Card>
           </Col>
@@ -354,7 +272,7 @@ const ProfileAccount = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Riwayat Keuangan</h4>
-                  <p className="text-muted mb-0">Gabungan pemasukan dan pengeluaran pribadi kamu, view-only.</p>
+                  <p className="text-muted mb-0">Gabungan pemasukan dan pengeluaran pribadi kamu.</p>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
@@ -374,23 +292,20 @@ const ProfileAccount = () => {
                       {userTransactions.map((transaction) => {
                         const isIncome = transaction.type === "income";
                         return (
-                        <tr key={transaction.id}>
-                          <td>
-                            <div className="fw-semibold text-dark">{transaction.name}</div>
-                          </td>
-                          <td>{transaction.category}</td>
-                          <td>{getAccountName(transaction.account_id)}</td>
-                          <td>{new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(`${transaction.date}T00:00:00`))}</td>
-                          <td className={`text-end fw-semibold ${isIncome ? "text-success" : "text-danger"}`}>
-                            {isIncome ? "+" : "-"}
-                            {rupiah(transaction.amount)}
-                          </td>
-                          <td>
-                            <Badge color={isIncome ? "success" : "secondary"} className={`bg-${isIncome ? "success" : "secondary"}-subtle text-${isIncome ? "success" : "secondary"}`}>
-                              {transaction.status}
-                            </Badge>
-                          </td>
-                        </tr>
+                          <tr key={transaction.id}>
+                            <td><div className="fw-semibold text-dark">{transaction.name}</div></td>
+                            <td>{transaction.category}</td>
+                            <td>{getAccountName(transaction.account_id)}</td>
+                            <td>{new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(`${transaction.date}T00:00:00`))}</td>
+                            <td className={`text-end fw-semibold ${isIncome ? "text-success" : "text-danger"}`}>
+                              {isIncome ? "+" : "-"}{rupiah(transaction.amount)}
+                            </td>
+                            <td>
+                              <Badge color={isIncome ? "success" : "secondary"} className={`bg-${isIncome ? "success" : "secondary"}-subtle text-${isIncome ? "success" : "secondary"}`}>
+                                {transaction.status}
+                              </Badge>
+                            </td>
+                          </tr>
                         );
                       })}
                     </tbody>

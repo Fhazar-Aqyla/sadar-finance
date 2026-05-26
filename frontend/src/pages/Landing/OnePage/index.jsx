@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import AnimatedTextCycle from "@/Components/ui/animated-text-cycle";
+import { Hero } from "@/Components/ui/animated-hero";
+import { ContainerScroll } from "@/Components/ui/container-scroll-animation";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
@@ -49,6 +50,8 @@ const cardClass =
   "rounded-[28px] border border-[#DDE8F2] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.09)]";
 const compactCardClass =
   "relative overflow-hidden rounded-[14px] border border-[#DDE8F2] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.08)]";
+
+const DashboardPreview = () => <div className="h-full w-full bg-[#F8FBFF]" />;
 
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
@@ -121,68 +124,13 @@ const OnePage = () => {
         )}
       </header>
 
-      <section id="home" className="relative overflow-hidden bg-white pb-[190px] pt-[182px] max-lg:pb-[148px] max-md:pt-[116px]">
-        <div className={`${shellClass} relative z-10 grid grid-cols-[0.86fr_1.14fr] items-start gap-20 max-xl:gap-16 max-lg:grid-cols-1 max-lg:gap-10`}>
-          <div className="pt-14 max-xl:pt-10 max-lg:pt-0">
-            <h1 className={`${headingClass} m-0 text-[56px] leading-[1.12] max-xl:text-[50px] max-sm:text-[36px]`}>
-              Pantau Uangmu
-              <span className="block !text-[#64AB88]">
-                Bangun{" "}
-                <AnimatedTextCycle
-                  words={["Masa Depanmu", "Keuanganmu", "Tabunganmu", "Impianmu"]}
-                  interval={3000}
-                  className="!font-extrabold !text-[#64AB88]"
-                />
-              </span>
-            </h1>
-            <p className="mb-7 mt-5 max-w-[560px] text-[16px] leading-8 text-[#333333] max-xl:text-[14px] max-xl:leading-7">
-              Pantau, analisis, dan pahami pengeluaranmu dengan bantuan cerdas agar kamu bisa
-              menghindari pengeluaran berlebihan dan lebih mengontrol keuangan.
-            </p>
-            <div className="flex items-center gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
-              <Link to="/register" className={primaryButtonClass}>
-                Mulai Sekarang
-                <i className="ri-arrow-right-line text-[13px]" aria-hidden="true"></i>
-              </Link>
-              <a
-                href="#how-it-works"
-                className="inline-flex min-h-8 items-center gap-2 text-[11px] font-semibold text-[#0C3954] no-underline"
-              >
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#0C3954]">
-                  <i className="ri-play-fill text-[10px]" aria-hidden="true"></i>
-                </span>
-                Lihat Cara Kerja
-              </a>
-            </div>
-          </div>
+      <Hero />
 
-          <div className="h-[475px] rounded-[18px] bg-[#D9D9D9] shadow-[0_8px_14px_rgba(51,51,51,0.28)] max-xl:h-[420px] max-lg:h-[320px] max-sm:h-[240px]" />
-        </div>
+      <ContainerScroll>
+        <DashboardPreview />
+      </ContainerScroll>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[265px] max-md:h-[170px]" aria-hidden="true">
-          <svg
-            className="absolute inset-0 h-full w-full"
-            viewBox="0 0 1440 260"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0 102C110 76 210 48 318 34C430 19 552 38 670 34C792 30 900 5 1016 6C1144 7 1247 36 1366 18C1396 13 1420 4 1440 -6V260H0V102Z"
-              fill="#64AB88"
-              fillOpacity="0.16"
-            />
-            <path
-              d="M0 118C104 91 222 55 328 44C454 31 558 52 680 50C800 48 896 22 1010 22C1132 22 1252 54 1368 34C1398 29 1423 19 1440 10V260H0V118Z"
-              fill="#124170"
-            />
-            <path
-              d="M0 176C130 199 255 222 402 228C512 233 618 228 726 228C792 228 824 238 865 260H0V176Z"
-              fill="#0C3954"
-            />
-          </svg>
-        </div>
-      </section>
-
-      <section id="features" className="relative z-10 bg-[#F8FBFF] py-24 max-md:py-16">
+      <section id="features" className="relative z-10 bg-[#F8FBFF] pb-24 pt-14 max-md:py-16">
         <div className={shellClass}>
           <div className="mx-auto max-w-[680px] text-center">
             <span className={sectionBadgeClass}>Fitur SADAR</span>
