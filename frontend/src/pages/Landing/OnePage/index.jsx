@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Hero } from "@/Components/ui/animated-hero";
 import { ContainerScroll } from "@/Components/ui/container-scroll-animation";
+import { GradientBackground } from "@/Components/ui/gradient-background";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
@@ -50,8 +51,132 @@ const cardClass =
   "rounded-[28px] border border-[#DDE8F2] bg-white p-8 shadow-[0_18px_46px_rgba(12,57,84,0.09)]";
 const compactCardClass =
   "relative overflow-hidden rounded-[14px] border border-[#DDE8F2] bg-white p-5 shadow-[0_14px_34px_rgba(12,57,84,0.08)]";
+const stepLabelClass = "text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]";
+const stepTitleClass = `${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`;
+const stepBodyClass = "mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]";
 
 const DashboardPreview = () => <div className="h-full w-full bg-[#F8FBFF]" />;
+
+const StepTransactionPreview = () => (
+  <div className="mt-5 grid gap-2">
+    {[
+      { icon: "ri-arrow-down-line", label: "Gaji freelance", amount: "+Rp 1,8 jt", tone: "text-[#64AB88]", bg: "bg-[#EAF6F0]" },
+      { icon: "ri-cup-line", label: "Kopi & makan", amount: "-Rp 86 rb", tone: "text-[#D86B5D]", bg: "bg-[#FFF0ED]" },
+    ].map((item) => (
+      <div key={item.label} className="flex h-11 items-center gap-3 rounded-[10px] border border-[#E6EEF5] bg-[#FBFDFF] px-3">
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${item.bg} ${item.tone}`}>
+          <i className={`${item.icon} text-[15px]`} aria-hidden="true"></i>
+        </span>
+        <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#334155]">{item.label}</span>
+        <span className={`text-[11px] font-bold ${item.tone}`}>{item.amount}</span>
+      </div>
+    ))}
+  </div>
+);
+
+const StepCategoryPreview = () => (
+  <div className="mt-5 grid grid-cols-2 gap-2">
+    {[
+      ["Makan", "42%", "bg-[#64AB88]"],
+      ["Transport", "24%", "bg-[#124170]"],
+      ["Tagihan", "21%", "bg-[#78B7D8]"],
+      ["Tabungan", "13%", "bg-[#F0B86E]"],
+    ].map(([label, value, color]) => (
+      <div key={label} className="rounded-[10px] border border-[#E6EEF5] bg-[#FBFDFF] p-3">
+        <div className="flex items-center justify-between gap-2 text-[10px] font-bold text-[#334155]">
+          <span className="truncate">{label}</span>
+          <span>{value}</span>
+        </div>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E8F0F7]">
+          <div className={`h-full rounded-full ${color}`} style={{ width: value }} />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const StepBudgetPreview = () => (
+  <div className="mt-5 grid gap-3">
+    {[
+      ["Makan", "78%", "bg-[#64AB88]"],
+      ["Belanja", "91%", "bg-[#D86B5D]"],
+    ].map(([label, value, color]) => (
+      <div key={label}>
+        <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-[#334155]">
+          <span>{label}</span>
+          <span>{value}</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-[#E8F0F7]">
+          <div className={`h-full rounded-full ${color}`} style={{ width: value }} />
+        </div>
+      </div>
+    ))}
+    <div className="flex items-center gap-2 rounded-[10px] bg-[#FFF7E8] px-3 py-2 text-[10px] font-semibold text-[#9A6A22]">
+      <i className="ri-alert-line text-[14px]" aria-hidden="true"></i>
+      Belanja hampir lewat batas bulan ini
+    </div>
+  </div>
+);
+
+const StepDashboardPreview = () => (
+  <div className="mt-6 grid grid-cols-[1.1fr_0.9fr] gap-4 max-md:grid-cols-1">
+    <div className="rounded-[12px] border border-[#E6EEF5] bg-[#FBFDFF] p-4">
+      <div className="flex items-end justify-between gap-2">
+        <div>
+          <p className="m-0 text-[10px] font-bold uppercase tracking-[0.1em] text-[#7A8795]">Cashflow</p>
+          <p className="m-0 mt-1 text-[18px] font-extrabold text-[#0C3954]">+Rp 620 rb</p>
+        </div>
+        <span className="rounded-full bg-[#EAF6F0] px-2 py-1 text-[10px] font-bold text-[#64AB88]">+12%</span>
+      </div>
+      <div className="mt-5 flex h-24 items-end gap-2">
+        {[44, 68, 52, 78, 60, 88, 72].map((height, index) => (
+          <span
+            key={height + index}
+            className={`flex-1 rounded-t-md ${index % 2 === 0 ? "bg-[#64AB88]" : "bg-[#124170]"}`}
+            style={{ height: `${height}%` }}
+          />
+        ))}
+      </div>
+    </div>
+
+    <div className="grid gap-2">
+      {[
+        ["Saldo aktif", "Rp 4,2 jt", "ri-wallet-3-line"],
+        ["Tabungan", "Rp 1,1 jt", "ri-piggy-bank-line"],
+        ["Pengeluaran", "Rp 2,5 jt", "ri-line-chart-line"],
+      ].map(([label, value, icon]) => (
+        <div key={label} className="flex items-center gap-3 rounded-[12px] border border-[#E6EEF5] bg-white px-3 py-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#EEF7F3] text-[#64AB88]">
+            <i className={`${icon} text-[16px]`} aria-hidden="true"></i>
+          </span>
+          <div className="min-w-0">
+            <p className="m-0 truncate text-[10px] font-semibold text-[#7A8795]">{label}</p>
+            <p className="m-0 text-[13px] font-extrabold text-[#0C3954]">{value}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const StepInsightPreview = () => (
+  <div className="mt-5 grid gap-2">
+    <div className="rounded-[12px] border border-[#DDE8F2] bg-[#FBFDFF] p-3">
+      <div className="flex items-start gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#EAF6F0] text-[#64AB88]">
+          <i className="ri-lightbulb-flash-line text-[16px]" aria-hidden="true"></i>
+        </span>
+        <div>
+          <p className="m-0 text-[11px] font-extrabold text-[#0C3954]">Kurangi jajan 15%</p>
+          <p className="m-0 mt-1 text-[10px] leading-4 text-[#7A8795]">Target tabungan bulan ini bisa naik Rp 180 rb.</p>
+        </div>
+      </div>
+    </div>
+    <div className="rounded-[12px] bg-[#0C3954] px-3 py-2 text-[10px] font-semibold text-white">
+      Rekomendasi siap dipakai di keputusan berikutnya
+    </div>
+  </div>
+);
 
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
@@ -64,7 +189,7 @@ const OnePage = () => {
   return (
     <main className={`${bodyClass} min-h-screen overflow-hidden bg-[#F8FBFF]`}>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-[#DDE8F2] bg-white shadow-[0_10px_30px_rgba(12,57,84,0.08)]">
-        <div className={`${shellClass} flex min-h-[86px] items-center justify-between gap-6 max-md:min-h-[68px]`}>
+        <div className={`${shellClass} grid min-h-[86px] grid-cols-[1fr_auto_1fr] items-center gap-6 max-lg:grid-cols-[1fr_auto] max-md:min-h-[68px]`}>
           <Link to="/" aria-label="SADAR Finance" className="inline-flex shrink-0 items-center no-underline">
             <img src={sadarLogo} alt="SADAR" className="h-[21px] w-auto" />
           </Link>
@@ -82,7 +207,7 @@ const OnePage = () => {
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex shrink-0 items-center justify-end gap-3">
             <Link to="/login" className="text-[12px] font-semibold !text-[#0C3954] no-underline hover:!text-[#124170]">
               Masuk
             </Link>
@@ -124,11 +249,27 @@ const OnePage = () => {
         )}
       </header>
 
-      <Hero />
+      <div className="relative overflow-hidden bg-white">
+        <GradientBackground
+          aria-hidden="true"
+          enableCenterContent={false}
+          className="pointer-events-none absolute inset-x-0 top-0 h-[76rem] max-md:h-[66rem]"
+          animationDuration={11}
+          overlay
+          overlayOpacity={0.04}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-[54rem] h-[26rem] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.72)_54%,#FFFFFF_100%)] max-md:top-[48rem] max-md:h-[22rem]"
+        />
+        <div className="relative z-10">
+          <Hero />
 
-      <ContainerScroll>
-        <DashboardPreview />
-      </ContainerScroll>
+          <ContainerScroll>
+            <DashboardPreview />
+          </ContainerScroll>
+        </div>
+      </div>
 
       <section id="features" className="relative z-10 bg-[#F8FBFF] pb-24 pt-14 max-md:py-16">
         <div className={shellClass}>
@@ -254,51 +395,56 @@ const OnePage = () => {
           <div className="mt-10 grid auto-rows-[minmax(178px,auto)] grid-cols-3 gap-4 max-lg:auto-rows-auto max-lg:grid-cols-2 max-sm:grid-cols-1">
             <div className={compactCardClass}>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 01</span>
-                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Catat transaksi harian</h3>
-                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
-                  Masukkan pemasukan dan pengeluaran tanpa format rumit. SADAR menangkap nominal, catatan, dan waktunya.
+                <span className={stepLabelClass}>Langkah 01</span>
+                <h3 className={stepTitleClass}>Catat transaksi harian</h3>
+                <p className={stepBodyClass}>
+                  Masukkan pemasukan dan pengeluaran. Data yang dibutuhkan cukup nominal, catatan, kategori, dan tanggal transaksi.
                 </p>
+                <StepTransactionPreview />
               </div>
             </div>
 
             <div className={compactCardClass}>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 02</span>
-                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Data dirapikan otomatis</h3>
-                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
-                  Transaksi dipetakan ke kategori yang tepat, lalu saldo dan histori bulanan ikut diperbarui.
+                <span className={stepLabelClass}>Langkah 02</span>
+                <h3 className={stepTitleClass}>Kategori langsung kebaca</h3>
+                <p className={stepBodyClass}>
+                  SADAR mengelompokkan transaksi ke makan, transport, tagihan, dan tabungan supaya histori bulanan rapi.
                 </p>
+                <StepCategoryPreview />
               </div>
             </div>
 
             <div className={compactCardClass}>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 03</span>
-                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Anggaran dijaga langsung</h3>
-                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
-                  Batas tiap kategori dipantau, jadi kamu tahu kapan harus mulai mengurangi pengeluaran.
+                <span className={stepLabelClass}>Langkah 03</span>
+                <h3 className={stepTitleClass}>Budget dipantau real-time</h3>
+                <p className={stepBodyClass}>
+                  Batas tiap kategori dibandingkan dengan pengeluaran berjalan, jadi sinyal boros muncul lebih cepat.
                 </p>
+                <StepBudgetPreview />
               </div>
             </div>
 
             <div className={`${compactCardClass} col-span-2 max-sm:col-span-1`}>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 04</span>
-                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Pola keuangan mulai kebaca</h3>
-                <p className="mt-2 max-w-[430px] text-[12px] leading-5 text-[#7A8795]">
-                  Tampilan dasbor membantu kamu melihat arus kas, lonjakan pengeluaran, dan progres tabungan dalam satu pandangan.
+                <span className={stepLabelClass}>Langkah 04</span>
+                <h3 className={stepTitleClass}>Dashboard merangkum arus kas</h3>
+                <p className="mt-2 max-w-[460px] text-[12px] leading-5 text-[#7A8795]">
+                  Chart dan ringkasan menampilkan saldo aktif, pemasukan, pengeluaran, serta progres tabungan dalam satu pandangan.
                 </p>
+                <StepDashboardPreview />
               </div>
             </div>
 
             <div className={compactCardClass}>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#64AB88]">Langkah 05</span>
-                <h3 className={`${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`}>Wawasan jadi aksi</h3>
-                <p className="mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]">
-                  SADAR memberi ringkasan kondisi, peringatan, dan rekomendasi kecil untuk keputusan berikutnya.
+                <span className={stepLabelClass}>Langkah 05</span>
+                <h3 className={stepTitleClass}>Insight jadi rekomendasi</h3>
+                <p className={stepBodyClass}>
+                  Pola belanja diterjemahkan jadi saran praktis, peringatan, dan langkah kecil yang bisa langsung kamu ikuti.
                 </p>
+                <StepInsightPreview />
               </div>
             </div>
           </div>

@@ -25,10 +25,10 @@ export const ContainerScroll = ({ titleComponent, children }) => {
 
   return (
     <div
-      className="relative flex h-[38rem] items-start justify-center overflow-hidden bg-white px-4 pt-0 md:h-[48rem] md:px-16 md:pt-0"
+      className="relative flex h-[38rem] items-start justify-center overflow-hidden px-4 pt-0 md:h-[48rem] md:px-16 md:pt-0"
       ref={containerRef}
     >
-      <div className="relative w-full py-0 md:py-0" style={{ perspective: "1000px" }}>
+      <div className="relative z-10 w-full py-0 md:py-0" style={{ perspective: "1000px" }}>
         {titleComponent ? <Header translate={translate} titleComponent={titleComponent} /> : null}
         <Card rotate={rotate} scale={scale}>
           {children}
