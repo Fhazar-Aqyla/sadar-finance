@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import {
@@ -9,6 +9,10 @@ import {
   CardHeader,
   Col,
   Container,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   Progress,
   Row,
   Table,
@@ -22,6 +26,7 @@ import {
   getUserRows,
   groupSumBy,
   incomes,
+  shouldShowSadarNewUserMode,
   sumBy,
   transactions,
   userProfile,
@@ -37,6 +42,371 @@ const rupiah = (value) =>
 
 const categoryLabels = ["Makanan", "Transportasi", "Belanja", "Hiburan", "Lainnya"];
 const categoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#94a3b8"];
+
+const newUserSummaryCards = [
+  {
+    label: "Total Saldo",
+    value: "Rp 0",
+    helper: "Belum ada account",
+    icon: "ri-wallet-3-line",
+    tone: "primary",
+  },
+  {
+    label: "Pemasukan Bulan Ini",
+    value: "Rp 0",
+    helper: "Income belum dicatat",
+    icon: "ri-arrow-down-circle-line",
+    tone: "success",
+  },
+  {
+    label: "Pengeluaran Bulan Ini",
+    value: "Rp 0",
+    helper: "Belum ada transaksi",
+    icon: "ri-arrow-up-circle-line",
+    tone: "warning",
+  },
+  {
+    label: "Sisa Budget",
+    value: "Belum diatur",
+    helper: "Atur budget 50/30/20",
+    icon: "ri-pie-chart-2-line",
+    tone: "teal",
+  },
+  {
+    label: "Jumlah Transaksi",
+    value: "0",
+    helper: "Belum ada catatan",
+    icon: "ri-file-list-3-line",
+    tone: "sand",
+  },
+];
+
+const setupSteps = [
+  {
+    title: "Tambahkan Account Pertama",
+    checklistLabel: "Tambahkan Account",
+    description: "Account digunakan untuk mencatat sumber uangmu, seperti Cash, Bank, atau E-wallet.",
+    cta: "Tambah Account",
+    to: "/profile-account#kelola-account",
+    icon: "ri-wallet-3-line",
+  },
+  {
+    title: "Catat Income Pertama",
+    checklistLabel: "Catat Income Pertama",
+    description: "Masukkan pemasukan pertamamu agar SADAR bisa membantu menghitung saldo dan rekomendasi budget awal.",
+    cta: "Catat Income",
+    to: "/catat-keuangan?type=income",
+    icon: "ri-arrow-down-circle-line",
+  },
+  {
+    title: "Atur Budget 50/30/20",
+    checklistLabel: "Atur Budget 50/30/20",
+    description: "Bagi pemasukanmu menjadi 50% kebutuhan, 30% keinginan, dan 20% tabungan agar pengeluaran lebih terarah.",
+    cta: "Atur Budget",
+    to: "/profile-account#atur-budget",
+    icon: "ri-pie-chart-2-line",
+  },
+  {
+    title: "Catat Transaksi Pertama",
+    checklistLabel: "Catat Transaksi Pertama",
+    description: "Mulai catat pengeluaran pertamamu agar dashboard, insight, dan alert bisa mulai bekerja.",
+    cta: "Catat Transaksi",
+    to: "/catat-keuangan",
+    icon: "ri-receipt-line",
+  },
+  {
+    title: "Dashboard Kamu Siap Digunakan",
+    checklistLabel: "Lihat Dashboard",
+    description: "Setelah data mulai terisi, SADAR akan membantu menampilkan ringkasan keuangan, pola pengeluaran, financial score, dan alert secara bertahap.",
+    cta: "Lihat Dashboard",
+    to: "/dashboard",
+    icon: "ri-dashboard-3-line",
+  },
+];
+
+const setupWizardStorageKey = `sadar_setup_wizard_${currentUserId}`;
+
+const defaultSetupWizardState = {
+  completed: false,
+  skipped: false,
+};
+
+const getStoredSetupWizardState = () => {
+  if (typeof window === "undefined") return defaultSetupWizardState;
+
+  try {
+    const savedState = window.localStorage.getItem(setupWizardStorageKey);
+    return savedState ? { ...defaultSetupWizardState, ...JSON.parse(savedState) } : defaultSetupWizardState;
+  } catch (_error) {
+    return defaultSetupWizardState;
+  }
+};
+
+const saveSetupWizardState = (state) => {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(setupWizardStorageKey, JSON.stringify(state));
+};
+
+const EmptyDashboardCard = ({ icon, title, description, action }) => (
+  <div className="sadar-empty-card">
+    <span className="sadar-empty-icon">
+      <i className={icon}></i>
+    </span>
+    <h5>{title}</h5>
+    <p>{description}</p>
+    {action}
+  </div>
+);
+
+const SetupGuideModal = ({ isOpen, onComplete, onSkip }) => {
+  const [activeStep, setActiveStep] = useState(0);
+  const step = setupSteps[activeStep];
+  const isFinalStep = activeStep === setupSteps.length - 1;
+
+  const goNext = () => {
+    if (isFinalStep) {
+      onComplete();
+      setActiveStep(0);
+      return;
+    }
+    setActiveStep((current) => current + 1);
+  };
+
+  const handleSkip = () => {
+    onSkip();
+    setActiveStep(0);
+  };
+
+  return (
+    <Modal isOpen={isOpen} centered className="sadar-setup-modal" backdrop="static" keyboard={false}>
+      <ModalHeader>Mulai Setup SADAR</ModalHeader>
+      <ModalBody>
+        <div className="sadar-stepper-count">
+          Langkah {Math.min(activeStep + 1, 4)} dari 4
+        </div>
+        <div className="sadar-stepper-progress" aria-hidden="true">
+          {setupSteps.slice(0, 4).map((item, index) => (
+            <span className={index <= activeStep ? "is-active" : ""} key={item.title}></span>
+          ))}
+        </div>
+        <div className="sadar-stepper-content">
+          <span className="sadar-stepper-badge">{isFinalStep ? "OK" : `0${activeStep + 1}`}</span>
+          <h4>{step.title}</h4>
+          <p>{step.description}</p>
+        </div>
+      </ModalBody>
+      <ModalFooter className="sadar-stepper-footer">
+        <Button color="link" className="sadar-stepper-skip" onClick={handleSkip}>
+          Lewati Dulu
+        </Button>
+        <div className="d-flex gap-2">
+          {activeStep > 0 && (
+            <Button
+              color="light"
+              className="sadar-table-action"
+              onClick={() => setActiveStep((current) => Math.max(current - 1, 0))}
+            >
+              Kembali
+            </Button>
+          )}
+          <Button color="primary" onClick={goNext}>
+            {isFinalStep ? "Selesai" : "Lanjut"}
+          </Button>
+        </div>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
+const NewUserDashboard = () => {
+  const [wizardState, setWizardState] = useState(getStoredSetupWizardState);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const shouldAutoOpenWizard = !wizardState.completed && !wizardState.skipped;
+  const hasDismissedSetup = wizardState.completed || wizardState.skipped;
+
+  useEffect(() => {
+    if (shouldAutoOpenWizard) {
+      setIsGuideOpen(true);
+    }
+  }, [shouldAutoOpenWizard]);
+
+  const updateWizardState = (nextState) => {
+    saveSetupWizardState(nextState);
+    setWizardState(nextState);
+  };
+
+  const skipSetupWizard = () => {
+    updateWizardState({ completed: false, skipped: true });
+    setIsGuideOpen(false);
+  };
+
+  const completeSetupWizard = () => {
+    updateWizardState({ completed: true, skipped: false });
+    setIsGuideOpen(false);
+  };
+
+  return (
+    <div className="page-content sadar-dashboard">
+      <Container fluid>
+        <section className="sadar-overview sadar-new-user-overview">
+          <div className="sadar-overview-main">
+            <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow">
+              Dashboard awal
+            </Badge>
+            <h1>Halo, {userProfile.name}</h1>
+            <p>Dashboard kamu masih kosong. Mulai catat account, pemasukan, budget, dan transaksi agar ringkasan keuangan mulai terbaca.</p>
+            {!hasDismissedSetup && (
+              <div className="sadar-overview-actions">
+                <Button color="primary" onClick={() => setIsGuideOpen(true)}>
+                  <i className="ri-play-circle-line align-bottom me-1"></i>
+                  Mulai Setup
+                </Button>
+                <Button color="light" className="sadar-ghost-btn" onClick={skipSetupWizard}>
+                  Lewati Dulu
+                </Button>
+              </div>
+            )}
+          </div>
+          <div className="sadar-overview-note sadar-new-user-note">
+            <span className="sadar-note-icon bg-teal-subtle text-teal">
+              <i className="ri-information-line"></i>
+            </span>
+            <div className="sadar-alert-copy">
+              <span className="sadar-section-label">Langkah pertama</span>
+              <p>Tambahkan account dulu supaya pemasukan dan transaksi bisa tercatat ke sumber uang yang benar.</p>
+            </div>
+          </div>
+        </section>
+
+        <Row className="g-3 row-cols-1 row-cols-md-2 row-cols-xl-5 mt-3">
+          {newUserSummaryCards.map((item) => (
+            <Col key={item.label}>
+              <Card className="metric-card h-100">
+                <CardBody>
+                  <div className="metric-card-top">
+                    <span className={`metric-icon bg-${item.tone}-subtle text-${item.tone}`}>
+                      <i className={item.icon}></i>
+                    </span>
+                    <span>{item.label}</span>
+                  </div>
+                  <h2>{item.value}</h2>
+                  <p>{item.helper}</p>
+                </CardBody>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        <Row className="g-3 mt-1">
+          <Col xl={8}>
+            <Card className="h-100 dashboard-panel">
+              <CardHeader>
+                <div>
+                  <h4 className="card-title mb-1">Cashflow bulanan</h4>
+                  <p className="text-muted mb-0">Pemasukan dan pengeluaran 6 bulan terakhir</p>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <EmptyDashboardCard
+                  icon="ri-bar-chart-grouped-line"
+                  title="Belum ada data cashflow"
+                  description="Grafik akan muncul setelah kamu mulai mencatat pemasukan dan pengeluaran."
+                />
+              </CardBody>
+            </Card>
+          </Col>
+          <Col xl={4}>
+            <Card className="h-100 dashboard-panel">
+              <CardHeader>
+                <div>
+                  <h4 className="card-title mb-1">Kategori Pengeluaran</h4>
+                  <p className="text-muted mb-0">Distribusi bulan ini</p>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <EmptyDashboardCard
+                  icon="ri-pie-chart-2-line"
+                  title="Belum ada distribusi kategori"
+                  description="Grafik akan muncul setelah kamu mulai mencatat pemasukan dan pengeluaran."
+                />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row className="g-3 mt-1">
+          <Col xl={8}>
+            <Card className="h-100 dashboard-panel">
+              <CardHeader className="expense-trend-header">
+                <div>
+                  <h4 className="card-title mb-1">Tren Pengeluaran</h4>
+                  <p className="text-muted mb-0">Pantau pola pengeluaran bulanan</p>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <EmptyDashboardCard
+                  icon="ri-line-chart-line"
+                  title="Tren belum tersedia"
+                  description="Grafik akan muncul setelah kamu mulai mencatat pemasukan dan pengeluaran."
+                />
+              </CardBody>
+            </Card>
+          </Col>
+          <Col xl={4}>
+            <div className="sadar-side-stack">
+              <Card className="insight-card dashboard-panel">
+                <CardBody>
+                  <div className="sadar-note-icon bg-teal-subtle text-teal">
+                    <i className="ri-lightbulb-flash-line"></i>
+                  </div>
+                  <h5>Smart Insight</h5>
+                  <p>Insight akan muncul setelah kamu memiliki cukup data transaksi.</p>
+                  <span>Semakin rutin kamu mencatat transaksi, semakin jelas pola keuangan yang bisa ditampilkan.</span>
+                </CardBody>
+              </Card>
+              <Card className="alert-card dashboard-panel">
+                <CardBody>
+                  <div className="sadar-note-icon bg-warning-subtle text-warning">
+                    <i className="ri-alert-line"></i>
+                  </div>
+                  <h5>Smart Alert</h5>
+                  <p>Belum ada alert. Sistem akan memberi tahu jika pengeluaran mulai mendekati batas budget.</p>
+                  <span>Atur budget 50/30/20 agar alert bisa bekerja.</span>
+                </CardBody>
+              </Card>
+            </div>
+          </Col>
+        </Row>
+
+        <Card className="dashboard-panel mt-3">
+          <CardHeader>
+            <div>
+              <h4 className="card-title mb-1">Riwayat Terbaru</h4>
+              <p className="text-muted mb-0">Preview 5 catatan keuangan terakhir</p>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <EmptyDashboardCard
+              icon="ri-receipt-line"
+              title="Belum ada transaksi."
+              description="Catat transaksi pertama agar riwayat keuangan mulai tersusun."
+              action={(
+                <Button color="primary" size="sm" tag={Link} to="/catat-keuangan">
+                  Catat Transaksi Pertama
+                </Button>
+              )}
+            />
+          </CardBody>
+        </Card>
+      </Container>
+      <SetupGuideModal
+        isOpen={isGuideOpen}
+        onComplete={completeSetupWizard}
+        onSkip={skipSetupWizard}
+      />
+    </div>
+  );
+};
 
 const chartBaseOptions = {
   chart: {
@@ -301,7 +671,7 @@ const createCategoryOptions = (labels, colors, setActiveCategory) => ({
   },
 });
 
-const SadarDashboard = () => {
+const DashboardWithData = () => {
   document.title = "Dashboard | SADAR Finance";
   const [activeCategory, setActiveCategory] = useState({ label: "", color: "#1E3A8A" });
 
@@ -630,6 +1000,16 @@ const SadarDashboard = () => {
       </Container>
     </div>
   );
+};
+
+const SadarDashboard = () => {
+  document.title = "Dashboard | SADAR Finance";
+
+  if (shouldShowSadarNewUserMode) {
+    return <NewUserDashboard />;
+  }
+
+  return <DashboardWithData />;
 };
 
 export default SadarDashboard;

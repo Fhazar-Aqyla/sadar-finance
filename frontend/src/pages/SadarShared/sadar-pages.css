@@ -229,6 +229,71 @@
   background: #f8fafc;
 }
 
+.sadar-empty-state-center {
+  display: flex;
+  min-height: 240px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  text-align: center;
+}
+
+.sadar-empty-state-center h4 {
+  margin: 0.2rem 0 0;
+  color: #172033;
+  font-size: 1.05rem;
+  font-weight: 760;
+}
+
+.sadar-empty-state-center p {
+  max-width: 520px;
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.sadar-empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+  font-size: 1.35rem;
+}
+
+.sadar-empty-state-note {
+  max-width: 520px;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  font-size: 0.86rem;
+}
+
+.sadar-step-status-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.35rem;
+}
+
+.sadar-step-status-list span {
+  display: inline-flex;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .sadar-progress {
   height: 8px;
   border-radius: 999px;
@@ -411,6 +476,50 @@
   white-space: nowrap;
 }
 
+.sadar-confirm-modal .modal-content {
+  border: 1px solid #e7ebf2;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.sadar-confirm-modal .modal-body {
+  padding: 1.35rem 1.35rem 0.75rem;
+}
+
+.sadar-confirm-modal .modal-body h4 {
+  margin: 0.9rem 0 0.45rem;
+  color: #172033;
+  font-size: 1.08rem;
+  font-weight: 780;
+}
+
+.sadar-confirm-modal .modal-body p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.sadar-confirm-modal .modal-footer {
+  gap: 0.6rem;
+  padding: 0.75rem 1.35rem 1.35rem;
+  border-top: 0;
+}
+
+.sadar-confirm-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+}
+
+.sadar-confirm-icon.danger {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
 .sadar-edit-profile-header {
   align-items: center;
 }
@@ -436,16 +545,26 @@
   align-items: center;
 }
 
+.sadar-edit-photo-panel,
+.sadar-edit-identity-panel {
+  height: 100%;
+}
+
 .sadar-edit-avatar-card {
   display: flex;
   width: 100%;
-  min-height: 260px;
+  min-height: 238px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
   padding: 0.5rem 0 0.75rem;
   text-align: center;
+}
+
+.sadar-edit-identity-panel .card-body {
+  display: flex;
+  flex-direction: column;
 }
 
 .sadar-edit-avatar {
@@ -499,6 +618,72 @@
 .sadar-edit-stack .form-select:focus {
   border-color: rgba(30, 58, 138, 0.55);
   box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.1);
+}
+
+.sadar-edit-profile-grid .input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.sadar-edit-inline-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.sadar-edit-inline-note strong,
+.sadar-password-rules strong {
+  display: block;
+  color: #172033;
+  font-weight: 780;
+}
+
+.sadar-edit-inline-note p {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.sadar-password-toggle {
+  min-width: 46px;
+  justify-content: center;
+  border-color: #d6deeb;
+  color: #475569;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.sadar-password-toggle:hover,
+.sadar-password-toggle:focus {
+  color: var(--sadar-primary);
+  background: #eef5ff;
+}
+
+.sadar-password-rules {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  padding: 0.9rem;
+  border: 1px solid #edf1f6;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+.sadar-password-rules span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #64748b;
+  font-weight: 650;
+}
+
+.sadar-password-rules span.is-valid {
+  color: var(--sadar-success);
 }
 
 .sadar-edit-stack {
@@ -624,6 +809,28 @@
   gap: 0.75rem;
 }
 
+.sadar-budget-helper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.sadar-budget-helper strong {
+  flex: 0 0 auto;
+  color: #172033;
+  font-weight: 780;
+}
+
+.sadar-budget-helper span {
+  color: #64748b;
+  line-height: 1.45;
+}
+
 @media (max-width: 991.98px) {
   .sadar-form-grid,
   .sadar-budget-grid,
@@ -660,5 +867,10 @@
 
   .sadar-edit-actions .btn {
     width: 100%;
+  }
+
+  .sadar-budget-helper {
+    flex-direction: column;
+    gap: 0.35rem;
   }
 }

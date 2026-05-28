@@ -1,4 +1,7 @@
 export const currentUserId = "user_001";
+export const isSadarDemoMode = import.meta.env.VITE_SADAR_DEMO_MODE !== "false";
+export const isSadarNewUserPreview = import.meta.env.VITE_SADAR_NEW_USER_PREVIEW === "true";
+export const shouldShowSadarNewUserMode = !isSadarDemoMode && isSadarNewUserPreview;
 
 export const userProfile = {
   id: currentUserId,

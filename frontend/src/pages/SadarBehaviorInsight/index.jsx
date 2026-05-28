@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import ReactApexChart from "react-apexcharts";
-import { Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
+import { Link } from "react-router-dom";
+import { Button, Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
 
 import {
   currentUserId,
@@ -12,6 +13,7 @@ import {
   incomes,
   isWeekend,
   rupiah,
+  shouldShowSadarNewUserMode,
   sumBy,
   transactions,
 } from "../SadarShared/mockData";
@@ -65,6 +67,32 @@ const toCategoryPrimary = (category) => {
   if (/tagihan|makanan|transport|kesehatan|pendidikan/.test(text)) return "Needs";
   if (/tabungan|invest|dana darurat/.test(text)) return "Investment";
   return "Wants";
+};
+
+const EmptyBehaviorInsight = () => {
+  document.title = "Behavior Insight | SADAR Finance";
+
+  return (
+    <div className="page-content sadar-page">
+      <Container fluid>
+        <Card className="sadar-panel">
+          <CardBody>
+            <div className="sadar-empty-state sadar-empty-state-center">
+              <span className="sadar-empty-state-icon">
+                <i className="ri-line-chart-line"></i>
+              </span>
+              <h4>Belum Ada Pola yang Bisa Dianalisis</h4>
+              <p>Insight akan muncul setelah kamu mulai mencatat transaksi secara rutin.</p>
+              <div className="sadar-empty-state-note">Insight akan lebih akurat setelah tersedia data transaksi minimal 14 hari.</div>
+              <Button color="primary" tag={Link} to="/catat-keuangan">
+                Catat Transaksi Pertama
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+      </Container>
+    </div>
+  );
 };
 
 const normalizeBackendTransaction = (row) => ({
@@ -172,7 +200,7 @@ const createTrendOptions = (categories, maxValue) => ({
   },
 });
 
-const BehaviorInsight = () => {
+const BehaviorInsightWithData = () => {
   document.title = "Behavior Insight | SADAR Finance";
   const [backendTransactions, setBackendTransactions] = useState(null);
   const [behaviorPrediction, setBehaviorPrediction] = useState(null);
@@ -592,5 +620,9 @@ const BehaviorInsight = () => {
     </div>
   );
 };
+
+const BehaviorInsight = () => (
+  shouldShowSadarNewUserMode ? <EmptyBehaviorInsight /> : <BehaviorInsightWithData />
+);
 
 export default BehaviorInsight;

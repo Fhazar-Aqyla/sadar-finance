@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Alert,
   Badge,
@@ -17,12 +17,11 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-import { accounts as mockAccounts, currentUserId } from "../SadarShared/mockData";
+import { accounts as mockAccounts, currentUserId, shouldShowSadarNewUserMode } from "../SadarShared/mockData";
 import "../SadarShared/sadar-pages.css";
 import "./transaction-input.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
-const AI_BASE_URL = import.meta.env.VITE_AI_URL || "http://localhost:5000";
 
 const categories = [
   { value: "food_and_beverage", label: "Makanan & Minuman" },
@@ -109,21 +108,6 @@ const buildDescription = (merchant, items) => {
   return merchant || itemText || "";
 };
 
-const unwrapApiResponse = (response) => response?.data ?? response;
-
-const normalizeAiOcrResult = (response) => {
-  const payload = unwrapApiResponse(response);
-  const result = payload?.data?.rawText || payload?.data?.confidence || payload?.data?.data
-    ? payload.data
-    : payload;
-
-  return {
-    rawText: result?.rawText || result?.raw_text || "",
-    parsedData: result?.data || result?.parsed_data || {},
-    confidence: Number(result?.confidence || 0),
-  };
-};
-
 const TransactionInput = () => {
   document.title = "Catat Keuangan | SADAR Finance";
   const location = useLocation();
@@ -141,7 +125,10 @@ const TransactionInput = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [notice, setNotice] = useState(null);
   const fallbackAccounts = useMemo(
-    () => mockAccounts.filter((account) => account.user_id === currentUserId).map(normalizeMockAccount),
+    () =>
+      shouldShowSadarNewUserMode
+        ? []
+        : mockAccounts.filter((account) => account.user_id === currentUserId).map(normalizeMockAccount),
     [],
   );
 
@@ -169,6 +156,13 @@ const TransactionInput = () => {
     let isMounted = true;
 
     const fetchAccounts = async () => {
+      if (shouldShowSadarNewUserMode) {
+        setAccounts([]);
+        setForm((current) => ({ ...current, accountId: "" }));
+        setIncomeForm((current) => ({ ...current, accountId: "" }));
+        return;
+      }
+
       setIsLoadingAccounts(true);
 
       try {
@@ -250,7 +244,7 @@ const TransactionInput = () => {
       accountId: form.accountId,
       merchant,
       transactionDate: parsed?.date || initialForm.transactionDate,
-      categoryGroup: parsed?.category || "other",
+      categoryGroup: parsed?.categoryGroup || parsed?.category_group || parsed?.category || "other",
       amount: parsed?.total ? String(parsed.total) : "",
       description,
       source: "ocr",
@@ -277,32 +271,6 @@ const TransactionInput = () => {
     throw new Error("OCR masih diproses. Coba ambil ulang hasil scan beberapa saat lagi.");
   };
 
-  const processWithAiService = async () => {
-    const body = new FormData();
-    body.append("image", receiptFile);
-
-    const response = await axios.post(`${AI_BASE_URL}/ocr`, body, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    const payload = unwrapApiResponse(response);
-
-    if (payload?.success === false) {
-      throw new Error("OCR gagal.");
-    }
-
-    const result = normalizeAiOcrResult(response);
-    const scan = {
-      status: "completed",
-      confidence: result.confidence,
-      parsed_data: result.parsedData,
-      raw_text: result.rawText,
-    };
-
-    setScanResult(scan);
-    applyScanToForm(scan);
-    setNotice({ color: "success", message: "Struk berhasil dibaca." });
-  };
-
   const handleScan = async () => {
     if (!receiptFile) {
       setNotice({ color: "warning", message: "Pilih gambar struk terlebih dahulu." });
@@ -313,36 +281,32 @@ const TransactionInput = () => {
     setNotice(null);
 
     try {
-      await processWithAiService();
-    } catch (aiError) {
-      try {
-        const body = new FormData();
-        body.append("image", receiptFile);
+      const body = new FormData();
+      body.append("image", receiptFile);
 
-        const uploadResponse = await axios.post(`${API_BASE_URL}/ocr/upload`, body, {
-          headers: {
-            ...authHeaders(),
-            "Content-Type": "multipart/form-data",
-          },
-        });
+      const uploadResponse = await axios.post(`${API_BASE_URL}/ocr/upload`, body, {
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        const uploadedScan = uploadResponse?.data?.data || uploadResponse?.data || uploadResponse;
-        const scanId = uploadedScan?.ocr_id || uploadedScan?.id;
+      const uploadedScan = uploadResponse?.data?.data || uploadResponse?.data || uploadResponse;
+      const scanId = uploadedScan?.ocr_id || uploadedScan?.id;
 
-        if (!scanId) {
-          throw new Error("OCR gagal.");
-        }
-
-        const completedScan = await pollScanResult(scanId);
-        setScanResult(completedScan);
-        applyScanToForm(completedScan);
-        setNotice({ color: "success", message: "Struk berhasil dibaca." });
-      } catch (backendError) {
-        setNotice({
-          color: "danger",
-          message: getErrorMessage(aiError, getErrorMessage(backendError, "OCR gagal.")),
-        });
+      if (!scanId) {
+        throw new Error("OCR gagal.");
       }
+
+      const completedScan = await pollScanResult(scanId);
+      setScanResult(completedScan);
+      applyScanToForm(completedScan);
+      setNotice({ color: "success", message: "Struk berhasil dibaca." });
+    } catch (error) {
+      setNotice({
+        color: "danger",
+        message: getErrorMessage(error, "OCR gagal."),
+      });
     } finally {
       setIsScanning(false);
     }
@@ -472,7 +436,10 @@ const TransactionInput = () => {
                     {entryType === "income" ? "Uang masuk dicatat tanpa OCR" : "Pilih cara mencatat pengeluaran"}
                   </p>
                 </div>
-                <Badge color={mode === "ocr" ? "success" : "primary"} className="sadar-mode-badge">
+                <Badge
+                  color={entryType === "income" ? "success" : mode === "ocr" ? "success" : "primary"}
+                  className={`sadar-mode-badge ${entryType === "income" ? "income" : ""}`}
+                >
                   {entryType === "income" ? "Pemasukan" : mode === "ocr" ? "OCR" : "Manual"}
                 </Badge>
               </CardHeader>
@@ -633,6 +600,13 @@ const TransactionInput = () => {
                           </option>
                         ))}
                       </Input>
+                      {!accounts.length && !isLoadingAccounts && (
+                        <div className="mt-2">
+                          <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/profile-account#kelola-account">
+                            Tambah Account Dulu
+                          </Button>
+                        </div>
+                      )}
                     </Col>
 
                     <Col md={6}>
@@ -736,6 +710,13 @@ const TransactionInput = () => {
                           </option>
                         ))}
                       </Input>
+                      {!accounts.length && !isLoadingAccounts && (
+                        <div className="mt-2">
+                          <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/profile-account#kelola-account">
+                            Tambah Account Dulu
+                          </Button>
+                        </div>
+                      )}
                     </Col>
 
                     <Col md={6}>

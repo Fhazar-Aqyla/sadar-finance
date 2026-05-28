@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import ReactApexChart from "react-apexcharts";
+import { Link } from "react-router-dom";
 import { Button, ButtonGroup, Card, CardBody, CardHeader, Col, Container, Progress, Row } from "reactstrap";
 
 import {
@@ -11,6 +12,7 @@ import {
   groupSumBy,
   incomes,
   rupiah,
+  shouldShowSadarNewUserMode,
   sumBy,
   transactions,
 } from "../SadarShared/mockData";
@@ -279,7 +281,42 @@ const buildFallbackData = (periodKey) => {
   };
 };
 
-const FinancialScore = () => {
+const EmptyFinancialScore = () => {
+  document.title = "Financial Score | SADAR Finance";
+
+  return (
+    <div className="page-content sadar-page">
+      <Container fluid>
+        <Card className="sadar-panel">
+          <CardBody>
+            <div className="sadar-empty-state sadar-empty-state-center">
+              <span className="sadar-empty-state-icon">
+                <i className="ri-speed-up-line"></i>
+              </span>
+              <h4>Financial Score Belum Tersedia</h4>
+              <p>Score akan dihitung setelah kamu menambahkan income, mengatur budget, dan mencatat transaksi.</p>
+              <div className="sadar-step-status-list">
+                <span>Income belum ada</span>
+                <span>Budget belum diatur</span>
+                <span>Transaksi belum cukup</span>
+              </div>
+              <div className="d-flex flex-wrap justify-content-center gap-2">
+                <Button color="success" tag={Link} to="/catat-keuangan?type=income">
+                  Catat Income
+                </Button>
+                <Button color="primary" tag={Link} to="/profile-account#atur-budget">
+                  Atur Budget
+                </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </Container>
+    </div>
+  );
+};
+
+const FinancialScoreWithData = () => {
   document.title = "Financial Score | SADAR Finance";
 
   const [healthScore, setHealthScore] = useState(null);
@@ -523,5 +560,9 @@ const FinancialScore = () => {
     </div>
   );
 };
+
+const FinancialScore = () => (
+  shouldShowSadarNewUserMode ? <EmptyFinancialScore /> : <FinancialScoreWithData />
+);
 
 export default FinancialScore;

@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  Alert,
   Button,
   Card,
   CardBody,
   CardHeader,
   Col,
   Container,
+  FormFeedback,
   Input,
+  InputGroup,
+  InputGroupText,
   Label,
   Row,
 } from "reactstrap";
@@ -21,20 +25,22 @@ const ProfileEdit = () => {
   const [profile, setProfile] = useState({
     name: userProfile.name,
     email: userProfile.email,
-    phone: "",
-    birthDate: "",
-    occupation: "",
-    monthlyIncomeRange: "5-10 juta",
-    financeGoal: "Bangun dana darurat",
-    language: "Indonesia",
-    timezone: "Asia/Jakarta",
     avatar: userProfile.avatar,
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [notice, setNotice] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [visiblePasswords, setVisiblePasswords] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
 
   const handleChange = (field, value) => {
+    setNotice(null);
+    setFieldErrors((current) => ({ ...current, [field]: "" }));
     setProfile((current) => ({ ...current, [field]: value }));
   };
 
@@ -43,6 +49,81 @@ const ProfileEdit = () => {
     if (!file) return;
     handleChange("avatar", URL.createObjectURL(file));
   };
+
+  const togglePasswordVisibility = (field) => {
+    setVisiblePasswords((current) => ({ ...current, [field]: !current[field] }));
+  };
+
+  const passwordHasMinimumLength = profile.newPassword.length >= 8;
+  const passwordHasLetterAndNumber = /[A-Za-z]/.test(profile.newPassword) && /\d/.test(profile.newPassword);
+  const isChangingPassword = profile.currentPassword || profile.newPassword || profile.confirmPassword;
+
+  const handleSave = () => {
+    const nextErrors = {};
+
+    if (!profile.name.trim()) {
+      nextErrors.name = "Nama lengkap tidak boleh kosong.";
+    }
+
+    if (!profile.email.trim()) {
+      nextErrors.email = "Email tidak boleh kosong.";
+    } else if (!/^\S+@\S+\.\S+$/.test(profile.email)) {
+      nextErrors.email = "Format email belum valid.";
+    }
+
+    if (isChangingPassword && !profile.currentPassword) {
+      nextErrors.currentPassword = "Isi password saat ini.";
+    }
+
+    if (isChangingPassword && !profile.newPassword) {
+      nextErrors.newPassword = "Isi password baru.";
+    } else if (isChangingPassword && !passwordHasMinimumLength) {
+      nextErrors.newPassword = "Password baru minimal 8 karakter.";
+    } else if (isChangingPassword && !passwordHasLetterAndNumber) {
+      nextErrors.newPassword = "Gunakan kombinasi huruf dan angka.";
+    }
+
+    if (isChangingPassword && !profile.confirmPassword) {
+      nextErrors.confirmPassword = "Konfirmasi password baru.";
+    } else if (isChangingPassword && profile.newPassword !== profile.confirmPassword) {
+      nextErrors.confirmPassword = "Konfirmasi password baru belum sama.";
+    }
+
+    setFieldErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length) {
+      setNotice({ color: "warning", message: "Periksa lagi data yang ditandai sebelum menyimpan profil." });
+      return;
+    }
+
+    setNotice({ color: "success", message: "Profil berhasil disimpan." });
+  };
+
+  const PasswordField = ({ id, label, field, placeholder }) => (
+    <div>
+      <Label htmlFor={id}>{label}</Label>
+      <InputGroup className={fieldErrors[field] ? "is-invalid" : ""}>
+        <Input
+          id={id}
+          type={visiblePasswords[field] ? "text" : "password"}
+          value={profile[field]}
+          onChange={(event) => handleChange(field, event.target.value)}
+          placeholder={placeholder}
+          invalid={Boolean(fieldErrors[field])}
+        />
+        <InputGroupText
+          tag="button"
+          type="button"
+          className="sadar-password-toggle"
+          onClick={() => togglePasswordVisibility(field)}
+          aria-label={visiblePasswords[field] ? "Sembunyikan password" : "Tampilkan password"}
+        >
+          <i className={visiblePasswords[field] ? "ri-eye-off-line" : "ri-eye-line"}></i>
+        </InputGroupText>
+      </InputGroup>
+      {fieldErrors[field] && <FormFeedback className="d-block">{fieldErrors[field]}</FormFeedback>}
+    </div>
+  );
 
   return (
     <div className="page-content sadar-page">
@@ -54,14 +135,14 @@ const ProfileEdit = () => {
             </Button>
             <div>
               <h1>Edit Profil</h1>
-              <p>Kelola identitas, keamanan, dan preferensi personal akun SADAR.</p>
+              <p>Kelola nama, email, foto profil, dan password akun SADAR.</p>
             </div>
           </div>
         </div>
 
         <Row className="g-3 sadar-edit-top-row">
           <Col xl={4}>
-            <Card className="sadar-panel h-100">
+            <Card className="sadar-panel sadar-edit-photo-panel">
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Foto Profil</h4>
@@ -86,7 +167,7 @@ const ProfileEdit = () => {
           </Col>
 
           <Col xl={8}>
-            <Card className="sadar-panel h-100">
+            <Card className="sadar-panel sadar-edit-identity-panel">
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Identitas Pribadi</h4>
@@ -94,36 +175,37 @@ const ProfileEdit = () => {
                 </div>
               </CardHeader>
               <CardBody>
+                {notice && <Alert color={notice.color} className="sadar-notice">{notice.message}</Alert>}
                 <div className="sadar-form-grid sadar-edit-profile-grid">
                   <div>
                     <Label htmlFor="profile-edit-name">Nama Lengkap</Label>
-                    <Input id="profile-edit-name" value={profile.name} onChange={(event) => handleChange("name", event.target.value)} />
+                    <Input
+                      id="profile-edit-name"
+                      value={profile.name}
+                      onChange={(event) => handleChange("name", event.target.value)}
+                      invalid={Boolean(fieldErrors.name)}
+                    />
+                    {fieldErrors.name && <FormFeedback>{fieldErrors.name}</FormFeedback>}
                   </div>
                   <div>
                     <Label htmlFor="profile-edit-email">Email</Label>
-                    <Input id="profile-edit-email" type="email" value={profile.email} onChange={(event) => handleChange("email", event.target.value)} />
+                    <Input
+                      id="profile-edit-email"
+                      type="email"
+                      value={profile.email}
+                      onChange={(event) => handleChange("email", event.target.value)}
+                      invalid={Boolean(fieldErrors.email)}
+                    />
+                    {fieldErrors.email && <FormFeedback>{fieldErrors.email}</FormFeedback>}
                   </div>
+                </div>
+                <div className="sadar-edit-inline-note">
+                  <span className="sadar-card-icon teal">
+                    <i className="ri-shield-user-line"></i>
+                  </span>
                   <div>
-                    <Label htmlFor="profile-edit-phone">Nomor HP</Label>
-                    <Input id="profile-edit-phone" placeholder="Contoh: 081234567890" value={profile.phone} onChange={(event) => handleChange("phone", event.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-edit-birth">Tanggal Lahir</Label>
-                    <Input id="profile-edit-birth" type="date" value={profile.birthDate} onChange={(event) => handleChange("birthDate", event.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-edit-occupation">Pekerjaan</Label>
-                    <Input id="profile-edit-occupation" placeholder="Contoh: Mahasiswa, Freelancer" value={profile.occupation} onChange={(event) => handleChange("occupation", event.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-edit-income">Rentang Pemasukan Bulanan</Label>
-                    <Input id="profile-edit-income" type="select" value={profile.monthlyIncomeRange} onChange={(event) => handleChange("monthlyIncomeRange", event.target.value)}>
-                      <option>Di bawah 3 juta</option>
-                      <option>3-5 juta</option>
-                      <option>5-10 juta</option>
-                      <option>10-20 juta</option>
-                      <option>Di atas 20 juta</option>
-                    </Input>
+                    <strong>Data utama akun</strong>
+                    <p>Nama dan email ini dipakai untuk identitas akun SADAR dan tampilan profil.</p>
                   </div>
                 </div>
               </CardBody>
@@ -132,66 +214,33 @@ const ProfileEdit = () => {
         </Row>
 
         <Row className="g-3 mt-1 sadar-edit-detail-row">
-          <Col xl={6}>
-            <Card className="sadar-panel h-100">
+          <Col xl={12}>
+            <Card className="sadar-panel">
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Keamanan</h4>
-                  <p className="text-muted mb-0">Ubah password akun</p>
+                  <p className="text-muted mb-0">Kosongkan jika tidak ingin mengubah password.</p>
                 </div>
               </CardHeader>
               <CardBody>
-                <div className="sadar-edit-stack">
-                  <div>
-                    <Label htmlFor="profile-current-password">Password Saat Ini</Label>
-                    <Input id="profile-current-password" type="password" value={profile.currentPassword} onChange={(event) => handleChange("currentPassword", event.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-new-password">Password Baru</Label>
-                    <Input id="profile-new-password" type="password" value={profile.newPassword} onChange={(event) => handleChange("newPassword", event.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-confirm-password">Konfirmasi Password Baru</Label>
-                    <Input id="profile-confirm-password" type="password" value={profile.confirmPassword} onChange={(event) => handleChange("confirmPassword", event.target.value)} />
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-
-          <Col xl={6}>
-            <Card className="sadar-panel h-100">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Preferensi</h4>
-                  <p className="text-muted mb-0">Atur konteks keuangan pribadi</p>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <div className="sadar-edit-stack">
-                  <div>
-                    <Label htmlFor="profile-goal">Tujuan Keuangan Utama</Label>
-                    <Input id="profile-goal" type="select" value={profile.financeGoal} onChange={(event) => handleChange("financeGoal", event.target.value)}>
-                      <option>Bangun dana darurat</option>
-                      <option>Kurangi pengeluaran</option>
-                      <option>Menabung untuk tujuan besar</option>
-                      <option>Rapikan cashflow bulanan</option>
-                    </Input>
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-language">Bahasa</Label>
-                    <Input id="profile-language" type="select" value={profile.language} onChange={(event) => handleChange("language", event.target.value)}>
-                      <option>Indonesia</option>
-                      <option>English</option>
-                    </Input>
-                  </div>
-                  <div>
-                    <Label htmlFor="profile-timezone">Zona Waktu</Label>
-                    <Input id="profile-timezone" type="select" value={profile.timezone} onChange={(event) => handleChange("timezone", event.target.value)}>
-                      <option>Asia/Jakarta</option>
-                      <option>Asia/Makassar</option>
-                      <option>Asia/Jayapura</option>
-                    </Input>
+                <div className="sadar-form-grid sadar-edit-profile-grid">
+                  <PasswordField id="profile-current-password" label="Password Saat Ini" field="currentPassword" />
+                  <PasswordField id="profile-new-password" label="Password Baru" field="newPassword" placeholder="Minimal 8 karakter" />
+                  <PasswordField id="profile-confirm-password" label="Konfirmasi Password Baru" field="confirmPassword" />
+                  <div className="sadar-password-rules">
+                    <strong>Aturan password</strong>
+                    <span className={passwordHasMinimumLength ? "is-valid" : ""}>
+                      <i className={passwordHasMinimumLength ? "ri-checkbox-circle-line" : "ri-circle-line"}></i>
+                      Minimal 8 karakter
+                    </span>
+                    <span className={passwordHasLetterAndNumber ? "is-valid" : ""}>
+                      <i className={passwordHasLetterAndNumber ? "ri-checkbox-circle-line" : "ri-circle-line"}></i>
+                      Ada huruf dan angka
+                    </span>
+                    <span className={profile.confirmPassword && profile.newPassword === profile.confirmPassword ? "is-valid" : ""}>
+                      <i className={profile.confirmPassword && profile.newPassword === profile.confirmPassword ? "ri-checkbox-circle-line" : "ri-circle-line"}></i>
+                      Konfirmasi sesuai
+                    </span>
                   </div>
                 </div>
               </CardBody>
@@ -201,7 +250,7 @@ const ProfileEdit = () => {
 
         <div className="sadar-edit-actions">
           <Button tag={Link} to="/profile-account" color="light" className="sadar-table-action">Batal</Button>
-          <Button color="primary">
+          <Button color="primary" onClick={handleSave}>
             <i className="ri-save-3-line align-bottom me-1"></i>
             Simpan Profil
           </Button>

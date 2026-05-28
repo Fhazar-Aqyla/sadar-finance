@@ -450,7 +450,7 @@ const OnePage = () => {
           </div>
         </div>
       </section>
-      <section id="faq" className="bg-[#F8FBFF] pb-36 pt-0 max-md:pb-24 max-md:pt-0">
+      <section id="faq" className="bg-[#F8FBFF] pb-4 pt-0 max-md:pb-4 max-md:pt-0">
         <div className={`${shellClass} max-w-[860px]`}>
           <div className="mx-auto max-w-[640px] text-center">
             <span className={sectionBadgeClass}>FAQ</span>
@@ -459,7 +459,7 @@ const OnePage = () => {
             </h2>
           </div>
 
-          <div className="mt-9 grid gap-3">
+          <div className="mt-9 grid h-[456px] content-start gap-3 max-md:h-[408px] max-sm:h-[388px]">
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
 
@@ -492,7 +492,7 @@ const OnePage = () => {
         </div>
       </section>
 
-      <section className="pb-[130px] pt-0 max-md:pb-20 max-md:pt-0">
+      <section className="pb-[66px] pt-16 max-md:pb-10 max-md:pt-10">
         <div className={shellClass}>
           <div className="min-h-[360px] rounded-xl bg-[#124170] max-md:min-h-[240px]" />
         </div>
