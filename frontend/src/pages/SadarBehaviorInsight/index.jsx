@@ -54,11 +54,43 @@ const dashboardCategoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#9
 
 const normalizeCategoryToDashboard = (category) => {
   const text = String(category || "").toLowerCase();
-  if (/makan|food|beverage|restaurant|warung|cafe|kopi/.test(text)) return "Makanan";
+  if (/makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(text)) return "Makanan";
   if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text)) return "Transportasi";
-  if (/belanja|shop|groceries|minimarket|supermarket|retail|marketplace|mall/.test(text)) return "Belanja";
+  if (/belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(text)) return "Belanja";
   if (/hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(text)) return "Hiburan";
   return "Lainnya";
+};
+
+const isBudgetBucketCategory = (category) =>
+  ["needs", "wants", "savings", "investment"].includes(String(category || "").toLowerCase());
+
+const inferCategoryFromTransaction = (row) =>
+  normalizeCategoryToDashboard(
+    [
+      row.description,
+      row.name,
+      row.merchant,
+      row.source,
+      row.category,
+      row.category_name,
+      row.categoryName,
+    ].filter(Boolean).join(" "),
+  );
+
+const getTransactionCategory = (row) => {
+  const explicitCategory =
+    row.category_group ||
+    row.categoryGroup ||
+    row.category ||
+    row.category_name ||
+    row.categoryName ||
+    "";
+
+  if (!explicitCategory || isBudgetBucketCategory(explicitCategory)) {
+    return inferCategoryFromTransaction(row);
+  }
+
+  return explicitCategory;
 };
 
 const getRiskTone = (riskLevel) => {
@@ -120,8 +152,8 @@ const normalizeBackendTransaction = (row) => ({
   id: row.transaction_id || row.id,
   account_id: row.account_id,
   name: row.description || row.source || "Transaksi",
-  category: row.category_group || "Lainnya",
-  budget_group: toCategoryPrimary(row.category_group),
+  category: getTransactionCategory(row),
+  budget_group: toCategoryPrimary(getTransactionCategory(row)),
   amount: Number(row.amount || 0),
   date: String(row.transaction_date || row.date || "").slice(0, 10),
   status: "Tercatat",

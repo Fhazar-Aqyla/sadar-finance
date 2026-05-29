@@ -217,6 +217,14 @@ $value in $theme-colors {
   font-size: 0.92rem;
 }
 
+.sadar-logo-dark-mode {
+  display: none;
+}
+
+.sadar-logo-light-mode {
+  display: inline-block;
+}
+
 .app-menu .navbar-brand-box .logo.logo-dark,
 .horizontal-logo .logo.logo-dark {
   display: flex !important;
@@ -264,6 +272,125 @@ $value in $theme-colors {
 .app-menu .navbar-brand-box .sadar-brand-logo {
   width: 128px;
   transform: translateY(-1px);
+}
+
+[data-bs-theme="dark"] {
+  --sadar-shell-bg: #0f172a;
+  --sadar-shell-bg-deep: #0b1120;
+  --sadar-shell-surface: #172232;
+  --sadar-shell-surface-soft: #1f2b3b;
+  --sadar-shell-border: rgba(148, 163, 184, 0.18);
+  --sadar-shell-text: #d8e2f0;
+  --sadar-shell-muted: #9fb0c7;
+  --sadar-shell-accent: #38bdf8;
+
+  body,
+  #layout-wrapper,
+  .main-content {
+    background: var(--sadar-shell-bg-deep) !important;
+  }
+
+  #page-topbar {
+    background: var(--sadar-shell-bg) !important;
+    border-bottom-color: var(--sadar-shell-border) !important;
+    box-shadow: 0 1px 0 rgba(148, 163, 184, 0.08);
+  }
+
+  .navbar-header .btn-topbar {
+    color: var(--sadar-shell-muted);
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      color: #f8fafc;
+      background: var(--sadar-shell-surface-soft);
+    }
+  }
+
+  .sadar-app-search .form-control,
+  .app-search .form-control {
+    border-color: var(--sadar-shell-border) !important;
+    background: #111827 !important;
+    color: var(--sadar-shell-text) !important;
+  }
+
+  .sadar-app-search .form-control::placeholder,
+  .app-search .form-control::placeholder {
+    color: var(--sadar-shell-muted) !important;
+  }
+
+  .sadar-profile.topbar-user {
+    background: transparent !important;
+  }
+
+  .sadar-profile .btn,
+  .sadar-profile .btn:hover,
+  .sadar-profile .btn:focus,
+  .sadar-profile.show .btn {
+    border-color: var(--sadar-shell-border) !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+  }
+
+  .sadar-profile .btn:hover,
+  .sadar-profile .btn:focus,
+  .sadar-profile.show .btn {
+    background: rgba(31, 43, 59, 0.72) !important;
+  }
+
+  .sadar-profile .user-name-text {
+    color: #f8fafc !important;
+  }
+
+  .sadar-profile .user-name-sub-text {
+    color: var(--sadar-shell-muted) !important;
+  }
+
+  .sadar-profile .header-profile-user {
+    border-color: rgba(56, 189, 248, 0.28) !important;
+  }
+
+  .sadar-profile .dropdown-menu,
+  .sadar-notification .dropdown-menu,
+  .sadar-search-menu {
+    border-color: var(--sadar-shell-border) !important;
+    background: var(--sadar-shell-surface) !important;
+    box-shadow: 0 20px 46px rgba(2, 6, 23, 0.35) !important;
+  }
+
+  .sadar-profile .dropdown-header,
+  .sadar-profile .dropdown-item,
+  .sadar-notification .dropdown-item,
+  .sadar-search-result {
+    color: var(--sadar-shell-text) !important;
+  }
+
+  .sadar-profile .dropdown-item:hover,
+  .sadar-profile .dropdown-item:focus,
+  .sadar-notification .dropdown-item:hover,
+  .sadar-search-result:hover,
+  .sadar-search-result:focus {
+    background: var(--sadar-shell-surface-soft) !important;
+  }
+
+  .footer {
+    color: var(--sadar-shell-muted) !important;
+    background: var(--sadar-shell-bg) !important;
+    border-top: 1px solid var(--sadar-shell-border);
+  }
+
+  .sadar-footer-brand,
+  .sadar-footer-note {
+    color: var(--sadar-shell-muted);
+  }
+
+  .sadar-logo-light-mode {
+    display: none !important;
+  }
+
+  .sadar-logo-dark-mode {
+    display: inline-block !important;
+  }
 }
 
 // Emoji Picker

@@ -46,11 +46,42 @@ const categoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#94a3b8"];
 
 const normalizeCategoryToDashboard = (category) => {
   const text = String(category || "").toLowerCase();
-  if (/makan|food|beverage|restaurant|warung|cafe|kopi/.test(text)) return "Makanan";
+  if (/makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(text)) return "Makanan";
   if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text)) return "Transportasi";
-  if (/belanja|shop|groceries|minimarket|supermarket|retail|marketplace|mall/.test(text)) return "Belanja";
+  if (/belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(text)) return "Belanja";
   if (/hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(text)) return "Hiburan";
   return "Lainnya";
+};
+
+const isBudgetBucketCategory = (category) =>
+  ["needs", "wants", "savings", "investment"].includes(String(category || "").toLowerCase());
+
+const inferCategoryFromTransaction = (transaction) =>
+  normalizeCategoryToDashboard(
+    [
+      transaction.description,
+      transaction.merchant,
+      transaction.source,
+      transaction.category,
+      transaction.category_name,
+      transaction.categoryName,
+    ].filter(Boolean).join(" "),
+  );
+
+const getTransactionCategory = (transaction) => {
+  const explicitCategory =
+    transaction.category_group ||
+    transaction.categoryGroup ||
+    transaction.category ||
+    transaction.category_name ||
+    transaction.categoryName ||
+    "";
+
+  if (!explicitCategory || isBudgetBucketCategory(explicitCategory)) {
+    return inferCategoryFromTransaction(transaction);
+  }
+
+  return explicitCategory;
 };
 
 const getBudgetTone = (usage) => {
@@ -145,8 +176,8 @@ const normalizeTransaction = (transaction) => ({
   id: transaction.transaction_id || transaction.id,
   account_id: transaction.account_id || transaction.accountId,
   name: transaction.description || transaction.merchant || "Pengeluaran",
-  category: transaction.category_group || transaction.categoryGroup || "Lainnya",
-  budget_group: toBudgetGroup(transaction.category_group || transaction.categoryGroup),
+  category: getTransactionCategory(transaction),
+  budget_group: toBudgetGroup(getTransactionCategory(transaction)),
   amount: Number(transaction.amount || 0),
   date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
   status: "Tercatat",
@@ -1235,7 +1266,7 @@ const DashboardWithData = () => {
                 </div>
               </CardHeader>
               <CardBody className="cashflow-chart-body">
-                <ReactApexChart options={dynamicCashflowOptions} series={dashboardData.cashflowSeries} type="bar" height={292} />
+                <ReactApexChart options={dynamicCashflowOptions} series={dashboardData.cashflowSeries} type="bar" height={390} />
               </CardBody>
             </Card>
           </Col>
@@ -1363,7 +1394,7 @@ const DashboardWithData = () => {
               <h4 className="card-title mb-1">Riwayat Terbaru</h4>
               <p className="text-muted mb-0">Pratinjau 5 catatan keuangan terakhir</p>
             </div>
-            <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/profile-account#riwayat-transaksi">
+            <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/financial-history">
               Lihat Semua
             </Button>
           </CardHeader>

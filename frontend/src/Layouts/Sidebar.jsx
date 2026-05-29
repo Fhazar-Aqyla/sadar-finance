@@ -7,17 +7,20 @@ import {
   Home,
   LogOut,
   Menu,
+  ReceiptText,
   User,
   X,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import sadarLogo from "../assets/images/landing/sadar-logo.png";
+import sadarLogoLight from "../assets/images/landing/logo-sadar-light.png";
 
 const navigationItems = [
   { id: "dashboard", name: "Dashboard", icon: Home, href: "/dashboard" },
   { id: "catat-keuangan", name: "Catat Keuangan", icon: Edit3, href: "/catat-keuangan" },
   { id: "behavior-insight", name: "Insight Perilaku", icon: Activity, href: "/behavior-insight" },
   { id: "financial-score", name: "Skor Finansial", icon: BarChart3, href: "/financial-score" },
+  { id: "financial-history", name: "Riwayat Keuangan", icon: ReceiptText, href: "/financial-history" },
   { id: "profile-account", name: "Profil & Akun", icon: User, href: "/profile-account" },
 ];
 
@@ -179,15 +182,16 @@ const Sidebar = ({ className = "" }) => {
       )}
 
       <div
-        className={`fixed left-0 top-0 z-40 flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
+        className={`sadar-sidebar fixed left-0 top-0 z-40 flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } ${className}`}
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
-        <div className="relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
+        <div className="sadar-sidebar-brand relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
           {!isCollapsed && (
             <Link to="/dashboard" className="flex min-w-0 items-center no-underline">
-              <img src={sadarLogo} alt="SADAR" className="h-auto w-[104px] object-contain" />
+              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[104px] object-contain" />
+              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto w-[104px] object-contain" />
             </Link>
           )}
 
@@ -197,13 +201,14 @@ const Sidebar = ({ className = "" }) => {
               className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm"
               aria-label="SADAR Finance"
             >
-              <img src={sadarLogo} alt="SADAR" className="h-6 w-6 object-cover object-left" />
+              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-6 w-6 object-cover object-left" />
+              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-6 w-6 object-cover object-left" />
             </Link>
           )}
 
         </div>
 
-        <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-6">
+        <nav className="sadar-sidebar-nav min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-6">
           <ul className="m-0 list-none space-y-1 p-0">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -214,18 +219,18 @@ const Sidebar = ({ className = "" }) => {
                   <Link
                     to={item.href}
                     onClick={handleItemClick}
-                    className={`group relative flex w-full items-center rounded-md px-3 py-2.5 text-left no-underline transition-all duration-200 ${
+                    className={`sadar-sidebar-link group relative flex w-full items-center rounded-md px-3 py-2.5 text-left no-underline transition-all duration-200 ${
                       isCollapsed ? "justify-center px-2" : "gap-2.5"
                     } ${
                       isActive
-                        ? "bg-blue-50 !text-blue-700"
-                        : "!text-slate-800 hover:bg-slate-50 hover:!text-blue-700"
+                        ? "sadar-sidebar-link-active bg-blue-50 text-blue-700"
+                        : "text-slate-800 hover:bg-slate-50 hover:text-blue-700"
                     }`}
                     title={isCollapsed ? item.name : undefined}
                   >
                     <div className="flex min-w-[24px] items-center justify-center">
                       <Icon
-                        className={`h-4 w-4 flex-shrink-0 ${
+                        className={`sadar-sidebar-icon h-4 w-4 flex-shrink-0 ${
                           isActive ? "text-blue-600" : "text-slate-600 group-hover:text-blue-600"
                         }`}
                       />
@@ -250,27 +255,27 @@ const Sidebar = ({ className = "" }) => {
           </ul>
         </nav>
 
-        <div className="mt-auto shrink-0 border-t border-slate-200 bg-white">
-          <div className={`h-[86px] border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "flex items-center justify-center px-2" : "flex items-center p-3"}`}>
+        <div className="sadar-sidebar-footer mt-auto shrink-0 border-t border-slate-200 bg-white">
+          <div className={`sadar-sidebar-user-wrap h-[86px] border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "flex items-center justify-center px-2" : "flex items-center p-3"}`}>
             {!isCollapsed ? (
               <Link
                 to="/profile-account"
-                className="flex items-center rounded-md bg-white px-3 py-2 no-underline transition-colors duration-200 hover:bg-slate-50"
+                className="sadar-sidebar-user flex items-center rounded-md bg-white px-3 py-2 no-underline transition-colors duration-200 hover:bg-slate-50"
               >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
-                  <span className="text-sm font-medium text-slate-700">{userInitials}</span>
+                  <div className="sadar-sidebar-avatar flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
+                  <span className="sadar-sidebar-avatar-text text-sm font-medium text-slate-700">{userInitials}</span>
                 </div>
                 <div className="ml-2.5 min-w-0 flex-1">
-                  <p className="mb-0 truncate text-sm font-medium text-slate-800">{userName}</p>
-                  <p className="mb-0 truncate text-xs text-slate-500">{userEmail}</p>
+                  <p className="sadar-sidebar-user-name mb-0 truncate text-sm font-medium text-slate-800">{userName}</p>
+                  <p className="sadar-sidebar-user-email mb-0 truncate text-xs text-slate-500">{userEmail}</p>
                 </div>
                 <div className="ml-2 h-2 w-2 rounded-full bg-green-500" title="Online" />
               </Link>
             ) : (
               <Link to="/profile-account" className="flex justify-center" aria-label="Profil & Akun">
                 <div className="relative">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200">
-                    <span className="text-sm font-medium text-slate-700">{userInitials}</span>
+                  <div className="sadar-sidebar-avatar flex h-9 w-9 items-center justify-center rounded-full bg-slate-200">
+                    <span className="sadar-sidebar-avatar-text text-sm font-medium text-slate-700">{userInitials}</span>
                   </div>
                   <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
                 </div>
@@ -281,16 +286,16 @@ const Sidebar = ({ className = "" }) => {
           <div className={isCollapsed ? "flex h-[66px] items-center justify-center p-3" : "flex h-[66px] items-center p-3"}>
             <Link
               to="/logout"
-              className={`group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
+              className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700 ${
                 isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
               }`}
               title={isCollapsed ? "Keluar" : undefined}
             >
               <div className="flex min-w-[22px] items-center justify-center">
-                <LogOut className="h-4 w-4 flex-shrink-0 !text-red-500 group-hover:!text-red-600" />
+                <LogOut className="h-4 w-4 flex-shrink-0 text-red-500 group-hover:text-red-600" />
               </div>
 
-              {!isCollapsed && <span className="text-sm !text-red-600 group-hover:!text-red-700">Keluar</span>}
+              {!isCollapsed && <span className="text-sm text-red-600 group-hover:text-red-700">Keluar</span>}
 
               {isCollapsed && (
                 <div className="invisible absolute left-full z-50 ml-2 whitespace-nowrap rounded bg-slate-800 px-2 py-1 text-xs text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">

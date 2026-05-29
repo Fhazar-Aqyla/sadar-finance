@@ -142,12 +142,16 @@ const mockApi = {
   transactions: {
     list: () => Promise.resolve(clone(mockTransactions)),
     create: (payload) => Promise.resolve({ id: `mock_trx_${Date.now()}`, ...payload }),
+    update: (id, payload) => Promise.resolve({ id, ...payload }),
+    remove: () => Promise.resolve({ success: true }),
     summary: () => Promise.resolve({}),
     monthlyTrend: () => Promise.resolve([]),
   },
   incomes: {
     list: () => Promise.resolve(clone(mockIncomes)),
     create: (payload) => Promise.resolve({ id: `mock_inc_${Date.now()}`, ...payload }),
+    update: (id, payload) => Promise.resolve({ id, ...payload }),
+    remove: () => Promise.resolve({ success: true }),
     monthlyTrend: () => Promise.resolve([]),
   },
   analytics: {
@@ -187,6 +191,8 @@ export const accountApi = {
 export const transactionApi = {
   list: (params = {}) => isSadarMockDataScenario ? mockApi.transactions.list(params) : apiClient.get("/transactions", { params }).then(unwrapData),
   create: (payload) => isSadarMockDataScenario ? mockApi.transactions.create(payload) : apiClient.post("/transactions", payload).then(unwrapData),
+  update: (id, payload) => isSadarMockDataScenario ? mockApi.transactions.update(id, payload) : apiClient.put(`/transactions/${id}`, payload).then(unwrapData),
+  remove: (id) => isSadarMockDataScenario ? mockApi.transactions.remove(id) : apiClient.delete(`/transactions/${id}`),
   summary: (params = {}) => isSadarMockDataScenario ? mockApi.transactions.summary(params) : apiClient.get("/transactions/summary", { params }).then(unwrapData),
   monthlyTrend: (params = {}) => isSadarMockDataScenario ? mockApi.transactions.monthlyTrend(params) : apiClient.get("/transactions/trend/monthly", { params }).then(unwrapData),
 };
@@ -194,6 +200,8 @@ export const transactionApi = {
 export const incomeApi = {
   list: (params = {}) => isSadarMockDataScenario ? mockApi.incomes.list(params) : apiClient.get("/incomes", { params }).then(unwrapData),
   create: (payload) => isSadarMockDataScenario ? mockApi.incomes.create(payload) : apiClient.post("/incomes", payload).then(unwrapData),
+  update: (id, payload) => isSadarMockDataScenario ? mockApi.incomes.update(id, payload) : apiClient.put(`/incomes/${id}`, payload).then(unwrapData),
+  remove: (id) => isSadarMockDataScenario ? mockApi.incomes.remove(id) : apiClient.delete(`/incomes/${id}`),
   monthlyTrend: (params = {}) => isSadarMockDataScenario ? mockApi.incomes.monthlyTrend(params) : apiClient.get("/incomes/trend/monthly", { params }).then(unwrapData),
 };
 
@@ -217,7 +225,7 @@ export const ocrApi = {
       headers: { "Content-Type": "multipart/form-data" },
     }).then(unwrapData),
   get: (id) => apiClient.get(`/ocr/${id}`).then(unwrapData),
-  list: () => apiClient.get("/ocr").then(unwrapData),
+  list: (params = {}) => apiClient.get("/ocr", { params }).then(unwrapData),
   confirmTransaction: (id, payload) => apiClient.post(`/ocr/${id}/confirm-transaction`, payload).then(unwrapData),
 };
 

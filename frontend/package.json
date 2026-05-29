@@ -92,6 +92,7 @@
     "sass": "1.77.6",
     "save": "^2.9.0",
     "simplebar-react": "^3.2.6",
+    "sweetalert2": "^11.26.25",
     "swiper": "^12.1.4",
     "typescript": "^5.9.3",
     "web-vitals": "^4.2.3",

@@ -288,6 +288,97 @@
   margin-bottom: 0;
 }
 
+html[data-bs-theme="dark"] .sadar-entry-tabs,
+html[data-bs-theme="dark"] .sadar-mode-toggle {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: #18212c;
+}
+
+html[data-bs-theme="dark"] .sadar-entry-tabs .btn,
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn {
+  color: #cbd5e1;
+}
+
+html[data-bs-theme="dark"] .sadar-entry-tabs .btn:hover,
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn:hover {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+html[data-bs-theme="dark"] .sadar-entry-tabs .btn.active,
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn.active {
+  color: #7dd3fc;
+  background: #243041;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22);
+}
+
+html[data-bs-theme="dark"] .sadar-receipt-dropzone,
+html[data-bs-theme="dark"] .sadar-manual-state,
+html[data-bs-theme="dark"] .sadar-file-meta {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: #1f2a37;
+}
+
+html[data-bs-theme="dark"] .sadar-receipt-dropzone:hover {
+  border-color: #38bdf8;
+  background: #243041;
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.14);
+}
+
+html[data-bs-theme="dark"] .sadar-receipt-dropzone.has-preview {
+  background: #111827;
+}
+
+html[data-bs-theme="dark"] .sadar-dropzone-empty strong,
+html[data-bs-theme="dark"] .sadar-manual-state strong,
+html[data-bs-theme="dark"] .sadar-file-meta span,
+html[data-bs-theme="dark"] .sadar-detail-card .form-label {
+  color: #f8fafc;
+}
+
+html[data-bs-theme="dark"] .sadar-dropzone-empty span,
+html[data-bs-theme="dark"] .sadar-manual-state p,
+html[data-bs-theme="dark"] .sadar-file-meta small {
+  color: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .sadar-dropzone-icon {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.14);
+}
+
+html[data-bs-theme="dark"] .sadar-dropzone-icon.income {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.16);
+}
+
+html[data-bs-theme="dark"] .sadar-detail-card .form-control,
+html[data-bs-theme="dark"] .sadar-detail-card .form-select {
+  border-color: rgba(203, 213, 225, 0.55);
+  color: #f8fafc;
+  background-color: #1f2a37;
+}
+
+html[data-bs-theme="dark"] .sadar-detail-card .form-control::placeholder {
+  color: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .sadar-detail-card .form-control:focus,
+html[data-bs-theme="dark"] .sadar-detail-card .form-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 0.2rem rgba(56, 189, 248, 0.14);
+}
+
+html[data-bs-theme="dark"] .sadar-reset-button {
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: #f8fafc !important;
+  background: #243041 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-reset-button:hover {
+  background: #2f3d4f !important;
+}
+
 @media (max-width: 1199.98px) {
   .sadar-input-card,
   .sadar-detail-card {

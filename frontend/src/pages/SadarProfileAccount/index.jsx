@@ -8,26 +8,33 @@ import {
   CardHeader,
   Col,
   Container,
+  Form,
   Input,
   Label,
   Modal,
   ModalBody,
   ModalFooter,
+  ModalHeader,
   Progress,
   Row,
-  Table,
 } from "reactstrap";
-import { accountApi, analyticsApi, authApi, incomeApi, transactionApi } from "../../Components/services/api";
+import Swal from "sweetalert2";
+import { accountApi, analyticsApi, authApi } from "../../Components/services/api";
 
 import "../SadarShared/sadar-pages.css";
-
-const TRANSACTION_PAGE_SIZE = 10;
 
 const defaultProfile = {
   id: "",
   name: "SADAR",
   email: "",
   avatar: "",
+};
+
+const defaultAccountForm = {
+  name: "",
+  type: "Bank",
+  accountNumber: "",
+  balance: "",
 };
 
 const rupiah = (value) =>
@@ -51,6 +58,21 @@ const formatNumberInput = (value) => {
   const digits = onlyDigits(value);
   return digits ? new Intl.NumberFormat("id-ID").format(Number(digits)) : "";
 };
+
+const showAccountAlert = ({ icon, title, text }) =>
+  Swal.fire({
+    icon,
+    title,
+    text,
+    confirmButtonText: "Mengerti",
+    buttonsStyling: false,
+    customClass: {
+      popup: "sadar-swal-popup",
+      title: "sadar-swal-title",
+      htmlContainer: "sadar-swal-text",
+      confirmButton: "btn btn-primary",
+    },
+  });
 
 const getStoredUserProfile = () => {
   try {
@@ -91,31 +113,6 @@ const normalizeAccount = (account) => ({
   balance: Number(account.balance || 0),
   accountNumber: account.account_number || account.accountNumber || "",
   isPersisted: Boolean(account.account_id || account.id),
-});
-
-const normalizeIncome = (income) => ({
-  id: income.income_id || income.id,
-  account_id: income.account_id || income.accountId,
-  source: income.source || "Pemasukan",
-  amount: Number(income.amount || 0),
-  date: String(income.income_date || income.incomeDate || income.date || "").slice(0, 10),
-});
-
-const toBudgetGroup = (category) => {
-  const text = String(category || "").toLowerCase();
-  if (/tabungan|invest|saving|dana darurat/.test(text)) return "Savings";
-  if (/makan|food|transport|tagihan|utilit|kesehatan|pendidikan|groceries|utilities|health|education/.test(text)) return "Needs";
-  return "Wants";
-};
-
-const normalizeTransaction = (transaction) => ({
-  id: transaction.transaction_id || transaction.id,
-  account_id: transaction.account_id || transaction.accountId,
-  name: transaction.description || transaction.merchant || "Pengeluaran",
-  category: transaction.category_group || transaction.categoryGroup || "Lainnya",
-  amount: Number(transaction.amount || 0),
-  date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
-  status: "Tercatat",
 });
 
 const buildBudgetRows = (budget) => {
@@ -408,26 +405,6 @@ const EmptyProfileAccount = () => {
             </Card>
           </Col>
         </Row>
-        <Row className="g-3 mt-1">
-          <Col xl={12}>
-            <Card className="sadar-panel" id="riwayat-transaksi">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Riwayat Keuangan</h4>
-                  <p className="text-muted mb-0">Gabungan pemasukan dan pengeluaran pribadi kamu.</p>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <div className="sadar-empty-state sadar-empty-state-center">
-                  <span className="sadar-empty-state-icon"><i className="ri-receipt-line"></i></span>
-                  <h4>Belum ada transaksi.</h4>
-                  <p>Catat transaksi pertama agar riwayat keuangan mulai tersusun.</p>
-                  <Button color="primary" tag={Link} to="/catat-keuangan">Catat Transaksi Pertama</Button>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
       </Container>
 
       <Modal
@@ -479,93 +456,47 @@ const ProfileAccountWithData = () => {
   const [accounts, setAccounts] = useState([]);
   const [accountNotice, setAccountNotice] = useState("");
   const [pendingDeleteAccount, setPendingDeleteAccount] = useState(null);
+  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const [newAccountForm, setNewAccountForm] = useState(defaultAccountForm);
+  const [isSavingAccount, setIsSavingAccount] = useState(false);
   const [budgetRows, setBudgetRows] = useState([]);
   const [budgetNotice, setBudgetNotice] = useState("");
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
-  const [currentTransactionPage, setCurrentTransactionPage] = useState(1);
 
   const [profile, setProfile] = useState(getStoredUserProfile);
-  const [incomesRows, setIncomesRows] = useState([]);
-  const [transactionRows, setTransactionRows] = useState([]);
   const totalBalance = useMemo(() => sumBy(accounts, (account) => account.balance), [accounts]);
-  const totalIncome = useMemo(() => sumBy(incomesRows, (item) => item.amount), [incomesRows]);
-  const resolveAccountName = (accountId) => accounts.find((account) => account.id === accountId)?.name || "-";
-
-
+  const totalIncome = useMemo(() => sumBy(budgetRows, (budget) => budget.limit), [budgetRows]);
 
   useEffect(() => {
     let isMounted = true;
 
     const loadProfileAccount = async () => {
       try {
-        const [profileResponse, accountRows, incomeRows, expenseRows, budgetResponse] = await Promise.all([
+        const [profileResponse, accountRows, budgetResponse] = await Promise.all([
           authApi.me(),
           accountApi.list(),
-          incomeApi.list({ limit: 100 }),
-          transactionApi.list({ limit: 100 }),
           analyticsApi.latestBudget().catch(() => null),
         ]);
 
         if (!isMounted) return;
 
         const normalizedAccounts = (accountRows || []).map(normalizeAccount);
-        const normalizedIncomes = (incomeRows || []).map(normalizeIncome);
-        const normalizedTransactions = (expenseRows || []).map(normalizeTransaction);
-
-        // Calculate client-side fallback used amounts for current month
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-
-        const currentMonthTransactions = normalizedTransactions.filter((t) => {
-          const d = new Date(`${t.date}T00:00:00`);
-          return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
-        });
-
-        let needsUsed = 0;
-        let wantsUsed = 0;
-        let savingsUsed = 0;
-
-        currentMonthTransactions.forEach((t) => {
-          const group = toBudgetGroup(t.category);
-          if (group === "Needs") needsUsed += t.amount;
-          else if (group === "Savings") savingsUsed += t.amount;
-          else wantsUsed += t.amount;
-        });
-
         const apiBudgetRows = buildBudgetRows(budgetResponse);
-        const mappedBudgetRows = apiBudgetRows.map((row) => {
-          let localUsed = row.used || 0;
-          if (localUsed === 0) {
-            if (row.category === "Needs") localUsed = needsUsed;
-            if (row.category === "Wants") localUsed = wantsUsed;
-            if (row.category === "Savings") localUsed = savingsUsed;
-          }
-          return { ...row, used: localUsed };
-        });
 
         setProfile(normalizeProfile(profileResponse));
         setAccounts(normalizedAccounts);
-        setIncomesRows(normalizedIncomes);
-        setTransactionRows(normalizedTransactions);
-        setBudgetRows(mappedBudgetRows.length ? mappedBudgetRows : budgetTargets.map((item) => {
-          let localUsed = 0;
-          if (item.category === "Needs") localUsed = needsUsed;
-          if (item.category === "Wants") localUsed = wantsUsed;
-          if (item.category === "Savings") localUsed = savingsUsed;
+        setBudgetRows(apiBudgetRows.length ? apiBudgetRows : budgetTargets.map((item) => {
           return {
             id: `budget_${item.category}`,
             category: item.category,
             label: item.label,
             limit: 0,
-            used: localUsed,
+            used: 0,
           };
         }));
       } catch {
         if (!isMounted) return;
         setAccounts([]);
-        setIncomesRows([]);
-        setTransactionRows([]);
         setBudgetRows([]);
         setAccountNotice("Data dari backend belum bisa dimuat.");
       }
@@ -577,50 +508,6 @@ const ProfileAccountWithData = () => {
       isMounted = false;
     };
   }, []);
-
-  const userTransactions = useMemo(() => {
-    const expenseRows = transactionRows.map((transaction) => ({
-      id: transaction.id,
-      type: "expense",
-      name: transaction.name,
-      category: transaction.category,
-      account_id: transaction.account_id,
-      date: transaction.date,
-      amount: transaction.amount,
-      status: transaction.status,
-    }));
-
-    const incomeRows = incomesRows.map((income) => ({
-      id: income.id,
-      type: "income",
-      name: income.source,
-      category: "Pemasukan",
-      account_id: income.account_id,
-      date: income.date,
-      amount: income.amount,
-      status: "Masuk",
-    }));
-
-    return [...expenseRows, ...incomeRows].sort(
-      (a, b) => new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`),
-    );
-  }, [incomesRows, transactionRows]);
-
-  const totalTransactionPages = Math.max(1, Math.ceil(userTransactions.length / TRANSACTION_PAGE_SIZE));
-  const activePage = Math.min(currentTransactionPage, totalTransactionPages);
-  const transactionPageStart = (activePage - 1) * TRANSACTION_PAGE_SIZE;
-  const paginatedTransactions = userTransactions.slice(
-    transactionPageStart,
-    transactionPageStart + TRANSACTION_PAGE_SIZE,
-  );
-  const transactionPageNumbers = Array.from({ length: totalTransactionPages }, (_, index) => index + 1);
-  const transactionStartNumber = userTransactions.length ? transactionPageStart + 1 : 0;
-  const transactionEndNumber = Math.min(transactionPageStart + paginatedTransactions.length, userTransactions.length);
-  const transactionEmptyRows = Math.max(0, TRANSACTION_PAGE_SIZE - paginatedTransactions.length);
-
-  const goToTransactionPage = (page) => {
-    setCurrentTransactionPage(Math.min(Math.max(page, 1), totalTransactionPages));
-  };
 
   const updateAccount = (id, field, value) => {
     setAccountNotice("");
@@ -645,16 +532,68 @@ const ProfileAccountWithData = () => {
     }
   };
 
-  const addAccount = async () => {
+  const openAddAccountModal = () => {
     setAccountNotice("");
+    setNewAccountForm(defaultAccountForm);
+    setIsAddAccountOpen(true);
+  };
+
+  const closeAddAccountModal = () => {
+    if (isSavingAccount) return;
+    setIsAddAccountOpen(false);
+    setNewAccountForm(defaultAccountForm);
+  };
+
+  const submitNewAccount = async (event) => {
+    event.preventDefault();
+
+    const accountName = newAccountForm.name.trim();
+    const balance = Number(onlyDigits(newAccountForm.balance));
+
+    if (!accountName) {
+      await showAccountAlert({
+        icon: "warning",
+        title: "Nama akun belum diisi",
+        text: "Isi nama akun terlebih dahulu sebelum menyimpan.",
+      });
+      return;
+    }
+
+    setIsSavingAccount(true);
+    setAccountNotice("");
+
     try {
       const account = await accountApi.create({
-        accountName: `Akun Baru ${accounts.length + 1}`,
-        balance: 0,
+        accountName,
+        accountNumber: newAccountForm.accountNumber.trim(),
+        balance,
       });
-      setAccounts((items) => [...items, normalizeAccount(account)]);
+      setAccounts((items) => [
+        ...items,
+        {
+          ...normalizeAccount(account),
+          type: newAccountForm.type,
+          balance,
+          accountNumber: newAccountForm.accountNumber.trim(),
+        },
+      ]);
+      setIsAddAccountOpen(false);
+      setNewAccountForm(defaultAccountForm);
+      await showAccountAlert({
+        icon: "success",
+        title: "Akun berhasil ditambahkan",
+        text: `${accountName} sudah masuk ke daftar akun kamu.`,
+      });
     } catch (error) {
-      setAccountNotice(error?.message || "Akun gagal dibuat.");
+      const message = error?.message || "Akun gagal dibuat.";
+      setAccountNotice(message);
+      await showAccountAlert({
+        icon: "error",
+        title: "Akun gagal disimpan",
+        text: message,
+      });
+    } finally {
+      setIsSavingAccount(false);
     }
   };
 
@@ -780,7 +719,7 @@ const ProfileAccountWithData = () => {
                   <h4 className="card-title mb-1">Kelola Akun</h4>
                   <p className="text-muted mb-0">Tunai, bank, dan dompet digital yang kamu pakai</p>
                 </div>
-                <Button color="primary" size="sm" onClick={addAccount}>
+                <Button color="primary" size="sm" className="sadar-add-account-btn" onClick={openAddAccountModal}>
                   <i className="ri-add-line align-bottom me-1"></i>
                   Tambah Akun
                 </Button>
@@ -877,104 +816,80 @@ const ProfileAccountWithData = () => {
           </Col>
         </Row>
 
-        <Row className="g-3 mt-1">
-          <Col xl={12}>
-            <Card className="sadar-panel" id="riwayat-transaksi">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Riwayat Keuangan</h4>
-                  <p className="text-muted mb-0">Gabungan pemasukan dan pengeluaran pribadi kamu.</p>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0">
-                {userTransactions.length > TRANSACTION_PAGE_SIZE && (
-                  <div className="sadar-table-pagination">
-                    <span>
-                      Menampilkan {transactionStartNumber}-{transactionEndNumber} dari {userTransactions.length} catatan
-                    </span>
-                    <ul className="pagination pagination-separated pagination-sm mb-0">
-                      <li className={`page-item ${currentTransactionPage === 1 ? "disabled" : ""}`}>
-                        <button
-                          type="button"
-                          className="page-link"
-                          onClick={() => goToTransactionPage(currentTransactionPage - 1)}
-                          disabled={currentTransactionPage === 1}
-                          aria-label="Halaman sebelumnya"
-                        >
-                          <i className="mdi mdi-chevron-left"></i>
-                        </button>
-                      </li>
-                      {transactionPageNumbers.map((page) => (
-                        <li className={`page-item ${page === currentTransactionPage ? "active" : ""}`} key={page}>
-                          <button
-                            type="button"
-                            className="page-link"
-                            onClick={() => goToTransactionPage(page)}
-                            aria-current={page === currentTransactionPage ? "page" : undefined}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      ))}
-                      <li className={`page-item ${currentTransactionPage === totalTransactionPages ? "disabled" : ""}`}>
-                        <button
-                          type="button"
-                          className="page-link"
-                          onClick={() => goToTransactionPage(currentTransactionPage + 1)}
-                          disabled={currentTransactionPage === totalTransactionPages}
-                          aria-label="Halaman berikutnya"
-                        >
-                          <i className="mdi mdi-chevron-right"></i>
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-                <div className="table-responsive sadar-table-wrap">
-                  <Table className="sadar-table align-middle mb-0">
-                    <thead>
-                      <tr>
-                        <th>Nama Catatan</th>
-                        <th>Kategori</th>
-                        <th>Akun</th>
-                        <th>Tanggal</th>
-                        <th className="text-end">Nominal</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedTransactions.map((transaction) => {
-                        const isIncome = transaction.type === "income";
-                        return (
-                          <tr key={transaction.id}>
-                            <td><div className="fw-semibold text-dark">{transaction.name}</div></td>
-                            <td>{transaction.category}</td>
-                            <td>{resolveAccountName(transaction.account_id)}</td>
-                            <td>{new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(`${transaction.date}T00:00:00`))}</td>
-                            <td className={`text-end fw-semibold ${isIncome ? "text-success" : "text-danger"}`}>
-                              {isIncome ? "+" : "-"}{rupiah(transaction.amount)}
-                            </td>
-                            <td>
-                              <Badge color={isIncome ? "success" : "secondary"} className={`bg-${isIncome ? "success" : "secondary"}-subtle text-${isIncome ? "success" : "secondary"}`}>
-                                {transaction.status}
-                              </Badge>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                      {Array.from({ length: transactionEmptyRows }, (_, index) => (
-                        <tr className="sadar-table-empty-row" key={`empty-${index}`}>
-                          <td colSpan={6} aria-hidden="true">&nbsp;</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
       </Container>
+
+      <Modal
+        isOpen={isAddAccountOpen}
+        toggle={closeAddAccountModal}
+        centered
+        className="sadar-history-modal sadar-account-modal"
+      >
+        <ModalHeader toggle={closeAddAccountModal}>
+          Tambah Akun
+        </ModalHeader>
+        <Form onSubmit={submitNewAccount} noValidate>
+          <ModalBody>
+            <div className="sadar-history-edit-grid">
+              <div>
+                <Label htmlFor="new-account-name">Nama Akun</Label>
+                <Input
+                  id="new-account-name"
+                  value={newAccountForm.name}
+                  onChange={(event) => setNewAccountForm((current) => ({ ...current, name: event.target.value }))}
+                  placeholder="Contoh: BCA Utama"
+                  autoFocus
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="new-account-type">Tipe</Label>
+                <Input
+                  id="new-account-type"
+                  type="select"
+                  value={newAccountForm.type}
+                  onChange={(event) => setNewAccountForm((current) => ({ ...current, type: event.target.value }))}
+                >
+                  {accountTypes.map((type) => (
+                    <option key={type.value} value={type.value}>{type.label}</option>
+                  ))}
+                </Input>
+              </div>
+              <div>
+                <Label htmlFor="new-account-number">Nomor Akun</Label>
+                <Input
+                  id="new-account-number"
+                  value={newAccountForm.accountNumber}
+                  onChange={(event) => setNewAccountForm((current) => ({ ...current, accountNumber: event.target.value }))}
+                  placeholder="Opsional"
+                />
+              </div>
+              <div>
+                <Label htmlFor="new-account-balance">Saldo Awal</Label>
+                <Input
+                  id="new-account-balance"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9.]*"
+                  value={formatNumberInput(newAccountForm.balance)}
+                  onChange={(event) => setNewAccountForm((current) => ({ ...current, balance: onlyDigits(event.target.value) }))}
+                  placeholder="Contoh: 500.000"
+                />
+              </div>
+            </div>
+            <p className="text-muted mb-0 mt-3">
+              Akun baru akan disimpan setelah kamu menekan tombol simpan.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="button" color="light" onClick={closeAddAccountModal} disabled={isSavingAccount}>
+              Batal
+            </Button>
+            <Button type="submit" color="primary" disabled={isSavingAccount}>
+              {isSavingAccount ? "Menyimpan..." : "Simpan Akun"}
+            </Button>
+          </ModalFooter>
+        </Form>
+      </Modal>
 
       <Modal
         isOpen={Boolean(pendingDeleteAccount)}

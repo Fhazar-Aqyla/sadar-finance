@@ -310,7 +310,7 @@ const FinancialScoreWithData = () => {
 
   const [healthScore, setHealthScore] = useState(null);
   const [loadError, setLoadError] = useState("");
-  const [selectedPeriod, setSelectedPeriod] = useState("3m");
+  const [selectedPeriod, setSelectedPeriod] = useState("2w");
 
   useEffect(() => {
     let isMounted = true;
@@ -494,7 +494,7 @@ const FinancialScoreWithData = () => {
                 </div>
                 <ButtonGroup
                   size="sm"
-                  className="flex-wrap justify-content-center mb-3"
+                  className="sadar-period-toggle flex-wrap justify-content-center mb-3"
                 >
                   {periodOptions.map((option) => (
                     <Button

@@ -32,6 +32,12 @@ const Navdata = () => {
       link: "/financial-score",
     },
     {
+      id: "financial-history",
+      label: "Riwayat Keuangan",
+      icon: <FeatherIcon icon="file-text" className="icon-dual" />,
+      link: "/financial-history",
+    },
+    {
       id: "profile-account",
       label: "Profil & Akun",
       icon: <FeatherIcon icon="user" className="icon-dual" />,

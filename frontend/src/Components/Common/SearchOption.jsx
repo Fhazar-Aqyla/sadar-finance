@@ -85,7 +85,7 @@ const buildSearchItems = () => {
     meta: formatDate(transaction.date),
     icon: "ri-arrow-up-circle-line",
     color: "danger",
-    link: "/profile-account#riwayat-transaksi",
+    link: "/financial-history",
     keywords: `${transaction.name} ${transaction.category} ${transaction.budget_group} ${getAccountName(transaction.account_id)} ${transaction.status}`,
   }));
 
@@ -96,7 +96,7 @@ const buildSearchItems = () => {
     meta: formatDate(income.date),
     icon: "ri-arrow-down-circle-line",
     color: "success",
-    link: "/profile-account#riwayat-transaksi",
+    link: "/financial-history",
     keywords: `${income.source} pemasukan income ${getAccountName(income.account_id)}`,
   }));
 

@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import SadarDashboard from "../pages/SadarDashboard";
 import SadarBehaviorInsight from "../pages/SadarBehaviorInsight";
 import SadarFinancialScore from "../pages/SadarFinancialScore";
+import SadarFinancialHistory from "../pages/SadarFinancialHistory";
 import SadarProfileAccount from "../pages/SadarProfileAccount";
 import SadarProfileEdit from "../pages/SadarProfileEdit";
 import TransactionInput from "../pages/Sadar/TransactionInput";
@@ -28,6 +29,7 @@ const authProtectedRoutes = [
   { path: "/catat-keuangan", component: <TransactionInput /> },
   { path: "/behavior-insight", component: <SadarBehaviorInsight /> },
   { path: "/financial-score", component: <SadarFinancialScore /> },
+  { path: "/financial-history", component: <SadarFinancialHistory /> },
   { path: "/profile-account", component: <SadarProfileAccount /> },
   { path: "/profile-account/edit", component: <SadarProfileEdit /> },
   { path: "/index", component: <SadarDashboard /> },
