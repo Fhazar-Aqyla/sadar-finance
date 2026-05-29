@@ -124,4 +124,20 @@ const getProfile = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { register, login, getProfile };
+const forgotPassword = asyncHandler(async (req, res) => {
+  const result = await authService.forgotPassword(req.body.email);
+  return success(res, {
+    data: result,
+    message: 'Password reset request received',
+  });
+});
+
+const updateProfile = asyncHandler(async (req, res) => {
+  const user = await authService.updateProfile(req.user.id, req.body);
+  return success(res, {
+    data: user,
+    message: 'Profile updated successfully',
+  });
+});
+
+module.exports = { register, login, getProfile, forgotPassword, updateProfile };

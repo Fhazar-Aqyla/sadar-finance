@@ -1,4 +1,9 @@
 export const currentUserId = "user_001";
+export const isSadarDemoMode =
+  import.meta.env.VITE_SADAR_DATA_SCENARIO === "mock-with-backend-auth" ||
+  import.meta.env.VITE_SADAR_DEMO_MODE === "true";
+export const isSadarNewUserPreview = import.meta.env.VITE_SADAR_NEW_USER_PREVIEW === "true";
+export const shouldShowSadarNewUserMode = !isSadarDemoMode && isSadarNewUserPreview;
 
 export const userProfile = {
   id: currentUserId,
@@ -8,7 +13,7 @@ export const userProfile = {
 };
 
 export const accounts = [
-  { id: "acc_001", user_id: currentUserId, name: "Cash", type: "Cash", balance: 650000 },
+  { id: "acc_001", user_id: currentUserId, name: "Tunai", type: "Cash", balance: 650000 },
   { id: "acc_002", user_id: currentUserId, name: "BCA Everyday", type: "Bank", balance: 12600000 },
   { id: "acc_003", user_id: currentUserId, name: "GoPay", type: "E-wallet", balance: 1250000 },
 ];
@@ -19,9 +24,9 @@ export const incomes = [
 ];
 
 export const budgets = [
-  { id: "bdg_001", user_id: currentUserId, category: "Needs", label: "Needs", limit: 4775000, used: 3025000 },
-  { id: "bdg_002", user_id: currentUserId, category: "Wants", label: "Wants", limit: 2865000, used: 2245000 },
-  { id: "bdg_003", user_id: currentUserId, category: "Savings", label: "Savings", limit: 1910000, used: 1150000 },
+  { id: "bdg_001", user_id: currentUserId, category: "Needs", label: "Kebutuhan", limit: 4775000, used: 3025000 },
+  { id: "bdg_002", user_id: currentUserId, category: "Wants", label: "Keinginan", limit: 2865000, used: 2245000 },
+  { id: "bdg_003", user_id: currentUserId, category: "Savings", label: "Tabungan", limit: 1910000, used: 1150000 },
 ];
 
 export const transactions = [
@@ -44,7 +49,7 @@ export const transactions = [
 ];
 
 export const alerts = [
-  { id: "alt_001", user_id: currentUserId, title: "Budget mendekati batas", message: "Kategori Wants sudah memakai 78% dari alokasi bulan ini.", level: "warning" },
+  { id: "alt_001", user_id: currentUserId, title: "Anggaran mendekati batas", message: "Kategori Keinginan sudah memakai 78% dari alokasi bulan ini.", level: "warning" },
 ];
 
 export const rupiah = (value) =>

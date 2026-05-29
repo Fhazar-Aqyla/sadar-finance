@@ -1,28 +1,37 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import ReactApexChart from "react-apexcharts";
-import { Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
+import { Link } from "react-router-dom";
+import { Button, Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
+import { analyticsApi, incomeApi, transactionApi } from "../../Components/services/api";
 
-import {
-  currentUserId,
-  formatShortDate,
-  getDayName,
-  getUserRows,
-  groupSumBy,
-  incomes,
-  isWeekend,
-  rupiah,
-  sumBy,
-  transactions,
-} from "../SadarShared/mockData";
 import "../SadarShared/sadar-pages.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
+const rupiah = (value) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
 
-const authHeaders = () => {
-  const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
-  return authUser?.token ? { Authorization: `Bearer ${authUser.token}` } : {};
+const sumBy = (rows, getValue) => rows.reduce((total, row) => total + getValue(row), 0);
+
+const groupSumBy = (rows, key) =>
+  rows.reduce((result, row) => {
+    const groupKey = row[key] || "Lainnya";
+    result[groupKey] = (result[groupKey] || 0) + row.amount;
+    return result;
+  }, {});
+
+const getDayName = (date) =>
+  new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(new Date(`${date}T00:00:00`));
+
+const isWeekend = (date) => {
+  const day = new Date(`${date}T00:00:00`).getDay();
+  return day === 0 || day === 6;
 };
+
+const formatShortDate = (date) =>
+  new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(new Date(`${date}T00:00:00`));
 
 const chartBase = {
   chart: {
@@ -43,6 +52,23 @@ const getTopEntry = (object) =>
 const dashboardCategoryLabels = ["Makanan", "Transportasi", "Belanja", "Hiburan", "Lainnya"];
 const dashboardCategoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#94a3b8"];
 
+const normalizeCategoryToDashboard = (category) => {
+  const text = String(category || "").toLowerCase();
+  if (/makan|food|beverage|restaurant|warung|cafe|kopi/.test(text)) return "Makanan";
+  if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text)) return "Transportasi";
+  if (/belanja|shop|groceries|minimarket|supermarket|retail|marketplace|mall/.test(text)) return "Belanja";
+  if (/hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(text)) return "Hiburan";
+  return "Lainnya";
+};
+
+const getRiskTone = (riskLevel) => {
+  const normalizedRisk = String(riskLevel || "").toLowerCase();
+  if (normalizedRisk === "high") return "danger";
+  if (normalizedRisk === "medium") return "warning";
+  if (normalizedRisk === "low") return "success";
+  return "warning";
+};
+
 const toDashboardCategoryRows = (byCategory) => {
   const rows = dashboardCategoryLabels.reduce((result, label) => {
     result[label] = 0;
@@ -50,11 +76,8 @@ const toDashboardCategoryRows = (byCategory) => {
   }, {});
 
   Object.entries(byCategory).forEach(([category, value]) => {
-    if (category in rows && category !== "Lainnya") {
-      rows[category] += value;
-      return;
-    }
-    rows.Lainnya += value;
+    const mappedCategory = normalizeCategoryToDashboard(category);
+    rows[mappedCategory] += value;
   });
 
   return rows;
@@ -67,9 +90,34 @@ const toCategoryPrimary = (category) => {
   return "Wants";
 };
 
+const EmptyBehaviorInsight = () => {
+  document.title = "Insight Perilaku | SADAR Finance";
+
+  return (
+    <div className="page-content sadar-page">
+      <Container fluid>
+        <Card className="sadar-panel">
+          <CardBody>
+            <div className="sadar-empty-state sadar-empty-state-center">
+              <span className="sadar-empty-state-icon">
+                <i className="ri-line-chart-line"></i>
+              </span>
+              <h4>Belum Ada Pola yang Bisa Dianalisis</h4>
+              <p>Insight akan muncul setelah kamu mulai mencatat transaksi secara rutin.</p>
+              <div className="sadar-empty-state-note">Insight akan lebih akurat setelah tersedia data transaksi minimal 14 hari.</div>
+              <Button color="primary" tag={Link} to="/catat-keuangan">
+                Catat Transaksi Pertama
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+      </Container>
+    </div>
+  );
+};
+
 const normalizeBackendTransaction = (row) => ({
   id: row.transaction_id || row.id,
-  user_id: currentUserId,
   account_id: row.account_id,
   name: row.description || row.source || "Transaksi",
   category: row.category_group || "Lainnya",
@@ -77,6 +125,12 @@ const normalizeBackendTransaction = (row) => ({
   amount: Number(row.amount || 0),
   date: String(row.transaction_date || row.date || "").slice(0, 10),
   status: "Tercatat",
+});
+
+const normalizeBackendIncome = (row) => ({
+  id: row.income_id || row.id,
+  amount: Number(row.amount || 0),
+  date: String(row.income_date || row.date || "").slice(0, 10),
 });
 
 const createTrendOptions = (categories, maxValue) => ({
@@ -172,16 +226,15 @@ const createTrendOptions = (categories, maxValue) => ({
   },
 });
 
-const BehaviorInsight = () => {
-  document.title = "Behavior Insight | SADAR Finance";
-  const [backendTransactions, setBackendTransactions] = useState(null);
+const BehaviorInsightWithData = () => {
+  document.title = "Insight Perilaku | SADAR Finance";
+  const [backendTransactions, setBackendTransactions] = useState([]);
+  const [backendIncomes, setBackendIncomes] = useState([]);
   const [behaviorPrediction, setBehaviorPrediction] = useState(null);
 
   const data = useMemo(() => {
-    const sourceTransactions = backendTransactions?.length ? backendTransactions : transactions;
-    const userTransactions = getUserRows(sourceTransactions, currentUserId);
-    const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
-    const userIncomes = getUserRows(incomes, currentUserId);
+    const expenseTransactions = backendTransactions.filter((item) => item.budget_group !== "Savings");
+    const userIncomes = backendIncomes;
     const distinctDays = new Set(expenseTransactions.map((item) => item.date)).size;
     const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
     const totalIncome = sumBy(userIncomes, (item) => item.amount);
@@ -289,28 +342,30 @@ const BehaviorInsight = () => {
       behaviorCandidate,
       rolling7dSpending,
     };
-  }, [backendTransactions]);
+  }, [backendIncomes, backendTransactions]);
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchTransactions = async () => {
+    const fetchApiData = async () => {
       try {
-        const { data: response } = await axios.get(`${API_BASE_URL}/transactions?limit=100`, {
-          headers: authHeaders(),
-        });
-        const rows = response?.data || [];
+        const [rows, incomeRows] = await Promise.all([
+          transactionApi.list({ limit: 100 }),
+          incomeApi.list({ limit: 100 }),
+        ]);
         if (isMounted) {
-          setBackendTransactions(rows.map(normalizeBackendTransaction));
+          setBackendTransactions((rows || []).map(normalizeBackendTransaction));
+          setBackendIncomes((incomeRows || []).map(normalizeBackendIncome));
         }
       } catch (_error) {
         if (isMounted) {
           setBackendTransactions([]);
+          setBackendIncomes([]);
         }
       }
     };
 
-    fetchTransactions();
+    fetchApiData();
 
     return () => {
       isMounted = false;
@@ -325,23 +380,19 @@ const BehaviorInsight = () => {
 
       try {
         const candidate = data.behaviorCandidate;
-        const { data: response } = await axios.post(
-          `${API_BASE_URL}/analytics/behavior/predict`,
-          {
-            amount: candidate.amount,
-            date: candidate.date,
-            merchant: candidate.name,
-            categoryGroup: candidate.category,
-            categoryPrimary: candidate.budget_group,
-            categoryDetail: candidate.category,
-            rolling7dSpending: data.rolling7dSpending,
-            transactionCount: data.userTransactions.length,
-          },
-          { headers: authHeaders() },
-        );
+        const response = await analyticsApi.behaviorPredict({
+          amount: candidate.amount,
+          date: candidate.date,
+          merchant: candidate.name,
+          categoryGroup: candidate.category,
+          categoryPrimary: candidate.budget_group,
+          categoryDetail: candidate.category,
+          rolling7dSpending: data.rolling7dSpending,
+          transactionCount: data.userTransactions.length,
+        });
 
         if (isMounted) {
-          setBehaviorPrediction(response?.data || null);
+          setBehaviorPrediction(response || null);
         }
       } catch (_error) {
         if (isMounted) {
@@ -367,18 +418,30 @@ const BehaviorInsight = () => {
     data.trendRows.map((item) => formatShortDate(item.date)),
     trendMaxValue,
   );
+  const riskLabelMap = {
+    low: "Rendah",
+    medium: "Sedang",
+    high: "Tinggi",
+  };
   const modelRiskLabel = behaviorPrediction?.riskLevel
-    ? behaviorPrediction.riskLevel.charAt(0).toUpperCase() + behaviorPrediction.riskLevel.slice(1)
+    ? riskLabelMap[String(behaviorPrediction.riskLevel).toLowerCase()] || "Sedang"
     : null;
   const predictionPercent = behaviorPrediction?.spikeProbability != null
     ? Math.round(behaviorPrediction.spikeProbability * 100)
     : null;
+  const modelRiskTone = getRiskTone(behaviorPrediction?.riskLevel);
+  const predictionSourceLabel = behaviorPrediction?.source === "ai-service"
+    ? "Model AI"
+    : behaviorPrediction?.source === "rule-based-fallback"
+      ? "Cadangan berbasis aturan"
+      : "Prediksi otomatis";
   const insightItems = behaviorPrediction
     ? [
         {
-          title: `Model behavior membaca risiko ${modelRiskLabel}`,
-          description: `${data.behaviorCandidate?.name || "Transaksi terbesar"} punya probabilitas spike ${predictionPercent}%. ${behaviorPrediction.recommendation}`,
-          type: behaviorPrediction.riskLevel === "high" ? "warning" : "behavior",
+          title: `Prediksi perilaku membaca risiko ${modelRiskLabel}`,
+          description: `${data.behaviorCandidate?.name || "Transaksi terbesar"} punya probabilitas lonjakan ${predictionPercent}%. ${behaviorPrediction.recommendation}`,
+          type: modelRiskTone,
+          sourceLabel: predictionSourceLabel,
         },
         ...data.insightItems,
       ]
@@ -386,6 +449,10 @@ const BehaviorInsight = () => {
   const recommendations = behaviorPrediction?.recommendation
     ? [behaviorPrediction.recommendation, ...data.recommendations]
     : data.recommendations;
+
+  if (data.userTransactions.length === 0) {
+    return <EmptyBehaviorInsight />;
+  }
 
   return (
     <div className="page-content sadar-page">
@@ -438,7 +505,7 @@ const BehaviorInsight = () => {
               <CardBody>
                 <div className="sadar-summary-label">
                   Potensi boros
-                  <span className="sadar-card-icon warning"><i className="ri-alert-line"></i></span>
+                  <span className={`sadar-card-icon ${modelRiskTone}`}><i className="ri-alert-line"></i></span>
                 </div>
                 <h2>{modelRiskLabel || (data.wantsRatio > 30 ? "Perlu Dipantau" : "Terkendali")}</h2>
                 <p>
@@ -549,16 +616,23 @@ const BehaviorInsight = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Insight Perilaku</h4>
-                  <p className="text-muted mb-0">Ringkasan pola yang terlihat dari transaksi</p>
+                  <p className="text-muted mb-0">Ringkasan berbasis transaksi; badge AI muncul jika prediksi model tersedia</p>
                 </div>
               </CardHeader>
               <CardBody>
                 <div className="sadar-insight-list">
                   {insightItems.map((item) => (
                     <div className="sadar-insight-item" key={item.title}>
-                      <span className={`sadar-dot ${item.type === "warning" ? "warning" : ""}`}></span>
+                      <span className={`sadar-dot ${["success", "warning", "danger"].includes(item.type) ? item.type : ""}`}></span>
                       <div>
-                        <strong>{item.title}</strong>
+                        <div className="sadar-insight-title-row">
+                          <strong>{item.title}</strong>
+                          {item.sourceLabel && (
+                            <span className={`sadar-source-badge ${behaviorPrediction?.source === "ai-service" ? "ai" : "fallback"}`}>
+                              {item.sourceLabel}
+                            </span>
+                          )}
+                        </div>
                         <p>{item.description}</p>
                       </div>
                     </div>
@@ -572,7 +646,7 @@ const BehaviorInsight = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Rekomendasi Ringan</h4>
-                  <p className="text-muted mb-0">Saran sederhana untuk menjaga budget</p>
+                  <p className="text-muted mb-0">Saran otomatis dari pola transaksi dan anggaran</p>
                 </div>
               </CardHeader>
               <CardBody>
@@ -592,5 +666,7 @@ const BehaviorInsight = () => {
     </div>
   );
 };
+
+const BehaviorInsight = () => <BehaviorInsightWithData />;
 
 export default BehaviorInsight;

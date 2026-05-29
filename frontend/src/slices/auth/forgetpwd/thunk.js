@@ -7,6 +7,7 @@ import {
   postFakeForgetPwd,
   postJwtForgetPwd,
 } from "../../../helpers/fakebackend_helper";
+import { authApi } from "../../../Components/services/api";
 
 const fireBaseBackend = getFirebaseBackend();
 const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
@@ -15,7 +16,8 @@ export const userForgetPassword = (user) => async (dispatch) => {
   try {
       let response;
       if (defaultAuth === "sadar") {
-          dispatch(userForgetPasswordError("Reset password belum tersedia."));
+          await authApi.forgotPassword({ email: user.email });
+          dispatch(userForgetPasswordSuccess("Permintaan reset password diterima. Cek email jika layanan email sudah aktif."));
           return;
       }
 

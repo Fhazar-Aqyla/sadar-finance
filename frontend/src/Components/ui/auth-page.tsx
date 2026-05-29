@@ -4,11 +4,13 @@ import { Col } from "reactstrap";
 
 const financeQuotes = [
   {
-    quote: "Jangan menabung dari sisa pengeluaran, tetapi keluarkan dari sisa setelah menabung.",
+    quote:
+      "Jangan menabung dari sisa pengeluaran, tetapi keluarkan dari sisa setelah menabung.",
     author: "Warren Buffett",
   },
   {
-    quote: "Anggaran adalah cara memberi arah pada uang, bukan menebak ke mana uang pergi.",
+    quote:
+      "Anggaran adalah cara memberi arah pada uang, bukan menebak ke mana uang pergi.",
     author: "Dave Ramsey",
   },
   {
@@ -24,7 +26,9 @@ export function AuthPage() {
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setQuoteIndex((currentIndex) => (currentIndex + 1) % financeQuotes.length);
+      setQuoteIndex(
+        (currentIndex) => (currentIndex + 1) % financeQuotes.length,
+      );
     }, 5200);
 
     return () => window.clearInterval(timer);
@@ -34,13 +38,13 @@ export function AuthPage() {
 
   return (
     <Col lg={6} className="sadar-auth-visual-panel">
-      <div className="relative flex h-full min-h-[720px] overflow-hidden bg-[#0C3954] p-10 text-white max-lg:min-h-[320px] max-lg:p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(100,171,136,0.20),transparent_20rem),radial-gradient(circle_at_76%_18%,rgba(44,155,224,0.18),transparent_18rem),linear-gradient(180deg,#124170_0%,#0C3954_46%,#082D43_100%)]" />
+      <div className="relative flex h-full min-h-[720px] overflow-hidden bg-[#1E3A8A] p-10 text-white max-lg:min-h-[320px] max-lg:p-6">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(20,184,166,0.18),transparent_20rem),radial-gradient(circle_at_76%_18%,rgba(20,184,166,0.18),transparent_18rem),linear-gradient(180deg,#2563EB_0%,#1E3A8A_46%,#111E3F_100%)]" />
         <div className="absolute inset-0 opacity-65">
           <FloatingPaths position={1} />
           <FloatingPaths position={-1} />
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#082D43] via-[#082D43]/78 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#111E3F] via-[#111E3F]/78 to-transparent" />
 
         <div className="relative z-10 flex w-full flex-col">
           <div className="max-w-[680px] pt-12 max-lg:max-w-[560px] max-lg:pt-4">
@@ -115,4 +119,3 @@ function FloatingPaths({ position }: { position: number }) {
     </div>
   );
 }
-

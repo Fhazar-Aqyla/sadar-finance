@@ -354,8 +354,8 @@ class AnalyticsService {
 
     const toPrimaryBucket = (categoryGroup) => {
       const text = String(categoryGroup || '').toLowerCase();
-      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa/.test(text)) return 'needs';
-      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito/.test(text)) return 'savings';
+      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
+      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
       return 'wants';
     };
 
@@ -416,25 +416,25 @@ class AnalyticsService {
     const insights = [
       totalIncome > 0
         ? `Pengeluaran memakai ${(expenseRatio * 100).toFixed(1)}% dari pemasukan pada periode ini.`
-        : 'Belum ada pemasukan tercatat pada periode ini, jadi score belum bisa membaca rasio income secara penuh.',
+        : 'Belum ada pemasukan tercatat pada periode ini, jadi skor belum bisa membaca rasio pemasukan secara penuh.',
       budgetLimit > 0
-        ? `Budget terpakai ${(budgetUsage * 100).toFixed(1)}% dari batas yang tersedia.`
-        : 'Budget belum tersedia, score memakai pemasukan sebagai batas pembanding sementara.',
+        ? `Anggaran terpakai ${(budgetUsage * 100).toFixed(1)}% dari batas yang tersedia.`
+        : 'Anggaran belum tersedia, skor memakai pemasukan sebagai batas pembanding sementara.',
       savingsRate >= 0.2
         ? 'Rasio tabungan sudah memenuhi target minimal 20%.'
         : 'Rasio tabungan belum mencapai target 20%.',
     ];
 
     const recommendations = [];
-    if (overallScore <= 40) recommendations.push('Prioritaskan kebutuhan utama dan tunda pengeluaran wants sampai rasio pengeluaran turun.');
+    if (overallScore <= 40) recommendations.push('Prioritaskan kebutuhan utama dan tunda pengeluaran keinginan sampai rasio pengeluaran turun.');
     if (expenseRatio > 0.7) recommendations.push('Usahakan total pengeluaran berada di bawah 70% dari pemasukan agar ruang tabungan lebih aman.');
-    if (budgetUsage >= 0.8) recommendations.push('Budget sudah mendekati batas, cek kategori terbesar sebelum menambah transaksi baru.');
+    if (budgetUsage >= 0.8) recommendations.push('Anggaran sudah mendekati batas, cek kategori terbesar sebelum menambah transaksi baru.');
     if (savingsScore < 100) recommendations.push('Sisihkan minimal 20% pemasukan untuk tabungan, dana darurat, atau investasi.');
     if (consistencyScore < 60) {
-      recommendations.push('Catat transaksi dan pemasukan lebih rutin agar score makin akurat.');
+      recommendations.push('Catat transaksi dan pemasukan lebih rutin agar skor makin akurat.');
     }
     if (recommendations.length === 0) {
-      recommendations.push('Kondisi keuangan cukup sehat. Pertahankan alokasi 50/30/20 dan review budget mingguan.');
+      recommendations.push('Kondisi keuangan cukup sehat. Pertahankan alokasi 50/30/20 dan tinjau anggaran mingguan.');
     }
 
     return {
@@ -508,7 +508,44 @@ class AnalyticsService {
   }
 
   async getLatestBudget(userId) {
-    return analyticsRepository.getLatestBudget(userId);
+    const budget = await analyticsRepository.getLatestBudget(userId);
+    if (!budget) return null;
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+
+    const summary = await transactionRepository.getSummary(userId, startOfMonth, endOfMonth);
+
+    const toPrimaryBucket = (categoryGroup) => {
+      const text = String(categoryGroup || '').toLowerCase();
+      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
+      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
+      return 'wants';
+    };
+
+    let needsUsed = 0;
+    let wantsUsed = 0;
+    let savingsUsed = 0;
+
+    for (const row of summary) {
+      const bucket = toPrimaryBucket(row.category_group);
+      const total = parseFloat(row.total || 0);
+      if (bucket === 'needs') {
+        needsUsed += total;
+      } else if (bucket === 'savings') {
+        savingsUsed += total;
+      } else {
+        wantsUsed += total;
+      }
+    }
+
+    return {
+      ...budget,
+      needs_used: needsUsed,
+      wants_used: wantsUsed,
+      savings_used: savingsUsed,
+    };
   }
 
   async getBudgetHistory(userId, limit) {

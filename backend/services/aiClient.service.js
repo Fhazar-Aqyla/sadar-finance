@@ -249,8 +249,8 @@ class AiClientService {
     return {
       insights: [
         {
-          title: 'AI Insight Preview',
-          description: `Spending trend is ${payload.spendingTrend || 'stable'} with savings rate ${payload.savingsRate || 0}%.`,
+          title: 'Pratinjau Insight AI',
+          description: `Tren pengeluaran ${payload.spendingTrend || 'stabil'} dengan rasio tabungan ${payload.savingsRate || 0}%.`,
         },
       ],
       alerts: [],

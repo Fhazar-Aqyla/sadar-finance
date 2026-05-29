@@ -8,6 +8,11 @@
   letter-spacing: 0.04em;
 }
 
+.sadar-mode-badge.income {
+  border-color: #22c55e !important;
+  background: #22c55e !important;
+}
+
 .sadar-entry-tabs {
   display: flex;
   gap: 0;

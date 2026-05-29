@@ -6,6 +6,7 @@
   --sadar-teal: #14b8a6;
   --sadar-success: #22c55e;
   --sadar-warning: #f59e0b;
+  --sadar-danger: #ef4444;
 }
 
 .sadar-page .container-fluid {
@@ -127,6 +128,16 @@
   background: rgba(245, 158, 11, 0.14);
 }
 
+.sadar-card-icon.success {
+  color: var(--sadar-success);
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.sadar-card-icon.danger {
+  color: var(--sadar-danger);
+  background: rgba(239, 68, 68, 0.12);
+}
+
 .sadar-summary-card h2 {
   margin: 1rem 0 0.3rem;
   color: #0f172a;
@@ -208,6 +219,36 @@
   color: #172033;
 }
 
+.sadar-insight-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.15rem;
+}
+
+.sadar-insight-title-row strong {
+  margin-bottom: 0;
+}
+
+.sadar-source-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.25rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.sadar-source-badge.ai {
+  background: rgba(20, 184, 166, 0.13);
+  color: #0f766e;
+}
+
 .sadar-dot {
   width: 9px;
   height: 9px;
@@ -221,12 +262,85 @@
   background: var(--sadar-warning);
 }
 
+.sadar-dot.success {
+  background: var(--sadar-success);
+}
+
+.sadar-dot.danger {
+  background: var(--sadar-danger);
+}
+
 .sadar-empty-state {
   padding: 1.25rem;
   border: 1px dashed #cbd5e1;
   border-radius: 12px;
   color: #64748b;
   background: #f8fafc;
+}
+
+.sadar-empty-state-center {
+  display: flex;
+  min-height: 240px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  text-align: center;
+}
+
+.sadar-empty-state-center h4 {
+  margin: 0.2rem 0 0;
+  color: #172033;
+  font-size: 1.05rem;
+  font-weight: 760;
+}
+
+.sadar-empty-state-center p {
+  max-width: 520px;
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.sadar-empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+  font-size: 1.35rem;
+}
+
+.sadar-empty-state-note {
+  max-width: 520px;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  font-size: 0.86rem;
+}
+
+.sadar-step-status-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.35rem;
+}
+
+.sadar-step-status-list span {
+  display: inline-flex;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .sadar-progress {
@@ -267,6 +381,57 @@
   border-bottom: 0;
 }
 
+.sadar-table-empty-row td {
+  height: 52px;
+  color: transparent;
+}
+
+.sadar-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.sadar-table-pagination .pagination {
+  gap: 0.35rem;
+}
+
+.sadar-table-pagination .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.7rem;
+  border-color: #e2e8f0;
+  border-radius: 6px !important;
+  color: #334155;
+  background: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.sadar-table-pagination .page-link:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.sadar-table-pagination .page-item.active .page-link {
+  border-color: var(--sadar-primary);
+  color: #ffffff;
+  background: var(--sadar-primary);
+}
+
+.sadar-table-pagination .page-item.disabled .page-link {
+  color: #94a3b8;
+  background: #f8fafc;
+}
+
 .sadar-table-action {
   color: #334155 !important;
   border-color: #e2e8f0 !important;
@@ -279,29 +444,42 @@
   gap: 1rem;
 }
 
+.sadar-profile-panel .card-body {
+  padding-top: 0.9rem;
+}
+
+.sadar-profile-body {
+  display: flex;
+  flex-direction: column;
+}
+
 .sadar-profile-photo-row {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
   border: 1px solid #edf1f6;
   border-radius: 12px;
-  background: #fbfcfe;
+  background:
+    linear-gradient(135deg, rgba(30, 58, 138, 0.08), rgba(20, 184, 166, 0.08)),
+    #ffffff;
 }
 
 .sadar-profile-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
-  height: 72px;
-  flex: 0 0 72px;
+  width: 82px;
+  height: 82px;
+  flex: 0 0 82px;
   overflow: hidden;
   border-radius: 999px;
   color: var(--sadar-primary);
-  background: rgba(30, 58, 138, 0.1);
-  font-size: 1.5rem;
+  background: #e9eef8;
+  border: 4px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 24px rgba(30, 58, 138, 0.12);
+  font-size: 1.65rem;
   font-weight: 800;
 }
 
@@ -320,6 +498,309 @@
 .sadar-profile-photo-copy p {
   margin: 0 0 0.65rem;
   color: #64748b;
+}
+
+.sadar-profile-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.15rem;
+}
+
+.sadar-profile-summary-item {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid #edf1f6;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+.sadar-profile-summary-item span,
+.sadar-profile-summary-item strong {
+  display: block;
+}
+
+.sadar-profile-summary-item span {
+  margin-bottom: 0.25rem;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.sadar-profile-summary-item strong {
+  overflow: hidden;
+  color: #172033;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sadar-profile-body .sadar-form-grid {
+  margin-top: auto;
+}
+
+.sadar-account-body {
+  padding-top: 0.9rem !important;
+}
+
+.sadar-account-list {
+  gap: 0.6rem;
+}
+
+.sadar-account-item {
+  align-items: center;
+  padding: 0.8rem;
+  min-width: 0;
+}
+
+.sadar-account-fields {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sadar-account-form-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1fr) max-content;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.sadar-account-form-grid .form-label {
+  margin-bottom: 0.35rem;
+}
+
+.sadar-account-form-grid .btn {
+  min-width: 78px;
+  padding-right: 0.8rem;
+  padding-left: 0.8rem;
+  white-space: nowrap;
+}
+
+.sadar-confirm-modal .modal-content {
+  border: 1px solid #e7ebf2;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.sadar-confirm-modal .modal-body {
+  padding: 1.35rem 1.35rem 0.75rem;
+}
+
+.sadar-confirm-modal .modal-body h4 {
+  margin: 0.9rem 0 0.45rem;
+  color: #172033;
+  font-size: 1.08rem;
+  font-weight: 780;
+}
+
+.sadar-confirm-modal .modal-body p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.sadar-confirm-modal .modal-footer {
+  gap: 0.6rem;
+  padding: 0.75rem 1.35rem 1.35rem;
+  border-top: 0;
+}
+
+.sadar-confirm-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+}
+
+.sadar-confirm-icon.danger {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.sadar-edit-profile-header {
+  align-items: center;
+}
+
+.sadar-edit-profile-header .btn-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+}
+
+.sadar-edit-top-row > [class*="col-"],
+.sadar-edit-detail-row > [class*="col-"] {
+  display: flex;
+}
+
+.sadar-edit-top-row .sadar-panel,
+.sadar-edit-detail-row .sadar-panel {
+  width: 100%;
+}
+
+.sadar-edit-avatar-body {
+  display: flex;
+  align-items: center;
+}
+
+.sadar-edit-photo-panel,
+.sadar-edit-identity-panel {
+  height: 100%;
+}
+
+.sadar-edit-avatar-card {
+  display: flex;
+  width: 100%;
+  min-height: 238px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0 0.75rem;
+  text-align: center;
+}
+
+.sadar-edit-identity-panel .card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.sadar-edit-avatar {
+  width: 118px;
+  height: 118px;
+  flex-basis: 118px;
+  margin-bottom: 0.25rem;
+  font-size: 2.05rem;
+}
+
+.sadar-edit-avatar-card h5 {
+  margin: 0.15rem 0 0;
+  color: #172033;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.sadar-edit-avatar-card p {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: #64748b;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sadar-edit-profile-grid {
+  gap: 1.05rem 1.5rem;
+}
+
+.sadar-edit-profile-grid .form-label,
+.sadar-edit-stack .form-label {
+  margin-bottom: 0.45rem;
+  color: #0f172a;
+  font-weight: 650;
+}
+
+.sadar-edit-profile-grid .form-control,
+.sadar-edit-profile-grid .form-select,
+.sadar-edit-stack .form-control,
+.sadar-edit-stack .form-select {
+  min-height: 48px;
+  border-color: #d6deeb;
+  border-radius: 8px;
+  color: #172033;
+}
+
+.sadar-edit-profile-grid .form-control:focus,
+.sadar-edit-profile-grid .form-select:focus,
+.sadar-edit-stack .form-control:focus,
+.sadar-edit-stack .form-select:focus {
+  border-color: rgba(30, 58, 138, 0.55);
+  box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.1);
+}
+
+.sadar-edit-profile-grid .input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.sadar-edit-inline-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.sadar-edit-inline-note strong,
+.sadar-password-rules strong {
+  display: block;
+  color: #172033;
+  font-weight: 780;
+}
+
+.sadar-edit-inline-note p {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.sadar-password-toggle {
+  min-width: 46px;
+  justify-content: center;
+  border-color: #d6deeb;
+  color: #475569;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.sadar-password-toggle:hover,
+.sadar-password-toggle:focus {
+  color: var(--sadar-primary);
+  background: #eef5ff;
+}
+
+.sadar-password-rules {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  padding: 0.9rem;
+  border: 1px solid #edf1f6;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+.sadar-password-rules span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #64748b;
+  font-weight: 650;
+}
+
+.sadar-password-rules span.is-valid {
+  color: var(--sadar-success);
+}
+
+.sadar-edit-stack {
+  display: grid;
+  gap: 1.05rem;
+}
+
+.sadar-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 1rem 0 0.5rem;
+}
+
+.sadar-edit-actions .btn {
+  min-width: 118px;
 }
 
 .sadar-score-main {
@@ -399,6 +880,18 @@
   line-height: 1;
 }
 
+.sadar-score-number.success {
+  color: var(--sadar-success);
+}
+
+.sadar-score-number.warning {
+  color: var(--sadar-warning);
+}
+
+.sadar-score-number.danger {
+  color: var(--sadar-danger);
+}
+
 .sadar-score-number span {
   margin-bottom: 0.45rem;
   color: #64748b;
@@ -415,6 +908,33 @@
   font-weight: 750;
 }
 
+.sadar-score-status.success {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.sadar-score-status.warning {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.sadar-score-status.danger {
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.sadar-semantic-value.success {
+  color: var(--sadar-success);
+}
+
+.sadar-semantic-value.warning {
+  color: var(--sadar-warning);
+}
+
+.sadar-semantic-value.danger {
+  color: var(--sadar-danger);
+}
+
 .sadar-score-note {
   max-width: 300px;
   margin: 0.25rem 0 0;
@@ -428,10 +948,37 @@
   gap: 0.75rem;
 }
 
+.sadar-budget-helper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.sadar-budget-helper strong {
+  flex: 0 0 auto;
+  color: #172033;
+  font-weight: 780;
+}
+
+.sadar-budget-helper span {
+  color: #64748b;
+  line-height: 1.45;
+}
+
 @media (max-width: 991.98px) {
   .sadar-form-grid,
-  .sadar-budget-grid {
+  .sadar-budget-grid,
+  .sadar-profile-summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sadar-edit-avatar-card {
+    min-height: 220px;
   }
 }
 
@@ -443,5 +990,31 @@
 
   .sadar-page-header h1 {
     font-size: 1.45rem;
+  }
+
+  .sadar-profile-photo-row {
+    align-items: flex-start;
+  }
+
+  .sadar-edit-profile-header .d-flex {
+    align-items: flex-start !important;
+  }
+
+  .sadar-edit-actions {
+    flex-direction: column-reverse;
+  }
+
+  .sadar-edit-actions .btn {
+    width: 100%;
+  }
+
+  .sadar-budget-helper {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .sadar-table-pagination {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

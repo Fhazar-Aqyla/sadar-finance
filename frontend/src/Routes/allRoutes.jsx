@@ -14,6 +14,7 @@ import SadarDashboard from "../pages/SadarDashboard";
 import SadarBehaviorInsight from "../pages/SadarBehaviorInsight";
 import SadarFinancialScore from "../pages/SadarFinancialScore";
 import SadarProfileAccount from "../pages/SadarProfileAccount";
+import SadarProfileEdit from "../pages/SadarProfileEdit";
 
 //Calendar
 import MonthGrid from "../pages/Calendar/MonthGrid";
@@ -260,6 +261,7 @@ const authProtectedRoutes = [
   { path: "/behavior-insight", component: <SadarBehaviorInsight /> },
   { path: "/financial-score", component: <SadarFinancialScore /> },
   { path: "/profile-account", component: <SadarProfileAccount /> },
+  { path: "/profile-account/edit", component: <SadarProfileEdit /> },
   { path: "/dashboard-jobs", component: <Dashboardjob /> },
   { path: "/index", component: <SadarDashboard /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },

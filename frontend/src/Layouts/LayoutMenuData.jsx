@@ -4,7 +4,7 @@ import FeatherIcon from "feather-icons-react";
 const Navdata = () => {
   const menuItems = [
     {
-      label: "Main Menu",
+      label: "Menu Utama",
       isHeader: true,
     },
     {
@@ -21,19 +21,19 @@ const Navdata = () => {
     },
     {
       id: "behavior-insight",
-      label: "Behavior Insight",
+      label: "Insight Perilaku",
       icon: <FeatherIcon icon="activity" className="icon-dual" />,
       link: "/behavior-insight",
     },
     {
       id: "financial-score",
-      label: "Financial Score",
+      label: "Skor Finansial",
       icon: <FeatherIcon icon="bar-chart-2" className="icon-dual" />,
       link: "/financial-score",
     },
     {
       id: "profile-account",
-      label: "Profile & Account",
+      label: "Profil & Akun",
       icon: <FeatherIcon icon="user" className="icon-dual" />,
       link: "/profile-account",
     },

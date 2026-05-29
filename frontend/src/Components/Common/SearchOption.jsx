@@ -31,10 +31,10 @@ const quickActions = [
     icon: "ri-dashboard-3-line",
     color: "primary",
     link: "/dashboard",
-    keywords: "dashboard ringkasan saldo cashflow",
+    keywords: "dashboard dasbor ringkasan saldo arus kas cashflow",
   },
   {
-    title: "Behavior Insight",
+    title: "Insight Perilaku",
     description: "Analisis pola pengeluaran",
     icon: "ri-lightbulb-flash-line",
     color: "info",
@@ -42,7 +42,7 @@ const quickActions = [
     keywords: "insight analisis perilaku behavior pengeluaran",
   },
   {
-    title: "Financial Score",
+    title: "Skor Finansial",
     description: "Skor kesehatan keuangan",
     icon: "ri-speed-up-line",
     color: "warning",
@@ -50,8 +50,8 @@ const quickActions = [
     keywords: "financial score skor kesehatan keuangan",
   },
   {
-    title: "Profile & Account",
-    description: "Account, budget, dan riwayat",
+    title: "Profil & Akun",
+    description: "Akun, anggaran, dan riwayat",
     icon: "ri-user-settings-line",
     color: "secondary",
     link: "/profile-account",
@@ -70,6 +70,12 @@ const formatDate = (date) =>
   new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(new Date(`${date}T00:00:00`));
 
 const normalize = (value) => value.toString().toLowerCase();
+
+const formatAccountType = (type) => {
+  if (type === "Cash") return "Tunai";
+  if (type === "E-wallet") return "Dompet digital";
+  return type || "Akun";
+};
 
 const buildSearchItems = () => {
   const transactionItems = transactions.map((transaction) => ({
@@ -95,10 +101,10 @@ const buildSearchItems = () => {
   }));
 
   const accountItems = accounts.map((account) => ({
-    type: "Account",
+    type: "Akun",
     title: account.name,
-    description: `${account.type} - saldo ${rupiah(account.balance)}`,
-    meta: "Account",
+    description: `${formatAccountType(account.type)} - saldo ${rupiah(account.balance)}`,
+    meta: "Akun",
     icon: "ri-wallet-3-line",
     color: "primary",
     link: "/profile-account",
