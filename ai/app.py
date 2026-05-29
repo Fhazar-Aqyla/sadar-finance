@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from inference.ocr import extract_text_from_image
 from inference.behavior import predict_behavior
+from inference.merchant_classifier import categorize_transaction
 from preprocessing.receipt_nlp import parse_receipt_text
 
 
@@ -21,7 +22,12 @@ def health():
         {
             "success": True,
             "message": "SADAR Finance AI service is running",
-            "features": ["ocr", "nlp_receipt_extraction", "behavior_spike_prediction"],
+            "features": [
+                "ocr",
+                "nlp_receipt_extraction",
+                "behavior_spike_prediction",
+                "merchant_categorization",
+            ],
         }
     )
 
@@ -59,6 +65,24 @@ def process_receipt_text():
         return jsonify({"success": False, "error": "rawText is required"}), 400
 
     return jsonify({"success": True, "data": parse_receipt_text(raw_text)})
+
+
+@app.post("/categorize")
+def categorize_transaction_route():
+    payload = request.get_json(silent=True) or {}
+    text = payload.get("text") or payload.get("inputText") or payload.get("input_text")
+    merchant = payload.get("merchant")
+
+    if not text and not merchant:
+        return jsonify({"success": False, "error": "text or merchant is required"}), 400
+
+    try:
+        result = categorize_transaction(payload)
+        return jsonify({"success": True, "data": result})
+    except FileNotFoundError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 503
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500
 
 
 @app.post("/behavior/predict")

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -72,7 +73,12 @@ def predict_behavior(payload: Dict[str, Any]) -> Dict[str, Any]:
     probability = float(model(model_input, training=False).numpy().reshape(-1)[0])
     risk_level = risk_from_probability(probability, metadata)
     category_primary = features["category_primary"]
-    recommendation = generate_behavior_recommendation(probability, risk_level, category_primary, payload)
+    recommendation, recommendation_source = generate_behavior_recommendation(
+        probability,
+        risk_level,
+        category_primary,
+        payload,
+    )
 
     return {
         "spikeProbability": round(probability, 4),
@@ -83,6 +89,7 @@ def predict_behavior(payload: Dict[str, Any]) -> Dict[str, Any]:
         "modelName": metadata.get("bestModel", "behavior_best_model"),
         "modelVersion": metadata.get("modelVersion", MODEL_VERSION),
         "recommendation": recommendation,
+        "recommendationSource": recommendation_source,
     }
 
 
@@ -172,23 +179,36 @@ def generate_behavior_recommendation(
     risk_level: str,
     category_primary: str,
     payload: Dict[str, Any],
-) -> str:
+) -> tuple[str, str]:
     prompt = (
         "Buat rekomendasi finansial singkat dalam Bahasa Indonesia untuk aplikasi SADAR Finance. "
+        "Maksimal 2 kalimat, tanpa markdown, tanpa daftar bernomor, dan fokus pada kontrol budget pribadi. "
         f"Risiko transaksi: {risk_level}, probabilitas spike: {probability:.2f}, "
         f"kategori 50/30/20: {category_primary}, nominal: Rp{float(payload.get('amount', 0) or 0):,.0f}."
     )
     generated = _try_generate_ai_text(prompt)
     if generated:
-        return generated
+        return generated, "generative-ai"
 
     if risk_level == "high":
         if category_primary == "Wants":
-            return "Transaksi ini berisiko tinggi dan masuk kategori Wants. Coba cek ulang apakah masih sesuai dengan batas 30% budget."
-        return "Transaksi ini terlihat tidak biasa dibanding pola pengeluaran. Pastikan nominal dan prioritasnya sudah sesuai rencana."
+            return (
+                "Transaksi ini berisiko tinggi dan masuk kategori Wants. Coba cek ulang apakah masih sesuai dengan batas 30% budget.",
+                "rule-based-fallback",
+            )
+        return (
+            "Transaksi ini terlihat tidak biasa dibanding pola pengeluaran. Pastikan nominal dan prioritasnya sudah sesuai rencana.",
+            "rule-based-fallback",
+        )
     if risk_level == "medium":
-        return "Transaksi ini masih perlu diperhatikan. Pantau sisa budget agar pola pengeluaran tetap sehat."
-    return "Risiko transaksi rendah. Tetap catat transaksi secara konsisten agar insight finansial makin akurat."
+        return (
+            "Transaksi ini masih perlu diperhatikan. Pantau sisa budget agar pola pengeluaran tetap sehat.",
+            "rule-based-fallback",
+        )
+    return (
+        "Risiko transaksi rendah. Tetap catat transaksi secara konsisten agar insight finansial makin akurat.",
+        "rule-based-fallback",
+    )
 
 
 def _try_generate_ai_text(prompt: str) -> str:
@@ -200,10 +220,26 @@ def _try_generate_ai_text(prompt: str) -> str:
 
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(os.getenv("GENERATIVE_AI_MODEL", "gemini-1.5-flash"))
-        response = model.generate_content(prompt)
-        return (getattr(response, "text", "") or "").strip()
+        response = model.generate_content(
+            prompt,
+            generation_config={"temperature": 0.3},
+        )
+        return _normalize_generated_recommendation(getattr(response, "text", "") or "")
     except Exception:
         return ""
+
+
+def _normalize_generated_recommendation(text: str) -> str:
+    cleaned = re.sub(r"[*_`#>-]", "", text or "")
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if len(cleaned) < 40:
+        return ""
+
+    sentences = re.split(r"(?<=[.!?])\s+", cleaned)
+    shortened = " ".join(sentence for sentence in sentences[:2] if sentence).strip()
+    if len(shortened) < 40 or not re.search(r"[.!?]$", shortened):
+        return ""
+    return shortened[:320].rstrip()
 
 
 if __name__ == "__main__":
