@@ -16,9 +16,9 @@ import sadarLogo from "../assets/images/landing/sadar-logo.png";
 const navigationItems = [
   { id: "dashboard", name: "Dashboard", icon: Home, href: "/dashboard" },
   { id: "catat-keuangan", name: "Catat Keuangan", icon: Edit3, href: "/catat-keuangan" },
-  { id: "behavior-insight", name: "Behavior Insight", icon: Activity, href: "/behavior-insight" },
-  { id: "financial-score", name: "Financial Score", icon: BarChart3, href: "/financial-score" },
-  { id: "profile-account", name: "Profile & Account", icon: User, href: "/profile-account" },
+  { id: "behavior-insight", name: "Insight Perilaku", icon: Activity, href: "/behavior-insight" },
+  { id: "financial-score", name: "Skor Finansial", icon: BarChart3, href: "/financial-score" },
+  { id: "profile-account", name: "Profil & Akun", icon: User, href: "/profile-account" },
 ];
 
 const sidebarWidths = {
@@ -267,7 +267,7 @@ const Sidebar = ({ className = "" }) => {
                 <div className="ml-2 h-2 w-2 rounded-full bg-green-500" title="Online" />
               </Link>
             ) : (
-              <Link to="/profile-account" className="flex justify-center" aria-label="Profile & Account">
+              <Link to="/profile-account" className="flex justify-center" aria-label="Profil & Akun">
                 <div className="relative">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200">
                     <span className="text-sm font-medium text-slate-700">{userInitials}</span>
@@ -284,17 +284,17 @@ const Sidebar = ({ className = "" }) => {
               className={`group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
                 isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
               }`}
-              title={isCollapsed ? "Logout" : undefined}
+              title={isCollapsed ? "Keluar" : undefined}
             >
               <div className="flex min-w-[22px] items-center justify-center">
                 <LogOut className="h-4 w-4 flex-shrink-0 !text-red-500 group-hover:!text-red-600" />
               </div>
 
-              {!isCollapsed && <span className="text-sm !text-red-600 group-hover:!text-red-700">Logout</span>}
+              {!isCollapsed && <span className="text-sm !text-red-600 group-hover:!text-red-700">Keluar</span>}
 
               {isCollapsed && (
                 <div className="invisible absolute left-full z-50 ml-2 whitespace-nowrap rounded bg-slate-800 px-2 py-1 text-xs text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-                  Logout
+                  Keluar
                   <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-x-1 -translate-y-1/2 rotate-45 bg-slate-800" />
                 </div>
               )}

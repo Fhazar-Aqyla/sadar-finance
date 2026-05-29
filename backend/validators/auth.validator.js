@@ -30,4 +30,19 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-module.exports = { registerSchema, loginSchema };
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().lowercase().trim().required(),
+});
+
+const updateProfileSchema = Joi.object({
+  firstName: Joi.string().min(2).max(100).trim().optional(),
+  lastName: Joi.string().min(2).max(100).trim().optional(),
+  gender: Joi.string().valid('male', 'female', 'other').optional().allow(null, ''),
+  phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{10,20}$/).optional().allow(null, ''),
+  dateOfBirth: Joi.date().iso().optional().allow(null, ''),
+  address: Joi.string().max(500).optional().allow(null, ''),
+  profilePicture: Joi.string().uri().max(1000).optional().allow(null, ''),
+  occupation: Joi.string().max(100).optional().allow(null, ''),
+}).min(1);
+
+module.exports = { registerSchema, loginSchema, forgotPasswordSchema, updateProfileSchema };

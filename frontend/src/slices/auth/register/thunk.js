@@ -1,11 +1,10 @@
 //Include Both Helper File with needed methods
-import axios from "axios";
 import { getFirebaseBackend } from "../../../helpers/firebase_helper";
 import {
   postFakeRegister,
   postJwtRegister,
 } from "../../../helpers/fakebackend_helper";
-import { api } from "../../../config";
+import { authApi } from "../../../Components/services/api";
 
 // action
 import {
@@ -18,7 +17,6 @@ import {
 // initialize relavant method of both Auth
 const fireBaseBackend = getFirebaseBackend();
 const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
-const apiBaseUrl = api.API_URL;
 
 const getErrorMessage = (error, fallback = "Registrasi gagal.") => {
   const message = String(
@@ -52,14 +50,14 @@ export const registerUser = (user) => async (dispatch) => {
 
     if (defaultAuth === "sadar") {
       const { firstName, lastName } = splitFullName(user.first_name);
-      response = await axios.post(`${apiBaseUrl}/auth/register`, {
+      response = await authApi.register({
         firstName,
         lastName,
         email: user.email,
         password: user.password,
       });
 
-      dispatch(registerUserSuccessful(response?.data?.data || response?.data || response));
+      dispatch(registerUserSuccessful(response?.data || response));
       return;
     }
 

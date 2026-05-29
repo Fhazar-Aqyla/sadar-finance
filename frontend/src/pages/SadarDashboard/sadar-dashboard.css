@@ -223,6 +223,16 @@
   color: var(--sadar-warning) !important;
 }
 
+.metric-icon.bg-danger-subtle,
+.sadar-dashboard .bg-danger-subtle {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+}
+
+.metric-icon.text-danger,
+.sadar-dashboard .text-danger {
+  color: #ef4444 !important;
+}
+
 .bg-teal-subtle {
   background-color: rgba(20, 184, 166, 0.12) !important;
 }

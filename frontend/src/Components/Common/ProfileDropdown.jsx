@@ -58,7 +58,7 @@ const ProfileDropdown = () => {
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
                             <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{userName}</span>
-                            <span className="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">Personal Finance</span>
+                            <span className="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">Keuangan Pribadi</span>
                         </span>
                     </span>
                 </DropdownToggle>
@@ -67,29 +67,22 @@ const ProfileDropdown = () => {
                     <DropdownItem className='p-0'>
                         <Link to= "/profile-account" className="dropdown-item">
                             <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
-                            <span className="align-middle">Profile & Account</span>
+                            <span className="align-middle">Profil & Akun</span>
                         </Link>
                     </DropdownItem>
                     <DropdownItem className='p-0'>
                         <Link to= "/financial-score" className="dropdown-item">
                             <i className="mdi mdi-speedometer text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle">Financial Score</span>
+                                className="align-middle">Skor Finansial</span>
                         </Link>
                     </DropdownItem>
                     <DropdownItem className='p-0'>
                         <Link to= "/behavior-insight" className="dropdown-item">
                             <i className="mdi mdi-lightbulb-on-outline text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle">Behavior Insight</span>
+                                className="align-middle">Insight Perilaku</span>
                         </Link>
                     </DropdownItem>
                     <div className="dropdown-divider"></div>
-                    <DropdownItem className='p-0'>
-                        <Link to= "/dashboard" className="dropdown-item">
-                            <i
-                                className="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i> <span
-                                    className="align-middle">Saldo : <b>Rp18,45 jt</b></span>
-                        </Link>
-                    </DropdownItem >
                     <DropdownItem className='p-0'>
                         <Link to= "/profile-account" className="dropdown-item">
                             <i
@@ -101,7 +94,7 @@ const ProfileDropdown = () => {
                         <Link to= "/logout" className="dropdown-item">
                             <i
                                 className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                    className="align-middle" data-key="t-logout">Logout</span>
+                                    className="align-middle" data-key="t-logout">Keluar</span>
                         </Link>
                     </DropdownItem>
                 </DropdownMenu>

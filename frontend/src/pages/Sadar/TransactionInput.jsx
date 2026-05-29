@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import {
   Alert,
@@ -17,11 +16,9 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-import { accounts as mockAccounts, currentUserId, shouldShowSadarNewUserMode } from "../SadarShared/mockData";
+import { accountApi, incomeApi, ocrApi, transactionApi } from "../../Components/services/api";
 import "../SadarShared/sadar-pages.css";
 import "./transaction-input.css";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
 
 const categories = [
   { value: "food_and_beverage", label: "Makanan & Minuman" },
@@ -58,24 +55,10 @@ const currencyFormatter = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 0,
 });
 
-const authHeaders = () => {
-  const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
-  return authUser?.token ? { Authorization: `Bearer ${authUser.token}` } : {};
-};
-
 const normalizeBackendAccount = (account) => ({
-  id: account.account_id,
-  name: account.account_name,
-  isMock: false,
+  id: account.account_id || account.id,
+  name: account.account_name || account.accountName || account.name || "Akun",
 });
-
-const normalizeMockAccount = (account) => ({
-  id: account.id,
-  name: account.name,
-  isMock: true,
-});
-
-const getSelectedAccount = (rows, accountId) => rows.find((account) => account.id === accountId);
 
 const onlyDigits = (value) => String(value || "").replace(/\D/g, "");
 
@@ -124,13 +107,6 @@ const TransactionInput = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [notice, setNotice] = useState(null);
-  const fallbackAccounts = useMemo(
-    () =>
-      shouldShowSadarNewUserMode
-        ? []
-        : mockAccounts.filter((account) => account.user_id === currentUserId).map(normalizeMockAccount),
-    [],
-  );
 
   useEffect(() => {
     return () => {
@@ -156,50 +132,37 @@ const TransactionInput = () => {
     let isMounted = true;
 
     const fetchAccounts = async () => {
-      if (shouldShowSadarNewUserMode) {
-        setAccounts([]);
-        setForm((current) => ({ ...current, accountId: "" }));
-        setIncomeForm((current) => ({ ...current, accountId: "" }));
-        return;
-      }
-
       setIsLoadingAccounts(true);
 
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/accounts`, {
-          headers: authHeaders(),
-        });
-        const rows = data?.data || [];
+        const rows = await accountApi.list();
         const normalizedAccounts = rows.map(normalizeBackendAccount);
 
         if (!isMounted) return;
 
-        setAccounts(normalizedAccounts.length ? normalizedAccounts : fallbackAccounts);
+        setAccounts(normalizedAccounts);
 
-        if (normalizedAccounts.length || fallbackAccounts.length) {
-          const availableAccounts = normalizedAccounts.length ? normalizedAccounts : fallbackAccounts;
-          const firstAccountId = availableAccounts[0].id;
+        if (normalizedAccounts.length) {
+          const firstAccountId = normalizedAccounts[0].id;
           setForm((current) => ({
             ...current,
-            accountId: availableAccounts.some((account) => account.id === current.accountId)
+            accountId: normalizedAccounts.some((account) => account.id === current.accountId)
               ? current.accountId
               : firstAccountId,
           }));
           setIncomeForm((current) => ({
             ...current,
-            accountId: availableAccounts.some((account) => account.id === current.accountId)
+            accountId: normalizedAccounts.some((account) => account.id === current.accountId)
               ? current.accountId
               : firstAccountId,
           }));
         }
       } catch (error) {
         if (isMounted) {
-          setAccounts(fallbackAccounts);
-          if (fallbackAccounts.length) {
-            const firstAccountId = fallbackAccounts[0].id;
-            setForm((current) => ({ ...current, accountId: current.accountId || firstAccountId }));
-            setIncomeForm((current) => ({ ...current, accountId: current.accountId || firstAccountId }));
-          }
+          setAccounts([]);
+          setForm((current) => ({ ...current, accountId: "" }));
+          setIncomeForm((current) => ({ ...current, accountId: "" }));
+          setNotice({ color: "danger", message: getErrorMessage(error, "Akun dari backend gagal dimuat.") });
         }
       } finally {
         if (isMounted) {
@@ -213,7 +176,7 @@ const TransactionInput = () => {
     return () => {
       isMounted = false;
     };
-  }, [fallbackAccounts]);
+  }, []);
 
   const updateForm = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -253,10 +216,7 @@ const TransactionInput = () => {
 
   const pollScanResult = async (scanId) => {
     for (let attempt = 0; attempt < 12; attempt += 1) {
-      const { data } = await axios.get(`${API_BASE_URL}/ocr/${scanId}`, {
-        headers: authHeaders(),
-      });
-      const scan = data?.data || data;
+      const scan = await ocrApi.get(scanId);
 
       if (scan?.status === "completed") {
         return scan;
@@ -284,14 +244,7 @@ const TransactionInput = () => {
       const body = new FormData();
       body.append("image", receiptFile);
 
-      const uploadResponse = await axios.post(`${API_BASE_URL}/ocr/upload`, body, {
-        headers: {
-          ...authHeaders(),
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      const uploadedScan = uploadResponse?.data?.data || uploadResponse?.data || uploadResponse;
+      const uploadedScan = await ocrApi.upload(body);
       const scanId = uploadedScan?.ocr_id || uploadedScan?.id;
 
       if (!scanId) {
@@ -327,21 +280,15 @@ const TransactionInput = () => {
 
     setIsSaving(true);
     setNotice(null);
-    const selectedAccount = getSelectedAccount(accounts, form.accountId);
-
     try {
-      await axios.post(
-        `${API_BASE_URL}/transactions`,
-        {
-          categoryGroup: form.categoryGroup,
-          accountId: selectedAccount?.isMock ? null : form.accountId,
-          transactionDate: new Date(form.transactionDate).toISOString(),
-          description: form.description || form.merchant,
-          source: form.source,
-          amount: Number(form.amount),
-        },
-        { headers: authHeaders() }
-      );
+      await transactionApi.create({
+        categoryGroup: form.categoryGroup,
+        accountId: form.accountId,
+        transactionDate: new Date(form.transactionDate).toISOString(),
+        description: form.description || form.merchant,
+        source: form.source,
+        amount: Number(form.amount),
+      });
 
       setNotice({
         color: "success",
@@ -370,19 +317,13 @@ const TransactionInput = () => {
 
     setIsSaving(true);
     setNotice(null);
-    const selectedAccount = getSelectedAccount(accounts, incomeForm.accountId);
-
     try {
-      await axios.post(
-        `${API_BASE_URL}/incomes`,
-        {
-          accountId: selectedAccount?.isMock ? null : incomeForm.accountId,
-          source: incomeForm.source,
-          amount: Number(incomeForm.amount),
-          incomeDate: new Date(incomeForm.date).toISOString(),
-        },
-        { headers: authHeaders() }
-      );
+      await incomeApi.create({
+        accountId: incomeForm.accountId,
+        source: incomeForm.source,
+        amount: Number(incomeForm.amount),
+        incomeDate: new Date(incomeForm.date).toISOString(),
+      });
 
       setNotice({
         color: "success",
@@ -454,7 +395,7 @@ const TransactionInput = () => {
                       }}
                     >
                       <i className="ri-scan-2-line align-bottom me-1" />
-                      Upload OCR
+                      Unggah OCR
                     </Button>
                     <Button
                       className={mode === "manual" ? "active" : ""}
@@ -485,7 +426,7 @@ const TransactionInput = () => {
                         {previewUrl ? (
                           <img
                             src={previewUrl}
-                            alt="Preview struk"
+                            alt="Pratinjau struk"
                             className="sadar-receipt-preview"
                           />
                         ) : (
@@ -493,7 +434,7 @@ const TransactionInput = () => {
                             <span className="sadar-dropzone-icon">
                               <i className="ri-upload-cloud-2-line" />
                             </span>
-                            <strong>Upload gambar struk</strong>
+                            <strong>Unggah gambar struk</strong>
                             <span>PNG, JPG, WEBP, atau HEIC</span>
                           </div>
                         )}
@@ -517,7 +458,7 @@ const TransactionInput = () => {
                         <i className="ri-keyboard-line" />
                       </span>
                       <strong>Input manual aktif</strong>
-                      <p>Isi detail transaksi langsung pada form di sebelah kanan.</p>
+                      <p>Isi detail transaksi langsung pada formulir di sebelah kanan.</p>
                     </div>
                   )}
 
@@ -526,8 +467,8 @@ const TransactionInput = () => {
                       <span className="sadar-dropzone-icon income">
                         <i className="ri-bank-card-line" />
                       </span>
-                      <strong>Pemasukan menambah saldo account</strong>
-                      <p>Gunakan form di sebelah kanan untuk mencatat gaji, freelance, bonus, atau pemasukan lainnya.</p>
+                      <strong>Pemasukan menambah saldo akun</strong>
+                      <p>Gunakan formulir di sebelah kanan untuk mencatat gaji, freelance, bonus, atau pemasukan lainnya.</p>
                     </div>
                   )}
                 </div>
@@ -544,7 +485,7 @@ const TransactionInput = () => {
                 </CardHeader>
                 <CardBody>
                   <div className="d-flex justify-content-between mb-2">
-                    <span className="text-muted">Confidence</span>
+                    <span className="text-muted">Tingkat keyakinan</span>
                     <strong>{Math.round(Number(scanResult.confidence || 0) * 100)}%</strong>
                   </div>
                   <div className="table-responsive">
@@ -570,7 +511,7 @@ const TransactionInput = () => {
                 <div>
                   <h4 className="card-title mb-1">{entryType === "income" ? "Detail Pemasukan" : "Detail Pengeluaran"}</h4>
                   <p className="text-muted mb-0">
-                    {entryType === "income" ? "Pilih account tujuan dan sumber pemasukan" : "Pilih account asal dan detail pengeluaran"}
+                    {entryType === "income" ? "Pilih akun tujuan dan sumber pemasukan" : "Pilih akun asal dan detail pengeluaran"}
                   </p>
                 </div>
               </CardHeader>
@@ -581,7 +522,7 @@ const TransactionInput = () => {
                 <Form onSubmit={handleSubmit} className="sadar-transaction-form">
                   <Row className="g-3 sadar-form-row">
                     <Col md={6}>
-                      <Label htmlFor="accountId" className="form-label">Account</Label>
+                      <Label htmlFor="accountId" className="form-label">Akun</Label>
                       <Input
                         id="accountId"
                         type="select"
@@ -591,7 +532,7 @@ const TransactionInput = () => {
                       >
                         {!accounts.length && (
                           <option value="">
-                            {isLoadingAccounts ? "Memuat account..." : "Belum ada account"}
+                            {isLoadingAccounts ? "Memuat akun..." : "Belum ada akun"}
                           </option>
                         )}
                         {accounts.map((account) => (
@@ -603,7 +544,7 @@ const TransactionInput = () => {
                       {!accounts.length && !isLoadingAccounts && (
                         <div className="mt-2">
                           <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/profile-account#kelola-account">
-                            Tambah Account Dulu
+                            Tambah Akun Dulu
                           </Button>
                         </div>
                       )}
@@ -678,7 +619,7 @@ const TransactionInput = () => {
                         onClick={() => setForm({ ...initialForm, accountId: form.accountId, source: mode === "ocr" ? "ocr" : "manual" })}
                       >
                         <i className="ri-refresh-line align-bottom me-1" />
-                        Reset
+                        Atur Ulang
                       </Button>
                       <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
@@ -691,7 +632,7 @@ const TransactionInput = () => {
                 <Form onSubmit={handleIncomeSubmit} className="sadar-transaction-form">
                   <Row className="g-3 sadar-form-row">
                     <Col md={6}>
-                      <Label htmlFor="income-account" className="form-label">Account Tujuan</Label>
+                      <Label htmlFor="income-account" className="form-label">Akun Tujuan</Label>
                       <Input
                         id="income-account"
                         type="select"
@@ -701,7 +642,7 @@ const TransactionInput = () => {
                       >
                         {!accounts.length && (
                           <option value="">
-                            {isLoadingAccounts ? "Memuat account..." : "Belum ada account"}
+                            {isLoadingAccounts ? "Memuat akun..." : "Belum ada akun"}
                           </option>
                         )}
                         {accounts.map((account) => (
@@ -713,7 +654,7 @@ const TransactionInput = () => {
                       {!accounts.length && !isLoadingAccounts && (
                         <div className="mt-2">
                           <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/profile-account#kelola-account">
-                            Tambah Account Dulu
+                            Tambah Akun Dulu
                           </Button>
                         </div>
                       )}
@@ -773,7 +714,7 @@ const TransactionInput = () => {
                         onClick={() => setIncomeForm({ ...initialIncomeForm, accountId: incomeForm.accountId })}
                       >
                         <i className="ri-refresh-line align-bottom me-1" />
-                        Reset
+                        Atur Ulang
                       </Button>
                       <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
@@ -793,3 +734,5 @@ const TransactionInput = () => {
 };
 
 export default TransactionInput;
+
+

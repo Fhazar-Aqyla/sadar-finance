@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Alert,
@@ -16,16 +16,40 @@ import {
   Row,
 } from "reactstrap";
 
-import { userProfile } from "../SadarShared/mockData";
+import { authApi } from "../../Components/services/api";
 import "../SadarShared/sadar-pages.css";
+
+const defaultProfile = {
+  name: "SADAR",
+  email: "",
+  avatar: "",
+};
+
+const normalizeProfile = (user) => {
+  const firstName = user?.first_name || user?.firstName || "";
+  const lastName = user?.last_name || user?.lastName || "";
+  return {
+    name: `${firstName} ${lastName}`.trim() || user?.email || defaultProfile.name,
+    email: user?.email || defaultProfile.email,
+    avatar: user?.profile_picture || user?.profilePicture || defaultProfile.avatar,
+  };
+};
+
+const splitFullName = (fullName = "") => {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || "SADAR",
+    lastName: parts.slice(1).join(" ") || "User",
+  };
+};
 
 const ProfileEdit = () => {
   document.title = "Edit Profil | SADAR Finance";
 
   const [profile, setProfile] = useState({
-    name: userProfile.name,
-    email: userProfile.email,
-    avatar: userProfile.avatar,
+    name: defaultProfile.name,
+    email: defaultProfile.email,
+    avatar: defaultProfile.avatar,
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -37,6 +61,31 @@ const ProfileEdit = () => {
     newPassword: false,
     confirmPassword: false,
   });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      try {
+        const user = await authApi.me();
+        if (!isMounted) return;
+        setProfile((current) => ({
+          ...current,
+          ...normalizeProfile(user),
+        }));
+      } catch (_error) {
+        if (isMounted) {
+          setNotice({ color: "warning", message: "Profil server belum bisa dimuat. Data lokal ditampilkan sementara." });
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleChange = (field, value) => {
     setNotice(null);
@@ -58,7 +107,7 @@ const ProfileEdit = () => {
   const passwordHasLetterAndNumber = /[A-Za-z]/.test(profile.newPassword) && /\d/.test(profile.newPassword);
   const isChangingPassword = profile.currentPassword || profile.newPassword || profile.confirmPassword;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const nextErrors = {};
 
     if (!profile.name.trim()) {
@@ -96,7 +145,22 @@ const ProfileEdit = () => {
       return;
     }
 
-    setNotice({ color: "success", message: "Profil berhasil disimpan." });
+    if (isChangingPassword) {
+      setNotice({ color: "warning", message: "Perubahan password belum tersedia di API backend." });
+      return;
+    }
+
+    try {
+      const { firstName, lastName } = splitFullName(profile.name);
+      const updatedUser = await authApi.updateMe({
+        firstName,
+        lastName,
+      });
+      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
+      setNotice({ color: "success", message: "Profil berhasil disimpan." });
+    } catch (error) {
+      setNotice({ color: "danger", message: error?.message || "Profil gagal disimpan." });
+    }
   };
 
   const PasswordField = ({ id, label, field, placeholder }) => (

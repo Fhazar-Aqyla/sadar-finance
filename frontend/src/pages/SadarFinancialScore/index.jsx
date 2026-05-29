@@ -1,22 +1,68 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
-import { Button, ButtonGroup, Card, CardBody, CardHeader, Col, Container, Progress, Row } from "reactstrap";
-
 import {
-  alerts,
-  budgets,
-  currentUserId,
-  getUserRows,
-  groupSumBy,
-  incomes,
-  rupiah,
-  shouldShowSadarNewUserMode,
-  sumBy,
-  transactions,
-} from "../SadarShared/mockData";
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Progress,
+  Row,
+} from "reactstrap";
+import {
+  analyticsApi,
+  incomeApi,
+  transactionApi,
+} from "../../Components/services/api";
+
+const sumBy = (rows, getValue) =>
+  rows.reduce((total, row) => total + getValue(row), 0);
+
+const toBudgetGroup = (category) => {
+  const text = String(category || "").toLowerCase();
+  if (/tabungan|invest|saving|dana darurat/.test(text)) return "Savings";
+  if (
+    /makan|food|transport|tagihan|utilit|kesehatan|pendidikan|groceries|utilities|health|education/.test(
+      text,
+    )
+  )
+    return "Needs";
+  return "Wants";
+};
+
+const normalizeTransaction = (transaction) => ({
+  id: transaction.transaction_id || transaction.id,
+  account_id: transaction.account_id || transaction.accountId,
+  category:
+    transaction.category_group || transaction.categoryGroup || "Lainnya",
+  amount: Number(transaction.amount || 0),
+  date: String(
+    transaction.transaction_date ||
+      transaction.transactionDate ||
+      transaction.date ||
+      "",
+  ).slice(0, 10),
+});
+
+const normalizeIncome = (income) => ({
+  id: income.income_id || income.id,
+  amount: Number(income.amount || 0),
+  date: String(
+    income.income_date || income.incomeDate || income.date || "",
+  ).slice(0, 10),
+});
+
 import "../SadarShared/sadar-pages.css";
+
+const rupiah = (value) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
 
 const getScoreStatus = (score) => {
   if (score <= 40) return "Perlu Perhatian";
@@ -24,9 +70,49 @@ const getScoreStatus = (score) => {
   return "Sehat";
 };
 
+const getScoreTone = (score) => {
+  if (score <= 40) {
+    return {
+      className: "danger",
+      chartColor: "#ef4444",
+      progressColor: "danger",
+    };
+  }
+
+  if (score <= 70) {
+    return {
+      className: "warning",
+      chartColor: "#f59e0b",
+      progressColor: "warning",
+    };
+  }
+
+  return {
+    className: "success",
+    chartColor: "#22c55e",
+    progressColor: "success",
+  };
+};
+
+const getBudgetTone = (usage) => {
+  if (usage >= 100) return "danger";
+  if (usage >= 80) return "warning";
+  return "success";
+};
+
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://sadar-finance.up.railway.app/api/v1";
+const getBudgetHealthProgress = (usage) => {
+  if (usage <= 80) return 100;
+  if (usage <= 100) return Math.round(100 - ((usage - 80) / 20) * 40);
+  return Math.round(clamp(60 - ((usage - 100) / 30) * 60, 0, 60));
+};
+
+const getExpenseHealthProgress = (ratio) => {
+  if (ratio <= 70) return 100;
+  if (ratio <= 100) return Math.round(100 - ((ratio - 70) / 30) * 50);
+  return Math.round(clamp(50 - ((ratio - 100) / 30) * 50, 0, 50));
+};
 
 const periodOptions = [
   { key: "2w", label: "2 Minggu", months: 1 },
@@ -37,17 +123,13 @@ const periodOptions = [
   { key: "all", label: "Semua", months: 24 },
 ];
 
-const authHeaders = () => {
-  const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
-  return authUser?.token ? { Authorization: `Bearer ${authUser.token}` } : {};
-};
-
 const toPercent = (value) => Number((value * 100).toFixed(1));
 
 const getPeriodOption = (periodKey) =>
   periodOptions.find((option) => option.key === periodKey) || periodOptions[2];
 
-const getDateValue = (item) => item.date || item.transaction_date || item.income_date || item.created_at;
+const getDateValue = (item) =>
+  item.date || item.transaction_date || item.income_date || item.created_at;
 
 const getPeriodStartDate = (periodKey, rows) => {
   if (periodKey === "all") return null;
@@ -81,7 +163,9 @@ const filterRowsByPeriod = (rows, periodKey) => {
 };
 
 const buildApiData = (healthScore) => {
-  const score = Number(healthScore?.breakdown?.overallScore ?? healthScore?.score?.score ?? 0);
+  const score = Number(
+    healthScore?.breakdown?.overallScore ?? healthScore?.score?.score ?? 0,
+  );
   const totalIncome = Number(healthScore?.financials?.totalIncome || 0);
   const totalExpense = Number(healthScore?.financials?.totalExpense || 0);
   const ratios = healthScore?.ratios || {};
@@ -110,12 +194,12 @@ const buildApiData = (healthScore) => {
         progress: clamp(Number(breakdown.expenseScore || 0), 0, 100),
       },
       {
-        label: "Budget Terpakai",
+        label: "Anggaran Terpakai",
         value: `${budgetUsage.toFixed(1)}%`,
         description:
           budgetUsage >= 80
-            ? "Budget mendekati batas, beberapa kategori perlu dipantau."
-            : "Penggunaan budget masih relatif aman.",
+            ? "Anggaran mendekati batas, beberapa kategori perlu dipantau."
+            : "Penggunaan anggaran masih relatif aman.",
         progress: clamp(Number(breakdown.budgetScore || 0), 0, 100),
       },
       {
@@ -124,14 +208,22 @@ const buildApiData = (healthScore) => {
         description:
           Number(breakdown.consistencyScore || 0) >= 60
             ? "Data pemasukan dan transaksi cukup konsisten untuk dibaca."
-            : "Data masih perlu dicatat lebih rutin agar score makin akurat.",
+            : "Data masih perlu dicatat lebih rutin agar skor makin akurat.",
         progress: clamp(Number(breakdown.consistencyScore || 0), 0, 100),
       },
       {
         label: "Alokasi 50/30/20",
         value: `${needsRatio.toFixed(0)} / ${wantsRatio.toFixed(0)} / ${savingsRatio.toFixed(0)}%`,
-        description: "Perbandingan Kebutuhan, Keinginan, dan Tabungan terhadap pemasukan bulan ini.",
-        progress: clamp(100 - Math.abs(50 - needsRatio) - Math.abs(30 - wantsRatio) - Math.abs(20 - savingsRatio), 0, 100),
+        description:
+          "Perbandingan Kebutuhan, Keinginan, dan Tabungan terhadap pemasukan bulan ini.",
+        progress: clamp(
+          100 -
+            Math.abs(50 - needsRatio) -
+            Math.abs(30 - wantsRatio) -
+            Math.abs(20 - savingsRatio),
+          0,
+          100,
+        ),
       },
       {
         label: "Rasio Tabungan",
@@ -150,139 +242,23 @@ const buildApiData = (healthScore) => {
             ? "Pengeluaran bulan ini masih berada di bawah pemasukan."
             : "Pengeluaran bulan ini sudah melewati pemasukan.",
           budgetUsage >= 80
-            ? "Penggunaan budget sudah mendekati batas dan perlu dipantau."
-            : "Penggunaan budget masih berada di area aman.",
+            ? "Penggunaan anggaran sudah mendekati batas dan perlu dipantau."
+            : "Penggunaan anggaran masih berada di area aman.",
           savingsRate < 20
             ? "Alokasi tabungan belum mencapai 20% dari pemasukan."
             : "Alokasi tabungan sudah mendekati prinsip 20%.",
         ],
     recommendations: healthScore?.recommendations?.length
       ? healthScore.recommendations
-      : ["Review budget mingguan agar pola pengeluaran tetap stabil."],
+      : ["Tinjau anggaran mingguan agar pola pengeluaran tetap stabil."],
     ratioSeries: [needsRatio, wantsRatio, savingsRatio],
   };
 };
 
-const buildFallbackData = (periodKey) => {
-  const userTransactions = filterRowsByPeriod(getUserRows(transactions, currentUserId), periodKey);
-  const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
-  const userIncomes = filterRowsByPeriod(getUserRows(incomes, currentUserId), periodKey);
-  const userBudgets = getUserRows(budgets, currentUserId);
-  const userAlerts = getUserRows(alerts, currentUserId);
-
-  const totalIncome = sumBy(userIncomes, (item) => item.amount);
-  const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
-  const expenseRatio = totalIncome ? (totalExpense / totalIncome) * 100 : 0;
-  const budgetUsed = sumBy(userBudgets, (item) => item.used);
-  const budgetLimit = sumBy(userBudgets, (item) => item.limit);
-  const budgetUsage = budgetLimit ? (budgetUsed / budgetLimit) * 100 : 0;
-  const budgetByGroup = groupSumBy(userTransactions, "budget_group");
-  const needsRatio = totalIncome ? ((budgetByGroup.Needs || 0) / totalIncome) * 100 : 0;
-  const wantsRatio = totalIncome ? ((budgetByGroup.Wants || 0) / totalIncome) * 100 : 0;
-  const savingsRatio = totalIncome ? ((budgetByGroup.Savings || 0) / totalIncome) * 100 : 0;
-
-  const byDate = Object.values(
-    expenseTransactions.reduce((result, item) => {
-      result[item.date] = (result[item.date] || 0) + item.amount;
-      return result;
-    }, {}),
-  );
-  const dailyAverage = byDate.length ? sumBy(byDate, (item) => item) / byDate.length : 0;
-  const spikeDays = byDate.filter((amount) => amount > dailyAverage * 1.65).length;
-
-  let score = 100;
-  score -= clamp(expenseRatio - 70, 0, 30) * 0.5;
-  score -= clamp(budgetUsage - 80, 0, 35) * 0.6;
-  score -= clamp(wantsRatio - 30, 0, 30) * 0.7;
-  score -= clamp(20 - savingsRatio, 0, 20) * 0.9;
-  score -= userAlerts.length * 4;
-  score -= spikeDays * 2;
-  score = Math.round(clamp(score, 0, 100));
-
-  const factors = [
-    {
-      label: "Pemasukan vs Pengeluaran",
-      value: `${expenseRatio.toFixed(1)}%`,
-      description:
-        expenseRatio < 70
-          ? "Pengeluaran masih berada di bawah pemasukan dengan ruang aman."
-          : "Pengeluaran mulai tinggi dibanding pemasukan bulan ini.",
-      progress: clamp(expenseRatio, 0, 100),
-    },
-    {
-      label: "Budget Terpakai",
-      value: `${budgetUsage.toFixed(1)}%`,
-      description:
-        budgetUsage >= 80
-          ? "Budget mendekati batas, beberapa kategori perlu dipantau."
-          : "Penggunaan budget masih relatif aman.",
-      progress: clamp(budgetUsage, 0, 100),
-    },
-    {
-      label: "Konsistensi Pengeluaran",
-      value: `${spikeDays} spike`,
-      description:
-        spikeDays > 0
-          ? "Ada hari dengan pengeluaran jauh lebih tinggi dari rata-rata."
-          : "Tidak ada lonjakan pengeluaran besar dalam periode ini.",
-      progress: clamp(100 - spikeDays * 18, 0, 100),
-    },
-    {
-      label: "Alokasi 50/30/20",
-      value: `${needsRatio.toFixed(0)} / ${wantsRatio.toFixed(0)} / ${savingsRatio.toFixed(0)}%`,
-      description: "Perbandingan Kebutuhan, Keinginan, dan Tabungan terhadap pemasukan bulan ini.",
-      progress: clamp(100 - Math.abs(50 - needsRatio) - Math.abs(30 - wantsRatio) - Math.abs(20 - savingsRatio), 0, 100),
-    },
-    {
-      label: "Alert Budget",
-      value: `${userAlerts.length} alert`,
-      description:
-        userAlerts.length > 0
-          ? "Ada kategori yang mendekati batas budget."
-          : "Belum ada alert overspending aktif.",
-      progress: clamp(100 - userAlerts.length * 22, 0, 100),
-    },
-  ];
-
-  const insights = [
-    totalExpense < totalIncome
-      ? "Pengeluaran bulan ini masih berada di bawah pemasukan."
-      : "Pengeluaran bulan ini sudah melewati pemasukan.",
-    budgetUsage >= 80
-      ? "Penggunaan budget sudah mendekati batas dan perlu dipantau."
-      : "Penggunaan budget masih berada di area aman.",
-    savingsRatio < 20
-      ? "Alokasi tabungan belum mencapai 20% dari pemasukan."
-      : "Alokasi tabungan sudah mendekati prinsip 20%.",
-  ];
-
-  const recommendations = [
-    wantsRatio > 30
-      ? "Kurangi pengeluaran kategori wants agar budget lebih aman."
-      : "Pertahankan porsi keinginan agar tetap di sekitar 30% dari pemasukan.",
-    savingsRatio < 20
-      ? "Sisihkan minimal 20% dari pemasukan untuk tabungan atau dana darurat."
-      : "Pertahankan kebiasaan menyisihkan dana untuk tabungan.",
-    budgetUsage >= 80
-      ? "Pantau kategori yang mendekati batas sebelum menambah transaksi baru."
-      : "Review budget mingguan agar pola pengeluaran tetap stabil.",
-  ];
-
-  return {
-    score,
-    status: getScoreStatus(score),
-    totalIncome,
-    totalExpense,
-    budgetUsage,
-    factors,
-    insights,
-    recommendations,
-    ratioSeries: [needsRatio, wantsRatio, savingsRatio],
-  };
-};
-
-const EmptyFinancialScore = () => {
-  document.title = "Financial Score | SADAR Finance";
+const EmptyFinancialScore = ({ message = "" }) => {
+  useEffect(() => {
+    document.title = "Skor Finansial | SADAR Finance";
+  }, []);
 
   return (
     <div className="page-content sadar-page">
@@ -293,19 +269,30 @@ const EmptyFinancialScore = () => {
               <span className="sadar-empty-state-icon">
                 <i className="ri-speed-up-line"></i>
               </span>
-              <h4>Financial Score Belum Tersedia</h4>
-              <p>Score akan dihitung setelah kamu menambahkan income, mengatur budget, dan mencatat transaksi.</p>
+              <h4>Skor Finansial Belum Tersedia</h4>
+              <p>
+                {message ||
+                  "Skor akan dihitung setelah kamu menambahkan pemasukan, mengatur anggaran, dan mencatat transaksi."}
+              </p>
               <div className="sadar-step-status-list">
-                <span>Income belum ada</span>
-                <span>Budget belum diatur</span>
+                <span>Pemasukan belum ada</span>
+                <span>Anggaran belum diatur</span>
                 <span>Transaksi belum cukup</span>
               </div>
               <div className="d-flex flex-wrap justify-content-center gap-2">
-                <Button color="success" tag={Link} to="/catat-keuangan?type=income">
-                  Catat Income
+                <Button
+                  color="success"
+                  tag={Link}
+                  to="/catat-keuangan?type=income"
+                >
+                  Catat Pemasukan
                 </Button>
-                <Button color="primary" tag={Link} to="/profile-account#atur-budget">
-                  Atur Budget
+                <Button
+                  color="primary"
+                  tag={Link}
+                  to="/profile-account#atur-budget"
+                >
+                  Atur Anggaran
                 </Button>
               </div>
             </div>
@@ -317,10 +304,12 @@ const EmptyFinancialScore = () => {
 };
 
 const FinancialScoreWithData = () => {
-  document.title = "Financial Score | SADAR Finance";
+  useEffect(() => {
+    document.title = "Skor Finansial | SADAR Finance";
+  }, []);
 
   const [healthScore, setHealthScore] = useState(null);
-  const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("3m");
 
   useEffect(() => {
@@ -329,20 +318,147 @@ const FinancialScoreWithData = () => {
     const fetchHealthScore = async () => {
       const periodOption = getPeriodOption(selectedPeriod);
       try {
-        const { data: response } = await axios.post(
-          `${API_BASE_URL}/analytics/health-score`,
-          { period: selectedPeriod, periodMonths: periodOption.months },
-          { headers: authHeaders() },
+        const [healthScoreResponse, incomeRows, expenseRows, budgetResponse] =
+          await Promise.all([
+            analyticsApi.healthScore({
+              period: selectedPeriod,
+              periodMonths: periodOption.months,
+            }),
+            incomeApi.list({ limit: 100 }).catch(() => []),
+            transactionApi.list({ limit: 100 }).catch(() => []),
+            analyticsApi.latestBudget().catch(() => null),
+          ]);
+
+        if (!isMounted) return;
+
+        const normalizedIncomes = (incomeRows || []).map(normalizeIncome);
+        const normalizedTransactions = (expenseRows || []).map(
+          normalizeTransaction,
         );
 
-        if (isMounted) {
-          setHealthScore(response?.data || null);
-          setIsUsingFallback(false);
-        }
+        const filteredIncomes = filterRowsByPeriod(
+          normalizedIncomes,
+          selectedPeriod,
+        );
+        const filteredTransactions = filterRowsByPeriod(
+          normalizedTransactions,
+          selectedPeriod,
+        );
+
+        const totalIncome = sumBy(filteredIncomes, (item) => item.amount);
+        const totalExpense = sumBy(filteredTransactions, (item) => item.amount);
+
+        let needsUsed = 0;
+        let wantsUsed = 0;
+        let savingsUsed = 0;
+
+        filteredTransactions.forEach((t) => {
+          const group = toBudgetGroup(t.category);
+          if (group === "Needs") needsUsed += t.amount;
+          else if (group === "Savings") savingsUsed += t.amount;
+          else wantsUsed += t.amount;
+        });
+
+        const needsLimit = Number(
+          budgetResponse?.needs_amount || budgetResponse?.needsAmount || 0,
+        );
+        const wantsLimit = Number(
+          budgetResponse?.wants_amount || budgetResponse?.wantsAmount || 0,
+        );
+        const savingsLimit = Number(
+          budgetResponse?.savings_amount || budgetResponse?.savingsAmount || 0,
+        );
+        const totalLimit = needsLimit + wantsLimit + savingsLimit;
+        const totalUsed = needsUsed + wantsUsed + savingsUsed;
+
+        // Calculate fallback ratios
+        const calculatedRatios = {
+          expenseRatio: totalIncome ? totalExpense / totalIncome : 0,
+          budgetUsage: totalLimit ? totalUsed / totalLimit : 0,
+          savingsRate: totalIncome ? savingsUsed / totalIncome : 0,
+          needsRatio: totalIncome ? needsUsed / totalIncome : 0,
+          wantsRatio: totalIncome ? wantsUsed / totalIncome : 0,
+          savingsRatio: totalIncome ? savingsUsed / totalIncome : 0,
+        };
+
+        const expenseRatioPercent = calculatedRatios.expenseRatio * 100;
+        const budgetUsagePercent = calculatedRatios.budgetUsage * 100;
+        const savingsRatePercent = calculatedRatios.savingsRate * 100;
+        const needsRatioPercent = calculatedRatios.needsRatio * 100;
+        const wantsRatioPercent = calculatedRatios.wantsRatio * 100;
+        const savingsRatioPercent = calculatedRatios.savingsRatio * 100;
+
+        // Fallback breakdown scores
+        const expenseScore = getExpenseHealthProgress(expenseRatioPercent);
+        const budgetScore = getBudgetHealthProgress(budgetUsagePercent);
+        const consistencyScore = healthScoreResponse?.breakdown
+          ?.consistencyScore
+          ? Number(healthScoreResponse.breakdown.consistencyScore)
+          : filteredTransactions.length >= 5
+            ? 100
+            : filteredTransactions.length * 20;
+        const allocationScore = Math.max(
+          0,
+          100 -
+            Math.abs(50 - needsRatioPercent) -
+            Math.abs(30 - wantsRatioPercent) -
+            Math.abs(20 - savingsRatioPercent),
+        );
+        const savingsScore = Math.min(100, savingsRatePercent * 5);
+
+        const calculatedOverallScore = Math.round(
+          (expenseScore +
+            budgetScore +
+            consistencyScore +
+            allocationScore +
+            savingsScore) /
+            5,
+        );
+
+        const fallbackHealthScore = {
+          ...healthScoreResponse,
+          financials: {
+            totalIncome:
+              totalIncome || healthScoreResponse?.financials?.totalIncome || 0,
+            totalExpense:
+              totalExpense ||
+              healthScoreResponse?.financials?.totalExpense ||
+              0,
+          },
+          ratios: {
+            expenseRatio: calculatedRatios.expenseRatio,
+            budgetUsage: calculatedRatios.budgetUsage,
+            savingsRate: calculatedRatios.savingsRate,
+            needsRatio: calculatedRatios.needsRatio,
+            wantsRatio: calculatedRatios.wantsRatio,
+            savingsRatio: calculatedRatios.savingsRatio,
+          },
+          breakdown: {
+            overallScore:
+              healthScoreResponse?.breakdown?.overallScore ||
+              healthScoreResponse?.score?.score ||
+              calculatedOverallScore,
+            expenseScore:
+              healthScoreResponse?.breakdown?.expenseScore || expenseScore,
+            budgetScore:
+              healthScoreResponse?.breakdown?.budgetScore || budgetScore,
+            consistencyScore: consistencyScore,
+            savingsScore:
+              healthScoreResponse?.breakdown?.savingsScore || savingsScore,
+          },
+          score: {
+            score: healthScoreResponse?.score?.score || calculatedOverallScore,
+          },
+        };
+
+        setHealthScore(fallbackHealthScore);
+        setLoadError("");
       } catch (_error) {
         if (isMounted) {
           setHealthScore(null);
-          setIsUsingFallback(true);
+          setLoadError(
+            "Gagal memuat skor finansial. Silakan coba beberapa saat lagi.",
+          );
         }
       }
     };
@@ -355,9 +471,15 @@ const FinancialScoreWithData = () => {
   }, [selectedPeriod]);
 
   const data = useMemo(
-    () => (healthScore ? buildApiData(healthScore) : buildFallbackData(selectedPeriod)),
-    [healthScore, selectedPeriod],
+    () => (healthScore ? buildApiData(healthScore) : null),
+    [healthScore],
   );
+
+  if (!data) {
+    return <EmptyFinancialScore message={loadError} />;
+  }
+  const scoreTone = getScoreTone(data.score);
+  const budgetTone = getBudgetTone(data.budgetUsage);
 
   return (
     <div className="page-content sadar-page">
@@ -367,13 +489,18 @@ const FinancialScoreWithData = () => {
             <Card className="sadar-panel flex-fill">
               <CardBody className="sadar-score-main">
                 <div className="sadar-score-heading">
-                  <span>Financial Score</span>
+                  <span>Skor Finansial</span>
                   <p>Ringkasan kesehatan keuangan bulan ini</p>
                 </div>
-                <ButtonGroup size="sm" className="flex-wrap justify-content-center mb-3">
+                <ButtonGroup
+                  size="sm"
+                  className="flex-wrap justify-content-center mb-3"
+                >
                   {periodOptions.map((option) => (
                     <Button
-                      color={selectedPeriod === option.key ? "primary" : "light"}
+                      color={
+                        selectedPeriod === option.key ? "primary" : "light"
+                      }
                       key={option.key}
                       onClick={() => setSelectedPeriod(option.key)}
                     >
@@ -382,12 +509,13 @@ const FinancialScoreWithData = () => {
                   ))}
                 </ButtonGroup>
                 <ReactApexChart
+                  key={scoreTone.chartColor}
                   type="radialBar"
                   height={250}
                   series={[data.score]}
                   options={{
                     chart: { sparkline: { enabled: true } },
-                    colors: ["#1E3A8A"],
+                    colors: [scoreTone.chartColor],
                     plotOptions: {
                       radialBar: {
                         hollow: { size: "70%" },
@@ -397,92 +525,113 @@ const FinancialScoreWithData = () => {
                     },
                   }}
                 />
-                <div className="sadar-score-number">
+                <div className={`sadar-score-number ${scoreTone.className}`}>
                   {data.score}
                   <span>/100</span>
                 </div>
-                <span className="sadar-score-status">{data.status}</span>
+                <span className={`sadar-score-status ${scoreTone.className}`}>
+                  {data.status}
+                </span>
                 <p className="sadar-score-note">
-                  {isUsingFallback
-                    ? "Skor fallback ditampilkan sementara sampai data backend tersedia."
-                    : "Skor ini membantu membaca pola pemasukan, pengeluaran, budget, dan tabunganmu."}
+                  Skor ini membantu membaca pola pemasukan, pengeluaran,
+                  anggaran, dan tabunganmu.
                 </p>
               </CardBody>
             </Card>
           </Col>
           <Col xl={8} className="d-flex">
             <div className="sadar-score-stack">
-            <Row className="g-3 flex-shrink-0">
-              <Col md={4}>
-                <Card className="sadar-summary-card">
-                  <CardBody>
-                    <div className="sadar-summary-label">
-                      Pemasukan
-                      <span className="sadar-card-icon teal"><i className="ri-arrow-down-circle-line"></i></span>
-                    </div>
-                    <h2>{rupiah(data.totalIncome)}</h2>
-                    <p>Total pemasukan bulan ini</p>
-                  </CardBody>
-                </Card>
-              </Col>
-              <Col md={4}>
-                <Card className="sadar-summary-card">
-                  <CardBody>
-                    <div className="sadar-summary-label">
-                      Pengeluaran
-                      <span className="sadar-card-icon"><i className="ri-arrow-up-circle-line"></i></span>
-                    </div>
-                    <h2>{rupiah(data.totalExpense)}</h2>
-                    <p>Total pengeluaran bulan ini</p>
-                  </CardBody>
-                </Card>
-              </Col>
-              <Col md={4}>
-                <Card className="sadar-summary-card">
-                  <CardBody>
-                    <div className="sadar-summary-label">
-                      Budget Terpakai
-                      <span className="sadar-card-icon warning"><i className="ri-alert-line"></i></span>
-                    </div>
-                    <h2>{data.budgetUsage.toFixed(1)}%</h2>
-                    <p>Warning muncul mulai 80%</p>
-                  </CardBody>
-                </Card>
-              </Col>
-            </Row>
+              <Row className="g-3 flex-shrink-0">
+                <Col md={4}>
+                  <Card className="sadar-summary-card">
+                    <CardBody>
+                      <div className="sadar-summary-label">
+                        Pemasukan
+                        <span className="sadar-card-icon teal">
+                          <i className="ri-arrow-down-circle-line"></i>
+                        </span>
+                      </div>
+                      <h2>{rupiah(data.totalIncome)}</h2>
+                      <p>Total pemasukan bulan ini</p>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col md={4}>
+                  <Card className="sadar-summary-card">
+                    <CardBody>
+                      <div className="sadar-summary-label">
+                        Pengeluaran
+                        <span className="sadar-card-icon">
+                          <i className="ri-arrow-up-circle-line"></i>
+                        </span>
+                      </div>
+                      <h2>{rupiah(data.totalExpense)}</h2>
+                      <p>Total pengeluaran bulan ini</p>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col md={4}>
+                  <Card className="sadar-summary-card">
+                    <CardBody>
+                      <div className="sadar-summary-label">
+                        Anggaran Terpakai
+                        <span className={`sadar-card-icon ${budgetTone}`}>
+                          <i className="ri-alert-line"></i>
+                        </span>
+                      </div>
+                      <h2 className={`sadar-semantic-value ${budgetTone}`}>
+                        {data.budgetUsage.toFixed(1)}%
+                      </h2>
+                      <p>Peringatan muncul mulai 80%</p>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
 
-            <Card className="sadar-panel mt-3 flex-fill">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Alokasi 50/30/20</h4>
-                  <p className="text-muted mb-0">Bandingkan alokasi aktual dengan target ideal</p>
-                </div>
-              </CardHeader>
-              <CardBody className="sadar-score-chart-body">
-                <ReactApexChart
-                  type="bar"
-                  height={270}
-                  series={[
-                    { name: "Aktual", data: data.ratioSeries },
-                    { name: "Target", data: [50, 30, 20] },
-                  ]}
-                  options={{
-                    chart: {
-                      toolbar: { show: false },
-                      fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-                    },
-                    colors: ["#1E3A8A", "#14B8A6"],
-                    plotOptions: { bar: { borderRadius: 7, columnWidth: "42%" } },
-                    dataLabels: { enabled: false },
-                    xaxis: { categories: ["Kebutuhan", "Keinginan", "Tabungan"] },
-                    yaxis: { max: 60, labels: { formatter: (value) => `${value}%` } },
-                    tooltip: { y: { formatter: (value) => `${value.toFixed(1)}%` } },
-                    legend: { position: "top", horizontalAlign: "right" },
-                    grid: { borderColor: "#edf2f7", strokeDashArray: 4 },
-                  }}
-                />
-              </CardBody>
-            </Card>
+              <Card className="sadar-panel mt-3 flex-fill">
+                <CardHeader>
+                  <div>
+                    <h4 className="card-title mb-1">Alokasi 50/30/20</h4>
+                    <p className="text-muted mb-0">
+                      Bandingkan alokasi aktual dengan target ideal
+                    </p>
+                  </div>
+                </CardHeader>
+                <CardBody className="sadar-score-chart-body">
+                  <ReactApexChart
+                    type="bar"
+                    height={270}
+                    series={[
+                      { name: "Aktual", data: data.ratioSeries },
+                      { name: "Target", data: [50, 30, 20] },
+                    ]}
+                    options={{
+                      chart: {
+                        toolbar: { show: false },
+                        fontFamily:
+                          "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+                      },
+                      colors: ["#1E3A8A", "#14B8A6"],
+                      plotOptions: {
+                        bar: { borderRadius: 7, columnWidth: "42%" },
+                      },
+                      dataLabels: { enabled: false },
+                      xaxis: {
+                        categories: ["Kebutuhan", "Keinginan", "Tabungan"],
+                      },
+                      yaxis: {
+                        max: 60,
+                        labels: { formatter: (value) => `${value}%` },
+                      },
+                      tooltip: {
+                        y: { formatter: (value) => `${value.toFixed(1)}%` },
+                      },
+                      legend: { position: "top", horizontalAlign: "right" },
+                      grid: { borderColor: "#edf2f7", strokeDashArray: 4 },
+                    }}
+                  />
+                </CardBody>
+              </Card>
             </div>
           </Col>
         </Row>
@@ -492,8 +641,11 @@ const FinancialScoreWithData = () => {
             <Card className="sadar-panel flex-fill mb-0">
               <CardHeader>
                 <div>
-                  <h4 className="card-title mb-1">Faktor Pembentuk Score</h4>
-                  <p className="text-muted mb-0">Alasan utama yang memengaruhi skor bulan ini</p>
+                  <h4 className="card-title mb-1">Faktor Pembentuk Skor</h4>
+                  <p className="text-muted mb-0">
+                    Dihitung otomatis dari pemasukan, pengeluaran, anggaran, dan
+                    tabungan
+                  </p>
                 </div>
               </CardHeader>
               <CardBody>
@@ -507,7 +659,11 @@ const FinancialScoreWithData = () => {
                           <strong>{factor.value}</strong>
                         </div>
                         <p>{factor.description}</p>
-                        <Progress value={factor.progress} className="sadar-progress mt-2" />
+                        <Progress
+                          value={factor.progress}
+                          color={getScoreTone(factor.progress).progressColor}
+                          className="sadar-progress mt-2"
+                        />
                       </div>
                     </div>
                   ))}
@@ -517,42 +673,46 @@ const FinancialScoreWithData = () => {
           </Col>
           <Col xl={5} className="d-flex">
             <div className="sadar-score-detail-stack">
-            <Card className="sadar-panel mb-0">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Insight Score</h4>
-                  <p className="text-muted mb-0">Penjelasan singkat dari kondisi keuangan</p>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <div className="sadar-insight-list">
-                  {data.insights.map((item) => (
-                    <div className="sadar-insight-item" key={item}>
-                      <span className="sadar-dot"></span>
-                      <p>{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="sadar-panel flex-fill mb-0">
-              <CardHeader>
-                <div>
-                  <h4 className="card-title mb-1">Rekomendasi</h4>
-                  <p className="text-muted mb-0">Langkah realistis yang bisa dilakukan</p>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <div className="sadar-recommend-list">
-                  {data.recommendations.map((item) => (
-                    <div className="sadar-insight-item" key={item}>
-                      <span className="sadar-dot warning"></span>
-                      <p>{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
+              <Card className="sadar-panel mb-0">
+                <CardHeader>
+                  <div>
+                    <h4 className="card-title mb-1">Insight Skor</h4>
+                    <p className="text-muted mb-0">
+                      Ringkasan berbasis data dari kondisi keuangan
+                    </p>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <div className="sadar-insight-list">
+                    {data.insights.map((item) => (
+                      <div className="sadar-insight-item" key={item}>
+                        <span className="sadar-dot"></span>
+                        <p>{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardBody>
+              </Card>
+              <Card className="sadar-panel flex-fill mb-0">
+                <CardHeader>
+                  <div>
+                    <h4 className="card-title mb-1">Rekomendasi</h4>
+                    <p className="text-muted mb-0">
+                      Saran otomatis dari pola anggaran dan transaksi
+                    </p>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <div className="sadar-recommend-list">
+                    {data.recommendations.map((item) => (
+                      <div className="sadar-insight-item" key={item}>
+                        <span className="sadar-dot warning"></span>
+                        <p>{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardBody>
+              </Card>
             </div>
           </Col>
         </Row>
@@ -561,8 +721,6 @@ const FinancialScoreWithData = () => {
   );
 };
 
-const FinancialScore = () => (
-  shouldShowSadarNewUserMode ? <EmptyFinancialScore /> : <FinancialScoreWithData />
-);
+const FinancialScore = () => <FinancialScoreWithData />;
 
 export default FinancialScore;

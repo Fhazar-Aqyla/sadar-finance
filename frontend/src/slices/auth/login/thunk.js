@@ -1,22 +1,18 @@
 //Include Both Helper File with needed methods
-import axios from "axios";
 import { getFirebaseBackend } from "../../../helpers/firebase_helper";
 import {
   postFakeLogin,
   postJwtLogin,
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
-import { api } from "../../../config";
+import { authApi } from "../../../Components/services/api";
 
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 
 const defaultAuth = import.meta.env.VITE_DEFAULTAUTH ?? "sadar";
-const apiBaseUrl = api.API_URL;
-
-const getErrorMessage = (_error, fallback = "Email atau password salah.") => fallback;
 
 const normalizeSadarAuth = (response) => {
-  const payload = response?.data?.data || response?.data || response;
+  const payload = response?.data || response;
   return {
     token: payload?.token,
     user: payload?.user,
@@ -28,7 +24,7 @@ export const loginUser = (user, history) => async (dispatch) => {
   try {
     let response;
     if (defaultAuth === "sadar") {
-      response = await axios.post(`${apiBaseUrl}/auth/login`, {
+      response = await authApi.login({
         email: user.email,
         password: user.password,
       });
@@ -88,7 +84,7 @@ export const loginUser = (user, history) => async (dispatch) => {
       }
     }
   } catch (error) {
-    dispatch(apiError(getErrorMessage(error, "Email atau password salah.")));
+    dispatch(apiError(error?.message || "Email atau password salah."));
   }
 };
 

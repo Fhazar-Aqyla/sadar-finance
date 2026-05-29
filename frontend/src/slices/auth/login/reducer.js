@@ -21,6 +21,7 @@ const loginSlice = createSlice({
     loginSuccess(state, action) {
       state.user = action.payload
       state.loading = false;
+      state.isUserLogout = false;
       state.errorMsg = false;
     },
     logoutUserSuccess(state) {

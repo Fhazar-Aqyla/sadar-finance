@@ -82,6 +82,24 @@ class AuthService {
     return this._sanitizeUser(user);
   }
 
+  async forgotPassword(email) {
+    await userRepository.findByEmail(email);
+
+    return {
+      email,
+      resetAvailable: false,
+      message: 'If the email is registered, reset instructions will be sent when email delivery is configured.',
+    };
+  }
+
+  async updateProfile(userId, data) {
+    const user = await userRepository.updateProfile(userId, data);
+    if (!user) {
+      throw new UnauthorizedError('User not found');
+    }
+    return this._sanitizeUser(user);
+  }
+
   /**
    * Generate a JWT token.
    */
