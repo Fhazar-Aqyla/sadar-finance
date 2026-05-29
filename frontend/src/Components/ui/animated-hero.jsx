@@ -27,14 +27,14 @@ function Hero() {
       >
         <div className="flex max-w-[1320px] flex-col items-center">
           <h1
-            className="font-['Plus_Jakarta_Sans',sans-serif] !text-[52px] font-black !leading-[1.06] tracking-normal text-[#0C3954] max-xl:!text-[48px] max-lg:!text-[44px] max-md:!text-[38px] max-sm:!text-[31px]"
+            className="font-['Plus_Jakarta_Sans',sans-serif] !text-[52px] font-black !leading-[1.06] tracking-normal text-[#1E3A8A] max-xl:!text-[48px] max-lg:!text-[44px] max-md:!text-[38px] max-sm:!text-[31px]"
             style={{ margin: 0 }}
           >
             <span className="block whitespace-nowrap max-lg:whitespace-normal">
               Bikin kamu lebih sadar sama
             </span>
             <span
-              className="relative flex h-[62px] w-full justify-center overflow-hidden text-center text-[#64AB88] max-xl:h-[58px] max-lg:h-[54px] max-md:h-[44px] max-sm:h-[36px]"
+              className="relative flex h-[62px] w-full justify-center overflow-hidden text-center text-[#14B8A6] max-xl:h-[58px] max-lg:h-[54px] max-md:h-[44px] max-sm:h-[36px]"
               style={{ marginTop: "8px" }}
             >
               <AnimatePresence mode="popLayout">
@@ -66,7 +66,7 @@ function Hero() {
           <Button
             asChild
             size="lg"
-            className="h-12 min-w-[190px] rounded-md bg-[#0C3954] px-6 text-[14px] font-bold text-white shadow-[0_14px_28px_rgba(12,57,84,0.18)] hover:bg-[#124170] max-md:h-11 max-md:min-w-[170px] max-md:text-[13px] max-sm:w-full"
+            className="h-12 min-w-[190px] rounded-md bg-[#1E3A8A] px-6 text-[14px] font-bold text-white shadow-[0_14px_28px_rgba(30,58,138,0.15)] hover:bg-[#1A3175] max-md:h-11 max-md:min-w-[170px] max-md:text-[13px] max-sm:w-full"
           >
             <Link to="/register" className="gap-2 no-underline">
               Mulai Sekarang
@@ -77,7 +77,7 @@ function Hero() {
             asChild
             size="lg"
             variant="outline"
-            className="h-12 min-w-[190px] rounded-md border-[#C9D8E6] bg-white/90 px-6 text-[14px] font-bold text-[#0C3954] shadow-[0_10px_24px_rgba(12,57,84,0.08)] hover:bg-white max-md:h-11 max-md:min-w-[170px] max-md:text-[13px] max-sm:w-full"
+            className="h-12 min-w-[190px] rounded-md border-[#DDE6EF] bg-white/90 px-6 text-[14px] font-bold text-[#1E3A8A] shadow-[0_10px_24px_rgba(30,58,138,0.06)] hover:bg-white max-md:h-11 max-md:min-w-[170px] max-md:text-[13px] max-sm:w-full"
           >
             <a href="#how-it-works" className="gap-2 no-underline">
               <PlayCircle className="h-4 w-4" />
