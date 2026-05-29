@@ -10,6 +10,9 @@ const categorizeSchema = Joi.object({
   text: Joi.string().min(1).max(1000).required()
     .messages({ 'string.empty': 'Transaction description text is required' }),
   transactionId: Joi.string().uuid().optional(),
+  merchant: Joi.string().max(200).optional().allow(''),
+  amount: Joi.number().min(0).optional(),
+  items: Joi.array().items(Joi.object().unknown(true)).optional(),
 });
 
 // Behavior analysis input

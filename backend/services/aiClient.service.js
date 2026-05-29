@@ -161,6 +161,10 @@ class AiClientService {
     return {
       inputText: payload.inputText || payload.input_text || text,
       predictedCategory: payload.predictedCategory || payload.categoryGroup || payload.category_group || payload.category || 'Other',
+      categoryGroup: payload.categoryGroup || payload.category_group || payload.predictedCategory || payload.category || null,
+      categoryDetail: payload.categoryDetail || payload.category_detail || null,
+      decisionSource: payload.decisionSource || payload.decision_source || null,
+      needsReview: Boolean(payload.needsReview ?? payload.needs_review ?? false),
       confidence: this._safeConfidence(payload.confidence, 0.5),
       modelVersion: payload.modelVersion || payload.model_version || 'ai-service',
       transactionId: payload.transactionId || payload.transaction_id || transactionId || null,

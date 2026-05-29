@@ -16,9 +16,9 @@ class AnalyticsService {
   /**
    * Categorize a transaction description using AI.
    */
-  async categorize(userId, { text, transactionId }) {
+  async categorize(userId, { text, transactionId, merchant, amount, items }) {
     try {
-      const result = await aiClient.categorize({ text, transactionId });
+      const result = await aiClient.categorize({ text, transactionId, merchant, amount, items });
       return {
         ...result,
         source: 'ai-service',
