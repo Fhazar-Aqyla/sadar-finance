@@ -58,7 +58,8 @@ const getStoredUserProfile = () => {
     const user = authUser?.user || authUser?.data?.user || {};
     const firstName = user.first_name || user.firstName || "";
     const lastName = user.last_name || user.lastName || "";
-    const name = `${firstName} ${lastName}`.trim() || user.name || user.username || user.email || defaultProfile.name;
+    const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
+    const name = `${firstName} ${cleanLastName}`.trim() || user.name || user.username || user.email || defaultProfile.name;
 
     return {
       id: user.users_id || user.id || defaultProfile.id,
@@ -66,7 +67,7 @@ const getStoredUserProfile = () => {
       email: user.email || defaultProfile.email,
       avatar: user.profile_picture || user.profilePicture || "",
     };
-  } catch (_error) {
+  } catch {
     return defaultProfile;
   }
 };
@@ -74,9 +75,10 @@ const getStoredUserProfile = () => {
 const normalizeProfile = (user) => {
   const firstName = user?.first_name || user?.firstName || "";
   const lastName = user?.last_name || user?.lastName || "";
+  const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
   return {
     id: user?.users_id || user?.id || defaultProfile.id,
-    name: `${firstName} ${lastName}`.trim() || user?.email || defaultProfile.name,
+    name: `${firstName} ${cleanLastName}`.trim() || user?.email || defaultProfile.name,
     email: user?.email || defaultProfile.email,
     avatar: user?.profile_picture || user?.profilePicture || "",
   };
@@ -198,17 +200,7 @@ const EmptyProfileAccount = () => {
     );
   };
 
-  const persistAccount = async (account) => {
-    try {
-      await accountApi.update(account.id, {
-        accountName: account.name,
-        accountNumber: account.accountNumber || "",
-        balance: Number(account.balance || 0),
-      });
-    } catch (error) {
-      setAccountNotice(error?.message || "Perubahan akun gagal disimpan.");
-    }
-  };
+
 
   const deleteAccount = (id) => {
     if (accounts.length <= 1) {
@@ -467,6 +459,18 @@ const EmptyProfileAccount = () => {
   );
 };
 
+const budgetTargets = [
+  { category: "Needs", label: "Kebutuhan", helper: "Kebutuhan utama", percent: 50 },
+  { category: "Wants", label: "Keinginan", helper: "Keinginan dan hiburan", percent: 30 },
+  { category: "Savings", label: "Tabungan", helper: "Tabungan dan dana darurat", percent: 20 },
+];
+
+const accountTypes = [
+  { value: "Cash", label: "Tunai" },
+  { value: "Bank", label: "Bank" },
+  { value: "E-wallet", label: "Dompet digital" },
+];
+
 const ProfileAccountWithData = () => {
   useEffect(() => {
     document.title = "Profil & Akun | SADAR Finance";
@@ -487,17 +491,7 @@ const ProfileAccountWithData = () => {
   const totalIncome = useMemo(() => sumBy(incomesRows, (item) => item.amount), [incomesRows]);
   const resolveAccountName = (accountId) => accounts.find((account) => account.id === accountId)?.name || "-";
 
-  const budgetTargets = [
-    { category: "Needs", label: "Kebutuhan", helper: "Kebutuhan utama", percent: 50 },
-    { category: "Wants", label: "Keinginan", helper: "Keinginan dan hiburan", percent: 30 },
-    { category: "Savings", label: "Tabungan", helper: "Tabungan dan dana darurat", percent: 20 },
-  ];
 
-  const accountTypes = [
-    { value: "Cash", label: "Tunai" },
-    { value: "Bank", label: "Bank" },
-    { value: "E-wallet", label: "Dompet digital" },
-  ];
 
   useEffect(() => {
     let isMounted = true;
@@ -567,7 +561,7 @@ const ProfileAccountWithData = () => {
             used: localUsed,
           };
         }));
-      } catch (_error) {
+      } catch {
         if (!isMounted) return;
         setAccounts([]);
         setIncomesRows([]);
@@ -613,7 +607,8 @@ const ProfileAccountWithData = () => {
   }, [incomesRows, transactionRows]);
 
   const totalTransactionPages = Math.max(1, Math.ceil(userTransactions.length / TRANSACTION_PAGE_SIZE));
-  const transactionPageStart = (currentTransactionPage - 1) * TRANSACTION_PAGE_SIZE;
+  const activePage = Math.min(currentTransactionPage, totalTransactionPages);
+  const transactionPageStart = (activePage - 1) * TRANSACTION_PAGE_SIZE;
   const paginatedTransactions = userTransactions.slice(
     transactionPageStart,
     transactionPageStart + TRANSACTION_PAGE_SIZE,
@@ -622,12 +617,6 @@ const ProfileAccountWithData = () => {
   const transactionStartNumber = userTransactions.length ? transactionPageStart + 1 : 0;
   const transactionEndNumber = Math.min(transactionPageStart + paginatedTransactions.length, userTransactions.length);
   const transactionEmptyRows = Math.max(0, TRANSACTION_PAGE_SIZE - paginatedTransactions.length);
-
-  useEffect(() => {
-    if (currentTransactionPage > totalTransactionPages) {
-      setCurrentTransactionPage(totalTransactionPages);
-    }
-  }, [currentTransactionPage, totalTransactionPages]);
 
   const goToTransactionPage = (page) => {
     setCurrentTransactionPage(Math.min(Math.max(page, 1), totalTransactionPages));

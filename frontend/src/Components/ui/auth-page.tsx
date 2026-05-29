@@ -4,11 +4,13 @@ import { Col } from "reactstrap";
 
 const financeQuotes = [
   {
-    quote: "Jangan menabung dari sisa pengeluaran, tetapi keluarkan dari sisa setelah menabung.",
+    quote:
+      "Jangan menabung dari sisa pengeluaran, tetapi keluarkan dari sisa setelah menabung.",
     author: "Warren Buffett",
   },
   {
-    quote: "Anggaran adalah cara memberi arah pada uang, bukan menebak ke mana uang pergi.",
+    quote:
+      "Anggaran adalah cara memberi arah pada uang, bukan menebak ke mana uang pergi.",
     author: "Dave Ramsey",
   },
   {
@@ -24,7 +26,9 @@ export function AuthPage() {
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setQuoteIndex((currentIndex) => (currentIndex + 1) % financeQuotes.length);
+      setQuoteIndex(
+        (currentIndex) => (currentIndex + 1) % financeQuotes.length,
+      );
     }, 5200);
 
     return () => window.clearInterval(timer);
@@ -115,4 +119,3 @@ function FloatingPaths({ position }: { position: number }) {
     </div>
   );
 }
-

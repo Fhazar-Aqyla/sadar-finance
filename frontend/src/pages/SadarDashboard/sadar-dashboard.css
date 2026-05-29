@@ -649,7 +649,7 @@
 }
 
 .sadar-stepper-progress span.is-active {
-  background: var(--sadar-primary);
+  background: var(--sadar-teal);
 }
 
 .sadar-stepper-content {
@@ -658,7 +658,7 @@
   justify-items: start;
   padding: 1rem;
   border: 1px solid #e6edf7;
-  border-left: 4px solid var(--sadar-primary);
+  border-left: 4px solid var(--sadar-teal);
   border-radius: 12px;
   background: #f8fbff;
 }
@@ -689,8 +689,8 @@
   height: 28px;
   padding: 0 0.55rem;
   border-radius: 999px;
-  color: var(--sadar-primary);
-  background: rgba(30, 58, 138, 0.08);
+  color: var(--sadar-teal);
+  background: rgba(20, 184, 166, 0.08);
   font-size: 0.78rem;
   font-weight: 800;
 }

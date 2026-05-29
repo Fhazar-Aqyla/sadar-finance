@@ -8,6 +8,7 @@ import { Footer } from "@/Components/ui/footer";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
+import dashboardPreview from "../../../assets/images/landing/dashboard-preview.png";
 
 const navItems = [
   { label: "Beranda", href: "#home" },
@@ -62,7 +63,13 @@ const compactCardClass =
 const stepTitleClass = `${headingClass} mt-2 text-[16px] leading-[1.25] text-[#17212B]`;
 const stepBodyClass = "mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]";
 
-const DashboardPreview = () => <div className="h-full w-full bg-[#F8FBFF]" />;
+const DashboardPreview = () => (
+  <img
+    src={dashboardPreview}
+    alt="SADAR Finance Dashboard"
+    className="h-full w-full object-cover object-top"
+  />
+);
 
 const StepTransactionPreview = () => (
   <div className="mt-5 grid gap-2">

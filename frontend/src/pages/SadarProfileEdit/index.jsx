@@ -28,8 +28,9 @@ const defaultProfile = {
 const normalizeProfile = (user) => {
   const firstName = user?.first_name || user?.firstName || "";
   const lastName = user?.last_name || user?.lastName || "";
+  const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
   return {
-    name: `${firstName} ${lastName}`.trim() || user?.email || defaultProfile.name,
+    name: `${firstName} ${cleanLastName}`.trim() || user?.email || defaultProfile.name,
     email: user?.email || defaultProfile.email,
     avatar: user?.profile_picture || user?.profilePicture || defaultProfile.avatar,
   };
@@ -44,7 +45,9 @@ const splitFullName = (fullName = "") => {
 };
 
 const ProfileEdit = () => {
-  document.title = "Edit Profil | SADAR Finance";
+  useEffect(() => {
+    document.title = "Edit Profil | SADAR Finance";
+  }, []);
 
   const [profile, setProfile] = useState({
     name: defaultProfile.name,
@@ -73,7 +76,7 @@ const ProfileEdit = () => {
           ...current,
           ...normalizeProfile(user),
         }));
-      } catch (_error) {
+      } catch {
         if (isMounted) {
           setNotice({ color: "warning", message: "Profil server belum bisa dimuat. Data lokal ditampilkan sementara." });
         }
@@ -163,7 +166,7 @@ const ProfileEdit = () => {
     }
   };
 
-  const PasswordField = ({ id, label, field, placeholder }) => (
+  const renderPasswordField = ({ id, label, field, placeholder }) => (
     <div>
       <Label htmlFor={id}>{label}</Label>
       <InputGroup className={fieldErrors[field] ? "is-invalid" : ""}>
@@ -288,9 +291,9 @@ const ProfileEdit = () => {
               </CardHeader>
               <CardBody>
                 <div className="sadar-form-grid sadar-edit-profile-grid">
-                  <PasswordField id="profile-current-password" label="Password Saat Ini" field="currentPassword" />
-                  <PasswordField id="profile-new-password" label="Password Baru" field="newPassword" placeholder="Minimal 8 karakter" />
-                  <PasswordField id="profile-confirm-password" label="Konfirmasi Password Baru" field="confirmPassword" />
+                  {renderPasswordField({ id: "profile-current-password", label: "Password Saat Ini", field: "currentPassword" })}
+                  {renderPasswordField({ id: "profile-new-password", label: "Password Baru", field: "newPassword", placeholder: "Minimal 8 karakter" })}
+                  {renderPasswordField({ id: "profile-confirm-password", label: "Konfirmasi Password Baru", field: "confirmPassword" })}
                   <div className="sadar-password-rules">
                     <strong>Aturan password</strong>
                     <span className={passwordHasMinimumLength ? "is-valid" : ""}>

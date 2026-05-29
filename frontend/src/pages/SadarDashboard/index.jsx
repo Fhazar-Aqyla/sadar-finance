@@ -217,7 +217,7 @@ const getStoredProfile = () => {
     return {
       name: String(name || "SADAR").trim(),
     };
-  } catch (_error) {
+  } catch {
     return { name: "SADAR" };
   }
 };
@@ -303,7 +303,18 @@ const setupSteps = [
   },
 ];
 
-const setupWizardStorageKey = "sadar_setup_wizard_api";
+const getSetupWizardStorageKey = () => {
+  if (typeof window === "undefined") return "sadar_setup_wizard_api";
+
+  try {
+    const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+    const user = authUser?.user || authUser?.data?.user || authUser?.data || authUser || {};
+    const userId = user?.id || user?.user_id || user?.email || user?.username || "guest";
+    return `sadar_setup_wizard_api_${userId}`;
+  } catch {
+    return "sadar_setup_wizard_api";
+  }
+};
 
 const defaultSetupWizardState = {
   completed: false,
@@ -314,16 +325,18 @@ const getStoredSetupWizardState = () => {
   if (typeof window === "undefined") return defaultSetupWizardState;
 
   try {
-    const savedState = window.localStorage.getItem(setupWizardStorageKey);
+    const key = getSetupWizardStorageKey();
+    const savedState = window.localStorage.getItem(key);
     return savedState ? { ...defaultSetupWizardState, ...JSON.parse(savedState) } : defaultSetupWizardState;
-  } catch (_error) {
+  } catch {
     return defaultSetupWizardState;
   }
 };
 
 const saveSetupWizardState = (state) => {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(setupWizardStorageKey, JSON.stringify(state));
+  const key = getSetupWizardStorageKey();
+  window.localStorage.setItem(key, JSON.stringify(state));
 };
 
 const EmptyDashboardCard = ({ icon, title, description, action }) => (
@@ -399,15 +412,9 @@ const SetupGuideModal = ({ isOpen, onComplete, onSkip }) => {
 
 const NewUserDashboard = ({ profileName = "SADAR" }) => {
   const [wizardState, setWizardState] = useState(getStoredSetupWizardState);
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const shouldAutoOpenWizard = !wizardState.completed && !wizardState.skipped;
+  const [isGuideOpen, setIsGuideOpen] = useState(shouldAutoOpenWizard);
   const hasDismissedSetup = wizardState.completed || wizardState.skipped;
-
-  useEffect(() => {
-    if (shouldAutoOpenWizard) {
-      setIsGuideOpen(true);
-    }
-  }, [shouldAutoOpenWizard]);
 
   const updateWizardState = (nextState) => {
     saveSetupWizardState(nextState);
@@ -896,6 +903,7 @@ const DashboardWithData = () => {
 
         const firstName = profileResponse?.first_name || profileResponse?.firstName || "";
         const lastName = profileResponse?.last_name || profileResponse?.lastName || "";
+        const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
         const normalizedTransactions = (transactionRows || []).map(normalizeTransaction);
         setApiRows({
           accounts: (accountRows || []).map(normalizeAccount),
@@ -903,12 +911,12 @@ const DashboardWithData = () => {
           transactions: normalizedTransactions,
           budgets: buildBudgetRows(budgetResponse, normalizedTransactions),
           profile: {
-            name: `${firstName} ${lastName}`.trim() || profileResponse?.email || getStoredProfile().name,
+            name: `${firstName} ${cleanLastName}`.trim() || profileResponse?.email || getStoredProfile().name,
           },
           healthScore: healthScoreResponse || null,
         });
         setLoadError("");
-      } catch (_error) {
+      } catch {
         if (isMounted) {
           setApiRows({
             accounts: [],
