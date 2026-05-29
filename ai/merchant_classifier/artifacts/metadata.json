@@ -1,0 +1,90 @@
+{
+  "project": "SADAR Merchant Classifier",
+  "created_at": "2026-05-29T07:34:30.065602Z",
+  "model_keras_file": "model/sadar_merchant_detail_classifier.keras",
+  "saved_model_dir": "model/sadar_merchant_detail_classifier_savedmodel",
+  "dictionary_rules_file": "artifacts/dictionary_rules.json",
+  "label_classes_file": "artifacts/label_classes.json",
+  "category_primary_map_file": "artifacts/category_primary_map.json",
+  "category_detail_output": true,
+  "category_primary_rule_based": true,
+  "database_mapping": {
+    "category_group": "category_primary",
+    "category_detail": "category_detail"
+  },
+  "trusted_rule_threshold": 0.9,
+  "model_review_threshold": 0.6,
+  "categorical_features": [
+    "payment_method",
+    "payment_media",
+    "source",
+    "day_of_week",
+    "time_of_day",
+    "spending_level",
+    "is_weekend"
+  ],
+  "numeric_features": [
+    "amount",
+    "log_amount",
+    "month",
+    "day",
+    "week",
+    "rolling_7d_spending",
+    "rolling_30d_spending",
+    "transaction_count_to_date"
+  ],
+  "normalized_numeric_features": [
+    "amount_norm",
+    "log_amount_norm",
+    "month_norm",
+    "day_norm",
+    "week_norm",
+    "rolling_7d_spending_norm",
+    "rolling_30d_spending_norm",
+    "transaction_count_to_date_norm"
+  ],
+  "numeric_mean": {
+    "amount": 18729914.97212417,
+    "log_amount": 12.625138046199954,
+    "month": 5.135382059800665,
+    "day": 15.604132059800664,
+    "week": 20.563849667774086,
+    "rolling_7d_spending": 2052093.0232558139,
+    "rolling_30d_spending": 8519727.782392027,
+    "transaction_count_to_date": 9.055647840531561
+  },
+  "numeric_std": {
+    "amount": 93740957.74414521,
+    "log_amount": 1.9033482150938519,
+    "month": 3.8564397689068075,
+    "day": 7.58805680792103,
+    "week": 16.672132351318176,
+    "rolling_7d_spending": 2422961.719947279,
+    "rolling_30d_spending": 7168345.991977378,
+    "transaction_count_to_date": 10.966662903077218
+  },
+  "label_classes": [
+    "education",
+    "entertainment",
+    "food",
+    "groceries",
+    "health",
+    "investment",
+    "self_care",
+    "shopping",
+    "transport",
+    "travel",
+    "utilities"
+  ],
+  "decision_policy": [
+    "If trusted dictionary rule matches with confidence >= 0.90, use rule.",
+    "Otherwise use Deep Learning prediction.",
+    "If model confidence < 0.60, return unknown_need_review."
+  ],
+  "validation_metrics": {
+    "val_accuracy": 0.800702370500439,
+    "val_macro_f1": 0.7758515849605376,
+    "cold_accuracy": 0.6769472033455306,
+    "cold_macro_f1": 0.6260752542759067
+  }
+}
