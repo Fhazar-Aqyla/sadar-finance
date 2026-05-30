@@ -471,7 +471,7 @@ const BehaviorInsightWithData = () => {
     ? [
         {
           title: `Prediksi perilaku membaca risiko ${modelRiskLabel}`,
-          description: `${data.behaviorCandidate?.name || "Transaksi terbesar"} punya probabilitas lonjakan ${predictionPercent}%. ${behaviorPrediction.recommendation}`,
+          description: `${data.behaviorCandidate?.name || "Transaksi terbesar"} memiliki probabilitas lonjakan sebesar ${predictionPercent}%.`,
           type: modelRiskTone,
           sourceLabel: predictionSourceLabel,
         },
