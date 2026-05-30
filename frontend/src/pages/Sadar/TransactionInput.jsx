@@ -219,7 +219,7 @@ const TransactionInput = () => {
   };
 
   const pollScanResult = async (scanId) => {
-    for (let attempt = 0; attempt < 12; attempt += 1) {
+    for (let attempt = 0; attempt < 40; attempt += 1) {
       const scan = await ocrApi.get(scanId);
 
       if (scan?.status === "completed") {
@@ -229,10 +229,10 @@ const TransactionInput = () => {
         throw new Error("OCR gagal.");
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
     }
 
-    throw new Error("OCR masih diproses. Coba ambil ulang hasil scan beberapa saat lagi.");
+    throw new Error("OCR masih diproses. Tunggu sebentar lalu coba proses OCR lagi.");
   };
 
   const handleScan = async () => {
