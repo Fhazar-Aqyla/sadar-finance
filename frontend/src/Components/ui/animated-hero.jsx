@@ -20,7 +20,7 @@ function Hero() {
   }, [titleNumber, titles]);
 
   return (
-    <section id="home" className="relative flex min-h-[620px] items-center overflow-hidden pb-10 pt-[126px] max-md:min-h-[560px] max-md:pb-8 max-md:pt-[104px]">
+    <section id="home" className="relative flex min-h-[620px] items-center overflow-hidden pb-10 pt-[104px] max-md:min-h-[560px] max-md:pb-8 max-md:pt-[92px]">
       <div
         className="mx-auto flex w-[min(calc(100%_-_64px),1480px)] flex-col items-center text-center max-md:w-[min(calc(100%_-_32px),960px)]"
         style={{ gap: "22px" }}

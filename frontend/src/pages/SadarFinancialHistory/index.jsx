@@ -695,6 +695,9 @@ const SadarFinancialHistory = () => {
               <div>
                 <strong>{receiptModal.transaction?.receipt?.name || "Struk transaksi"}</strong>
                 <span>{receiptModal.transaction?.name}</span>
+                <span className="mt-2 d-block text-muted text-break" style={{ fontSize: '10px' }}>
+                  DEBUG URL: {receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl}
+                </span>
               </div>
             </div>
           ) : (
