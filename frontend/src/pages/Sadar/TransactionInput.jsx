@@ -71,6 +71,20 @@ const getErrorMessage = (error, fallbackMessage) => {
   return error?.message || fallbackMessage;
 };
 
+const parseAmountValue = (value) => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  const text = String(value || "").trim();
+  if (!text) return 0;
+
+  const normalizedText = text
+    .replace(/[^\d,.-]/g, "")
+    .replace(/\.(?=\d{3}(\D|$))/g, "")
+    .replace(",", ".");
+  const amount = Number(normalizedText);
+
+  return Number.isFinite(amount) ? amount : Number(onlyDigits(text) || 0);
+};
+
 const toIsoDate = (dateValue) => {
   const date = new Date(`${dateValue}T00:00:00`);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
@@ -78,13 +92,32 @@ const toIsoDate = (dateValue) => {
 
 const normalizeParsedData = (scan) => {
   const parsed = scan?.parsed_data || scan?.parsedData || scan?.data || {};
-  if (typeof parsed !== "string") return parsed;
+  const parsedObject = typeof parsed === "string"
+    ? (() => {
+        try {
+          return JSON.parse(parsed);
+        } catch {
+          return {};
+        }
+      })()
+    : parsed;
 
-  try {
-    return JSON.parse(parsed);
-  } catch {
-    return {};
-  }
+  return parsedObject?.data && typeof parsedObject.data === "object"
+    ? {
+        ...parsedObject.data,
+        rawText: parsedObject.rawText || parsedObject.raw_text || scan?.raw_text || scan?.rawText || "",
+      }
+    : parsedObject;
+};
+
+const getScanId = (scan) => scan?.ocr_id || scan?.ocrId || scan?.id || "";
+
+const getParsedDate = (dateValue) => {
+  const rawDate = String(dateValue || "").trim();
+  if (!rawDate) return initialForm.transactionDate;
+
+  const date = new Date(rawDate);
+  return Number.isNaN(date.getTime()) ? initialForm.transactionDate : date.toISOString().slice(0, 10);
 };
 
 const buildDescription = (merchant, items) => {
@@ -206,13 +239,14 @@ const TransactionInput = () => {
     const parsed = normalizeParsedData(scan);
     const merchant = parsed?.merchant || "";
     const description = buildDescription(merchant, parsed?.items);
+    const amount = parseAmountValue(parsed?.total || parsed?.amount || parsed?.grandTotal || parsed?.grand_total);
 
     setForm({
       accountId: form.accountId,
       merchant,
-      transactionDate: parsed?.date || initialForm.transactionDate,
+      transactionDate: getParsedDate(parsed?.date || parsed?.transactionDate || parsed?.transaction_date),
       categoryGroup: parsed?.categoryGroup || parsed?.category_group || parsed?.category || "other",
-      amount: parsed?.total ? String(parsed.total) : "",
+      amount: amount ? String(amount) : "",
       description,
       source: "ocr",
     });
@@ -290,15 +324,23 @@ const TransactionInput = () => {
 
     setIsSaving(true);
     setNotice(null);
+    const payload = {
+      categoryGroup: form.categoryGroup,
+      accountId: form.accountId,
+      transactionDate,
+      description: form.description || form.merchant,
+      source: form.source,
+      amount: Number(form.amount),
+    };
+
     try {
-      await transactionApi.create({
-        categoryGroup: form.categoryGroup,
-        accountId: form.accountId,
-        transactionDate,
-        description: form.description || form.merchant,
-        source: form.source,
-        amount: Number(form.amount),
-      });
+      const scanId = form.source === "ocr" ? getScanId(scanResult) : "";
+
+      if (scanId) {
+        await ocrApi.confirmTransaction(scanId, payload);
+      } else {
+        await transactionApi.create(payload);
+      }
 
       setNotice({
         color: "success",
