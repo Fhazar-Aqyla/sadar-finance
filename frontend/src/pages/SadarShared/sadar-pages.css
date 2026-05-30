@@ -575,43 +575,80 @@
 .sadar-history-modal .modal-content {
   border: 1px solid #e7ebf2;
   border-radius: 14px;
-  background: #ffffff;
+  overflow: hidden;
+  color: #172033;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  opacity: 1 !important;
 }
 
 .sadar-history-modal .modal-header {
-  padding: 1rem 1.25rem 0.7rem;
-  border-bottom-color: #eef2f7;
+  padding: 1.25rem 1.55rem 0.9rem;
+  background: inherit;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .sadar-history-modal .modal-title {
   color: #172033;
+  font-size: 1.15rem;
   font-weight: 780;
 }
 
 .sadar-history-modal .modal-body {
-  padding: 1.15rem 1.25rem;
+  padding: 1.1rem 1.55rem 1.25rem;
+  background: inherit;
 }
 
 .sadar-history-modal .modal-footer {
   gap: 0.6rem;
-  padding: 0.8rem 1.25rem 1.2rem;
-  border-top-color: #eef2f7;
+  padding: 1rem 1.55rem 1.35rem;
+  background: inherit;
+  border-top: 1px solid #eef2f7;
+}
+
+.sadar-history-modal .btn-close {
+  box-shadow: none !important;
+}
+
+.sadar-history-modal .modal-dialog {
+  max-width: min(94vw, 620px);
+}
+
+.sadar-history-modal .modal-dialog.modal-lg {
+  max-width: min(94vw, 1000px);
 }
 
 .sadar-history-edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.15rem 1.25rem;
 }
 
 .sadar-history-edit-grid .form-control,
 .sadar-history-edit-grid .form-select {
-  min-height: 44px;
+  min-height: 52px;
   border-color: #d6deeb;
   border-radius: 8px;
   color: #172033;
   background: #ffffff;
+}
+
+.sadar-history-edit-grid .form-control[type="file"] {
+  padding: 0;
+  overflow: hidden;
+}
+
+.sadar-history-edit-grid .form-control[type="file"]::file-selector-button {
+  height: 52px;
+  margin-right: 1rem;
+  padding: 0 1rem;
+  border: 0;
+  border-right: 1px solid #d6deeb;
+  color: #334155;
+  background: #f1f5f9;
+  font-weight: 700;
 }
 
 .sadar-receipt-preview,
@@ -1546,24 +1583,46 @@ html[data-bs-theme="dark"] .sadar-edit-stack .form-select:focus {
 
 html[data-bs-theme="dark"] .sadar-confirm-modal .modal-content {
   border-color: var(--sadar-dark-border-soft);
-  background: var(--sadar-dark-surface);
+  background: var(--sadar-dark-surface) !important;
+  background-color: var(--sadar-dark-surface) !important;
+  background-image: none !important;
 }
 
 html[data-bs-theme="dark"] .sadar-history-modal .modal-content,
 html[data-bs-theme="dark"] .sadar-row-action-menu {
   border-color: var(--sadar-dark-border-soft);
-  background: var(--sadar-dark-surface);
+  background: var(--sadar-dark-surface) !important;
+  background-color: var(--sadar-dark-surface) !important;
+  background-image: none !important;
   box-shadow: 0 24px 60px rgba(2, 6, 23, 0.36);
+  opacity: 1 !important;
 }
 
 html[data-bs-theme="dark"] .sadar-history-modal .modal-header,
+html[data-bs-theme="dark"] .sadar-history-modal .modal-body,
 html[data-bs-theme="dark"] .sadar-history-modal .modal-footer {
+  background: var(--sadar-dark-surface) !important;
+  background-color: var(--sadar-dark-surface) !important;
   border-color: rgba(148, 163, 184, 0.18);
 }
 
 html[data-bs-theme="dark"] .sadar-history-modal .modal-title,
 html[data-bs-theme="dark"] .sadar-receipt-viewer strong {
   color: var(--sadar-dark-heading);
+}
+
+html[data-bs-theme="dark"] .sadar-history-modal .btn-close {
+  filter: invert(1) grayscale(100%) brightness(1.65);
+  opacity: 0.72;
+}
+
+html[data-bs-theme="dark"] .sadar-history-modal .btn-close:hover {
+  opacity: 1;
+}
+
+html[data-bs-theme="dark"] .modal-backdrop.show {
+  background-color: #020617;
+  opacity: 0.78;
 }
 
 html[data-bs-theme="dark"] .sadar-row-action-menu .dropdown-item {
@@ -1579,7 +1638,18 @@ html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control,
 html[data-bs-theme="dark"] .sadar-history-edit-grid .form-select {
   border-color: rgba(148, 163, 184, 0.42);
   color: var(--sadar-dark-heading);
-  background: #111827;
+  background: #111827 !important;
+  background-color: #111827 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control::placeholder {
+  color: #8a97aa;
+}
+
+html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control[type="file"]::file-selector-button {
+  border-right-color: rgba(148, 163, 184, 0.42);
+  color: var(--sadar-dark-heading);
+  background: #2b3442;
 }
 
 html[data-bs-theme="dark"] .sadar-receipt-preview,
