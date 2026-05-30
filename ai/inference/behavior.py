@@ -219,7 +219,7 @@ def _try_generate_ai_text(prompt: str) -> str:
         import google.generativeai as genai
 
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(os.getenv("GENERATIVE_AI_MODEL", "gemini-1.5-flash"))
+        model = genai.GenerativeModel(os.getenv("GENERATIVE_AI_MODEL", "gemini-3.1-flash-lite"))
         response = model.generate_content(
             prompt,
             generation_config={"temperature": 0.3},

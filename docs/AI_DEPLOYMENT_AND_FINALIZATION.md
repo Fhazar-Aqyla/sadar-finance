@@ -331,7 +331,7 @@ Secret di Hugging Face AI service:
 
 ```env
 GEMINI_API_KEY=<secret>
-GENERATIVE_AI_MODEL=gemini-2.5-flash
+GENERATIVE_AI_MODEL=gemini-3.1-flash-lite
 ```
 
 Backend tidak perlu menyimpan Gemini key. Backend cukup menerima `recommendation` dan `recommendationSource` dari AI.
