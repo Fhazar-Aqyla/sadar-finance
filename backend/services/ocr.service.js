@@ -7,6 +7,7 @@
 
 const ocrRepository = require("../repositories/ocr.repository");
 const config = require("../config");
+const fs = require("fs/promises");
 const aiClient = require("./aiClient.service");
 const analyticsService = require("./analytics.service");
 const transactionService = require("./transaction.service");
@@ -115,14 +116,17 @@ class OcrService {
 
       const parsedData = await aiClient.extractReceipt({ file, scanId });
       await this._attachCategory(userId, parsedData);
+      await this._attachReceiptPreview(parsedData, file);
 
       await ocrRepository.updateStatus(scanId, "completed", parsedData);
     } catch (err) {
       try {
+        const fallbackData = this._fallbackParsedData(err);
+        await this._attachReceiptPreview(fallbackData, file);
         await ocrRepository.updateStatus(
           scanId,
           "completed",
-          this._fallbackParsedData(err),
+          fallbackData,
         );
       } catch (fallbackErr) {
         await ocrRepository.updateStatus(scanId, "failed", {
@@ -152,6 +156,20 @@ class OcrService {
     parsedData.data.categoryGroup = category.predictedCategory;
     parsedData.data.categoryConfidence = category.confidence;
     parsedData.data.categorySource = category.source;
+  }
+
+  async _attachReceiptPreview(parsedData, file) {
+    if (!file?.path || !file?.mimetype) return;
+
+    try {
+      if (file.size && file.size > 1.5 * 1024 * 1024) return;
+      const buffer = await fs.readFile(file.path);
+      parsedData.data = parsedData.data || {};
+      parsedData.data.receiptDataUrl = `data:${file.mimetype};base64,${buffer.toString("base64")}`;
+      parsedData.data.receiptName = file.originalname || null;
+    } catch (_err) {
+      // Static upload URL remains the primary fallback if embedding fails.
+    }
   }
 
   _getParsedData(scan) {

@@ -136,9 +136,20 @@ const resolveReceiptImageUrl = (url) => {
 const getReceiptUrl = (row) =>
   resolveReceiptImageUrl(row.receipt_url || row.receiptUrl || row.image_url || row.imageUrl || "");
 
+const getParsedData = (row) => {
+  const parsed = row?.parsed_data || row?.parsedData || {};
+  if (typeof parsed !== "string") return parsed;
+
+  try {
+    return JSON.parse(parsed);
+  } catch {
+    return {};
+  }
+};
+
 const normalizeOcrReceipt = (scan) => ({
-  name: scan.original_name || scan.originalName || "Struk OCR",
-  dataUrl: getReceiptUrl(scan),
+  name: getParsedData(scan).receiptName || scan.original_name || scan.originalName || "Struk OCR",
+  dataUrl: getParsedData(scan).receiptDataUrl || getReceiptUrl(scan),
   updatedAt: scan.updated_at || scan.updatedAt || scan.created_at || scan.createdAt || "",
 });
 
