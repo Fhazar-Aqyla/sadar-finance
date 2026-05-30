@@ -68,8 +68,15 @@ app.use('/api/', rateLimit({
   legacyHeaders: false,
 }));
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(uploadDir));
+// Serve uploaded files statically. Receipts are embedded by the Vercel frontend,
+// so upload responses must allow cross-origin image usage.
+app.use('/uploads', express.static(uploadDir, {
+  setHeaders(res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; img-src * data: blob:");
+  },
+}));
 
 // ── Swagger Documentation ──────────────────────────────────
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
