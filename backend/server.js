@@ -32,7 +32,9 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // ── Global Middleware ───────────────────────────────────────
-app.use(helmet());                                      // Security headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));                                                    // Security headers
 app.use(cors({
   origin(origin, callback) {
     const allowedOrigins = config.cors.allowedOrigins;
