@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "https://sadar-finance.up.railway.app/api/v1/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://sadar-finance.up.railway.app/uploads/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
