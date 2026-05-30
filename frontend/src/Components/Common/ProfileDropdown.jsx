@@ -2,10 +2,10 @@ import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 //import images
-import avatar1 from "../../assets/images/users/avatar-1.jpg";
+import dummyAvatar from "../../assets/images/users/user-dummy-img.jpg";
 
 const resolveAvatarUrl = (url) => {
-    if (!url) return avatar1;
+    if (!url) return dummyAvatar;
     if (/^(https?:|data:)/i.test(url)) return url;
     const serverUrl = "https://sadar-finance.up.railway.app";
     return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
@@ -65,7 +65,7 @@ const ProfileDropdown = () => {
                 // ignore
             }
         }
-        return avatar1;
+        return dummyAvatar;
     }, [user]);
 
     return (
