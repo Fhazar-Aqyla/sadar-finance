@@ -139,6 +139,8 @@ const ProfileEdit = () => {
           ...current,
           ...normalizeProfile(user),
         }));
+        updateSessionUser(user);
+        dispatch(profileSuccess({ data: user, status: "success" }));
       } catch {
         if (isMounted) {
           setIdentityNotice({ color: "warning", message: "Profil server belum bisa dimuat. Data lokal ditampilkan sementara." });
@@ -151,7 +153,7 @@ const ProfileEdit = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [dispatch]);
 
   const handleChange = (field, value) => {
     setFieldErrors((current) => ({ ...current, [field]: "" }));

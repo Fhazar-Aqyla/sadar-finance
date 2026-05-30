@@ -18,6 +18,8 @@ import {
   Row,
   Table,
 } from "reactstrap";
+import { useDispatch } from "react-redux";
+import { profileSuccess } from "../../slices/auth/profile/reducer";
 import { accountApi, analyticsApi, authApi, incomeApi, transactionApi } from "../../Components/services/api";
 
 import "./sadar-dashboard.css";
@@ -251,6 +253,28 @@ const getStoredProfile = () => {
     };
   } catch {
     return { name: "SADAR" };
+  }
+};
+
+const updateSessionUser = (updatedUser) => {
+  try {
+    const rawAuth = sessionStorage.getItem("authUser");
+    if (!rawAuth) return;
+    const authData = JSON.parse(rawAuth);
+
+    if (authData.user) {
+      authData.user = { ...authData.user, ...updatedUser };
+    } else if (authData.data && authData.data.user) {
+      authData.data.user = { ...authData.data.user, ...updatedUser };
+    } else if (authData.data) {
+      authData.data = { ...authData.data, ...updatedUser };
+    } else {
+      Object.assign(authData, updatedUser);
+    }
+
+    sessionStorage.setItem("authUser", JSON.stringify(authData));
+  } catch (e) {
+    console.error("Failed to update sessionStorage user", e);
   }
 };
 
@@ -911,6 +935,7 @@ const createCategoryOptions = (labels, colors, setActiveCategory) => ({
 });
 
 const DashboardWithData = () => {
+  const dispatch = useDispatch();
   useEffect(() => {
     document.title = "Dashboard | SADAR Finance";
   }, []);
@@ -942,6 +967,9 @@ const DashboardWithData = () => {
         ]);
 
         if (!isMounted) return;
+
+        updateSessionUser(profileResponse);
+        dispatch(profileSuccess({ data: profileResponse, status: "success" }));
 
         const firstName = profileResponse?.first_name || profileResponse?.firstName || "";
         const lastName = profileResponse?.last_name || profileResponse?.lastName || "";
@@ -980,7 +1008,7 @@ const DashboardWithData = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [dispatch]);
 
   const dashboardData = useMemo(() => {
     const userAccounts = apiRows.accounts;

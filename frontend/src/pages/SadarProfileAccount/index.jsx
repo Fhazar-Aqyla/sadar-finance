@@ -24,6 +24,8 @@ import {
   Row,
 } from "reactstrap";
 import Swal from "sweetalert2";
+import { useDispatch } from "react-redux";
+import { profileSuccess } from "../../slices/auth/profile/reducer";
 import { accountApi, analyticsApi, authApi } from "../../Components/services/api";
 
 import "../SadarShared/sadar-pages.css";
@@ -109,6 +111,28 @@ const normalizeProfile = (user) => {
     email: user?.email || defaultProfile.email,
     avatar: user?.profile_picture || user?.profilePicture || "",
   };
+};
+
+const updateSessionUser = (updatedUser) => {
+  try {
+    const rawAuth = sessionStorage.getItem("authUser");
+    if (!rawAuth) return;
+    const authData = JSON.parse(rawAuth);
+
+    if (authData.user) {
+      authData.user = { ...authData.user, ...updatedUser };
+    } else if (authData.data && authData.data.user) {
+      authData.data.user = { ...authData.data.user, ...updatedUser };
+    } else if (authData.data) {
+      authData.data = { ...authData.data, ...updatedUser };
+    } else {
+      Object.assign(authData, updatedUser);
+    }
+
+    sessionStorage.setItem("authUser", JSON.stringify(authData));
+  } catch (e) {
+    console.error("Failed to update sessionStorage user", e);
+  }
 };
 
 const normalizeAccount = (account) => ({
@@ -472,6 +496,7 @@ const ProfileAccountWithData = () => {
   const [budgetNotice, setBudgetNotice] = useState("");
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
 
+  const dispatch = useDispatch();
   const [profile, setProfile] = useState(getStoredUserProfile);
   const totalBalance = useMemo(() => sumBy(accounts, (account) => account.balance), [accounts]);
   const totalIncome = useMemo(() => sumBy(budgetRows, (budget) => budget.limit), [budgetRows]);
@@ -493,6 +518,8 @@ const ProfileAccountWithData = () => {
         const apiBudgetRows = buildBudgetRows(budgetResponse);
 
         setProfile(normalizeProfile(profileResponse));
+        updateSessionUser(profileResponse);
+        dispatch(profileSuccess({ data: profileResponse, status: "success" }));
         setAccounts(normalizedAccounts);
         setBudgetRows(apiBudgetRows.length ? apiBudgetRows : budgetTargets.map((item) => {
           return {
@@ -516,7 +543,7 @@ const ProfileAccountWithData = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [dispatch]);
 
   const updateAccount = (id, field, value) => {
     setAccountNotice("");
