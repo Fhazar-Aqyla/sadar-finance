@@ -4,10 +4,11 @@
  */
 
 const bcrypt = require('bcryptjs');
+const fs = require('fs/promises');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const userRepository = require('../repositories/user.repository');
-const { UnauthorizedError, ConflictError } = require('../utils/errors');
+const { UnauthorizedError, ConflictError, BadRequestError } = require('../utils/errors');
 
 class AuthService {
   /**
@@ -93,31 +94,91 @@ class AuthService {
   }
 
   async updateProfile(userId, data) {
-    if (data.newPassword) {
-      if (!data.currentPassword) {
-        throw new UnauthorizedError('Password saat ini wajib diisi untuk mengubah password');
-      }
-      const currentHash = await userRepository.getPasswordHash(userId);
-      const isMatch = await bcrypt.compare(data.currentPassword, currentHash);
-      if (!isMatch) {
-        throw new UnauthorizedError('Password saat ini tidak cocok');
-      }
-      const passwordHash = await bcrypt.hash(data.newPassword, 12);
-      await userRepository.updatePassword(userId, passwordHash);
-
-      delete data.currentPassword;
-      delete data.newPassword;
-    }
-
-    const remainingFields = Object.keys(data).filter((k) => data[k] !== undefined);
-    if (remainingFields.length === 0) {
-      return this.getProfile(userId);
-    }
-
     const user = await userRepository.updateProfile(userId, data);
     if (!user) {
       throw new UnauthorizedError('User not found');
     }
+    return this._sanitizeUser(user);
+  }
+
+  async updateProfileAndPassword(userId, data) {
+    const profileData = this._pickProfileFields(data);
+    const shouldChangePassword = this.hasPasswordChange(data);
+
+    if (shouldChangePassword) {
+      await this.changePassword(userId, data);
+    }
+
+    if (Object.keys(profileData).length) {
+      return this.updateProfile(userId, profileData);
+    }
+
+    if (shouldChangePassword) {
+      return this.getProfile(userId);
+    }
+
+    throw new BadRequestError('No profile or password changes were provided');
+  }
+
+  hasPasswordChange(data = {}) {
+    const passwordData = this._normalizePasswordInput(data);
+    return Boolean(passwordData.currentPassword || passwordData.newPassword || passwordData.confirmPassword);
+  }
+
+  async changePassword(userId, data) {
+    const { currentPassword, newPassword, confirmPassword } = this._normalizePasswordInput(data);
+
+    if (!currentPassword) {
+      throw new BadRequestError('Current password is required');
+    }
+    if (!newPassword) {
+      throw new BadRequestError('New password is required');
+    }
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestError('New password confirmation does not match');
+    }
+    if (!this._isValidPassword(newPassword)) {
+      throw new BadRequestError('New password must be at least 8 characters and contain letters and numbers');
+    }
+    if (currentPassword === newPassword) {
+      throw new BadRequestError('New password must be different from the current password');
+    }
+
+    const user = await userRepository.findByIdWithPassword(userId);
+    if (!user) {
+      throw new UnauthorizedError('User not found');
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedError('Current password is incorrect');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    const updatedUser = await userRepository.updatePassword(userId, passwordHash);
+
+    if (!updatedUser) {
+      throw new UnauthorizedError('User not found');
+    }
+
+    return this._sanitizeUser(updatedUser);
+  }
+
+  async updateProfilePicture(userId, file) {
+    if (!file) {
+      throw new BadRequestError('Profile picture file is required');
+    }
+
+    const imageBuffer = await fs.readFile(file.path);
+    await fs.unlink(file.path).catch(() => {});
+
+    const profilePicture = `data:${file.mimetype};base64,${imageBuffer.toString('base64')}`;
+    const user = await userRepository.updateProfile(userId, { profilePicture });
+
+    if (!user) {
+      throw new UnauthorizedError('User not found');
+    }
+
     return this._sanitizeUser(user);
   }
 
@@ -143,6 +204,41 @@ class AuthService {
   _sanitizeUser(user) {
     const { password_hash, ...sanitized } = user;
     return sanitized;
+  }
+
+  _pickProfileFields(data = {}) {
+    const fields = [
+      'firstName',
+      'lastName',
+      'gender',
+      'phoneNumber',
+      'dateOfBirth',
+      'address',
+      'profilePicture',
+      'occupation',
+    ];
+
+    return fields.reduce((profileData, field) => {
+      if (data[field] !== undefined) {
+        profileData[field] = data[field];
+      }
+      return profileData;
+    }, {});
+  }
+
+  _normalizePasswordInput(data = {}) {
+    return {
+      currentPassword: data.currentPassword || data.current_password || data.oldPassword || data.old_password || data.passwordCurrent || '',
+      newPassword: data.newPassword || data.new_password || data.passwordNew || data.password_new || data.password || '',
+      confirmPassword: data.confirmPassword || data.confirm_password || data.passwordConfirmation || data.password_confirmation || data.newPasswordConfirm || data.new_password_confirm || data.newPassword || data.new_password || data.password || '',
+    };
+  }
+
+  _isValidPassword(password) {
+    return typeof password === 'string'
+      && password.length >= 8
+      && /[A-Za-z]/.test(password)
+      && /\d/.test(password);
   }
 }
 

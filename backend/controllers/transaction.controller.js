@@ -1,6 +1,6 @@
 /**
  * Transaction Controller — Handles expense transaction HTTP requests.
- * Matches ERD: transaction_id, user_id, account_id, category_group, etc.
+ * Matches ERD: transaction_id, user_id, account_id, category_group, category_detail, etc.
  */
 
 const asyncHandler = require('../utils/asyncHandler');
@@ -28,7 +28,10 @@ const transactionService = require('../services/transaction.service');
  *                 format: uuid
  *               categoryGroup:
  *                 type: string
- *                 example: "Food & Dining"
+ *                 example: "Needs"
+ *               categoryDetail:
+ *                 type: string
+ *                 example: "groceries"
  *               transactionDate:
  *                 type: string
  *                 format: date-time
@@ -71,6 +74,10 @@ const createTransaction = asyncHandler(async (req, res) => {
  *           default: 20
  *       - in: query
  *         name: categoryGroup
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: categoryDetail
  *         schema:
  *           type: string
  *       - in: query
@@ -169,6 +176,8 @@ const getTransaction = asyncHandler(async (req, res) => {
  *                 type: string
  *                 format: uuid
  *               categoryGroup:
+ *                 type: string
+ *               categoryDetail:
  *                 type: string
  *               description:
  *                 type: string

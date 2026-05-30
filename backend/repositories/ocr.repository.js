@@ -4,20 +4,54 @@
 
 const { query } = require('../config/database');
 
+const ocrScanColumns = `
+  ocr_id,
+  user_id,
+  transaction_id,
+  image_url,
+  original_name,
+  mime_type,
+  file_size,
+  status,
+  raw_text,
+  parsed_data,
+  confidence,
+  error_message,
+  processed_at,
+  created_at
+`;
+
+const ocrScanListColumns = `
+  ocr_id,
+  user_id,
+  transaction_id,
+  image_url,
+  original_name,
+  mime_type,
+  file_size,
+  status,
+  parsed_data,
+  confidence,
+  error_message,
+  processed_at,
+  created_at
+`;
+
 class OcrRepository {
   async create(userId, data) {
     const result = await query(
-      `INSERT INTO ocr_scans (user_id, image_url, original_name, mime_type, file_size, status)
-       VALUES ($1, $2, $3, $4, $5, 'pending')
-       RETURNING *`,
-      [userId, data.imageUrl, data.originalName, data.mimeType, data.fileSize]
+      `INSERT INTO ocr_scans (user_id, image_url, image_data, original_name, mime_type, file_size, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+       RETURNING ${ocrScanColumns}`,
+      [userId, data.imageUrl, data.imageData, data.originalName, data.mimeType, data.fileSize]
     );
     return result.rows[0];
   }
 
-  async findById(ocrId, userId) {
-    const result = await query(
-      `SELECT * FROM ocr_scans WHERE ocr_id = $1 AND user_id = $2`,
+  async findById(ocrId, userId, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
+      `SELECT ${ocrScanColumns} FROM ocr_scans WHERE ocr_id = $1 AND user_id = $2`,
       [ocrId, userId]
     );
     return result.rows[0] || null;
@@ -32,7 +66,7 @@ class OcrRepository {
     );
 
     const dataResult = await query(
-      `SELECT * FROM ocr_scans
+      `SELECT ${ocrScanListColumns} FROM ocr_scans
        WHERE user_id = $1
        ORDER BY created_at DESC
        LIMIT $2 OFFSET $3`,
@@ -55,23 +89,39 @@ class OcrRepository {
            error_message = $6,
            processed_at = NOW()
        WHERE ocr_id = $1
-       RETURNING *`,
+       RETURNING ${ocrScanColumns}`,
       [
         ocrId,
         status,
         parsedData.rawText || null,
         JSON.stringify(parsedData.data || {}),
-        parsedData.confidence || null,
+        parsedData.confidence ?? null,
         parsedData.errorMessage || null,
       ]
     );
     return result.rows[0] || null;
   }
 
-  async linkTransaction(ocrId, transactionId) {
-    const result = await query(
-      `UPDATE ocr_scans SET transaction_id = $2 WHERE ocr_id = $1 RETURNING *`,
+  async linkTransaction(ocrId, transactionId, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
+      `UPDATE ocr_scans
+       SET transaction_id = $2
+       WHERE ocr_id = $1 AND transaction_id IS NULL
+       RETURNING ${ocrScanColumns}`,
       [ocrId, transactionId]
+    );
+    return result.rows[0] || null;
+  }
+
+  async findImageByUrl(imageUrl) {
+    const result = await query(
+      `SELECT image_data, mime_type, original_name
+       FROM ocr_scans
+       WHERE image_url = $1 AND image_data IS NOT NULL
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [imageUrl]
     );
     return result.rows[0] || null;
   }

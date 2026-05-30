@@ -15,6 +15,8 @@ const parseCsv = (value) => {
     .filter(Boolean);
 };
 
+const unique = (values) => [...new Set(values)];
+
 const rawDbPassword = process.env.DB_PASSWORD;
 const dbPassword = rawDbPassword === 'your_password_here' ? '' : String(rawDbPassword ?? '');
 
@@ -27,6 +29,11 @@ const jwtSecret = process.env.JWT_SECRET || 'default_secret_change_me';
 
 if (env === 'production' && jwtSecret === 'default_secret_change_me') {
   throw new Error('[CONFIG] JWT_SECRET wajib di-set saat NODE_ENV=production.');
+}
+
+const corsAllowedOrigins = parseCsv(process.env.CORS_ORIGINS || process.env.FRONTEND_URL);
+if (env === 'production' && process.env.CORS_ALLOW_VERCEL !== 'false') {
+  corsAllowedOrigins.push('https://*.vercel.app');
 }
 
 const config = {
@@ -49,7 +56,7 @@ const config = {
   },
 
   cors: {
-    allowedOrigins: parseCsv(process.env.CORS_ORIGINS || process.env.FRONTEND_URL),
+    allowedOrigins: unique(corsAllowedOrigins),
   },
 
   ai: {
@@ -60,7 +67,9 @@ const config = {
 
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
-    max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100,
+    max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 600,
+    authWindowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
+    authMax: parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10) || 50,
   },
 
   upload: {

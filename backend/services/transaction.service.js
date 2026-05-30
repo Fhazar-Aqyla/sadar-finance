@@ -5,12 +5,43 @@
 
 const transactionRepository = require('../repositories/transaction.repository');
 const accountRepository = require('../repositories/account.repository');
+const ocrRepository = require('../repositories/ocr.repository');
+const { getClient } = require('../config/database');
 const { BadRequestError, NotFoundError } = require('../utils/errors');
+
+const primaryCategoryGroups = new Set(['Needs', 'Wants', 'Savings', 'Other']);
 
 class TransactionService {
   async create(userId, data) {
-    await this._ensureAccountBelongsToUser(data.accountId, userId);
-    return transactionRepository.create(userId, data);
+    const input = this._normalizeTransactionInput(data, { defaultSource: 'manual' });
+
+    await this._ensureAccountBelongsToUser(input.accountId, userId);
+
+    const normalized = this._normalizeCategoryData(input);
+    if (!input.ocrScanId) {
+      return transactionRepository.create(userId, normalized);
+    }
+
+    await this._ensureLinkableOcrScan(input.ocrScanId, userId);
+
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const transaction = await transactionRepository.create(userId, normalized, client);
+      const linkedScan = await ocrRepository.linkTransaction(input.ocrScanId, transaction.transaction_id, client);
+
+      if (!linkedScan) {
+        throw new BadRequestError('OCR scan is already linked to a transaction');
+      }
+
+      await client.query('COMMIT');
+      return transaction;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async findAll(userId, filters) {
@@ -26,9 +57,11 @@ class TransactionService {
   }
 
   async update(transactionId, userId, data) {
+    const input = this._normalizeTransactionInput(data);
+
     await this.findById(transactionId, userId);
-    await this._ensureAccountBelongsToUser(data.accountId, userId);
-    return transactionRepository.update(transactionId, userId, data);
+    await this._ensureAccountBelongsToUser(input.accountId, userId);
+    return transactionRepository.update(transactionId, userId, this._normalizeCategoryData(input));
   }
 
   async delete(transactionId, userId) {
@@ -50,6 +83,7 @@ class TransactionService {
       transactionCount: totalExpense.count,
       categoryBreakdown: categoryBreakdown.map((c) => ({
         categoryGroup: c.category_group || 'Uncategorized',
+        categoryDetail: c.category_detail || null,
         count: c.count,
         total: parseFloat(c.total),
         percentage: parseFloat(totalExpense.total) > 0
@@ -70,6 +104,72 @@ class TransactionService {
     if (!account) {
       throw new BadRequestError('Account does not exist or does not belong to the current user');
     }
+  }
+
+  async _ensureLinkableOcrScan(ocrScanId, userId) {
+    const scan = await ocrRepository.findById(ocrScanId, userId);
+    if (!scan) {
+      throw new BadRequestError('OCR scan does not exist or does not belong to the current user');
+    }
+    if (scan.transaction_id) {
+      throw new BadRequestError('OCR scan is already linked to a transaction');
+    }
+    if (scan.status !== 'completed') {
+      throw new BadRequestError('OCR scan must be completed before creating a transaction');
+    }
+    return scan;
+  }
+
+  _normalizeTransactionInput(data = {}, { defaultSource = undefined } = {}) {
+    return {
+      ...data,
+      accountId: data.accountId ?? data.account_id ?? null,
+      categoryGroup: data.categoryGroup ?? data.category_group ?? data.budgetGroup ?? data.budget_group ?? null,
+      categoryDetail: data.categoryDetail ?? data.category_detail ?? data.category ?? null,
+      transactionDate: data.transactionDate ?? data.transaction_date ?? data.date ?? undefined,
+      description: data.description ?? data.name ?? data.merchant ?? data.note ?? null,
+      source: data.source || defaultSource,
+      amount: data.amount,
+      ocrScanId: data.ocrScanId ?? data.ocr_scan_id ?? null,
+    };
+  }
+
+  _normalizeCategoryData(data) {
+    const normalized = { ...data };
+    const categoryGroup = this._cleanCategory(normalized.categoryGroup);
+    const categoryDetail = this._cleanCategory(normalized.categoryDetail);
+
+    if (categoryGroup && primaryCategoryGroups.has(categoryGroup)) {
+      normalized.categoryGroup = categoryGroup;
+      normalized.categoryDetail = categoryDetail || null;
+      return normalized;
+    }
+
+    if (categoryGroup && !primaryCategoryGroups.has(categoryGroup)) {
+      normalized.categoryGroup = this._inferCategoryGroup(categoryGroup);
+      normalized.categoryDetail = categoryDetail || categoryGroup;
+      return normalized;
+    }
+
+    if (categoryDetail) {
+      normalized.categoryGroup = this._inferCategoryGroup(categoryDetail);
+      normalized.categoryDetail = categoryDetail;
+    }
+
+    return normalized;
+  }
+
+  _cleanCategory(value) {
+    const text = String(value || '').trim();
+    return text || null;
+  }
+
+  _inferCategoryGroup(value) {
+    const text = String(value || '').toLowerCase();
+    if (/tabungan|saving|savings|invest|dana darurat/.test(text)) return 'Savings';
+    if (/makan|food|beverage|groceries|transport|tagihan|utilit|kesehatan|health|pendidikan|education|bills/.test(text)) return 'Needs';
+    if (!text || text === 'other' || text === 'lainnya') return 'Other';
+    return 'Wants';
   }
 }
 

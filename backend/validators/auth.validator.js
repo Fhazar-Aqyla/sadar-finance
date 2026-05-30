@@ -34,6 +34,34 @@ const forgotPasswordSchema = Joi.object({
   email: Joi.string().email().lowercase().trim().required(),
 });
 
+const passwordValue = Joi.string().min(8).max(128)
+  .pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
+  .messages({
+    'string.pattern.base': 'Password must contain letters and numbers',
+    'string.min': 'Password must be at least 8 characters',
+  });
+
+const passwordAliasFields = {
+  currentPassword: Joi.string().max(128).optional().allow(''),
+  current_password: Joi.string().max(128).optional().allow(''),
+  oldPassword: Joi.string().max(128).optional().allow(''),
+  old_password: Joi.string().max(128).optional().allow(''),
+  passwordCurrent: Joi.string().max(128).optional().allow(''),
+  newPassword: passwordValue.optional().allow(''),
+  new_password: passwordValue.optional().allow(''),
+  passwordNew: passwordValue.optional().allow(''),
+  password_new: passwordValue.optional().allow(''),
+  password: passwordValue.optional().allow(''),
+  confirmPassword: Joi.string().max(128).optional().allow(''),
+  confirm_password: Joi.string().max(128).optional().allow(''),
+  passwordConfirmation: Joi.string().max(128).optional().allow(''),
+  password_confirmation: Joi.string().max(128).optional().allow(''),
+  newPasswordConfirm: Joi.string().max(128).optional().allow(''),
+  new_password_confirm: Joi.string().max(128).optional().allow(''),
+};
+
+const changePasswordSchema = Joi.object(passwordAliasFields).min(1);
+
 const updateProfileSchema = Joi.object({
   firstName: Joi.string().min(2).max(100).trim().optional(),
   lastName: Joi.string().min(2).max(100).trim().optional(),
@@ -41,10 +69,15 @@ const updateProfileSchema = Joi.object({
   phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{10,20}$/).optional().allow(null, ''),
   dateOfBirth: Joi.date().iso().optional().allow(null, ''),
   address: Joi.string().max(500).optional().allow(null, ''),
-  profilePicture: Joi.string().max(1000).optional().allow(null, ''),
+  profilePicture: Joi.string().uri().max(1000).optional().allow(null, ''),
   occupation: Joi.string().max(100).optional().allow(null, ''),
-  currentPassword: Joi.string().optional().allow(''),
-  newPassword: Joi.string().min(8).max(128).optional().allow(''),
+  ...passwordAliasFields,
 }).min(1);
 
-module.exports = { registerSchema, loginSchema, forgotPasswordSchema, updateProfileSchema };
+module.exports = {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  updateProfileSchema,
+  changePasswordSchema,
+};

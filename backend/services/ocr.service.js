@@ -6,9 +6,10 @@
  */
 
 const ocrRepository = require("../repositories/ocr.repository");
-const config = require("../config");
 const fs = require("fs/promises");
+const config = require("../config");
 const aiClient = require("./aiClient.service");
+const localOcrService = require("./localOcr.service");
 const analyticsService = require("./analytics.service");
 const transactionService = require("./transaction.service");
 const { NotFoundError, BadRequestError } = require("../utils/errors");
@@ -19,8 +20,11 @@ class OcrService {
       throw new BadRequestError("Image file is required");
     }
 
+    const imageData = await fs.readFile(file.path);
+
     const scan = await ocrRepository.create(userId, {
       imageUrl: `/${config.upload.dir}/${file.filename}`,
+      imageData,
       originalName: file.originalname,
       mimeType: file.mimetype,
       fileSize: file.size,
@@ -50,6 +54,7 @@ class OcrService {
    */
   async confirmTransaction(scanId, userId, data) {
     const scan = await this.getScan(scanId, userId);
+    const input = this._normalizeTransactionInput(data);
 
     if (scan.transaction_id) {
       throw new BadRequestError("OCR scan is already linked to a transaction");
@@ -62,7 +67,7 @@ class OcrService {
     }
 
     const parsedData = this._getParsedData(scan);
-    const amount = Number(data.amount ?? parsedData.total);
+    const amount = Number(input.amount ?? parsedData.total);
 
     if (!amount || Number.isNaN(amount) || amount <= 0) {
       throw new BadRequestError(
@@ -71,11 +76,16 @@ class OcrService {
     }
 
     const description =
-      data.description || this._buildReceiptDescription(parsedData);
+      input.description || this._buildReceiptDescription(parsedData);
     let categoryGroup =
-      data.categoryGroup ||
+      input.categoryGroup ||
       parsedData.categoryGroup ||
       parsedData.category_group ||
+      null;
+    let categoryDetail =
+      input.categoryDetail ||
+      parsedData.categoryDetail ||
+      parsedData.category_detail ||
       null;
 
     if (!categoryGroup) {
@@ -85,21 +95,21 @@ class OcrService {
           .join(" "),
       });
       categoryGroup = category.predictedCategory;
+      categoryDetail = category.categoryDetail || categoryDetail;
     }
 
     const transaction = await transactionService.create(userId, {
-      accountId: data.accountId,
+      accountId: input.accountId,
+      ocrScanId: scan.ocr_id || scan.id,
       categoryGroup,
-      transactionDate: data.transactionDate || parsedData.date || new Date(),
+      categoryDetail,
+      transactionDate: input.transactionDate || parsedData.date || new Date(),
       description,
-      source: data.source || "ocr",
+      source: input.source || "ocr",
       amount,
     });
 
-    const linkedScan = await ocrRepository.linkTransaction(
-      scan.ocr_id || scan.id,
-      transaction.transaction_id,
-    );
+    const linkedScan = await ocrRepository.findById(scan.ocr_id || scan.id, userId);
 
     return {
       transaction,
@@ -114,26 +124,36 @@ class OcrService {
     try {
       await ocrRepository.updateStatus(scanId, "processing");
 
-      const parsedData = await aiClient.extractReceipt({ file, scanId });
+      const parsedData = await this._extractReceipt(file, scanId);
       await this._attachCategory(userId, parsedData);
-      await this._attachReceiptPreview(parsedData, file);
 
       await ocrRepository.updateStatus(scanId, "completed", parsedData);
     } catch (err) {
       try {
-        const fallbackData = this._fallbackParsedData(err);
-        await this._attachReceiptPreview(fallbackData, file);
-        await ocrRepository.updateStatus(
-          scanId,
-          "completed",
-          fallbackData,
-        );
+        await ocrRepository.updateStatus(scanId, "failed", this._failedParsedData(err));
       } catch (fallbackErr) {
         await ocrRepository.updateStatus(scanId, "failed", {
           errorMessage: fallbackErr.message,
         });
       }
     }
+  }
+
+  async _extractReceipt(file, scanId) {
+    try {
+      const localResult = await localOcrService.extractReceipt(file);
+      if (this._hasUsableReceiptData(localResult)) {
+        return localResult;
+      }
+    } catch (_err) {
+      // Fall back to the AI service below when local OCR cannot read the image.
+    }
+
+    return aiClient.extractReceipt({ file, scanId });
+  }
+
+  _hasUsableReceiptData(parsedData) {
+    return Boolean(parsedData?.data?.total);
   }
 
   async _attachCategory(userId, parsedData) {
@@ -154,22 +174,9 @@ class OcrService {
     });
     parsedData.data = parsedData.data || {};
     parsedData.data.categoryGroup = category.predictedCategory;
+    parsedData.data.categoryDetail = category.categoryDetail;
     parsedData.data.categoryConfidence = category.confidence;
     parsedData.data.categorySource = category.source;
-  }
-
-  async _attachReceiptPreview(parsedData, file) {
-    if (!file?.path || !file?.mimetype) return;
-
-    try {
-      if (file.size && file.size > 1.5 * 1024 * 1024) return;
-      const buffer = await fs.readFile(file.path);
-      parsedData.data = parsedData.data || {};
-      parsedData.data.receiptDataUrl = `data:${file.mimetype};base64,${buffer.toString("base64")}`;
-      parsedData.data.receiptName = file.originalname || null;
-    } catch (_err) {
-      // Static upload URL remains the primary fallback if embedding fails.
-    }
   }
 
   _getParsedData(scan) {
@@ -182,6 +189,19 @@ class OcrService {
       }
     }
     return scan.parsed_data;
+  }
+
+  _normalizeTransactionInput(data = {}) {
+    return {
+      ...data,
+      accountId: data.accountId ?? data.account_id ?? null,
+      categoryGroup: data.categoryGroup ?? data.category_group ?? data.budgetGroup ?? data.budget_group ?? null,
+      categoryDetail: data.categoryDetail ?? data.category_detail ?? data.category ?? null,
+      transactionDate: data.transactionDate ?? data.transaction_date ?? data.date ?? undefined,
+      description: data.description ?? data.name ?? data.merchant ?? data.note ?? null,
+      source: data.source || "ocr",
+      amount: data.amount,
+    };
   }
 
   _buildReceiptDescription(parsedData) {
@@ -199,24 +219,16 @@ class OcrService {
       .slice(0, 500);
   }
 
-  _fallbackParsedData(error) {
+  _failedParsedData(error) {
+    const message = error?.message || String(error) || "OCR processing failed";
+
     return {
-      rawText:
-        "SAMPLE RECEIPT\nStore: Indomaret\nDate: 2025-01-15\nItems:\n- Rice 5kg: Rp 75.000\n- Cooking Oil 1L: Rp 18.000\nTotal: Rp 93.000",
+      rawText: "",
       data: {
-        merchant: "Indomaret",
-        date: "2025-01-15",
-        items: [
-          { name: "Rice 5kg", amount: 75000 },
-          { name: "Cooking Oil 1L", amount: 18000 },
-        ],
-        total: 93000,
-        currency: "IDR",
-        categoryGroup: "groceries",
-        categoryConfidence: 0.86,
-        fallbackReason: error?.message || String(error),
+        fallbackReason: message,
       },
-      confidence: 0.72,
+      confidence: 0,
+      errorMessage: message,
     };
   }
 }
