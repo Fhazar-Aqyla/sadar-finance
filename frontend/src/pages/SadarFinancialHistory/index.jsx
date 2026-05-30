@@ -59,7 +59,7 @@ const normalizeIncome = (income) => ({
   source: income.source || "Pemasukan",
   amount: Number(income.amount || 0),
   date: String(income.income_date || income.incomeDate || income.date || "").slice(0, 10),
-  receiptUrl: income.receipt_url || income.receiptUrl || income.image_url || income.imageUrl || "",
+  receiptUrl: getReceiptUrl(income),
 });
 
 const isBudgetBucketCategory = (category) =>
@@ -108,7 +108,7 @@ const normalizeTransaction = (transaction) => ({
   amount: Number(transaction.amount || 0),
   date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
   status: "Tercatat",
-  receiptUrl: transaction.receipt_url || transaction.receiptUrl || transaction.image_url || transaction.imageUrl || "",
+  receiptUrl: getReceiptUrl(transaction),
 });
 
 const loadStoredReceipts = () => {
@@ -133,9 +133,12 @@ const resolveReceiptImageUrl = (url) => {
   return `${apiRoot}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
+const getReceiptUrl = (row) =>
+  resolveReceiptImageUrl(row.receipt_url || row.receiptUrl || row.image_url || row.imageUrl || "");
+
 const normalizeOcrReceipt = (scan) => ({
   name: scan.original_name || scan.originalName || "Struk OCR",
-  dataUrl: resolveReceiptImageUrl(scan.image_url || scan.imageUrl || ""),
+  dataUrl: getReceiptUrl(scan),
   updatedAt: scan.updated_at || scan.updatedAt || scan.created_at || scan.createdAt || "",
 });
 

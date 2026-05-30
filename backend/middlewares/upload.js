@@ -9,10 +9,11 @@ const config = require('../config');
 const { BadRequestError } = require('../utils/errors');
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const uploadDir = path.resolve(__dirname, '..', config.upload.dir);
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    cb(null, config.upload.dir);
+    cb(null, uploadDir);
   },
   filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname);
