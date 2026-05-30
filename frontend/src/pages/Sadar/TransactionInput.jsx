@@ -87,6 +87,8 @@ const normalizeParsedData = (scan) => {
   }
 };
 
+const getScanId = (scan) => scan?.ocr_id || scan?.ocrId || scan?.id || "";
+
 const buildDescription = (merchant, items) => {
   const itemText = Array.isArray(items) && items.length
     ? items.map((item) => `${item.name} (${currencyFormatter.format(item.amount || 0)})`).join(", ")
@@ -291,20 +293,33 @@ const TransactionInput = () => {
     setIsSaving(true);
     setNotice(null);
     try {
-      await transactionApi.create({
+      const payload = {
         categoryGroup: form.categoryGroup,
         accountId: form.accountId,
         transactionDate,
         description: form.description || form.merchant,
         source: form.source,
         amount: Number(form.amount),
-      });
+      };
+
+      const scanId = mode === "ocr" ? getScanId(scanResult) : "";
+      if (scanId) {
+        await ocrApi.confirmTransaction(scanId, payload);
+      } else {
+        await transactionApi.create(payload);
+      }
 
       setNotice({
         color: "success",
         message: "Pengeluaran berhasil disimpan.",
       });
       setForm({ ...initialForm, accountId: form.accountId, source: mode === "ocr" ? "ocr" : "manual" });
+      setScanResult(null);
+      setReceiptFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl("");
+      }
     } catch (error) {
       setNotice({ color: "danger", message: getErrorMessage(error, "Pengeluaran gagal disimpan.") });
     } finally {
