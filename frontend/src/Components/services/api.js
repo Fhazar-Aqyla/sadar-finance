@@ -36,13 +36,20 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    const apiError = error?.response?.data?.error;
     const message =
-      error?.response?.data?.error?.message ||
+      apiError?.message ||
       error?.response?.data?.message ||
       error?.message ||
       "Terjadi kesalahan saat menghubungi server.";
 
-    return Promise.reject(new Error(message));
+    const customError = new Error(message);
+    if (apiError) {
+      customError.code = apiError.code;
+      customError.details = apiError.details;
+    }
+
+    return Promise.reject(customError);
   },
 );
 

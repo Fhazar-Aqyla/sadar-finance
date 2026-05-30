@@ -263,7 +263,6 @@ const EmptyProfileAccount = () => {
                     {profile.avatar ? <img src={profile.avatar} alt="Foto profil" /> : profile.name.slice(0, 1).toUpperCase()}
                   </div>
                   <div className="sadar-profile-photo-copy">
-                    <Badge color="primary" className="bg-primary-subtle text-primary mb-2">Keuangan Pribadi</Badge>
                     <h5>{profile.name}</h5>
                     <p>{profile.email}</p>
                   </div>
@@ -782,7 +781,6 @@ const ProfileAccountWithData = () => {
                     {profile.avatar ? <img src={profile.avatar} alt="Foto profil" /> : profile.name.slice(0, 1).toUpperCase()}
                   </div>
                   <div className="sadar-profile-photo-copy">
-                    <Badge color="primary" className="bg-primary-subtle text-primary mb-2">Keuangan Pribadi</Badge>
                     <h5>{profile.name}</h5>
                     <p>{profile.email}</p>
                   </div>

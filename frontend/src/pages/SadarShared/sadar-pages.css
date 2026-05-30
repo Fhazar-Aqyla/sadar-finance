@@ -288,9 +288,9 @@
 }
 
 .sadar-recommend-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   width: 36px;
   height: 36px;
   flex: 0 0 36px;
@@ -298,6 +298,16 @@
   color: #0f766e;
   background: rgba(20, 184, 166, 0.12);
   font-size: 1.05rem;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.sadar-recommend-icon i {
+  display: inline-block !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .sadar-recommend-icon.warning {

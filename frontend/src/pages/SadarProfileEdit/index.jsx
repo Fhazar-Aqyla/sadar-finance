@@ -19,9 +19,32 @@ import {
   Row,
   Progress,
 } from "reactstrap";
-
+import { useDispatch } from "react-redux";
+import { profileSuccess } from "../../slices/auth/profile/reducer";
 import { authApi } from "../../Components/services/api";
 import "../SadarShared/sadar-pages.css";
+
+const updateSessionUser = (updatedUser) => {
+  try {
+    const rawAuth = sessionStorage.getItem("authUser");
+    if (!rawAuth) return;
+    const authData = JSON.parse(rawAuth);
+
+    if (authData.user) {
+      authData.user = { ...authData.user, ...updatedUser };
+    } else if (authData.data && authData.data.user) {
+      authData.data.user = { ...authData.data.user, ...updatedUser };
+    } else if (authData.data) {
+      authData.data = { ...authData.data, ...updatedUser };
+    } else {
+      Object.assign(authData, updatedUser);
+    }
+
+    sessionStorage.setItem("authUser", JSON.stringify(authData));
+  } catch (e) {
+    console.error("Failed to update sessionStorage user", e);
+  }
+};
 
 const defaultProfile = {
   firstName: "",
@@ -64,6 +87,8 @@ const normalizeProfile = (user) => {
 };
 
 const ProfileEdit = () => {
+  const dispatch = useDispatch();
+
   useEffect(() => {
     document.title = "Edit Profil | SADAR Finance";
   }, []);
@@ -175,6 +200,10 @@ const ProfileEdit = () => {
       setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
       setAvatarNotice({ color: "success", message: "Foto profil berhasil diperbarui." });
       setAvatarFile(null);
+      
+      // Update sessionStorage and Redux state to sync header avatar instantly
+      updateSessionUser(updatedUser);
+      dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
       setAvatarNotice({ color: "danger", message: error?.message || "Foto profil gagal disimpan." });
     } finally {
@@ -211,6 +240,10 @@ const ProfileEdit = () => {
       });
       setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
       setIdentityNotice({ color: "success", message: "Identitas pribadi berhasil disimpan." });
+      
+      // Update sessionStorage and Redux state to sync header user details instantly
+      updateSessionUser(updatedUser);
+      dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
       setIdentityNotice({ color: "danger", message: error?.message || "Identitas pribadi gagal disimpan." });
     } finally {
@@ -262,7 +295,16 @@ const ProfileEdit = () => {
         confirmPassword: "",
       }));
     } catch (error) {
-      setSecurityNotice({ color: "danger", message: error?.message || "Gagal memperbarui sandi." });
+      if (error.details && error.details.length) {
+        const fieldMap = {};
+        error.details.forEach((d) => {
+          fieldMap[d.field] = d.message;
+        });
+        setFieldErrors(fieldMap);
+        setSecurityNotice({ color: "danger", message: "Validasi gagal. Periksa kembali input Anda." });
+      } else {
+        setSecurityNotice({ color: "danger", message: error?.message || "Gagal memperbarui sandi." });
+      }
     } finally {
       setIsSavingSecurity(false);
     }

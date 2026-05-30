@@ -137,7 +137,7 @@ const splitRecommendationText = (text) => {
     };
   }
 
-  if (firstSentence.length <= 82 && rest.length) {
+  if (firstSentence.length <= 180 && rest.length) {
     return {
       title: firstSentence.replace(/\.$/, ""),
       description: rest.join(" "),
@@ -145,8 +145,8 @@ const splitRecommendationText = (text) => {
   }
 
   return {
-    title: cleanText.length > 82 ? `${cleanText.slice(0, 79).trim()}...` : cleanText,
-    description: cleanText.length > 82 ? cleanText : "Aksi ini bisa membantu menjaga arus kas tetap terkendali.",
+    title: cleanText.length > 180 ? `${cleanText.slice(0, 177).trim()}...` : cleanText,
+    description: cleanText.length > 180 ? cleanText : "Aksi ini bisa membantu menjaga arus kas tetap terkendali.",
   };
 };
 

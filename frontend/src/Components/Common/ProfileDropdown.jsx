@@ -4,6 +4,13 @@ import { useSelector } from 'react-redux';
 //import images
 import avatar1 from "../../assets/images/users/avatar-1.jpg";
 
+const resolveAvatarUrl = (url) => {
+    if (!url) return avatar1;
+    if (/^(https?:|data:)/i.test(url)) return url;
+    const serverUrl = "https://sadar-finance.up.railway.app";
+    return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+};
+
 const normalizeAccountName = (value) => {
     const name = String(value || "").trim();
     if (!name || name.toLowerCase() === "admin" || name.toLowerCase().includes("themesbrand")) {
@@ -14,6 +21,7 @@ const normalizeAccountName = (value) => {
 
 const ProfileDropdown = () => {
     const user = useSelector((state) => state.Profile?.user ?? {});
+    
     const userName = useMemo(() => {
         const fallbackName = normalizeAccountName(user?.first_name || user?.username || "Aqyla");
         const storedUser = sessionStorage.getItem("authUser");
@@ -42,16 +50,33 @@ const ProfileDropdown = () => {
         }
     }, [user]);
 
+    const avatarUrl = useMemo(() => {
+        const rawAvatar = user?.profile_picture || user?.profilePicture || user?.avatar;
+        if (rawAvatar) return resolveAvatarUrl(rawAvatar);
+
+        const storedUser = sessionStorage.getItem("authUser");
+        if (storedUser) {
+            try {
+                const authUser = JSON.parse(storedUser);
+                const u = authUser?.user || authUser?.data?.user || authUser?.data || authUser;
+                const av = u?.profile_picture || u?.profilePicture || u?.avatar;
+                if (av) return resolveAvatarUrl(av);
+            } catch {
+                // ignore
+            }
+        }
+        return avatar1;
+    }, [user]);
+
     return (
         <React.Fragment>
             <div className="header-item topbar-user sadar-profile">
                 <div className="btn d-flex align-items-center" style={{ cursor: 'default' }}>
                     <span className="d-flex align-items-center">
-                        <img className="rounded-circle header-profile-user" src={avatar1}
+                        <img className="rounded-circle header-profile-user" src={avatarUrl}
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
                             <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{userName}</span>
-                            <span className="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">Keuangan Pribadi</span>
                         </span>
                     </span>
                 </div>

@@ -16,8 +16,8 @@ export const userForgetPassword = (user) => async (dispatch) => {
   try {
       let response;
       if (defaultAuth === "sadar") {
-          await authApi.forgotPassword({ email: user.email });
-          dispatch(userForgetPasswordSuccess("Permintaan reset password diterima. Cek email jika layanan email sudah aktif."));
+          const res = await authApi.forgotPassword({ email: user.email });
+          dispatch(userForgetPasswordSuccess(res?.message || "Permintaan reset password diterima. Cek email jika layanan email sudah aktif."));
           return;
       }
 
