@@ -129,7 +129,10 @@ const resolveReceiptImageUrl = (url) => {
   if (!url) return "";
   if (/^(https?:|data:)/i.test(url)) return url;
 
-  const apiRoot = api.API_URL.replace(/\/api\/v\d+\/?$/i, "");
+  let apiRoot = api.API_URL.replace(/\/api\/v\d+\/?$/i, "");
+  if (!apiRoot || apiRoot.startsWith("/")) {
+    apiRoot = "https://sadar-finance.up.railway.app";
+  }
   return `${apiRoot}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
