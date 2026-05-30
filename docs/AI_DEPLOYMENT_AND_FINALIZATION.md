@@ -6,7 +6,7 @@ AI service yang dipakai:
 
 ```env
 AI_SERVICE_URL=https://sadar-finance-sadar-finance-ai.hf.space
-AI_SERVICE_TIMEOUT_MS=30000
+AI_SERVICE_TIMEOUT_MS=60000
 AI_MOCK_MODE=false
 ```
 
@@ -67,7 +67,7 @@ Di `.env` backend lokal atau Railway variables:
 
 ```env
 AI_SERVICE_URL=https://sadar-finance-sadar-finance-ai.hf.space
-AI_SERVICE_TIMEOUT_MS=30000
+AI_SERVICE_TIMEOUT_MS=60000
 AI_MOCK_MODE=false
 ```
 
@@ -513,7 +513,7 @@ Yang perlu dipastikan tim backend:
   - `/api/v1/analytics/behavior/predict`
 - Railway variables:
   - `AI_SERVICE_URL=https://sadar-finance-sadar-finance-ai.hf.space`
-  - `AI_SERVICE_TIMEOUT_MS=30000`
+  - `AI_SERVICE_TIMEOUT_MS=60000`
   - `AI_MOCK_MODE=false`
 - Response backend untuk categorize bukan lagi `mock-category-v1`.
 - Response backend untuk behavior punya `source: "ai-service"`.

@@ -21,9 +21,16 @@ def preprocess_image(image_path: str) -> Image.Image:
     image = image.filter(ImageFilter.SHARPEN)
 
     width, height = image.size
-    if width < 1200:
-        scale = 1200 / max(width, 1)
+    target_width = int(os.getenv("OCR_TARGET_WIDTH", "600"))
+    max_height = int(os.getenv("OCR_MAX_HEIGHT", "1800"))
+
+    if width < target_width:
+        scale = target_width / max(width, 1)
         image = image.resize((int(width * scale), int(height * scale)))
+
+    if image.height > max_height:
+        scale = max_height / max(image.height, 1)
+        image = image.resize((max(1, int(image.width * scale)), max_height))
 
     return image
 
@@ -36,7 +43,8 @@ def extract_text_from_image(image_path: str, lang: Optional[str] = None) -> str:
     image = preprocess_image(str(path))
     tesseract_lang = lang or "ind+eng"
     config = "--psm 6"
+    timeout = int(os.getenv("OCR_TIMEOUT_SECONDS", "15"))
     try:
-        return pytesseract.image_to_string(image, lang=tesseract_lang, config=config)
+        return pytesseract.image_to_string(image, lang=tesseract_lang, config=config, timeout=timeout)
     except pytesseract.TesseractError:
-        return pytesseract.image_to_string(image, lang="eng", config=config)
+        return pytesseract.image_to_string(image, lang="eng", config=config, timeout=timeout)

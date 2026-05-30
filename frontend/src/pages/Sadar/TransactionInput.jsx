@@ -260,7 +260,7 @@ const TransactionInput = () => {
         return scan;
       }
       if (scan?.status === "failed") {
-        throw new Error("OCR gagal.");
+        throw new Error(scan?.error_message || scan?.errorMessage || "OCR gagal.");
       }
 
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -283,7 +283,7 @@ const TransactionInput = () => {
       body.append("image", receiptFile);
 
       const uploadedScan = await ocrApi.upload(body);
-      const scanId = uploadedScan?.ocr_id || uploadedScan?.id;
+      const scanId = getScanId(uploadedScan);
 
       if (!scanId) {
         throw new Error("OCR gagal.");
