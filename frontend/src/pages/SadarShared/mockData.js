@@ -82,4 +82,3 @@ export const isWeekend = (date) => {
 
 export const formatShortDate = (date) =>
   new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(new Date(`${date}T00:00:00`));
-

@@ -1,7 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
 
 //import images
 import avatar1 from "../../assets/images/users/avatar-1.jpg";
@@ -39,20 +37,15 @@ const ProfileDropdown = () => {
                 authUser?.email ||
                 "Aqyla"
             );
-        } catch (error) {
+        } catch {
             return fallbackName;
         }
     }, [user]);
 
-    //Dropdown Toggle
-    const [isProfileDropdown, setIsProfileDropdown] = useState(false);
-    const toggleProfileDropdown = () => {
-        setIsProfileDropdown(!isProfileDropdown);
-    };
     return (
         <React.Fragment>
-            <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="header-item topbar-user sadar-profile">
-                <DropdownToggle tag="button" type="button" className="btn">
+            <div className="header-item topbar-user sadar-profile">
+                <div className="btn d-flex align-items-center" style={{ cursor: 'default' }}>
                     <span className="d-flex align-items-center">
                         <img className="rounded-circle header-profile-user" src={avatar1}
                             alt="Header Avatar" />
@@ -61,44 +54,8 @@ const ProfileDropdown = () => {
                             <span className="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">Keuangan Pribadi</span>
                         </span>
                     </span>
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-menu-end">
-                    <h6 className="dropdown-header">Halo, {userName}</h6>
-                    <DropdownItem className='p-0'>
-                        <Link to= "/profile-account" className="dropdown-item">
-                            <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
-                            <span className="align-middle">Profil & Akun</span>
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem className='p-0'>
-                        <Link to= "/financial-score" className="dropdown-item">
-                            <i className="mdi mdi-speedometer text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle">Skor Finansial</span>
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem className='p-0'>
-                        <Link to= "/behavior-insight" className="dropdown-item">
-                            <i className="mdi mdi-lightbulb-on-outline text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle">Insight Perilaku</span>
-                        </Link>
-                    </DropdownItem>
-                    <div className="dropdown-divider"></div>
-                    <DropdownItem className='p-0'>
-                        <Link to= "/profile-account" className="dropdown-item">
-                            <i
-                                    className="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
-                                        className="align-middle">Pengaturan</span>
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem className='p-0'>
-                        <Link to= "/logout" className="dropdown-item">
-                            <i
-                                className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                    className="align-middle" data-key="t-logout">Keluar</span>
-                        </Link>
-                    </DropdownItem>
-                </DropdownMenu>
-            </Dropdown>
+                </div>
+            </div>
         </React.Fragment>
     );
 };

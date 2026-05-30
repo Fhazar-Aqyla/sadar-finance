@@ -39,7 +39,7 @@ const Navdata = () => {
     },
     {
       id: "profile-account",
-      label: "Profil & Akun",
+      label: "Profil",
       icon: <FeatherIcon icon="user" className="icon-dual" />,
       link: "/profile-account",
     },

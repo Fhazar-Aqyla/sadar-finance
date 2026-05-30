@@ -96,9 +96,37 @@ class AnalyticsService {
     // Generate insights and save to insights table
     const insightEntries = [];
 
+    const translateTrend = (trend) => {
+      const trends = {
+        stable: 'Stabil',
+        frugal: 'Hemat',
+        balanced: 'Seimbang',
+        moderate: 'Sedang',
+        overspending: 'Boros'
+      };
+      return trends[trend] || trend;
+    };
+
+    const translateCategory = (cat) => {
+      const cats = {
+        'Food & Dining': 'Makanan & Minuman',
+        'Transportation': 'Transportasi',
+        'Shopping': 'Belanja',
+        'Entertainment': 'Hiburan',
+        'Bills & Utilities': 'Tagihan & Utilitas',
+        'Healthcare': 'Kesehatan',
+        'Education': 'Pendidikan',
+        'Salary': 'Gaji',
+        'Investment': 'Investasi',
+        'Other': 'Lainnya',
+        'Uncategorized': 'Lainnya'
+      };
+      return cats[cat] || cat;
+    };
+
     insightEntries.push({
-      title: `Spending Trend: ${spendingTrend.charAt(0).toUpperCase() + spendingTrend.slice(1)}`,
-      description: `During ${periodStart} to ${periodEnd}, your savings rate was ${savingsRate}%. Total income: Rp ${totalIncome.toLocaleString()}, Total expenses: Rp ${totalExpense.toLocaleString()}.`,
+      title: `Tren Pengeluaran: ${translateTrend(spendingTrend)}`,
+      description: `Selama periode ${periodStart} hingga ${periodEnd}, rasio tabungan Anda adalah ${savingsRate}%. Total pemasukan: Rp ${totalIncome.toLocaleString('id-ID')}, Total pengeluaran: Rp ${totalExpense.toLocaleString('id-ID')}.`,
     });
 
     if (expenseSummary.length > 0) {
@@ -107,20 +135,20 @@ class AnalyticsService {
         ? ((parseFloat(topCategory.total) / totalExpense) * 100).toFixed(1)
         : 0;
       insightEntries.push({
-        title: `Top Category: ${topCategory.category_group || 'Uncategorized'}`,
-        description: `${topCategory.category_group || 'Uncategorized'} accounts for ${percentage}% of your total expenses (Rp ${parseFloat(topCategory.total).toLocaleString()}).`,
+        title: `Kategori Terbesar: ${translateCategory(topCategory.category_group || 'Uncategorized')}`,
+        description: `Kategori ${translateCategory(topCategory.category_group || 'Uncategorized')} menyumbang ${percentage}% dari total pengeluaran Anda (Rp ${parseFloat(topCategory.total).toLocaleString('id-ID')}).`,
       });
     }
 
     if (spendingTrend === 'overspending') {
       insightEntries.push({
-        title: 'Overspending Detected',
-        description: 'Your expenses exceed your income. Consider reviewing non-essential spending.',
+        title: 'Terdeteksi Pengeluaran Berlebih',
+        description: 'Pengeluaran Anda melebihi pemasukan. Pertimbangkan untuk meninjau kembali pengeluaran non-essential Anda.',
       });
     } else if (savingsRate > 30) {
       insightEntries.push({
-        title: 'Excellent Savings Rate',
-        description: `You saved ${savingsRate}% of your income. Great financial discipline!`,
+        title: 'Rasio Tabungan Sangat Baik',
+        description: `Anda berhasil menabung ${savingsRate}% dari pemasukan Anda. Disiplin keuangan yang luar biasa!`,
       });
     }
 
@@ -279,9 +307,26 @@ class AnalyticsService {
     // Generate alerts and save to alerts table
     const alertEntries = [];
 
+    const translateCategory = (cat) => {
+      const cats = {
+        'Food & Dining': 'Makanan & Minuman',
+        'Transportation': 'Transportasi',
+        'Shopping': 'Belanja',
+        'Entertainment': 'Hiburan',
+        'Bills & Utilities': 'Tagihan & Utilitas',
+        'Healthcare': 'Kesehatan',
+        'Education': 'Pendidikan',
+        'Salary': 'Gaji',
+        'Investment': 'Investasi',
+        'Other': 'Lainnya',
+        'Uncategorized': 'Lainnya'
+      };
+      return cats[cat] || cat;
+    };
+
     if (riskLevel === 'critical' || riskLevel === 'high') {
       alertEntries.push({
-        message: `⚠️ Predicted spending for ${month} is Rp ${predictedAmount.toLocaleString()}, which exceeds your budget of Rp ${effectiveBudget.toLocaleString()} by ${((ratio - 1) * 100).toFixed(0)}%.`,
+        message: `⚠️ Perkiraan pengeluaran untuk ${month} adalah Rp ${predictedAmount.toLocaleString('id-ID')}, melebihi batas anggaran Anda sebesar Rp ${effectiveBudget.toLocaleString('id-ID')} sekitar ${((ratio - 1) * 100).toFixed(0)}%.`,
         alertType: 'overspending',
       });
     }
@@ -292,7 +337,7 @@ class AnalyticsService {
       const isHigh = catTotal > (effectiveBudget * 0.3);
       if (isHigh) {
         alertEntries.push({
-          message: `${c.category_group || 'Uncategorized'} spending (Rp ${catTotal.toLocaleString()}) exceeds 30% of your budget.`,
+          message: `Pengeluaran ${translateCategory(c.category_group || 'Uncategorized')} (Rp ${catTotal.toLocaleString('id-ID')}) melebihi 30% dari total anggaran Anda.`,
           alertType: 'budget_exceeded',
         });
       }
@@ -305,7 +350,7 @@ class AnalyticsService {
 
     if (riskLevel === 'medium') {
       alertEntries.push({
-        message: `You are approaching your budget limit for ${month}. Predicted: Rp ${finalPredictedAmount.toLocaleString()}, Budget: Rp ${effectiveBudget.toLocaleString()}.`,
+        message: `Pengeluaran Anda mendekati batas anggaran bulanan untuk ${month}. Perkiraan: Rp ${finalPredictedAmount.toLocaleString('id-ID')}, Anggaran: Rp ${effectiveBudget.toLocaleString('id-ID')}.`,
         alertType: 'reminder',
       });
     }

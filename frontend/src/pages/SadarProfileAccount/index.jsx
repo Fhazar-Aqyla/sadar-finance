@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Wallet, PieChart } from "lucide-react";
 import {
   Badge,
   Button,
@@ -8,6 +9,10 @@ import {
   CardHeader,
   Col,
   Container,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
   Form,
   Input,
   Label,
@@ -294,7 +299,7 @@ const EmptyProfileAccount = () => {
                 {accountNotice && <div className="alert alert-warning py-2 mb-3">{accountNotice}</div>}
                 {accounts.length === 0 ? (
                   <div className="sadar-empty-state sadar-empty-state-center">
-                    <span className="sadar-empty-state-icon"><i className="ri-wallet-3-line"></i></span>
+                    <span className="sadar-empty-state-icon"><Wallet className="h-5 w-5" /></span>
                     <h4>Belum ada akun yang ditambahkan.</h4>
                     <p>Tambahkan sumber uang pertama agar pemasukan dan transaksi bisa tercatat dengan benar.</p>
                     <Button color="primary" onClick={addAccount}>Tambah Akun</Button>
@@ -357,7 +362,7 @@ const EmptyProfileAccount = () => {
               <CardBody>
                 {!isBudgetOpen ? (
                   <div className="sadar-empty-state sadar-empty-state-center">
-                    <span className="sadar-empty-state-icon"><i className="ri-pie-chart-2-line"></i></span>
+                    <span className="sadar-empty-state-icon"><PieChart className="h-5 w-5" /></span>
                     <h4>Anggaran belum diatur.</h4>
                     <p>Prinsip 50/30/20 membantu membagi pemasukan menjadi 50% kebutuhan, 30% keinginan, dan 20% tabungan.</p>
                     <Button color="primary" onClick={() => setIsBudgetOpen(true)}>Atur Anggaran 50/30/20</Button>
@@ -456,8 +461,13 @@ const ProfileAccountWithData = () => {
   const [accounts, setAccounts] = useState([]);
   const [accountNotice, setAccountNotice] = useState("");
   const [pendingDeleteAccount, setPendingDeleteAccount] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [openActionAccountId, setOpenActionAccountId] = useState("");
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const [isEditAccountOpen, setIsEditAccountOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState(null);
   const [newAccountForm, setNewAccountForm] = useState(defaultAccountForm);
+  const [editAccountForm, setEditAccountForm] = useState(defaultAccountForm);
   const [isSavingAccount, setIsSavingAccount] = useState(false);
   const [budgetRows, setBudgetRows] = useState([]);
   const [budgetNotice, setBudgetNotice] = useState("");
@@ -597,6 +607,83 @@ const ProfileAccountWithData = () => {
     }
   };
 
+  const openEditAccountModal = (account) => {
+    setAccountNotice("");
+    setEditingAccount(account);
+    setEditAccountForm({
+      name: account.name,
+      type: account.type || "Bank",
+      accountNumber: account.accountNumber || "",
+      balance: String(account.balance || ""),
+    });
+    setIsEditAccountOpen(true);
+  };
+
+  const closeEditAccountModal = () => {
+    if (isSavingAccount) return;
+    setIsEditAccountOpen(false);
+    setEditingAccount(null);
+    setEditAccountForm(defaultAccountForm);
+  };
+
+  const submitEditAccount = async (event) => {
+    event.preventDefault();
+
+    const accountName = editAccountForm.name.trim();
+    const balance = Number(onlyDigits(editAccountForm.balance));
+
+    if (!accountName) {
+      await showAccountAlert({
+        icon: "warning",
+        title: "Nama akun belum diisi",
+        text: "Isi nama akun terlebih dahulu sebelum menyimpan.",
+      });
+      return;
+    }
+
+    setIsSavingAccount(true);
+    setAccountNotice("");
+
+    try {
+      await accountApi.update(editingAccount.id, {
+        accountName,
+        accountNumber: editAccountForm.accountNumber.trim(),
+        balance,
+      });
+
+      setAccounts((items) =>
+        items.map((acc) =>
+          acc.id === editingAccount.id
+            ? {
+                ...acc,
+                name: accountName,
+                type: editAccountForm.type,
+                balance,
+                accountNumber: editAccountForm.accountNumber.trim(),
+              }
+            : acc
+        )
+      );
+      setIsEditAccountOpen(false);
+      setEditingAccount(null);
+      await showAccountAlert({
+        icon: "success",
+        title: "Akun berhasil diperbarui",
+        text: `${accountName} sudah diperbarui.`,
+      });
+    } catch (error) {
+      const message = error?.message || "Akun gagal diperbarui.";
+      setAccountNotice(message);
+      await showAccountAlert({
+        icon: "error",
+        title: "Akun gagal disimpan",
+        text: message,
+      });
+    } finally {
+      setIsSavingAccount(false);
+    }
+  };
+
   const deleteAccount = (id) => {
     if (accounts.length <= 1) {
       setAccountNotice("Minimal satu akun diperlukan untuk mencatat pemasukan dan transaksi.");
@@ -604,6 +691,7 @@ const ProfileAccountWithData = () => {
     }
 
     const selectedAccount = accounts.find((account) => account.id === id);
+    setDeleteConfirmText("");
     setPendingDeleteAccount(selectedAccount || null);
   };
 
@@ -615,9 +703,11 @@ const ProfileAccountWithData = () => {
       setAccounts((items) => items.filter((account) => account.id !== pendingDeleteAccount.id));
       setAccountNotice("");
       setPendingDeleteAccount(null);
+      setDeleteConfirmText("");
     } catch (error) {
       setAccountNotice(error?.message || "Akun gagal dihapus.");
       setPendingDeleteAccount(null);
+      setDeleteConfirmText("");
     }
   };
 
@@ -749,10 +839,28 @@ const ProfileAccountWithData = () => {
                             <Input type="text" inputMode="numeric" value={formatNumberInput(account.balance)} readOnly />
                           </div>
                           <div className="d-flex align-items-end justify-content-end">
-                            <Button color="light" className="text-danger" onClick={() => deleteAccount(account.id)}>
-                              <i className="ri-delete-bin-line align-bottom me-1"></i>
-                              Hapus
-                            </Button>
+                            <Dropdown
+                              isOpen={openActionAccountId === account.id}
+                              toggle={() => setOpenActionAccountId(openActionAccountId === account.id ? "" : account.id)}
+                            >
+                              <DropdownToggle
+                                className="sadar-row-action-toggle btn-sm"
+                                color="light"
+                                aria-label={`Aksi untuk ${account.name}`}
+                              >
+                                <i className="ri-more-fill align-bottom"></i>
+                              </DropdownToggle>
+                              <DropdownMenu end className="sadar-row-action-menu">
+                                <DropdownItem onClick={() => openEditAccountModal(account)}>
+                                  <i className="ri-pencil-line align-bottom me-2"></i>
+                                  Ubah
+                                </DropdownItem>
+                                <DropdownItem className="text-danger" onClick={() => deleteAccount(account.id)}>
+                                  <i className="ri-delete-bin-line align-bottom me-2"></i>
+                                  Hapus
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
                           </div>
                         </div>
                       </div>
@@ -892,8 +1000,84 @@ const ProfileAccountWithData = () => {
       </Modal>
 
       <Modal
+        isOpen={isEditAccountOpen}
+        toggle={closeEditAccountModal}
+        centered
+        className="sadar-history-modal sadar-account-modal"
+      >
+        <ModalHeader toggle={closeEditAccountModal}>
+          Edit Akun
+        </ModalHeader>
+        <Form onSubmit={submitEditAccount} noValidate>
+          <ModalBody>
+            <div className="sadar-history-edit-grid">
+              <div>
+                <Label htmlFor="edit-account-name">Nama Akun</Label>
+                <Input
+                  id="edit-account-name"
+                  value={editAccountForm.name}
+                  onChange={(event) => setEditAccountForm((current) => ({ ...current, name: event.target.value }))}
+                  placeholder="Contoh: BCA Utama"
+                  autoFocus
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-account-type">Tipe</Label>
+                <Input
+                  id="edit-account-type"
+                  type="select"
+                  value={editAccountForm.type}
+                  onChange={(event) => setEditAccountForm((current) => ({ ...current, type: event.target.value }))}
+                >
+                  {accountTypes.map((type) => (
+                    <option key={type.value} value={type.value}>{type.label}</option>
+                  ))}
+                </Input>
+              </div>
+              <div>
+                <Label htmlFor="edit-account-number">Nomor Akun</Label>
+                <Input
+                  id="edit-account-number"
+                  value={editAccountForm.accountNumber}
+                  onChange={(event) => setEditAccountForm((current) => ({ ...current, accountNumber: event.target.value }))}
+                  placeholder="Opsional"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-account-balance">Saldo Berjalan</Label>
+                <Input
+                  id="edit-account-balance"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9.]*"
+                  value={formatNumberInput(editAccountForm.balance)}
+                  onChange={(event) => setEditAccountForm((current) => ({ ...current, balance: onlyDigits(event.target.value) }))}
+                  placeholder="Contoh: 500.000"
+                />
+              </div>
+            </div>
+            <p className="text-muted mb-0 mt-3">
+              Perubahan akun akan disimpan setelah kamu menekan tombol simpan.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button type="button" color="light" onClick={closeEditAccountModal} disabled={isSavingAccount}>
+              Batal
+            </Button>
+            <Button type="submit" color="primary" disabled={isSavingAccount}>
+              {isSavingAccount ? "Menyimpan..." : "Simpan Perubahan"}
+            </Button>
+          </ModalFooter>
+        </Form>
+      </Modal>
+
+      <Modal
         isOpen={Boolean(pendingDeleteAccount)}
-        toggle={() => setPendingDeleteAccount(null)}
+        toggle={() => {
+          setPendingDeleteAccount(null);
+          setDeleteConfirmText("");
+        }}
         centered
         className="sadar-confirm-modal"
       >
@@ -906,12 +1090,32 @@ const ProfileAccountWithData = () => {
             Akun <strong>{pendingDeleteAccount?.name || "ini"}</strong> akan dihapus dari daftar akun kamu.
             Tindakan ini tidak bisa dibatalkan.
           </p>
+          <div className="mt-3 text-start">
+            <Label htmlFor="delete-confirm-input" className="form-label text-muted fs-13">
+              Ketik nama akun <strong>{pendingDeleteAccount?.name}</strong> di bawah untuk konfirmasi:
+            </Label>
+            <Input
+              id="delete-confirm-input"
+              type="text"
+              value={deleteConfirmText}
+              onChange={(event) => setDeleteConfirmText(event.target.value)}
+              placeholder="Masukkan nama akun"
+              autoComplete="off"
+            />
+          </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="light" onClick={() => setPendingDeleteAccount(null)}>
+          <Button color="light" onClick={() => {
+            setPendingDeleteAccount(null);
+            setDeleteConfirmText("");
+          }}>
             Batal
           </Button>
-          <Button color="danger" onClick={confirmDeleteAccount}>
+          <Button
+            color="danger"
+            onClick={confirmDeleteAccount}
+            disabled={deleteConfirmText !== pendingDeleteAccount?.name}
+          >
             Hapus Akun
           </Button>
         </ModalFooter>

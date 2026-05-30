@@ -1211,9 +1211,7 @@
   background: #25a0e2 !important;
 }
 
-html[data-bs-theme="dark"] .sadar-page {
-  background: #111827;
-  color: #e5edf7;
+html[data-bs-theme="dark"] {
   --sadar-dark-surface: #18212c;
   --sadar-dark-surface-raised: #1f2a37;
   --sadar-dark-surface-soft: #263241;
@@ -1222,6 +1220,19 @@ html[data-bs-theme="dark"] .sadar-page {
   --sadar-dark-heading: #f8fafc;
   --sadar-dark-body: #cbd5e1;
   --sadar-dark-muted: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .sadar-page {
+  background: #111827;
+  color: #e5edf7;
+}
+
+html[data-bs-theme="dark"] .sadar-table tbody td.text-success {
+  color: #22c55e !important;
+}
+
+html[data-bs-theme="dark"] .sadar-table tbody td.text-danger {
+  color: #f87171 !important;
 }
 
 html[data-bs-theme="dark"] .sadar-page .card {

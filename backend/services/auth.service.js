@@ -93,6 +93,27 @@ class AuthService {
   }
 
   async updateProfile(userId, data) {
+    if (data.newPassword) {
+      if (!data.currentPassword) {
+        throw new UnauthorizedError('Password saat ini wajib diisi untuk mengubah password');
+      }
+      const currentHash = await userRepository.getPasswordHash(userId);
+      const isMatch = await bcrypt.compare(data.currentPassword, currentHash);
+      if (!isMatch) {
+        throw new UnauthorizedError('Password saat ini tidak cocok');
+      }
+      const passwordHash = await bcrypt.hash(data.newPassword, 12);
+      await userRepository.updatePassword(userId, passwordHash);
+
+      delete data.currentPassword;
+      delete data.newPassword;
+    }
+
+    const remainingFields = Object.keys(data).filter((k) => data[k] !== undefined);
+    if (remainingFields.length === 0) {
+      return this.getProfile(userId);
+    }
+
     const user = await userRepository.updateProfile(userId, data);
     if (!user) {
       throw new UnauthorizedError('User not found');

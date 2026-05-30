@@ -1,23 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Dropdown, DropdownMenu, DropdownToggle, Row } from "reactstrap";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar-react";
 
-import { alerts } from "../../pages/SadarShared/mockData";
+import { analyticsApi } from "../services/api";
 
-const notifications = alerts.map((alert) => ({
-  icon: alert.level === "warning" ? "ri-alert-line" : "ri-information-line",
-  tone: alert.level || "info",
-  title: alert.title,
-  message: alert.message,
-  time: "Dari sistem",
-}));
+const translateMessage = (msg) => {
+  if (!msg) return "";
+  let cleanMsg = msg;
+  cleanMsg = cleanMsg.replace("Your Food & Dining spending is 10% higher than last month.", "Pengeluaran Makanan & Minuman Anda 10% lebih tinggi dibandingkan bulan lalu.");
+  cleanMsg = cleanMsg.replace("You are approaching your monthly budget limit (85% used).", "Pengeluaran Anda mendekati batas anggaran bulanan (85% terpakai).");
+  cleanMsg = cleanMsg.replace(/Predicted spending for (.*?) is Rp (.*?), which exceeds your budget of Rp (.*?) by (.*?)\./i, "Perkiraan pengeluaran untuk $1 adalah Rp $2, melebihi batas anggaran Anda sebesar Rp $3 sekitar $4.");
+  cleanMsg = cleanMsg.replace(/spending \(Rp (.*?)\) exceeds 30% of your budget\./i, " (Rp $1) melebihi 30% dari total anggaran Anda.");
+  cleanMsg = cleanMsg.replace(/You are approaching your budget limit for (.*?)\. Predicted: Rp (.*?), Budget: Rp (.*?)\./i, "Pengeluaran Anda mendekati batas anggaran bulanan untuk $1. Perkiraan: Rp $2, Anggaran: Rp $3.");
+  cleanMsg = cleanMsg.replace("Food & Dining", "Makanan & Minuman");
+  cleanMsg = cleanMsg.replace("Transportation", "Transportasi");
+  cleanMsg = cleanMsg.replace("Shopping", "Belanja");
+  cleanMsg = cleanMsg.replace("Entertainment", "Hiburan");
+  cleanMsg = cleanMsg.replace("Bills & Utilities", "Tagihan & Utilitas");
+  return cleanMsg;
+};
 
 const NotificationDropdown = () => {
   const [isNotificationDropdown, setIsNotificationDropdown] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
   const toggleNotificationDropdown = () => {
     setIsNotificationDropdown(!isNotificationDropdown);
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchNotifications = async () => {
+      try {
+        const response = await analyticsApi.alerts();
+        const rawAlerts = response?.data || response || [];
+        if (!isMounted) return;
+
+        if (Array.isArray(rawAlerts)) {
+          const mapped = rawAlerts.map((alert) => ({
+            icon: alert.alert_type === "warning" || alert.alertType === "warning" ? "ri-alert-line" : "ri-information-line",
+            tone: alert.alert_type === "warning" || alert.alertType === "warning" ? "warning" : "info",
+            title: alert.alert_type === "warning" || alert.alertType === "warning" ? "Peringatan Anggaran" : "Informasi Keuangan",
+            message: translateMessage(alert.message || ""),
+            time: alert.created_at ? new Intl.DateTimeFormat("id-ID", { dateStyle: "short", timeStyle: "short" }).format(new Date(alert.created_at)) : "Baru saja",
+          }));
+          setNotifications(mapped);
+        }
+      } catch {
+        if (!isMounted) return;
+        setNotifications([]);
+      }
+    };
+    fetchNotifications();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <Dropdown isOpen={isNotificationDropdown} toggle={toggleNotificationDropdown} className="topbar-head-dropdown header-item sadar-notification">

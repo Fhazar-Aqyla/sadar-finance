@@ -140,4 +140,16 @@ const updateProfile = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { register, login, getProfile, forgotPassword, updateProfile };
+const updateProfilePicture = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new Error('Pilih file foto profil terlebih dahulu');
+  }
+  const imageUrl = `/uploads/${req.file.filename}`;
+  const user = await authService.updateProfile(req.user.id, { profilePicture: imageUrl });
+  return success(res, {
+    data: user,
+    message: 'Foto profil berhasil diperbarui',
+  });
+});
+
+module.exports = { register, login, getProfile, forgotPassword, updateProfile, updateProfilePicture };

@@ -73,9 +73,9 @@ const seed = async () => {
     await client.query(
       `INSERT INTO insights (user_id, title, description)
        VALUES
-         ($1, 'Spending Trend: Stable', 'Your spending this month is consistent with last month. Good discipline!'),
-         ($1, 'Top Category: Food & Dining', 'Food & Dining accounts for 35% of your total expenses.'),
-         ($1, 'Savings Rate: 20%', 'You saved 20% of your income this month. Keep it up!')`,
+         ($1, 'Tren Pengeluaran: Stabil', 'Pengeluaran Anda bulan ini konsisten dengan bulan lalu. Disiplin yang sangat baik!'),
+         ($1, 'Kategori Terbesar: Makanan', 'Makanan menyumbang 35% dari total pengeluaran Anda.'),
+         ($1, 'Rasio Tabungan: 20%', 'Anda menghemat 20% dari pemasukan Anda bulan ini. Pertahankan!')`,
       [userId]
     );
 
@@ -83,8 +83,8 @@ const seed = async () => {
     await client.query(
       `INSERT INTO alerts (user_id, message, alert_type)
        VALUES
-         ($1, 'Your Food & Dining spending is 10% higher than last month.', 'overspending'),
-         ($1, 'You are approaching your monthly budget limit (85% used).', 'budget_exceeded')`,
+         ($1, 'Pengeluaran Makanan Anda 10% lebih tinggi dibandingkan bulan lalu.', 'overspending'),
+         ($1, 'Pengeluaran Anda mendekati batas anggaran bulanan (85% terpakai).', 'budget_exceeded')`,
       [userId]
     );
 

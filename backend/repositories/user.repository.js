@@ -74,6 +74,15 @@ class UserRepository {
     );
     return result.rows[0] || null;
   }
+
+  async getPasswordHash(id) {
+    const result = await query(`SELECT password_hash FROM users WHERE users_id = $1`, [id]);
+    return result.rows[0]?.password_hash || null;
+  }
+
+  async updatePassword(id, passwordHash) {
+    await query(`UPDATE users SET password_hash = $2, updated_at = NOW() WHERE users_id = $1`, [id, passwordHash]);
+  }
 }
 
 module.exports = new UserRepository();

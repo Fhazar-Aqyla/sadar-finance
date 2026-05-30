@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Receipt, Search, Loader2 } from "lucide-react";
 import {
   Badge,
   Button,
@@ -61,11 +62,49 @@ const normalizeIncome = (income) => ({
   receiptUrl: income.receipt_url || income.receiptUrl || income.image_url || income.imageUrl || "",
 });
 
+const isBudgetBucketCategory = (category) =>
+  ["needs", "wants", "savings", "investment"].includes(String(category || "").toLowerCase());
+
+const normalizeCategoryToHistory = (category) => {
+  const text = String(category || "").toLowerCase();
+  if (/makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(text)) return "Makanan";
+  if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text)) return "Transportasi";
+  if (/belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(text)) return "Belanja";
+  if (/hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(text)) return "Hiburan";
+  return "Lainnya";
+};
+
+const inferCategoryFromTransaction = (transaction) =>
+  normalizeCategoryToHistory(
+    [
+      transaction.description || transaction.merchant || "",
+      transaction.category,
+      transaction.category_name,
+      transaction.categoryName,
+    ].filter(Boolean).join(" "),
+  );
+
+const getTransactionCategory = (transaction) => {
+  const explicitCategory =
+    transaction.category_group ||
+    transaction.categoryGroup ||
+    transaction.category ||
+    transaction.category_name ||
+    transaction.categoryName ||
+    "";
+
+  if (!explicitCategory || isBudgetBucketCategory(explicitCategory)) {
+    return inferCategoryFromTransaction(transaction);
+  }
+
+  return explicitCategory;
+};
+
 const normalizeTransaction = (transaction) => ({
   id: transaction.transaction_id || transaction.id,
   account_id: transaction.account_id || transaction.accountId,
   name: transaction.description || transaction.merchant || "Pengeluaran",
-  category: transaction.category_group || transaction.categoryGroup || "Lainnya",
+  category: getTransactionCategory(transaction),
   amount: Number(transaction.amount || 0),
   date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
   status: "Tercatat",
@@ -75,7 +114,7 @@ const normalizeTransaction = (transaction) => ({
 const loadStoredReceipts = () => {
   try {
     return JSON.parse(localStorage.getItem(RECEIPT_STORAGE_KEY) || "{}");
-  } catch (_error) {
+  } catch {
     return {};
   }
 };
@@ -286,7 +325,7 @@ const SadarFinancialHistory = () => {
             }
           : current.transaction,
       }));
-    } catch (_error) {
+    } catch {
       setReceiptModal((current) => current);
     } finally {
       setIsReceiptLoading(false);
@@ -475,7 +514,7 @@ const SadarFinancialHistory = () => {
                 {notice && <div className="sadar-empty-state mb-3">{notice}</div>}
                 {!notice && userTransactions.length === 0 ? (
                   <div className="sadar-empty-state sadar-empty-state-center">
-                    <span className="sadar-empty-state-icon"><i className="ri-receipt-line"></i></span>
+                    <span className="sadar-empty-state-icon"><Receipt className="h-5 w-5" /></span>
                     <h4>Belum ada transaksi.</h4>
                     <p>Catat transaksi pertama agar riwayat keuangan mulai tersusun.</p>
                     <Button color="primary" tag={Link} to="/catat-keuangan">Catat Transaksi Pertama</Button>
@@ -529,7 +568,7 @@ const SadarFinancialHistory = () => {
                     </div>
                     {filteredTransactions.length === 0 ? (
                       <div className="sadar-empty-state sadar-empty-state-center">
-                        <span className="sadar-empty-state-icon"><i className="ri-search-line"></i></span>
+                        <span className="sadar-empty-state-icon"><Search className="h-5 w-5" /></span>
                         <h4>Tidak ada hasil.</h4>
                         <p>Coba kata kunci lain untuk mencari riwayat keuanganmu.</p>
                       </div>
@@ -626,7 +665,7 @@ const SadarFinancialHistory = () => {
         <ModalBody>
           {isReceiptLoading ? (
             <div className="sadar-empty-state sadar-empty-state-center sadar-receipt-empty">
-              <span className="sadar-empty-state-icon"><i className="ri-loader-4-line"></i></span>
+              <span className="sadar-empty-state-icon"><Loader2 className="h-5 w-5 animate-spin" /></span>
               <h4>Mencari struk...</h4>
               <p>Sedang mengecek lampiran struk yang pernah diunggah.</p>
             </div>
@@ -643,7 +682,7 @@ const SadarFinancialHistory = () => {
             </div>
           ) : (
             <div className="sadar-empty-state sadar-empty-state-center sadar-receipt-empty">
-              <span className="sadar-empty-state-icon"><i className="ri-receipt-line"></i></span>
+              <span className="sadar-empty-state-icon"><Receipt className="h-5 w-5" /></span>
               <h4>No receipt</h4>
               <p>Belum ada struk yang tersimpan untuk catatan ini.</p>
             </div>

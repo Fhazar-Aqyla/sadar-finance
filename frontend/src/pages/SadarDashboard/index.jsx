@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
+import { BarChart3, LineChart, PieChart, Receipt } from "lucide-react";
 import {
   Badge,
   Button,
@@ -370,16 +371,26 @@ const saveSetupWizardState = (state) => {
   window.localStorage.setItem(key, JSON.stringify(state));
 };
 
-const EmptyDashboardCard = ({ icon, title, description, action }) => (
-  <div className="sadar-empty-card">
-    <span className="sadar-empty-icon">
-      <i className={icon}></i>
-    </span>
-    <h5>{title}</h5>
-    <p>{description}</p>
-    {action}
-  </div>
-);
+const LucideIconMap = {
+  "ri-bar-chart-grouped-line": BarChart3,
+  "ri-line-chart-line": LineChart,
+  "ri-pie-chart-2-line": PieChart,
+  "ri-receipt-line": Receipt,
+};
+
+const EmptyDashboardCard = ({ icon, title, description, action }) => {
+  const IconComponent = LucideIconMap[icon];
+  return (
+    <div className="sadar-empty-card">
+      <span className="sadar-empty-icon">
+        {IconComponent ? <IconComponent className="h-5 w-5" /> : <i className={icon}></i>}
+      </span>
+      <h5>{title}</h5>
+      <p>{description}</p>
+      {action}
+    </div>
+  );
+};
 
 const SetupGuideModal = ({ isOpen, onComplete, onSkip }) => {
   const [activeStep, setActiveStep] = useState(0);

@@ -50,7 +50,7 @@ const quickActions = [
     keywords: "financial score skor kesehatan keuangan",
   },
   {
-    title: "Profil & Akun",
+    title: "Profil",
     description: "Akun, anggaran, dan riwayat",
     icon: "ri-user-settings-line",
     color: "secondary",

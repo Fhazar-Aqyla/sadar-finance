@@ -21,7 +21,7 @@ const navigationItems = [
   { id: "behavior-insight", name: "Insight Perilaku", icon: Activity, href: "/behavior-insight" },
   { id: "financial-score", name: "Skor Finansial", icon: BarChart3, href: "/financial-score" },
   { id: "financial-history", name: "Riwayat Keuangan", icon: ReceiptText, href: "/financial-history" },
-  { id: "profile-account", name: "Profil & Akun", icon: User, href: "/profile-account" },
+  { id: "profile-account", name: "Profil", icon: User, href: "/profile-account" },
 ];
 
 const sidebarWidths = {
@@ -223,8 +223,8 @@ const Sidebar = ({ className = "" }) => {
                       isCollapsed ? "justify-center px-2" : "gap-2.5"
                     } ${
                       isActive
-                        ? "sadar-sidebar-link-active bg-blue-50 text-blue-700"
-                        : "text-slate-800 hover:bg-slate-50 hover:text-blue-700"
+                        ? "sadar-sidebar-link-active bg-blue-50 !text-blue-700"
+                        : "!text-slate-800 hover:bg-slate-50 hover:!text-blue-700"
                     }`}
                     title={isCollapsed ? item.name : undefined}
                   >
@@ -256,37 +256,10 @@ const Sidebar = ({ className = "" }) => {
         </nav>
 
         <div className="sadar-sidebar-footer mt-auto shrink-0 border-t border-slate-200 bg-white">
-          <div className={`sadar-sidebar-user-wrap h-[86px] border-b border-slate-200 bg-slate-50/30 ${isCollapsed ? "flex items-center justify-center px-2" : "flex items-center p-3"}`}>
-            {!isCollapsed ? (
-              <Link
-                to="/profile-account"
-                className="sadar-sidebar-user flex items-center rounded-md bg-white px-3 py-2 no-underline transition-colors duration-200 hover:bg-slate-50"
-              >
-                  <div className="sadar-sidebar-avatar flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
-                  <span className="sadar-sidebar-avatar-text text-sm font-medium text-slate-700">{userInitials}</span>
-                </div>
-                <div className="ml-2.5 min-w-0 flex-1">
-                  <p className="sadar-sidebar-user-name mb-0 truncate text-sm font-medium text-slate-800">{userName}</p>
-                  <p className="sadar-sidebar-user-email mb-0 truncate text-xs text-slate-500">{userEmail}</p>
-                </div>
-                <div className="ml-2 h-2 w-2 rounded-full bg-green-500" title="Online" />
-              </Link>
-            ) : (
-              <Link to="/profile-account" className="flex justify-center" aria-label="Profil & Akun">
-                <div className="relative">
-                  <div className="sadar-sidebar-avatar flex h-9 w-9 items-center justify-center rounded-full bg-slate-200">
-                    <span className="sadar-sidebar-avatar-text text-sm font-medium text-slate-700">{userInitials}</span>
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
-                </div>
-              </Link>
-            )}
-          </div>
-
           <div className={isCollapsed ? "flex h-[66px] items-center justify-center p-3" : "flex h-[66px] items-center p-3"}>
             <Link
               to="/logout"
-              className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700 ${
+              className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
                 isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
               }`}
               title={isCollapsed ? "Keluar" : undefined}

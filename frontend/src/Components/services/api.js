@@ -179,6 +179,9 @@ export const authApi = {
   forgotPassword: (payload) => apiClient.post("/auth/forgot-password", payload).then(unwrapData),
   me: () => apiClient.get("/auth/me").then(unwrapData),
   updateMe: (payload) => apiClient.put("/auth/me", payload).then(unwrapData),
+  updateAvatar: (formData) => apiClient.post("/auth/profile-picture", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }).then(unwrapData),
 };
 
 export const accountApi = {

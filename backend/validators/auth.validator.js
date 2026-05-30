@@ -41,8 +41,10 @@ const updateProfileSchema = Joi.object({
   phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{10,20}$/).optional().allow(null, ''),
   dateOfBirth: Joi.date().iso().optional().allow(null, ''),
   address: Joi.string().max(500).optional().allow(null, ''),
-  profilePicture: Joi.string().uri().max(1000).optional().allow(null, ''),
+  profilePicture: Joi.string().max(1000).optional().allow(null, ''),
   occupation: Joi.string().max(100).optional().allow(null, ''),
+  currentPassword: Joi.string().optional().allow(''),
+  newPassword: Joi.string().min(8).max(128).optional().allow(''),
 }).min(1);
 
 module.exports = { registerSchema, loginSchema, forgotPasswordSchema, updateProfileSchema };

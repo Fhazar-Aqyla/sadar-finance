@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Card, Alert, Container, Input, Label, Form, FormFeedback } from "reactstrap";
+import { Row, Col, Card, Alert, Container, Input, Label, Form, FormFeedback, Modal, ModalHeader, ModalBody } from "reactstrap";
 
 // Formik Validation
 import * as Yup from "yup";
@@ -26,6 +26,9 @@ const Register = () => {
     const dispatch = useDispatch();
     const [passwordShow, setPasswordShow] = useState(false);
     const [confirmPasswordShow, setConfirmPasswordShow] = useState(false);
+    const [agreeTerms, setAgreeTerms] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const toggleTermsModal = () => setShowTermsModal(!showTermsModal);
 
     const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
@@ -114,6 +117,10 @@ const Register = () => {
                                             <Form
                                                 onSubmit={(e) => {
                                                     e.preventDefault();
+                                                    if (!agreeTerms) {
+                                                        toast.error("Kamu harus menyetujui ketentuan penggunaan terlebih dahulu.");
+                                                        return false;
+                                                    }
                                                     validation.handleSubmit();
                                                     return false;
                                                 }}
@@ -233,13 +240,21 @@ const Register = () => {
 
                                                 </div>
 
-                                                <div className="mb-4">
-                                                    <p className="mb-0 fs-12 text-muted fst-italic">Dengan mendaftar, kamu menyetujui
-                                                        <Link to="/term-conditions" className="text-primary text-decoration-underline fst-normal fw-medium"> ketentuan penggunaan SADAR Finance</Link>.</p>
+                                                <div className="form-check mb-4">
+                                                    <Input
+                                                        type="checkbox"
+                                                        className="form-check-input"
+                                                        id="agreeTerms"
+                                                        checked={agreeTerms}
+                                                        onChange={(e) => setAgreeTerms(e.target.checked)}
+                                                    />
+                                                    <Label className="form-check-label text-muted fs-12 fst-italic" htmlFor="agreeTerms">
+                                                        Saya menyetujui <span style={{ cursor: "pointer" }} className="text-primary text-decoration-underline fst-normal fw-medium" onClick={toggleTermsModal}>ketentuan penggunaan SADAR Finance</span>
+                                                    </Label>
                                                 </div>
 
                                                 <div className="mt-4">
-                                                    <button className="btn btn-success w-100" type="submit">Daftar</button>
+                                                    <button className="btn btn-success w-100" type="submit" disabled={!agreeTerms}>Daftar</button>
                                                 </div>
 
 
@@ -269,6 +284,26 @@ const Register = () => {
                     </Container>
                 </footer>
             </div>
+
+            <Modal isOpen={showTermsModal} toggle={toggleTermsModal} centered size="lg" className="sadar-history-modal">
+                <ModalHeader toggle={toggleTermsModal}>Ketentuan Pengguna SADAR Finance</ModalHeader>
+                <ModalBody style={{ maxHeight: '420px', overflowY: 'auto' }} className="text-muted p-4">
+                    <h5 className="text-primary mb-3">1. Ketentuan Umum</h5>
+                    <p className="fs-13 lh-base">Selamat datang di SADAR Finance. Dengan mengakses dan mendaftar pada aplikasi kami, Anda menyetujui untuk terikat secara hukum oleh Ketentuan Pengguna ini. Harap membaca dokumen ini dengan saksama.</p>
+
+                    <h5 className="text-primary mt-4 mb-3">2. Pendaftaran dan Akun</h5>
+                    <p className="fs-13 lh-base">Untuk menggunakan fitur lengkap SADAR Finance, Anda wajib membuat akun dengan memberikan informasi pribadi yang akurat, jujur, dan lengkap (Nama Lengkap, Email aktif, dan Password yang aman). Anda bertanggung jawab penuh untuk menjaga kerahasiaan password dan aktivitas akun Anda.</p>
+
+                    <h5 className="text-primary mt-4 mb-3">3. Layanan Analisis dan Insight Keuangan (AI)</h5>
+                    <p className="fs-13 lh-base">SADAR Finance menyediakan visualisasi pencatatan arus kas, alokasi anggaran dengan prinsip 50/30/20, skor kesehatan finansial, serta rekomendasi penghematan otomatis berbasis Kecerdasan Buatan (AI) yang terhubung dengan Gemini API dan Hugging Face. Anda memahami dan menyetujui bahwa semua insight, skor, dan prediksi pengeluaran yang disajikan bersifat sebagai <strong>alat bantu dan rekomendasi non-binding (tidak mengikat)</strong>, bukan merupakan nasihat keuangan profesional, investasi, atau hukum.</p>
+
+                    <h5 className="text-primary mt-4 mb-3">4. Batasan Tanggung Jawab</h5>
+                    <p className="fs-13 lh-base">SADAR Finance berusaha memberikan analisis seakurat mungkin berdasarkan data transaksi yang Anda masukkan. Namun, kami tidak bertanggung jawab atas kerugian finansial, kesalahan pengambilan keputusan, atau dampak keuangan apa pun yang terjadi akibat penggunaan aplikasi atau penerapan rekomendasi AI kami. Segala keputusan keuangan sepenuhnya merupakan tanggung jawab Anda sendiri.</p>
+
+                    <h5 className="text-primary mt-4 mb-3">5. Privasi dan Enkripsi Data</h5>
+                    <p className="fs-13 lh-base">Kami sangat menghargai privasi Anda. Semua data transaksi, saldo, anggaran, dan identitas Anda akan dilindungi dengan standar keamanan modern. Data tersebut hanya diolah untuk menyajikan visualisasi grafik serta dianalisis secara anonim untuk melatih model prediksi pengeluaran AI demi meningkatkan kesehatan keuangan Anda.</p>
+                </ModalBody>
+            </Modal>
         </React.Fragment>
     );
 };
