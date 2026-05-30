@@ -252,12 +252,29 @@ class AnalyticsService {
       effectiveBudget = latestBudget ? parseFloat(latestBudget.limit_amount) : avgExpense;
     }
 
+    let aiPrediction = null;
+    try {
+      aiPrediction = await aiClient.predictOverspending({
+        month,
+        budgetLimit: effectiveBudget,
+        predictedAmount,
+        expenseTrend: trend,
+        categorySummary,
+      });
+    } catch (_err) {
+      aiPrediction = null;
+    }
+
+    const finalPredictedAmount = aiPrediction?.predictedAmount || predictedAmount;
+
     // Determine risk level
-    let riskLevel = 'low';
-    const ratio = effectiveBudget > 0 ? predictedAmount / effectiveBudget : 0;
-    if (ratio > 1.3) riskLevel = 'critical';
-    else if (ratio > 1.1) riskLevel = 'high';
-    else if (ratio > 0.9) riskLevel = 'medium';
+    let riskLevel = aiPrediction?.riskLevel || 'low';
+    const ratio = effectiveBudget > 0 ? finalPredictedAmount / effectiveBudget : 0;
+    if (!aiPrediction) {
+      if (ratio > 1.3) riskLevel = 'critical';
+      else if (ratio > 1.1) riskLevel = 'high';
+      else if (ratio > 0.9) riskLevel = 'medium';
+    }
 
     // Generate alerts and save to alerts table
     const alertEntries = [];
@@ -288,7 +305,7 @@ class AnalyticsService {
 
     if (riskLevel === 'medium') {
       alertEntries.push({
-        message: `You are approaching your budget limit for ${month}. Predicted: Rp ${predictedAmount.toLocaleString()}, Budget: Rp ${effectiveBudget.toLocaleString()}.`,
+        message: `You are approaching your budget limit for ${month}. Predicted: Rp ${finalPredictedAmount.toLocaleString()}, Budget: Rp ${effectiveBudget.toLocaleString()}.`,
         alertType: 'reminder',
       });
     }
@@ -300,12 +317,18 @@ class AnalyticsService {
 
     return {
       predictedMonth: month,
-      predictedAmount,
+      predictedAmount: finalPredictedAmount,
       budgetLimit: effectiveBudget,
       riskLevel,
+      willOverspend: aiPrediction?.willOverspend ?? finalPredictedAmount > effectiveBudget,
+      overspendingProbability: aiPrediction?.overspendingProbability ?? Math.min(Math.max(ratio - 0.5, 0), 1),
+      estimatedOverspendingAmount:
+        aiPrediction?.estimatedOverspendingAmount ?? Math.max(finalPredictedAmount - effectiveBudget, 0),
+      recommendation: aiPrediction?.recommendation || null,
       categoryRisks,
       alerts: savedAlerts,
-      modelVersion: 'v1.0-moving-average',
+      modelName: aiPrediction?.modelName || 'moving-average-fallback',
+      modelVersion: aiPrediction?.modelVersion || 'v1.0-moving-average',
     };
   }
 

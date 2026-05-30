@@ -9,6 +9,7 @@ load_dotenv()
 from inference.ocr import extract_text_from_image
 from inference.behavior import predict_behavior
 from inference.merchant_classifier import categorize_transaction
+from inference.overspending_forecast import predict_overspending
 from preprocessing.receipt_nlp import parse_receipt_text
 
 
@@ -27,6 +28,7 @@ def health():
                 "nlp_receipt_extraction",
                 "behavior_spike_prediction",
                 "merchant_categorization",
+                "end_month_overspending_forecast",
             ],
         }
     )
@@ -96,6 +98,21 @@ def predict_behavior_route():
         return jsonify({"success": True, "data": result})
     except FileNotFoundError as exc:
         return jsonify({"success": False, "error": str(exc)}), 503
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500
+
+
+@app.post("/overspending")
+@app.post("/overspending/forecast")
+def predict_overspending_route():
+    payload = request.get_json(silent=True) or {}
+    try:
+        result = predict_overspending(payload)
+        return jsonify({"success": True, "data": result})
+    except FileNotFoundError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 503
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
 

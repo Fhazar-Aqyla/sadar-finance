@@ -25,8 +25,8 @@ Opsional:
 
 ```env
 DB_SSL=true
-AI_SERVICE_URL=https://domain-ai-service-kamu.com
-AI_SERVICE_TIMEOUT_MS=10000
+AI_SERVICE_URL=https://sadar-finance-sadar-finance-ai.hf.space
+AI_SERVICE_TIMEOUT_MS=30000
 AI_MOCK_MODE=true
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX=100
