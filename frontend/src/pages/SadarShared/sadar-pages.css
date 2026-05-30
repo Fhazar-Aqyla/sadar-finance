@@ -251,6 +251,70 @@
   color: #0f766e;
 }
 
+.sadar-recommend-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.95rem;
+  border: 1px solid #e3eaf3;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.sadar-recommend-card strong,
+.sadar-recommend-card p,
+.sadar-recommend-card span {
+  display: block;
+}
+
+.sadar-recommend-card strong {
+  margin-bottom: 0.25rem;
+  color: #172033;
+  font-weight: 780;
+  line-height: 1.3;
+}
+
+.sadar-recommend-card p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.sadar-recommend-card div > span {
+  margin-top: 0.55rem;
+  color: #1e3a8a;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.sadar-recommend-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 10px;
+  color: #0f766e;
+  background: rgba(20, 184, 166, 0.12);
+  font-size: 1.05rem;
+}
+
+.sadar-recommend-icon.warning {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.sadar-recommend-icon.primary {
+  color: var(--sadar-primary);
+  background: rgba(30, 58, 138, 0.1);
+}
+
+.sadar-recommend-icon.success {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.14);
+}
+
 .sadar-dot {
   width: 9px;
   height: 9px;
@@ -1354,6 +1418,23 @@ html[data-bs-theme="dark"] .sadar-source-badge {
 html[data-bs-theme="dark"] .sadar-source-badge.ai {
   background: rgba(20, 184, 166, 0.18);
   color: #5eead4;
+}
+
+html[data-bs-theme="dark"] .sadar-recommend-card {
+  border-color: var(--sadar-dark-border-soft);
+  background: var(--sadar-dark-surface-raised);
+}
+
+html[data-bs-theme="dark"] .sadar-recommend-card strong {
+  color: var(--sadar-dark-heading);
+}
+
+html[data-bs-theme="dark"] .sadar-recommend-card p {
+  color: var(--sadar-dark-muted);
+}
+
+html[data-bs-theme="dark"] .sadar-recommend-card div > span {
+  color: #93c5fd;
 }
 
 html[data-bs-theme="dark"] .sadar-progress,

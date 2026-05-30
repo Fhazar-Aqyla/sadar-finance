@@ -68,7 +68,12 @@ const formatNumberInput = (value) => {
 };
 
 const getErrorMessage = (error, fallbackMessage) => {
-  return fallbackMessage;
+  return error?.message || fallbackMessage;
+};
+
+const toIsoDate = (dateValue) => {
+  const date = new Date(`${dateValue}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 };
 
 const normalizeParsedData = (scan) => {
@@ -92,10 +97,12 @@ const buildDescription = (merchant, items) => {
 };
 
 const TransactionInput = () => {
-  document.title = "Catat Keuangan | SADAR Finance";
   const location = useLocation();
 
-  const [entryType, setEntryType] = useState("transaction");
+  const [entryType, setEntryType] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("type") === "income" ? "income" : "transaction";
+  });
   const [mode, setMode] = useState("ocr");
   const [form, setForm] = useState(initialForm);
   const [incomeForm, setIncomeForm] = useState(initialIncomeForm);
@@ -109,6 +116,10 @@ const TransactionInput = () => {
   const [notice, setNotice] = useState(null);
 
   useEffect(() => {
+    document.title = "Catat Keuangan | SADAR Finance";
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -120,13 +131,6 @@ const TransactionInput = () => {
     const parsed = normalizeParsedData(scanResult);
     return Array.isArray(parsed?.items) ? parsed.items : [];
   }, [scanResult]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get("type") === "income") {
-      setEntryType("income");
-    }
-  }, [location.search]);
 
   useEffect(() => {
     let isMounted = true;
@@ -278,13 +282,19 @@ const TransactionInput = () => {
       return;
     }
 
+    const transactionDate = toIsoDate(form.transactionDate);
+    if (!transactionDate) {
+      setNotice({ color: "warning", message: "Tanggal pengeluaran belum valid." });
+      return;
+    }
+
     setIsSaving(true);
     setNotice(null);
     try {
       await transactionApi.create({
         categoryGroup: form.categoryGroup,
         accountId: form.accountId,
-        transactionDate: new Date(form.transactionDate).toISOString(),
+        transactionDate,
         description: form.description || form.merchant,
         source: form.source,
         amount: Number(form.amount),
@@ -315,6 +325,12 @@ const TransactionInput = () => {
       return;
     }
 
+    const incomeDate = toIsoDate(incomeForm.date);
+    if (!incomeDate) {
+      setNotice({ color: "warning", message: "Tanggal pemasukan belum valid." });
+      return;
+    }
+
     setIsSaving(true);
     setNotice(null);
     try {
@@ -322,7 +338,7 @@ const TransactionInput = () => {
         accountId: incomeForm.accountId,
         source: incomeForm.source,
         amount: Number(incomeForm.amount),
-        incomeDate: new Date(incomeForm.date).toISOString(),
+        incomeDate,
       });
 
       setNotice({

@@ -101,6 +101,80 @@ const getRiskTone = (riskLevel) => {
   return "warning";
 };
 
+const normalizePrediction = (prediction) => {
+  if (!prediction) return null;
+
+  const rawProbability =
+    prediction.spikeProbability ??
+    prediction.spike_probability ??
+    prediction.probability ??
+    prediction.overspending_probability ??
+    null;
+  const probabilityNumber = rawProbability == null ? null : Number(rawProbability);
+  const spikeProbability =
+    probabilityNumber == null || Number.isNaN(probabilityNumber)
+      ? null
+      : probabilityNumber > 1
+        ? probabilityNumber / 100
+        : probabilityNumber;
+
+  return {
+    riskLevel: prediction.riskLevel || prediction.risk_level || prediction.risk || "medium",
+    spikeProbability,
+    recommendation: prediction.recommendation || prediction.message || prediction.insight || "",
+    source: prediction.source || prediction.model_source || "auto",
+  };
+};
+
+const splitRecommendationText = (text) => {
+  const cleanText = String(text || "").trim();
+  const [firstSentence, ...rest] = cleanText.split(/(?<=\.)\s+/);
+
+  if (!cleanText) {
+    return {
+      title: "Pantau pola berikutnya",
+      description: "Tambahkan transaksi rutin agar rekomendasi bisa lebih spesifik.",
+    };
+  }
+
+  if (firstSentence.length <= 82 && rest.length) {
+    return {
+      title: firstSentence.replace(/\.$/, ""),
+      description: rest.join(" "),
+    };
+  }
+
+  return {
+    title: cleanText.length > 82 ? `${cleanText.slice(0, 79).trim()}...` : cleanText,
+    description: cleanText.length > 82 ? cleanText : "Aksi ini bisa membantu menjaga arus kas tetap terkendali.",
+  };
+};
+
+const toRecommendationCard = (item, index) => {
+  if (typeof item === "object" && item) {
+    return {
+      title: item.title,
+      description: item.description,
+      action: item.action || "Cek detail",
+      tone: item.tone || "teal",
+      icon: item.icon || "ri-lightbulb-flash-line",
+    };
+  }
+
+  const text = splitRecommendationText(item);
+  const presets = [
+    { action: "Prioritaskan minggu ini", tone: "teal", icon: "ri-focus-2-line" },
+    { action: "Terapkan batas harian", tone: "warning", icon: "ri-calendar-check-line" },
+    { action: "Review sebelum belanja", tone: "primary", icon: "ri-wallet-3-line" },
+    { action: "Pantau ulang", tone: "success", icon: "ri-check-double-line" },
+  ];
+
+  return {
+    ...text,
+    ...presets[index % presets.length],
+  };
+};
+
 const toDashboardCategoryRows = (byCategory) => {
   const rows = dashboardCategoryLabels.reduce((result, label) => {
     result[label] = 0;
@@ -123,8 +197,6 @@ const toCategoryPrimary = (category) => {
 };
 
 const EmptyBehaviorInsight = () => {
-  document.title = "Insight Perilaku | SADAR Finance";
-
   return (
     <div className="page-content sadar-page">
       <Container fluid>
@@ -259,7 +331,6 @@ const createTrendOptions = (categories, maxValue) => ({
 });
 
 const BehaviorInsightWithData = () => {
-  document.title = "Insight Perilaku | SADAR Finance";
   const [backendTransactions, setBackendTransactions] = useState([]);
   const [backendIncomes, setBackendIncomes] = useState([]);
   const [behaviorPrediction, setBehaviorPrediction] = useState(null);
@@ -389,7 +460,7 @@ const BehaviorInsightWithData = () => {
           setBackendTransactions((rows || []).map(normalizeBackendTransaction));
           setBackendIncomes((incomeRows || []).map(normalizeBackendIncome));
         }
-      } catch (_error) {
+      } catch {
         if (isMounted) {
           setBackendTransactions([]);
           setBackendIncomes([]);
@@ -426,7 +497,7 @@ const BehaviorInsightWithData = () => {
         if (isMounted) {
           setBehaviorPrediction(response || null);
         }
-      } catch (_error) {
+      } catch {
         if (isMounted) {
           setBehaviorPrediction(null);
         }
@@ -455,32 +526,36 @@ const BehaviorInsightWithData = () => {
     medium: "Sedang",
     high: "Tinggi",
   };
-  const modelRiskLabel = behaviorPrediction?.riskLevel
-    ? riskLabelMap[String(behaviorPrediction.riskLevel).toLowerCase()] || "Sedang"
+  const normalizedPrediction = normalizePrediction(behaviorPrediction);
+  const modelRiskLabel = normalizedPrediction?.riskLevel
+    ? riskLabelMap[String(normalizedPrediction.riskLevel).toLowerCase()] || "Sedang"
     : null;
-  const predictionPercent = behaviorPrediction?.spikeProbability != null
-    ? Math.round(behaviorPrediction.spikeProbability * 100)
+  const predictionPercent = normalizedPrediction?.spikeProbability != null
+    ? Math.round(normalizedPrediction.spikeProbability * 100)
     : null;
-  const modelRiskTone = getRiskTone(behaviorPrediction?.riskLevel);
-  const predictionSourceLabel = behaviorPrediction?.source === "ai-service"
+  const modelRiskTone = getRiskTone(normalizedPrediction?.riskLevel);
+  const predictionSourceLabel = normalizedPrediction?.source === "ai-service"
     ? "Model AI"
-    : behaviorPrediction?.source === "rule-based-fallback"
+    : normalizedPrediction?.source === "rule-based-fallback"
       ? "Cadangan berbasis aturan"
       : "Prediksi otomatis";
-  const insightItems = behaviorPrediction
+  const insightItems = normalizedPrediction
     ? [
         {
           title: `Prediksi perilaku membaca risiko ${modelRiskLabel}`,
-          description: `${data.behaviorCandidate?.name || "Transaksi terbesar"} memiliki probabilitas lonjakan sebesar ${predictionPercent}%.`,
+          description: predictionPercent != null
+            ? `${data.behaviorCandidate?.name || "Transaksi terbesar"} memiliki probabilitas lonjakan sebesar ${predictionPercent}%.`
+            : normalizedPrediction.recommendation || "Model membaca pola transaksi terbaru untuk memberi sinyal risiko.",
           type: modelRiskTone,
           sourceLabel: predictionSourceLabel,
         },
         ...data.insightItems,
       ]
     : data.insightItems;
-  const recommendations = behaviorPrediction?.recommendation
-    ? [behaviorPrediction.recommendation, ...data.recommendations]
+  const recommendations = normalizedPrediction?.recommendation
+    ? [normalizedPrediction.recommendation, ...data.recommendations]
     : data.recommendations;
+  const recommendationCards = recommendations.map(toRecommendationCard);
 
   if (data.userTransactions.length === 0) {
     return <EmptyBehaviorInsight />;
@@ -660,7 +735,7 @@ const BehaviorInsightWithData = () => {
                         <div className="sadar-insight-title-row">
                           <strong>{item.title}</strong>
                           {item.sourceLabel && (
-                            <span className={`sadar-source-badge ${behaviorPrediction?.source === "ai-service" ? "ai" : "fallback"}`}>
+                            <span className={`sadar-source-badge ${normalizedPrediction?.source === "ai-service" ? "ai" : "fallback"}`}>
                               {item.sourceLabel}
                             </span>
                           )}
@@ -683,10 +758,16 @@ const BehaviorInsightWithData = () => {
               </CardHeader>
               <CardBody>
                 <div className="sadar-recommend-list">
-                  {recommendations.map((item) => (
-                    <div className="sadar-insight-item" key={item}>
-                      <span className="sadar-dot"></span>
-                      <p>{item}</p>
+                  {recommendationCards.map((item, index) => (
+                    <div className="sadar-recommend-card" key={`${item.title}-${index}`}>
+                      <span className={`sadar-recommend-icon ${item.tone}`}>
+                        <i className={item.icon}></i>
+                      </span>
+                      <div>
+                        <strong>{item.title}</strong>
+                        <p>{item.description}</p>
+                        <span>{item.action}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -699,6 +780,12 @@ const BehaviorInsightWithData = () => {
   );
 };
 
-const BehaviorInsight = () => <BehaviorInsightWithData />;
+const BehaviorInsight = () => {
+  useEffect(() => {
+    document.title = "Insight Perilaku | SADAR Finance";
+  }, []);
+
+  return <BehaviorInsightWithData />;
+};
 
 export default BehaviorInsight;

@@ -80,6 +80,8 @@
         --#{$prefix}btn-hover-border-color: #1A3175;
         --#{$prefix}btn-active-bg: #1E3A8A;
         --#{$prefix}btn-active-border-color: #1E3A8A;
+        --#{$prefix}btn-disabled-bg: #4f63a0;
+        --#{$prefix}btn-disabled-border-color: #4f63a0;
     }
 
     .text-primary,
@@ -242,6 +244,8 @@
         --#{$prefix}btn-hover-border-color: #1A3175;
         --#{$prefix}btn-active-bg: #1E3A8A;
         --#{$prefix}btn-active-border-color: #1E3A8A;
+        --#{$prefix}btn-disabled-bg: #4f63a0;
+        --#{$prefix}btn-disabled-border-color: #4f63a0;
     }
 
     .sadar-auth-slider {
