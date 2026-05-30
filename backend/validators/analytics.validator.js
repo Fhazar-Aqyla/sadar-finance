@@ -49,14 +49,46 @@ const healthScoreSchema = Joi.object({
   period: Joi.string().valid('2w', '1m', '3m', '6m', '1y', 'all').optional(),
 });
 
-// Budget input (50/30/20 rule)
+// Budget input. Accepts the current frontend names and the latest ERD names.
+const budgetAmount = Joi.number().precision(2).min(0);
 const createBudgetSchema = Joi.object({
-  needsAmount: Joi.number().precision(2).min(0).required(),
-  wantsAmount: Joi.number().precision(2).min(0).required(),
-  savingsAmount: Joi.number().precision(2).min(0).required(),
+  incomeId: Joi.string().uuid().optional(),
+  income_id: Joi.string().uuid().optional(),
+  needsAmount: budgetAmount.optional(),
+  needsBudget: budgetAmount.optional(),
+  needs_amount: budgetAmount.optional(),
+  needs_budget: budgetAmount.optional(),
+  wantsAmount: budgetAmount.optional(),
+  wantsBudget: budgetAmount.optional(),
+  wants_amount: budgetAmount.optional(),
+  wants_budget: budgetAmount.optional(),
+  savingsAmount: budgetAmount.optional(),
+  savings_amount: budgetAmount.optional(),
+  investmentAmount: budgetAmount.optional(),
+  investmentBudget: budgetAmount.optional(),
+  investment_amount: budgetAmount.optional(),
+  investment_budget: budgetAmount.optional(),
+  incomeAmount: budgetAmount.optional(),
+  income_amount: budgetAmount.optional(),
+  budgetLimit: budgetAmount.optional(),
+  limitAmount: budgetAmount.optional(),
+  budget_limit: budgetAmount.optional(),
+  limit_amount: budgetAmount.optional(),
+  source: Joi.string().max(100).allow('', null).optional(),
+  incomeDate: Joi.date().iso().optional(),
+  income_date: Joi.date().iso().optional(),
   percentage: Joi.number().precision(2).min(0).max(100).optional(),
-  limitAmount: Joi.number().precision(2).min(0).required(),
-});
+})
+  .or('needsAmount', 'needsBudget', 'needs_amount', 'needs_budget')
+  .or('wantsAmount', 'wantsBudget', 'wants_amount', 'wants_budget')
+  .or(
+    'savingsAmount',
+    'savings_amount',
+    'investmentAmount',
+    'investmentBudget',
+    'investment_amount',
+    'investment_budget'
+  );
 
 module.exports = {
   categorizeSchema,

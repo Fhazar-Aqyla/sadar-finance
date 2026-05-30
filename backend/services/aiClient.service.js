@@ -70,15 +70,6 @@ class AiClientService {
     return this._normalizeBehaviorResult(response);
   }
 
-  async predictOverspending(payload) {
-    if (config.ai.mockMode) {
-      return this._mockOverspendingResult(payload);
-    }
-
-    const response = await this._postJson('/overspending/forecast', payload);
-    return this._normalizeOverspendingResult(response);
-  }
-
   async _postJson(endpoint, payload) {
     return this._request(endpoint, {
       method: 'POST',
@@ -159,6 +150,7 @@ class AiClientService {
         total: parsed.total ?? payload.total ?? null,
         currency: parsed.currency || payload.currency || 'IDR',
         categoryGroup: parsed.categoryGroup || parsed.category_group || payload.categoryGroup || payload.category_group || null,
+        categoryDetail: parsed.categoryDetail || parsed.category_detail || payload.categoryDetail || payload.category_detail || null,
       },
       confidence: this._safeConfidence(payload.confidence ?? parsed.confidence),
       modelVersion: payload.modelVersion || payload.model_version || null,
@@ -219,38 +211,10 @@ class AiClientService {
     };
   }
 
-  _normalizeOverspendingResult(response) {
-    const payload = this._unwrapPayload(response) || {};
-
-    return {
-      willOverspend: Boolean(payload.willOverspend ?? payload.will_overspend),
-      overspendingProbability: this._safeConfidence(
-        payload.overspendingProbability ?? payload.overspending_probability,
-        0
-      ),
-      predictedAmount: this._safeNumber(payload.predictedAmount ?? payload.predicted_amount, 0),
-      budgetLimit: this._safeNumber(payload.budgetLimit ?? payload.budget_limit, 0),
-      estimatedOverspendingAmount: this._safeNumber(
-        payload.estimatedOverspendingAmount ?? payload.estimated_overspending_amount,
-        0
-      ),
-      riskLevel: payload.riskLevel || payload.risk_level || 'low',
-      recommendation: payload.recommendation || '',
-      modelName: payload.modelName || payload.model_name || null,
-      modelVersion: payload.modelVersion || payload.model_version || 'end-month-overspending-multitask-mlp-v1',
-    };
-  }
-
   _safeConfidence(value, fallback = null) {
     const parsed = Number(value);
     if (Number.isNaN(parsed)) return fallback;
     return Math.max(0, Math.min(1, parseFloat(parsed.toFixed(4))));
-  }
-
-  _safeNumber(value, fallback = null) {
-    const parsed = Number(value);
-    if (Number.isNaN(parsed)) return fallback;
-    return parseFloat(parsed.toFixed(2));
   }
 
   _mockReceiptResult() {
@@ -317,25 +281,6 @@ class AiClientService {
         riskLevel === 'high'
           ? 'Transaksi ini terlihat tinggi dibanding pola normal. Cek ulang prioritas sebelum saldo terpakai.'
           : 'Risiko transaksi masih terkendali. Tetap catat transaksi supaya insight makin akurat.',
-    };
-  }
-
-  _mockOverspendingResult(payload) {
-    const budgetLimit = Number(payload.budgetLimit || payload.budget_limit || payload.effectiveBudget || 0);
-    const predictedAmount = Number(payload.predictedAmount || payload.predicted_amount || budgetLimit * 1.05 || 0);
-    const estimatedOverspendingAmount = Math.max(predictedAmount - budgetLimit, 0);
-    const probability = budgetLimit > 0 ? Math.min(Math.max(predictedAmount / budgetLimit - 0.5, 0), 1) : 0;
-
-    return {
-      willOverspend: predictedAmount > budgetLimit,
-      overspendingProbability: probability,
-      predictedAmount,
-      budgetLimit,
-      estimatedOverspendingAmount,
-      riskLevel: probability >= 0.7 ? 'high' : probability >= 0.45 ? 'medium' : 'low',
-      recommendation: 'Pantau pengeluaran sampai akhir bulan dan prioritaskan kategori wajib.',
-      modelName: 'mock-overspending',
-      modelVersion: 'mock-end-month-overspending-v1',
     };
   }
 }

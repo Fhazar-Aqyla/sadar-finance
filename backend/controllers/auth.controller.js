@@ -133,23 +133,37 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 const updateProfile = asyncHandler(async (req, res) => {
-  const user = await authService.updateProfile(req.user.id, req.body);
+  const user = await authService.updateProfileAndPassword(req.user.id, req.body);
   return success(res, {
     data: user,
     message: 'Profile updated successfully',
   });
 });
 
-const updateProfilePicture = asyncHandler(async (req, res) => {
-  if (!req.file) {
-    throw new Error('Pilih file foto profil terlebih dahulu');
-  }
-  const imageUrl = `/uploads/${req.file.filename}`;
-  const user = await authService.updateProfile(req.user.id, { profilePicture: imageUrl });
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await authService.changePassword(req.user.id, req.body);
   return success(res, {
     data: user,
-    message: 'Foto profil berhasil diperbarui',
+    message: 'Password updated successfully',
   });
 });
 
-module.exports = { register, login, getProfile, forgotPassword, updateProfile, updateProfilePicture };
+const uploadProfilePicture = asyncHandler(async (req, res) => {
+  const file = req.file || req.files?.find((uploadedFile) => uploadedFile.mimetype?.startsWith('image/'));
+  const user = await authService.updateProfilePicture(req.user.id, file);
+
+  return success(res, {
+    data: user,
+    message: 'Profile picture updated successfully',
+  });
+});
+
+module.exports = {
+  register,
+  login,
+  getProfile,
+  forgotPassword,
+  updateProfile,
+  changePassword,
+  uploadProfilePicture,
+};

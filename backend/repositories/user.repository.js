@@ -29,6 +29,17 @@ class UserRepository {
     return result.rows[0] || null;
   }
 
+  async findByIdWithPassword(id) {
+    const result = await query(
+      `SELECT users_id, first_name, last_name, gender, email, password_hash,
+              phone_number, date_of_birth, address, profile_picture, occupation, status,
+              created_at, updated_at
+       FROM users WHERE users_id = $1`,
+      [id]
+    );
+    return result.rows[0] || null;
+  }
+
   async create({ firstName, lastName, gender, email, passwordHash, phoneNumber, dateOfBirth, address, occupation }) {
     const result = await query(
       `INSERT INTO users (first_name, last_name, gender, email, password_hash, phone_number, date_of_birth, address, occupation)
@@ -75,13 +86,16 @@ class UserRepository {
     return result.rows[0] || null;
   }
 
-  async getPasswordHash(id) {
-    const result = await query(`SELECT password_hash FROM users WHERE users_id = $1`, [id]);
-    return result.rows[0]?.password_hash || null;
-  }
-
   async updatePassword(id, passwordHash) {
-    await query(`UPDATE users SET password_hash = $2, updated_at = NOW() WHERE users_id = $1`, [id, passwordHash]);
+    const result = await query(
+      `UPDATE users
+       SET password_hash = $2,
+           updated_at = NOW()
+       WHERE users_id = $1
+       RETURNING users_id, first_name, last_name, gender, email, phone_number, date_of_birth, address, profile_picture, occupation, status, updated_at`,
+      [id, passwordHash]
+    );
+    return result.rows[0] || null;
   }
 }
 

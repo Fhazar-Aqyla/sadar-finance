@@ -15,7 +15,12 @@
     "db:reset": "node db/migrate.js && node db/seed.js",
     "test": "jest --coverage --forceExit"
   },
-  "keywords": ["fintech", "api", "express", "postgresql"],
+  "keywords": [
+    "fintech",
+    "api",
+    "express",
+    "postgresql"
+  ],
   "author": "SADAR Finance Team",
   "license": "ISC",
   "type": "commonjs",
@@ -33,6 +38,7 @@
     "pg": "^8.20.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "tesseract.js": "^7.0.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

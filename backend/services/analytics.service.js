@@ -7,6 +7,7 @@ const transactionRepository = require('../repositories/transaction.repository');
 const incomeRepository = require('../repositories/income.repository');
 const analyticsRepository = require('../repositories/analytics.repository');
 const aiClient = require('./aiClient.service');
+const { BadRequestError } = require('../utils/errors');
 
 class AnalyticsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -96,37 +97,9 @@ class AnalyticsService {
     // Generate insights and save to insights table
     const insightEntries = [];
 
-    const translateTrend = (trend) => {
-      const trends = {
-        stable: 'Stabil',
-        frugal: 'Hemat',
-        balanced: 'Seimbang',
-        moderate: 'Sedang',
-        overspending: 'Boros'
-      };
-      return trends[trend] || trend;
-    };
-
-    const translateCategory = (cat) => {
-      const cats = {
-        'Food & Dining': 'Makanan & Minuman',
-        'Transportation': 'Transportasi',
-        'Shopping': 'Belanja',
-        'Entertainment': 'Hiburan',
-        'Bills & Utilities': 'Tagihan & Utilitas',
-        'Healthcare': 'Kesehatan',
-        'Education': 'Pendidikan',
-        'Salary': 'Gaji',
-        'Investment': 'Investasi',
-        'Other': 'Lainnya',
-        'Uncategorized': 'Lainnya'
-      };
-      return cats[cat] || cat;
-    };
-
     insightEntries.push({
-      title: `Tren Pengeluaran: ${translateTrend(spendingTrend)}`,
-      description: `Selama periode ${periodStart} hingga ${periodEnd}, rasio tabungan Anda adalah ${savingsRate}%. Total pemasukan: Rp ${totalIncome.toLocaleString('id-ID')}, Total pengeluaran: Rp ${totalExpense.toLocaleString('id-ID')}.`,
+      title: `Spending Trend: ${spendingTrend.charAt(0).toUpperCase() + spendingTrend.slice(1)}`,
+      description: `During ${periodStart} to ${periodEnd}, your savings rate was ${savingsRate}%. Total income: Rp ${totalIncome.toLocaleString()}, Total expenses: Rp ${totalExpense.toLocaleString()}.`,
     });
 
     if (expenseSummary.length > 0) {
@@ -135,20 +108,20 @@ class AnalyticsService {
         ? ((parseFloat(topCategory.total) / totalExpense) * 100).toFixed(1)
         : 0;
       insightEntries.push({
-        title: `Kategori Terbesar: ${translateCategory(topCategory.category_group || 'Uncategorized')}`,
-        description: `Kategori ${translateCategory(topCategory.category_group || 'Uncategorized')} menyumbang ${percentage}% dari total pengeluaran Anda (Rp ${parseFloat(topCategory.total).toLocaleString('id-ID')}).`,
+        title: `Top Category: ${topCategory.category_group || 'Uncategorized'}`,
+        description: `${topCategory.category_group || 'Uncategorized'} accounts for ${percentage}% of your total expenses (Rp ${parseFloat(topCategory.total).toLocaleString()}).`,
       });
     }
 
     if (spendingTrend === 'overspending') {
       insightEntries.push({
-        title: 'Terdeteksi Pengeluaran Berlebih',
-        description: 'Pengeluaran Anda melebihi pemasukan. Pertimbangkan untuk meninjau kembali pengeluaran non-essential Anda.',
+        title: 'Overspending Detected',
+        description: 'Your expenses exceed your income. Consider reviewing non-essential spending.',
       });
     } else if (savingsRate > 30) {
       insightEntries.push({
-        title: 'Rasio Tabungan Sangat Baik',
-        description: `Anda berhasil menabung ${savingsRate}% dari pemasukan Anda. Disiplin keuangan yang luar biasa!`,
+        title: 'Excellent Savings Rate',
+        description: `You saved ${savingsRate}% of your income. Great financial discipline!`,
       });
     }
 
@@ -277,56 +250,24 @@ class AnalyticsService {
     let effectiveBudget = budgetLimit;
     if (!effectiveBudget) {
       const latestBudget = await analyticsRepository.getLatestBudget(userId);
-      effectiveBudget = latestBudget ? parseFloat(latestBudget.limit_amount) : avgExpense;
+      effectiveBudget = latestBudget
+        ? parseFloat(latestBudget.budget_limit || latestBudget.limit_amount || 0)
+        : avgExpense;
     }
-
-    let aiPrediction = null;
-    try {
-      aiPrediction = await aiClient.predictOverspending({
-        month,
-        budgetLimit: effectiveBudget,
-        predictedAmount,
-        expenseTrend: trend,
-        categorySummary,
-      });
-    } catch (_err) {
-      aiPrediction = null;
-    }
-
-    const finalPredictedAmount = aiPrediction?.predictedAmount || predictedAmount;
 
     // Determine risk level
-    let riskLevel = aiPrediction?.riskLevel || 'low';
-    const ratio = effectiveBudget > 0 ? finalPredictedAmount / effectiveBudget : 0;
-    if (!aiPrediction) {
-      if (ratio > 1.3) riskLevel = 'critical';
-      else if (ratio > 1.1) riskLevel = 'high';
-      else if (ratio > 0.9) riskLevel = 'medium';
-    }
+    let riskLevel = 'low';
+    const ratio = effectiveBudget > 0 ? predictedAmount / effectiveBudget : 0;
+    if (ratio > 1.3) riskLevel = 'critical';
+    else if (ratio > 1.1) riskLevel = 'high';
+    else if (ratio > 0.9) riskLevel = 'medium';
 
     // Generate alerts and save to alerts table
     const alertEntries = [];
 
-    const translateCategory = (cat) => {
-      const cats = {
-        'Food & Dining': 'Makanan & Minuman',
-        'Transportation': 'Transportasi',
-        'Shopping': 'Belanja',
-        'Entertainment': 'Hiburan',
-        'Bills & Utilities': 'Tagihan & Utilitas',
-        'Healthcare': 'Kesehatan',
-        'Education': 'Pendidikan',
-        'Salary': 'Gaji',
-        'Investment': 'Investasi',
-        'Other': 'Lainnya',
-        'Uncategorized': 'Lainnya'
-      };
-      return cats[cat] || cat;
-    };
-
     if (riskLevel === 'critical' || riskLevel === 'high') {
       alertEntries.push({
-        message: `⚠️ Perkiraan pengeluaran untuk ${month} adalah Rp ${predictedAmount.toLocaleString('id-ID')}, melebihi batas anggaran Anda sebesar Rp ${effectiveBudget.toLocaleString('id-ID')} sekitar ${((ratio - 1) * 100).toFixed(0)}%.`,
+        message: `⚠️ Predicted spending for ${month} is Rp ${predictedAmount.toLocaleString()}, which exceeds your budget of Rp ${effectiveBudget.toLocaleString()} by ${((ratio - 1) * 100).toFixed(0)}%.`,
         alertType: 'overspending',
       });
     }
@@ -337,7 +278,7 @@ class AnalyticsService {
       const isHigh = catTotal > (effectiveBudget * 0.3);
       if (isHigh) {
         alertEntries.push({
-          message: `Pengeluaran ${translateCategory(c.category_group || 'Uncategorized')} (Rp ${catTotal.toLocaleString('id-ID')}) melebihi 30% dari total anggaran Anda.`,
+          message: `${c.category_group || 'Uncategorized'} spending (Rp ${catTotal.toLocaleString()}) exceeds 30% of your budget.`,
           alertType: 'budget_exceeded',
         });
       }
@@ -350,7 +291,7 @@ class AnalyticsService {
 
     if (riskLevel === 'medium') {
       alertEntries.push({
-        message: `Pengeluaran Anda mendekati batas anggaran bulanan untuk ${month}. Perkiraan: Rp ${finalPredictedAmount.toLocaleString('id-ID')}, Anggaran: Rp ${effectiveBudget.toLocaleString('id-ID')}.`,
+        message: `You are approaching your budget limit for ${month}. Predicted: Rp ${predictedAmount.toLocaleString()}, Budget: Rp ${effectiveBudget.toLocaleString()}.`,
         alertType: 'reminder',
       });
     }
@@ -362,18 +303,12 @@ class AnalyticsService {
 
     return {
       predictedMonth: month,
-      predictedAmount: finalPredictedAmount,
+      predictedAmount,
       budgetLimit: effectiveBudget,
       riskLevel,
-      willOverspend: aiPrediction?.willOverspend ?? finalPredictedAmount > effectiveBudget,
-      overspendingProbability: aiPrediction?.overspendingProbability ?? Math.min(Math.max(ratio - 0.5, 0), 1),
-      estimatedOverspendingAmount:
-        aiPrediction?.estimatedOverspendingAmount ?? Math.max(finalPredictedAmount - effectiveBudget, 0),
-      recommendation: aiPrediction?.recommendation || null,
       categoryRisks,
       alerts: savedAlerts,
-      modelName: aiPrediction?.modelName || 'moving-average-fallback',
-      modelVersion: aiPrediction?.modelVersion || 'v1.0-moving-average',
+      modelVersion: 'v1.0-moving-average',
     };
   }
 
@@ -409,7 +344,7 @@ class AnalyticsService {
     const incomeCount = parseInt(totalIncomeData.count || 0, 10);
     const netSavings = totalIncome - totalExpense;
     const budgetLimit = latestBudget
-      ? parseFloat(latestBudget.limit_amount || 0)
+      ? parseFloat(latestBudget.budget_limit || latestBudget.limit_amount || 0)
       : totalIncome;
 
     const clampScore = (value) => Math.max(0, Math.min(100, Math.round(value)));
@@ -572,7 +507,61 @@ class AnalyticsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   async createBudget(userId, data) {
-    return analyticsRepository.createBudget(userId, data);
+    const payload = await this._resolveBudgetPayload(userId, data);
+    return analyticsRepository.createBudget(userId, payload);
+  }
+
+  async _resolveBudgetPayload(userId, data) {
+    const incomeId = data.incomeId || data.income_id || null;
+    let income = null;
+
+    if (incomeId) {
+      income = await incomeRepository.findById(incomeId, userId);
+      if (!income) {
+        throw new BadRequestError('Income does not exist or does not belong to the current user');
+      }
+    }
+
+    const firstNumber = (...values) => {
+      for (const value of values) {
+        if (value !== undefined && value !== null && value !== '') {
+          const number = Number(value);
+          if (!Number.isNaN(number)) return number;
+        }
+      }
+      return 0;
+    };
+
+    const needsBudget = firstNumber(data.needsBudget, data.needsAmount, data.needs_budget, data.needs_amount);
+    const wantsBudget = firstNumber(data.wantsBudget, data.wantsAmount, data.wants_budget, data.wants_amount);
+    const investmentBudget = firstNumber(
+      data.investmentBudget,
+      data.investmentAmount,
+      data.savingsAmount,
+      data.investment_budget,
+      data.investment_amount,
+      data.savings_amount
+    );
+    const incomeAmount = firstNumber(data.incomeAmount, data.income_amount, income?.amount);
+    const budgetLimit = firstNumber(
+      data.budgetLimit,
+      data.limitAmount,
+      data.budget_limit,
+      data.limit_amount,
+      needsBudget + wantsBudget
+    );
+
+    return {
+      incomeId,
+      needsBudget,
+      wantsBudget,
+      investmentBudget,
+      incomeAmount,
+      budgetLimit,
+      source: data.source || income?.source || null,
+      incomeDate: data.incomeDate || data.income_date || income?.income_date || null,
+      percentage: data.percentage,
+    };
   }
 
   async getLatestBudget(userId) {
@@ -613,6 +602,7 @@ class AnalyticsService {
       needs_used: needsUsed,
       wants_used: wantsUsed,
       savings_used: savingsUsed,
+      investment_used: savingsUsed,
     };
   }
 

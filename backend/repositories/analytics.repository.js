@@ -9,12 +9,29 @@ class AnalyticsRepository {
   // ── Budget ────────────────────────────────────────────────
   async createBudget(userId, data) {
     const result = await query(
-      `INSERT INTO budgets (user_id, needs_amount, wants_amount, savings_amount, percentage, limit_amount)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO budgets (
+         user_id, income_id,
+         needs_budget, wants_budget, investment_budget,
+         income_amount, budget_limit, source, income_date,
+         needs_amount, wants_amount, savings_amount, investment_amount,
+         percentage, limit_amount
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $3, $4, $5, $5, $10, $7)
        RETURNING *`,
-      [userId, data.needsAmount, data.wantsAmount, data.savingsAmount, data.percentage || null, data.limitAmount]
+      [
+        userId,
+        data.incomeId || null,
+        data.needsBudget,
+        data.wantsBudget,
+        data.investmentBudget,
+        data.incomeAmount,
+        data.budgetLimit,
+        data.source || null,
+        data.incomeDate || null,
+        data.percentage || null,
+      ]
     );
-    return result.rows[0];
+    return this._normalizeBudget(result.rows[0]);
   }
 
   async getLatestBudget(userId) {
@@ -22,7 +39,7 @@ class AnalyticsRepository {
       `SELECT * FROM budgets WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [userId]
     );
-    return result.rows[0] || null;
+    return this._normalizeBudget(result.rows[0] || null);
   }
 
   async getBudgetHistory(userId, limit = 10) {
@@ -30,7 +47,38 @@ class AnalyticsRepository {
       `SELECT * FROM budgets WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2`,
       [userId, limit]
     );
-    return result.rows;
+    return result.rows.map((row) => this._normalizeBudget(row));
+  }
+
+  _normalizeBudget(row) {
+    if (!row) return row;
+
+    const needsBudget = row.needs_budget ?? row.needs_amount ?? '0';
+    const wantsBudget = row.wants_budget ?? row.wants_amount ?? '0';
+    const investmentBudget = row.investment_budget ?? row.investment_amount ?? row.savings_amount ?? '0';
+    const budgetLimit = row.budget_limit ?? row.limit_amount ?? String(Number(needsBudget) + Number(wantsBudget));
+
+    return {
+      ...row,
+      needs_budget: needsBudget,
+      wants_budget: wantsBudget,
+      investment_budget: investmentBudget,
+      investment_amount: row.investment_amount ?? investmentBudget,
+      budget_limit: budgetLimit,
+      needs_amount: row.needs_amount ?? needsBudget,
+      wants_amount: row.wants_amount ?? wantsBudget,
+      savings_amount: row.savings_amount ?? investmentBudget,
+      limit_amount: row.limit_amount ?? budgetLimit,
+      needsBudget,
+      wantsBudget,
+      investmentBudget,
+      savingsAmount: row.savings_amount ?? investmentBudget,
+      budgetLimit,
+      limitAmount: row.limit_amount ?? budgetLimit,
+      incomeId: row.income_id,
+      incomeAmount: row.income_amount,
+      incomeDate: row.income_date,
+    };
   }
 
   // ── Insight ───────────────────────────────────────────────

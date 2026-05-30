@@ -39,43 +39,52 @@ const seed = async () => {
 
     // ── Seed Demo Transactions (expenses) ───────────────────
     await client.query(
-      `INSERT INTO transactions (user_id, account_id, category_group, transaction_date, description, source, amount)
+      `INSERT INTO transactions (user_id, account_id, category_group, category_detail, transaction_date, description, source, amount)
        VALUES
-         ($1, $2, 'Food & Dining', NOW() - INTERVAL '1 day', 'Makan siang di Warung Padang', 'manual', 35000),
-         ($1, $2, 'Transportation', NOW() - INTERVAL '2 days', 'Grab ke kantor', 'manual', 25000),
-         ($1, $2, 'Shopping', NOW() - INTERVAL '3 days', 'Beli baju di Uniqlo', 'manual', 399000),
-         ($1, $2, 'Bills & Utilities', NOW() - INTERVAL '5 days', 'Bayar listrik bulan ini', 'manual', 350000),
-         ($1, $2, 'Entertainment', NOW() - INTERVAL '7 days', 'Netflix subscription', 'manual', 54000),
-         ($1, $2, 'Food & Dining', NOW() - INTERVAL '8 days', 'Ngopi di Starbucks', 'manual', 65000),
-         ($1, $2, 'Healthcare', NOW() - INTERVAL '10 days', 'Beli obat di apotek', 'manual', 75000),
-         ($1, $2, 'Education', NOW() - INTERVAL '12 days', 'Course Udemy', 'manual', 150000)`,
+         ($1, $2, 'Needs', 'Food & Dining', NOW() - INTERVAL '1 day', 'Makan siang di Warung Padang', 'manual', 35000),
+         ($1, $2, 'Needs', 'Transportation', NOW() - INTERVAL '2 days', 'Grab ke kantor', 'manual', 25000),
+         ($1, $2, 'Wants', 'Shopping', NOW() - INTERVAL '3 days', 'Beli baju di Uniqlo', 'manual', 399000),
+         ($1, $2, 'Needs', 'Bills & Utilities', NOW() - INTERVAL '5 days', 'Bayar listrik bulan ini', 'manual', 350000),
+         ($1, $2, 'Wants', 'Entertainment', NOW() - INTERVAL '7 days', 'Netflix subscription', 'manual', 54000),
+         ($1, $2, 'Needs', 'Food & Dining', NOW() - INTERVAL '8 days', 'Ngopi di Starbucks', 'manual', 65000),
+         ($1, $2, 'Needs', 'Healthcare', NOW() - INTERVAL '10 days', 'Beli obat di apotek', 'manual', 75000),
+         ($1, $2, 'Needs', 'Education', NOW() - INTERVAL '12 days', 'Course Udemy', 'manual', 150000)`,
       [userId, mainAccountId]
     );
 
     // ── Seed Demo Incomes ───────────────────────────────────
-    await client.query(
+    const incomeResult = await client.query(
       `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
        VALUES
          ($1, $2, 8000000, NOW() - INTERVAL '5 days', 'Gaji Bulanan'),
          ($1, $2, 1500000, NOW() - INTERVAL '10 days', 'Freelance Project'),
-         ($1, $2, 250000, NOW() - INTERVAL '15 days', 'Cashback Promo')`,
+         ($1, $2, 250000, NOW() - INTERVAL '15 days', 'Cashback Promo')
+       RETURNING income_id, amount, income_date, source`,
       [userId, mainAccountId]
     );
+    const primaryIncome = incomeResult.rows[0];
 
     // ── Seed Demo Budget ────────────────────────────────────
     await client.query(
-      `INSERT INTO budgets (user_id, needs_amount, wants_amount, savings_amount, percentage, limit_amount)
-       VALUES ($1, 4000000, 2400000, 1600000, 50, 8000000)`,
-      [userId]
+      `INSERT INTO budgets (
+         user_id, income_id,
+         needs_budget, wants_budget, investment_budget,
+         income_amount, budget_limit, source, income_date,
+         needs_amount, wants_amount, savings_amount, investment_amount,
+         percentage, limit_amount
+       )
+       VALUES ($1, $2, 4000000, 2400000, 1600000, $3, 6400000, $4, $5,
+               4000000, 2400000, 1600000, 1600000, 50, 6400000)`,
+      [userId, primaryIncome.income_id, primaryIncome.amount, primaryIncome.source, primaryIncome.income_date]
     );
 
     // ── Seed Demo Insights ──────────────────────────────────
     await client.query(
       `INSERT INTO insights (user_id, title, description)
        VALUES
-         ($1, 'Tren Pengeluaran: Stabil', 'Pengeluaran Anda bulan ini konsisten dengan bulan lalu. Disiplin yang sangat baik!'),
-         ($1, 'Kategori Terbesar: Makanan', 'Makanan menyumbang 35% dari total pengeluaran Anda.'),
-         ($1, 'Rasio Tabungan: 20%', 'Anda menghemat 20% dari pemasukan Anda bulan ini. Pertahankan!')`,
+         ($1, 'Spending Trend: Stable', 'Your spending this month is consistent with last month. Good discipline!'),
+         ($1, 'Top Category: Food & Dining', 'Food & Dining accounts for 35% of your total expenses.'),
+         ($1, 'Savings Rate: 20%', 'You saved 20% of your income this month. Keep it up!')`,
       [userId]
     );
 
@@ -83,8 +92,8 @@ const seed = async () => {
     await client.query(
       `INSERT INTO alerts (user_id, message, alert_type)
        VALUES
-         ($1, 'Pengeluaran Makanan Anda 10% lebih tinggi dibandingkan bulan lalu.', 'overspending'),
-         ($1, 'Pengeluaran Anda mendekati batas anggaran bulanan (85% terpakai).', 'budget_exceeded')`,
+         ($1, 'Your Food & Dining spending is 10% higher than last month.', 'overspending'),
+         ($1, 'You are approaching your monthly budget limit (85% used).', 'budget_exceeded')`,
       [userId]
     );
 

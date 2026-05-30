@@ -6,8 +6,11 @@ Backend ini siap dideploy dari folder `backend`.
 
 - Root Directory: `backend`
 - Build Command: `npm ci`
+- Pre-deploy Command: `npm run db:migrate`
 - Start Command: `npm start`
 - Healthcheck Path: `/health`
+
+Repo ini juga punya `railway.json` di root dan di `backend/`, jadi setting build/deploy akan ikut terbaca otomatis kalau Railway memakai config-as-code.
 
 ## Environment Variables
 
@@ -18,15 +21,18 @@ NODE_ENV=production
 JWT_SECRET=isi_dengan_random_secret_panjang
 JWT_EXPIRES_IN=7d
 DATABASE_URL=${{ Postgres.DATABASE_URL }}
-CORS_ORIGINS=https://domain-frontend-kamu.com
+CORS_ORIGINS=https://domain-frontend-kamu.vercel.app,https://*.vercel.app
 ```
+
+Backend otomatis mengizinkan `https://*.vercel.app` saat `NODE_ENV=production`.
+Kalau ingin membatasi hanya ke domain final, set `CORS_ALLOW_VERCEL=false` dan isi `CORS_ORIGINS` dengan domain Vercel production saja.
 
 Opsional:
 
 ```env
 DB_SSL=true
-AI_SERVICE_URL=https://sadar-finance-sadar-finance-ai.hf.space
-AI_SERVICE_TIMEOUT_MS=60000
+AI_SERVICE_URL=https://domain-ai-service-kamu.com
+AI_SERVICE_TIMEOUT_MS=10000
 AI_MOCK_MODE=true
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX=100
@@ -36,7 +42,7 @@ UPLOAD_DIR=uploads
 
 ## Database
 
-Setelah service backend dan Postgres tersambung, jalankan migrasi dari Railway shell atau local terminal yang punya env production:
+Migration sudah dijalankan otomatis lewat pre-deploy command. Kalau perlu menjalankan manual dari Railway shell atau terminal lokal yang punya env production:
 
 ```bash
 npm run db:migrate

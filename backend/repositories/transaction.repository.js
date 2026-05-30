@@ -1,7 +1,7 @@
 /**
  * Transaction Repository — Data access layer for transactions table (expenses).
  * Matches ERD: transaction_id, user_id, account_id, category_group,
- *              transaction_date, description, source, amount
+ *              category_detail, transaction_date, description, source, amount
  */
 
 const { query } = require('../config/database');
@@ -23,6 +23,7 @@ class TransactionRepository {
       page = 1,
       limit = 20,
       categoryGroup,
+      categoryDetail,
       accountId,
       startDate,
       endDate,
@@ -40,6 +41,10 @@ class TransactionRepository {
     if (categoryGroup) {
       conditions.push(`t.category_group = $${paramIndex++}`);
       params.push(categoryGroup);
+    }
+    if (categoryDetail) {
+      conditions.push(`t.category_detail = $${paramIndex++}`);
+      params.push(categoryDetail);
     }
     if (accountId) {
       conditions.push(`t.account_id = $${paramIndex++}`);
@@ -95,15 +100,17 @@ class TransactionRepository {
     return { data: dataResult.rows, total };
   }
 
-  async create(userId, data) {
-    const result = await query(
-      `INSERT INTO transactions (user_id, account_id, category_group, transaction_date, description, source, amount)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+  async create(userId, data, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
+      `INSERT INTO transactions (user_id, account_id, category_group, category_detail, transaction_date, description, source, amount)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [
         userId,
         data.accountId || null,
         data.categoryGroup || null,
+        data.categoryDetail || null,
         data.transactionDate || new Date(),
         data.description || null,
         data.source || 'manual',
@@ -121,6 +128,7 @@ class TransactionRepository {
     const fieldMap = {
       accountId: 'account_id',
       categoryGroup: 'category_group',
+      categoryDetail: 'category_detail',
       transactionDate: 'transaction_date',
       description: 'description',
       source: 'source',
@@ -157,13 +165,14 @@ class TransactionRepository {
     const result = await query(
       `SELECT
          category_group,
+         category_detail,
          COUNT(*)::integer as count,
          COALESCE(SUM(amount), 0)::numeric as total
        FROM transactions
        WHERE user_id = $1
          AND transaction_date >= $2
          AND transaction_date <= $3
-       GROUP BY category_group
+       GROUP BY category_group, category_detail
        ORDER BY total DESC`,
       [userId, startDate, endDate]
     );

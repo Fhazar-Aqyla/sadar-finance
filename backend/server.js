@@ -18,12 +18,14 @@ const config = require('./config');
 const swaggerSpec = require('./config/swagger');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
+const ocrRepository = require('./repositories/ocr.repository');
 const { query: dbQuery } = require('./config/database');
 const { error: errorResponse } = require('./utils/response');
 const { getDatabaseErrorResponse } = require('./utils/dbError');
 
 const app = express();
 app.set('trust proxy', 1);
+app.set('etag', false);
 
 // ── Ensure upload directory exists ──────────────────────────
 const uploadDir = path.join(__dirname, config.upload.dir);
@@ -31,10 +33,49 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+const rateLimitMessage = {
+  success: false,
+  error: {
+    code: 'TOO_MANY_REQUESTS',
+    message: 'Too many requests, please try again later.',
+  },
+};
+
+const authRateLimitedPaths = new Set([
+  '/api/v1/auth/login',
+  '/api/v1/auth/register',
+  '/api/v1/auth/forgot-password',
+]);
+
+const normalizePath = (req) => (req.originalUrl || '')
+  .split('?')[0]
+  .replace(/\/+$/, '');
+
+const isAuthRateLimitedPath = (req) => authRateLimitedPaths.has(normalizePath(req));
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const isCorsOriginAllowed = (origin) => {
+  const allowedOrigins = config.cors.allowedOrigins;
+  const normalizedOrigin = origin.replace(/\/$/, '');
+
+  return allowedOrigins.some((allowedOrigin) => {
+    if (allowedOrigin === '*') return true;
+    if (!allowedOrigin.includes('*')) return allowedOrigin === normalizedOrigin;
+
+    const originPattern = escapeRegExp(allowedOrigin).replace(/\\\*/g, '[^/]+');
+    return new RegExp(`^${originPattern}$`, 'i').test(normalizedOrigin);
+  });
+};
+
+const setUploadResponseHeaders = (res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; img-src * data: blob:;");
+};
+
 // ── Global Middleware ───────────────────────────────────────
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-}));                                                    // Security headers
+app.use(helmet());                                      // Security headers
 app.use(cors({
   origin(origin, callback) {
     const allowedOrigins = config.cors.allowedOrigins;
@@ -43,7 +84,7 @@ app.use(cors({
     if (allowedOrigins.length === 0 && config.env !== 'production') {
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (isCorsOriginAllowed(origin)) return callback(null, true);
 
     return callback(null, false);
   },
@@ -53,23 +94,55 @@ app.use(express.json({ limit: '10mb' }));               // Parse JSON body
 app.use(express.urlencoded({ extended: true }));         // Parse URL-encoded body
 app.use(morgan(config.env === 'production' ? 'combined' : 'dev')); // Logging
 
-// Rate limiter
-app.use('/api/', rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
-  message: {
-    success: false,
-    error: {
-      code: 'TOO_MANY_REQUESTS',
-      message: 'Too many requests, please try again later.',
-    },
-  },
+app.use('/api/v1', (_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+});
+
+// Auth limiter protects sensitive auth actions without sharing the dashboard/profile quota.
+app.use(['/api/v1/auth/login', '/api/v1/auth/register', '/api/v1/auth/forgot-password'], rateLimit({
+  windowMs: config.rateLimit.authWindowMs,
+  max: config.rateLimit.authMax,
+  skip: (req) => req.method === 'OPTIONS',
+  skipSuccessfulRequests: true,
+  message: rateLimitMessage,
   standardHeaders: true,
   legacyHeaders: false,
 }));
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(uploadDir));
+// General API limiter for regular app traffic.
+app.use('/api/', rateLimit({
+  windowMs: config.rateLimit.windowMs,
+  max: config.rateLimit.max,
+  skip: (req) => req.method === 'OPTIONS' || isAuthRateLimitedPath(req),
+  message: rateLimitMessage,
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
+
+// Serve uploaded files statically. Receipts can be embedded by the Vercel frontend.
+app.use('/uploads', express.static(uploadDir, {
+  setHeaders: setUploadResponseHeaders,
+}));
+app.get('/uploads/:filename', async (req, res, next) => {
+  try {
+    const image = await ocrRepository.findImageByUrl(`/uploads/${req.params.filename}`);
+
+    if (!image?.image_data) {
+      return next();
+    }
+
+    setUploadResponseHeaders(res);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.type(image.mime_type || 'application/octet-stream');
+    return res.send(image.image_data);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // ── Swagger Documentation ──────────────────────────────────
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
