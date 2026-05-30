@@ -129,7 +129,10 @@ const resolveReceiptImageUrl = (url) => {
   if (!url) return "";
   if (/^(https?:|data:)/i.test(url)) return url;
 
-  const apiRoot = api.API_URL.replace(/\/api\/v\d+\/?$/i, "");
+  let apiRoot = api.API_URL.replace(/\/api\/v\d+\/?$/i, "");
+  if (!apiRoot || apiRoot.startsWith("/")) {
+    apiRoot = "https://sadar-finance.up.railway.app";
+  }
   return `${apiRoot}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
@@ -692,6 +695,9 @@ const SadarFinancialHistory = () => {
               <div>
                 <strong>{receiptModal.transaction?.receipt?.name || "Struk transaksi"}</strong>
                 <span>{receiptModal.transaction?.name}</span>
+                <span className="mt-2 d-block text-muted text-break" style={{ fontSize: '10px' }}>
+                  DEBUG URL: {receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl}
+                </span>
               </div>
             </div>
           ) : (
