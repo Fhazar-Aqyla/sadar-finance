@@ -681,13 +681,13 @@ const OnePage = () => {
               initial="offscreen" 
               whileInView="onscreen" 
               viewport={{ once: true, amount: 0.2 }} 
-              className="relative h-[390px] w-full max-w-[240px] justify-self-center max-xl:h-[370px] max-xl:max-w-[225px] max-lg:h-[568px] max-lg:max-w-[347px] max-md:h-[390px] max-md:max-w-[240px]"
+              className="relative h-[390px] w-full max-w-[240px] justify-self-center max-xl:h-[370px] max-xl:max-w-[225px] max-md:h-[390px] max-md:max-w-[240px]"
             >
-              <div className="absolute inset-x-0 bottom-0 h-[300px] rounded-[16px] bg-[#1E3A8A] max-xl:h-[285px] max-lg:h-[440px] max-md:h-[300px]" />
+              <div className="absolute inset-x-0 bottom-0 h-[300px] rounded-[16px] bg-[#1E3A8A] max-xl:h-[285px] max-md:h-[300px]" />
               <img
                 src={boyLaptop}
                 alt="Pengguna SADAR memakai laptop"
-                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-lg:h-[568px] max-lg:origin-bottom max-lg:scale-x-[4.50] max-md:h-[390px]"
+                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-md:h-[390px]"
               />
             </motion.div>
 

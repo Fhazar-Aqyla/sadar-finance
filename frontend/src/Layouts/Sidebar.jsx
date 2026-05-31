@@ -166,14 +166,6 @@ const Sidebar = ({ className = "" }) => {
 
   return (
     <React.Fragment>
-      <button
-        onClick={toggleSidebar}
-        className="fixed left-6 top-6 z-50 rounded-lg border border-slate-100 bg-white p-3 shadow-md transition-all duration-200 hover:bg-slate-50 md:hidden"
-        aria-label="Toggle sidebar"
-      >
-        {isOpen ? <X className="h-5 w-5 text-slate-600" /> : <Menu className="h-5 w-5 text-slate-600" />}
-      </button>
-
       {isOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm transition-opacity duration-300 md:hidden"
@@ -182,7 +174,7 @@ const Sidebar = ({ className = "" }) => {
       )}
 
       <div
-        className={`sadar-sidebar fixed left-0 top-0 z-40 flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
+        className={`sadar-sidebar fixed left-0 top-0 z-40 hidden md:flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } ${className}`}
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
@@ -206,6 +198,13 @@ const Sidebar = ({ className = "" }) => {
             </Link>
           )}
 
+          <button
+            onClick={toggleSidebar}
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-lg p-2 border-0 bg-transparent hover:bg-slate-200/50 md:hidden flex items-center justify-center transition-colors duration-200"
+            aria-label="Close sidebar"
+          >
+            <X className="h-5 w-5 text-slate-500 hover:text-slate-700" />
+          </button>
         </div>
 
         <nav className="sadar-sidebar-nav min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-6">

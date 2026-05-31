@@ -293,8 +293,10 @@
         }
 
         .sadar-auth-form-panel {
-            display: block;
-            --sadar-auth-content-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            --sadar-auth-content-width: #{min(calc(100% - 48px), 460px)};
             --sadar-auth-content-padding: 1.5rem;
         }
 

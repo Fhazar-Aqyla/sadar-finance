@@ -2059,3 +2059,117 @@ html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
   object-fit: cover;
 }
 
+/* --- SADAR Finance Responsive Adaptations --- */
+
+@media (max-width: 991.98px) {
+  .sadar-page {
+    padding-bottom: 4.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .sadar-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .sadar-page-header h1 {
+    font-size: 1.45rem;
+  }
+
+  .sadar-page-header p {
+    margin-top: 0.45rem;
+    font-size: 0.88rem;
+  }
+
+  .sadar-page .card-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+    min-height: 0 !important;
+    padding: 1rem !important;
+  }
+
+  .sadar-form-grid,
+  .sadar-profile-summary-grid,
+  .sadar-history-edit-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  .sadar-profile-photo-row {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+
+  .sadar-profile-photo-copy {
+    text-align: center;
+  }
+
+  .sadar-profile-photo-copy p {
+    margin-bottom: 0.5rem;
+  }
+
+  .sadar-profile-avatar {
+    width: 74px;
+    height: 74px;
+    flex: 0 0 74px;
+    font-size: 1.45rem;
+  }
+
+  .sadar-summary-card h2 {
+    font-size: 1.15rem;
+  }
+
+  .sadar-table thead th {
+    padding: 0.65rem 0.75rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .sadar-table tbody td {
+    padding: 0.7rem 0.75rem !important;
+    font-size: 0.82rem !important;
+  }
+  
+  .sadar-table-pagination {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .sadar-table-search {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  .sadar-table-pagination .pagination {
+    justify-content: center;
+  }
+
+  .sadar-history-modal .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .sadar-history-modal .modal-header,
+  .sadar-history-modal .modal-body,
+  .sadar-history-modal .modal-footer {
+    padding: 0.95rem 1.15rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .sadar-summary-card .card-body {
+    min-height: 124px;
+  }
+
+  .sadar-summary-card h2 {
+    margin-top: 0.75rem;
+  }
+}
+

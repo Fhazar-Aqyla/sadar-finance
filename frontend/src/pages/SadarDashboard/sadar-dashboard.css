@@ -444,6 +444,7 @@
 }
 
 .sadar-table-wrap {
+  overflow-x: auto;
   border: 1px solid #edf1f6;
   border-radius: 8px;
 }
@@ -1031,6 +1032,19 @@ html[data-bs-theme="dark"] .sadar-sidebar-logout:hover {
 @media (max-width: 767.98px) {
   .sadar-dashboard .page-title-right {
     display: none;
+  }
+
+  .metric-card {
+    min-height: 110px !important;
+  }
+
+  .metric-card .card-body {
+    padding: 0.85rem !important;
+  }
+
+  .metric-card h2 {
+    margin: 0.6rem 0 0.15rem !important;
+    font-size: 1.15rem !important;
   }
 
   .sadar-overview {

@@ -833,10 +833,14 @@ const createTrendOptions = (categories, maxValue) => ({
       height: 4,
     },
     labels: {
+      show: true,
+      rotate: -45,
+      rotateAlways: false,
+      hideOverlappingLabels: true,
       offsetY: 8,
       style: {
         colors: "#596374",
-        fontSize: "13px",
+        fontSize: "11px",
         fontWeight: 600,
       },
     },
@@ -870,6 +874,34 @@ const createTrendOptions = (categories, maxValue) => ({
       formatter: (value) => rupiah(value * 100),
     },
   },
+  responsive: [
+    {
+      breakpoint: 768,
+      options: {
+        chart: {
+          height: 250,
+        },
+        xaxis: {
+          tickAmount: 5,
+          labels: {
+            rotate: 0,
+            rotateAlways: false,
+            style: {
+              fontSize: "10px",
+            },
+          },
+        },
+        yaxis: {
+          tickAmount: 3,
+          labels: {
+            style: {
+              fontSize: "10px",
+            },
+          },
+        },
+      },
+    },
+  ],
 });
 
 const createCategoryOptions = (labels, colors, setActiveCategory) => ({

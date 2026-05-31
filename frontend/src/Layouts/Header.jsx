@@ -25,12 +25,19 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
     const sidebarVisibilitytype = useSelector(selectDashboardData);
 
     const [search, setSearch] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const toogleSearch = () => {
         setSearch(!search);
     };
 
     const toogleMenuBtn = () => {
         var windowSize = document.documentElement.clientWidth;
+        
+        if (windowSize <= 767) {
+            setIsMobileMenuOpen(!isMobileMenuOpen);
+            return;
+        }
+
         dispatch(changeSidebarVisibility("show"));
 
         if (windowSize > 767)
@@ -50,7 +57,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                 document.body.classList.remove('vertical-sidebar-enable');
                 (document.documentElement.getAttribute('data-sidebar-size') === 'lg') ? document.documentElement.setAttribute('data-sidebar-size', 'sm') : document.documentElement.setAttribute('data-sidebar-size', 'lg');
             } else if (windowSize <= 767) {
-                document.body.classList.add('vertical-sidebar-enable');
+                document.body.classList.toggle('vertical-sidebar-enable');
                 document.documentElement.setAttribute('data-sidebar-size', 'lg');
             }
         }
@@ -94,7 +101,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 type="button"
                                 className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger"
                                 id="topnav-hamburger-icon">
-                                <span className="hamburger-icon">
+                                <span className={`hamburger-icon ${isMobileMenuOpen ? 'open' : ''}`}>
                                     <span></span>
                                     <span></span>
                                     <span></span>
@@ -118,13 +125,45 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 </DropdownMenu>
                             </Dropdown>
 
-                            <FullScreenDropdown />
+                            <div className="d-none d-md-block">
+                                <FullScreenDropdown />
+                            </div>
                             <LightDark layoutMode={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
                             <NotificationDropdown />
                             <ProfileDropdown />
                         </div>
                     </div>
                 </div>
+
+                {isMobileMenuOpen && (
+                    <nav
+                        className="d-md-none absolute left-0 right-0 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-lg flex flex-col gap-1 p-3 z-50"
+                        style={{ top: "100%" }}
+                        aria-label="Menu Mobile"
+                    >
+                        {[
+                            { name: "Dashboard", href: "/dashboard" },
+                            { name: "Catat Keuangan", href: "/catat-keuangan" },
+                            { name: "Insight Perilaku", href: "/behavior-insight" },
+                            { name: "Skor Finansial", href: "/financial-score" },
+                            { name: "Riwayat Keuangan", href: "/financial-history" },
+                            { name: "Profil", href: "/profile-account" },
+                            { name: "Keluar", href: "/logout", className: "text-danger" },
+                        ].map((item) => (
+                            <Link
+                                key={item.href}
+                                to={item.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`px-3 py-2.5 rounded-lg text-[13px] font-semibold no-underline transition-all duration-200 flex items-center justify-between ${
+                                    item.className ? "text-red-500 hover:bg-red-50" : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+                                }`}
+                            >
+                                <span>{item.name}</span>
+                                <i className="ri-arrow-right-s-line text-slate-400"></i>
+                            </Link>
+                        ))}
+                    </nav>
+                )}
             </header>
         </React.Fragment>
     );
