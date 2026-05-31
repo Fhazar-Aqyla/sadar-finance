@@ -12,6 +12,12 @@ import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.png";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
 import dashboardPreview from "../../../assets/images/landing/dashboard-preview.png";
+import diahAvatar from "../../../assets/images/users/diah.png";
+import marselaAvatar from "../../../assets/images/users/marsela.png";
+import dzakyAvatar from "../../../assets/images/users/dzaky.png";
+import farrelAvatar from "../../../assets/images/users/farrel.png";
+import fhazarAvatar from "../../../assets/images/users/fhazar.jpg";
+import habibAvatar from "../../../assets/images/users/habib.png";
 
 const navItems = [
   { label: "Beranda", href: "#home" },
@@ -54,7 +60,7 @@ const teamData = [
   {
     name: "Diah Ayu Puspasari",
     title: "Data Scientist",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop",
+    avatar: diahAvatar,
     socials: { 
       github: "https://github.com/Diahayuups", 
       linkedin: "https://www.linkedin.com/in/diahaps/", 
@@ -64,9 +70,9 @@ const teamData = [
   {
     name: "Marsela",
     title: "Data Scientist",
-    avatar: "https://images.unsplash.com/photo-1580894742494-019a8453969d?q=80&w=400&auto=format&fit=crop",
+    avatar: marselaAvatar,
     socials: { 
-      github: "", 
+      github: "https://github.com/Marsela0603", 
       linkedin: "https://www.linkedin.com/in/marsela-marsela-30a763248", 
       instagram: "https://www.linkedin.com/in/marsela-marsela-30a763248" 
     }
@@ -74,7 +80,7 @@ const teamData = [
   {
     name: "Dzaky Jaisy Al-Qorney",
     title: "AI Engineer",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    avatar: dzakyAvatar,
     socials: { 
       github: "https://github.com/iMiNerVaa", 
       linkedin: "https://www.linkedin.com/in/dj-al/", 
@@ -84,7 +90,7 @@ const teamData = [
   {
     name: "Farrel Al Faqih Ekatama",
     title: "AI Engineer",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+    avatar: farrelAvatar,
     socials: { 
       github: "https://github.com/farrelalfaqih", 
       linkedin: "https://www.linkedin.com/in/farrel-al-faqih-ekatama-339980217/", 
@@ -94,7 +100,8 @@ const teamData = [
   {
     name: "Fhazar Raffiful Aqyla",
     title: "Full Stack Developer",
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop",
+    avatar: fhazarAvatar,
+    objectPosition: "center 30%",
     socials: { 
       github: "https://github.com/Fhazar-Aqyla", 
       linkedin: "https://www.linkedin.com/in/fhazaraqyla/", 
@@ -104,7 +111,7 @@ const teamData = [
   {
     name: "Muhammad Habib Rafi",
     title: "Full Stack Developer",
-    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop",
+    avatar: habibAvatar,
     socials: { 
       github: "https://github.com/mhmdhabibrafi", 
       linkedin: "https://www.linkedin.com/in/mhmdhabibrafi", 

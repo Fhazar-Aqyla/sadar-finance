@@ -30,6 +30,7 @@ export interface TeamMember {
   name: string;
   title: string;
   avatar: string;
+  objectPosition?: string;
   socials: Record<'github' | 'linkedin' | 'instagram', string>;
 }
 
@@ -118,6 +119,7 @@ const TeamMemberCard = React.memo(({ member, index }: { member: TeamMember; inde
                         alt={`Portrait of ${member.name}`}
                         loading="lazy"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        style={member.objectPosition ? { objectPosition: member.objectPosition } : undefined}
                         onError={(e) => { (e.target as HTMLImageElement).src='https://placehold.co/400x400/cccccc/ffffff?text=??'; }}
                     />
                 </div>
