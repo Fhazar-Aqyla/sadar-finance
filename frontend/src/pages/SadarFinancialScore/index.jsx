@@ -303,6 +303,19 @@ const EmptyFinancialScore = ({ message = "" }) => {
   );
 };
 
+const SadarLoadingScreen = () => {
+  return (
+    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+      <div className="text-center">
+        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
+          <span className="visually-hidden">Memuat...</span>
+        </div>
+        <p className="mt-3 text-muted fw-semibold">Memuat skor finansial...</p>
+      </div>
+    </div>
+  );
+};
+
 const FinancialScoreWithData = () => {
   useEffect(() => {
     document.title = "Skor Finansial | SADAR Finance";
@@ -311,6 +324,7 @@ const FinancialScoreWithData = () => {
   const [healthScore, setHealthScore] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("2w");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -460,6 +474,10 @@ const FinancialScoreWithData = () => {
             "Gagal memuat skor finansial. Silakan coba beberapa saat lagi.",
           );
         }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -474,6 +492,10 @@ const FinancialScoreWithData = () => {
     () => (healthScore ? buildApiData(healthScore) : null),
     [healthScore],
   );
+
+  if (isLoading) {
+    return <SadarLoadingScreen />;
+  }
 
   if (!data) {
     return <EmptyFinancialScore message={loadError} />;

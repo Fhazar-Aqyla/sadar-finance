@@ -222,8 +222,8 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
                       isCollapsed ? "justify-center px-2" : "gap-2.5"
                     } ${
                       isActive
-                        ? "sadar-sidebar-link-active bg-blue-50 !text-blue-700"
-                        : "!text-slate-800 hover:bg-slate-50 hover:!text-blue-700"
+                        ? "sadar-sidebar-link-active bg-blue-50 !text-blue-700 dark:bg-blue-950/40 dark:!text-blue-400"
+                        : "!text-slate-800 hover:bg-slate-50 hover:!text-blue-700 dark:!text-slate-200 dark:hover:bg-slate-800/40 dark:hover:!text-blue-400"
                     }`}
                     title={isCollapsed ? item.name : undefined}
                   >
@@ -264,16 +264,16 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
                   onLogoutClick();
                 }
               }}
-              className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
+              className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 dark:!text-red-400 dark:hover:bg-red-950/30 dark:hover:!text-red-300 ${
                 isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
               }`}
               title={isCollapsed ? "Keluar" : undefined}
             >
               <div className="flex min-w-[22px] items-center justify-center">
-                <LogOut className="h-4 w-4 flex-shrink-0 text-red-500 group-hover:text-red-600" />
+                <LogOut className="h-4 w-4 flex-shrink-0 text-red-500 group-hover:text-red-600 dark:text-red-400 dark:group-hover:text-red-300" />
               </div>
 
-              {!isCollapsed && <span className="text-sm text-red-600 group-hover:text-red-700">Keluar</span>}
+              {!isCollapsed && <span className="text-sm text-red-600 group-hover:text-red-700 dark:text-red-400 dark:group-hover:text-red-300">Keluar</span>}
 
               {isCollapsed && (
                 <div className="invisible absolute left-full z-50 ml-2 whitespace-nowrap rounded bg-slate-800 px-2 py-1 text-xs text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">

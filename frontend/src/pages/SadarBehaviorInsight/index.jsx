@@ -196,6 +196,19 @@ const toCategoryPrimary = (category) => {
   return "Wants";
 };
 
+const SadarLoadingScreen = () => {
+  return (
+    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+      <div className="text-center">
+        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
+          <span className="visually-hidden">Memuat...</span>
+        </div>
+        <p className="mt-3 text-muted fw-semibold">Memuat analisis perilaku...</p>
+      </div>
+    </div>
+  );
+};
+
 const EmptyBehaviorInsight = () => {
   return (
     <div className="page-content sadar-page">
@@ -366,6 +379,7 @@ const BehaviorInsightWithData = () => {
   const [backendTransactions, setBackendTransactions] = useState([]);
   const [backendIncomes, setBackendIncomes] = useState([]);
   const [behaviorPrediction, setBehaviorPrediction] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const data = useMemo(() => {
     const expenseTransactions = backendTransactions.filter((item) => item.budget_group !== "Savings");
@@ -497,6 +511,10 @@ const BehaviorInsightWithData = () => {
           setBackendTransactions([]);
           setBackendIncomes([]);
         }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -588,6 +606,10 @@ const BehaviorInsightWithData = () => {
     ? [normalizedPrediction.recommendation, ...data.recommendations]
     : data.recommendations;
   const recommendationCards = recommendations.map(toRecommendationCard);
+
+  if (isLoading) {
+    return <SadarLoadingScreen />;
+  }
 
   if (data.userTransactions.length === 0) {
     return <EmptyBehaviorInsight />;

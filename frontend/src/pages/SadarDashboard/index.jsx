@@ -966,6 +966,19 @@ const createCategoryOptions = (labels, colors, setActiveCategory) => ({
   },
 });
 
+const SadarLoadingScreen = () => {
+  return (
+    <div className="page-content sadar-dashboard d-flex align-items-center justify-content-center" style={{ minHeight: "80vh" }}>
+      <div className="text-center">
+        <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
+          <span className="visually-hidden">Memuat...</span>
+        </div>
+        <p className="mt-3 text-muted fw-semibold fs-15">Menyiapkan dashboard keuangan Anda...</p>
+      </div>
+    </div>
+  );
+};
+
 const DashboardWithData = () => {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -1256,6 +1269,10 @@ const DashboardWithData = () => {
         tone: "success",
         detail: "Anggaran membantu memberi sinyal sebelum pengeluaran melewati batas.",
       };
+
+  if (isLoading) {
+    return <SadarLoadingScreen />;
+  }
 
   if (!isLoading && (loadError || dashboardData.transactionCount === 0)) {
     return <NewUserDashboard profileName={displayProfile.name} />;

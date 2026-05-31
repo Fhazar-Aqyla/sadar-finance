@@ -171,11 +171,25 @@ const readFileAsReceipt = (file) =>
     reader.readAsDataURL(file);
   });
 
+const SadarLoadingScreen = () => {
+  return (
+    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+      <div className="text-center">
+        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
+          <span className="visually-hidden">Memuat...</span>
+        </div>
+        <p className="mt-3 text-muted fw-semibold">Memuat riwayat keuangan...</p>
+      </div>
+    </div>
+  );
+};
+
 const SadarFinancialHistory = () => {
   const [accounts, setAccounts] = useState([]);
   const [incomesRows, setIncomesRows] = useState([]);
   const [transactionRows, setTransactionRows] = useState([]);
   const [currentTransactionPage, setCurrentTransactionPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [notice, setNotice] = useState("");
   const [receiptMap, setReceiptMap] = useState(() => loadStoredReceipts());
@@ -204,18 +218,23 @@ const SadarFinancialHistory = () => {
           transactionApi.list({ limit: 100 }),
         ]);
 
-        if (!isMounted) return;
-
-        setAccounts((accountRows || []).map(normalizeAccount));
-        setIncomesRows((incomeRows || []).map(normalizeIncome));
-        setTransactionRows((expenseRows || []).map(normalizeTransaction));
-        setNotice("");
+        if (isMounted) {
+          setAccounts((accountRows || []).map(normalizeAccount));
+          setIncomesRows((incomeRows || []).map(normalizeIncome));
+          setTransactionRows((expenseRows || []).map(normalizeTransaction));
+          setNotice("");
+        }
       } catch (error) {
-        if (!isMounted) return;
-        setAccounts([]);
-        setIncomesRows([]);
-        setTransactionRows([]);
-        setNotice(error?.message || "Riwayat keuangan belum bisa dimuat.");
+        if (isMounted) {
+          setAccounts([]);
+          setIncomesRows([]);
+          setTransactionRows([]);
+          setNotice(error?.message || "Riwayat keuangan belum bisa dimuat.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -502,6 +521,10 @@ const SadarFinancialHistory = () => {
       setIsSubmittingAction(false);
     }
   };
+
+  if (isLoading) {
+    return <SadarLoadingScreen />;
+  }
 
   return (
     <div className="page-content sadar-page">

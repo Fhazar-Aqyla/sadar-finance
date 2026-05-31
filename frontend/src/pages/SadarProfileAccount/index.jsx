@@ -476,6 +476,19 @@ const accountTypes = [
   { value: "E-wallet", label: "Dompet digital" },
 ];
 
+const SadarLoadingScreen = () => {
+  return (
+    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+      <div className="text-center">
+        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
+          <span className="visually-hidden">Memuat...</span>
+        </div>
+        <p className="mt-3 text-muted fw-semibold">Memuat profil dan akun...</p>
+      </div>
+    </div>
+  );
+};
+
 const ProfileAccountWithData = () => {
   useEffect(() => {
     document.title = "Profil & Akun | SADAR Finance";
@@ -484,6 +497,7 @@ const ProfileAccountWithData = () => {
   const [accounts, setAccounts] = useState([]);
   const [accountNotice, setAccountNotice] = useState("");
   const [pendingDeleteAccount, setPendingDeleteAccount] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [openActionAccountId, setOpenActionAccountId] = useState("");
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
@@ -512,29 +526,34 @@ const ProfileAccountWithData = () => {
           analyticsApi.latestBudget().catch(() => null),
         ]);
 
-        if (!isMounted) return;
+        if (isMounted) {
+          const normalizedAccounts = (accountRows || []).map(normalizeAccount);
+          const apiBudgetRows = buildBudgetRows(budgetResponse);
 
-        const normalizedAccounts = (accountRows || []).map(normalizeAccount);
-        const apiBudgetRows = buildBudgetRows(budgetResponse);
-
-        setProfile(normalizeProfile(profileResponse));
-        updateSessionUser(profileResponse);
-        dispatch(profileSuccess({ data: profileResponse, status: "success" }));
-        setAccounts(normalizedAccounts);
-        setBudgetRows(apiBudgetRows.length ? apiBudgetRows : budgetTargets.map((item) => {
-          return {
-            id: `budget_${item.category}`,
-            category: item.category,
-            label: item.label,
-            limit: 0,
-            used: 0,
-          };
-        }));
+          setProfile(normalizeProfile(profileResponse));
+          updateSessionUser(profileResponse);
+          dispatch(profileSuccess({ data: profileResponse, status: "success" }));
+          setAccounts(normalizedAccounts);
+          setBudgetRows(apiBudgetRows.length ? apiBudgetRows : budgetTargets.map((item) => {
+            return {
+              id: `budget_${item.category}`,
+              category: item.category,
+              label: item.label,
+              limit: 0,
+              used: 0,
+            };
+          }));
+        }
       } catch {
-        if (!isMounted) return;
-        setAccounts([]);
-        setBudgetRows([]);
-        setAccountNotice("Data dari backend belum bisa dimuat.");
+        if (isMounted) {
+          setAccounts([]);
+          setBudgetRows([]);
+          setAccountNotice("Data dari backend belum bisa dimuat.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -786,6 +805,10 @@ const ProfileAccountWithData = () => {
       setBudgetNotice(error?.message || "Anggaran gagal disimpan.");
     }
   };
+
+  if (isLoading) {
+    return <SadarLoadingScreen />;
+  }
 
   return (
     <div className="page-content sadar-page">
