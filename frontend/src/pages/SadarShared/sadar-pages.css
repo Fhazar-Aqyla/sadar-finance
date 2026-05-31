@@ -905,6 +905,18 @@
   border-top: 0;
 }
 
+.sadar-confirm-modal .btn-light {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.sadar-confirm-modal .btn-light:hover {
+  background-color: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
 .sadar-confirm-icon {
   display: inline-flex;
   align-items: center;

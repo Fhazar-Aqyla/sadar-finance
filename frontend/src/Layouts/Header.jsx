@@ -14,7 +14,7 @@ import { changeSidebarVisibility } from '../slices/thunks';
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from 'reselect';
 
-const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
+const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick }) => {
     const dispatch = useDispatch();
 
     const selectDashboardData = createSelector(
@@ -152,8 +152,16 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                         ].map((item) => (
                             <Link
                                 key={item.href}
-                                to={item.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
+                                to={item.href === "/logout" ? "#" : item.href}
+                                onClick={(e) => {
+                                    setIsMobileMenuOpen(false);
+                                    if (item.href === "/logout") {
+                                        e.preventDefault();
+                                        if (onLogoutClick) {
+                                            onLogoutClick();
+                                        }
+                                    }
+                                }}
                                 className={`px-3 py-2.5 rounded-lg text-[13px] font-semibold no-underline transition-all duration-200 flex items-center justify-between ${
                                     item.className ? "text-red-500 hover:bg-red-50" : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"
                                 }`}

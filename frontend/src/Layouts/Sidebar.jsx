@@ -63,7 +63,7 @@ const normalizeAccountEmail = (value) => {
   return email;
 };
 
-const Sidebar = ({ className = "" }) => {
+const Sidebar = ({ className = "", onLogoutClick }) => {
   const location = useLocation();
   const profileUser = useSelector((state) => state.Profile?.user ?? {});
   const [isOpen, setIsOpen] = useState(false);
@@ -257,7 +257,13 @@ const Sidebar = ({ className = "" }) => {
         <div className="sadar-sidebar-footer mt-auto shrink-0 border-t border-slate-200 bg-white">
           <div className={isCollapsed ? "flex h-[66px] items-center justify-center p-3" : "flex h-[66px] items-center p-3"}>
             <Link
-              to="/logout"
+              to="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (onLogoutClick) {
+                  onLogoutClick();
+                }
+              }}
               className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 ${
                 isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
               }`}
