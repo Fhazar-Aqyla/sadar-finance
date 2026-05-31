@@ -213,6 +213,26 @@ const ProfileEdit = () => {
     }
   };
 
+  const handleDeleteAvatar = async () => {
+    setIsSavingAvatar(true);
+    setAvatarNotice(null);
+
+    try {
+      const updatedUser = await authApi.updateMe({ profilePicture: null });
+      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
+      setAvatarNotice({ color: "success", message: "Foto profil berhasil dihapus." });
+      setAvatarFile(null);
+      
+      // Update sessionStorage and Redux state to sync header avatar instantly
+      updateSessionUser(updatedUser);
+      dispatch(profileSuccess({ data: updatedUser, status: "success" }));
+    } catch (error) {
+      setAvatarNotice({ color: "danger", message: error?.message || "Gagal menghapus foto profil." });
+    } finally {
+      setIsSavingAvatar(false);
+    }
+  };
+
   const handleSaveIdentity = async () => {
     const nextErrors = {};
 
@@ -385,11 +405,29 @@ const ProfileEdit = () => {
                   <h4 className="fw-bold mb-1 text-dark">{profile.name}</h4>
                   <p className="text-muted mb-0 fs-14">{profile.occupation || "Pengguna SADAR Finance"}</p>
 
+                  {avatarNotice && (
+                    <div className="mt-3 px-3">
+                      <Alert color={avatarNotice.color} className="py-2 mb-2 fs-12">{avatarNotice.message}</Alert>
+                    </div>
+                  )}
+
                   {avatarFile && (
-                    <div className="mt-3 px-3 mb-3">
-                      {avatarNotice && <Alert color={avatarNotice.color} className="py-2 mb-2 fs-12">{avatarNotice.message}</Alert>}
+                    <div className="mt-3 px-3">
                       <Button color="success" size="sm" className="w-100" onClick={handleSaveAvatar} disabled={isSavingAvatar}>
                         {isSavingAvatar ? "Menyimpan..." : "Terapkan Foto Baru"}
+                      </Button>
+                    </div>
+                  )}
+
+                  {profile.avatar && (
+                    <div className="mt-2 text-center">
+                      <Button 
+                        color="link" 
+                        className="text-danger p-0 fs-13 text-decoration-none" 
+                        onClick={handleDeleteAvatar} 
+                        disabled={isSavingAvatar}
+                      >
+                        <i className="ri-delete-bin-line align-middle me-1"></i> Hapus Foto
                       </Button>
                     </div>
                   )}
