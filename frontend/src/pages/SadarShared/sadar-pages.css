@@ -1890,3 +1890,172 @@ html[data-bs-theme="dark"] .sadar-period-toggle .btn.active {
     flex-basis: 100%;
   }
 }
+
+/* Custom Profile Photo Dropdown */
+.profile-photo-dropdown {
+  position: absolute;
+  top: 105px;
+  right: -20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 6px 0;
+  z-index: 1050;
+  min-width: 175px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  animation: fadeInPhotoMenu 0.15s ease-out;
+}
+
+@keyframes fadeInPhotoMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-photo-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: #334155;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-photo-dropdown-item:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.profile-photo-dropdown-item i {
+  font-size: 15px;
+  color: #64748b;
+  transition: color 0.2s ease;
+}
+
+.profile-photo-dropdown-item:hover i {
+  color: #334155;
+}
+
+.profile-photo-dropdown-item.text-danger {
+  color: #dc2626;
+}
+
+.profile-photo-dropdown-item.text-danger i {
+  color: #dc2626;
+}
+
+.profile-photo-dropdown-item.text-danger:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.profile-photo-dropdown-item.text-danger:hover i {
+  color: #b91c1c;
+}
+
+.profile-photo-dropdown-divider {
+  border-top: 1px solid #e2e8f0;
+  margin: 4px 0;
+}
+
+/* Dark Mode Overrides for Dropdown */
+html[data-bs-theme="dark"] .profile-photo-dropdown {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item {
+  color: #e2e8f0;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item i {
+  color: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item:hover i {
+  color: #ffffff;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item.text-danger {
+  color: #ef4444;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item.text-danger i {
+  color: #ef4444;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item.text-danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-item.text-danger:hover i {
+  color: #f87171;
+}
+
+html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Lightbox Styles */
+.sadar-photo-lightbox-modal .modal-content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.sadar-photo-lightbox-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: relative;
+}
+
+.sadar-photo-lightbox-img {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+}
+
+/* Custom Webcam Modal Styles */
+.sadar-webcam-preview-wrapper {
+  background: #000000;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 4/3;
+  width: 100%;
+}
+
+.sadar-webcam-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sadar-webcam-captured {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+

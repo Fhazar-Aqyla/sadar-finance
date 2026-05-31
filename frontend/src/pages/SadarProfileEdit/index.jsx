@@ -18,6 +18,9 @@ import {
   NavLink,
   Row,
   Progress,
+  Modal,
+  ModalHeader,
+  ModalBody,
 } from "reactstrap";
 import { useDispatch } from "react-redux";
 import { profileSuccess } from "../../slices/auth/profile/reducer";
@@ -128,6 +131,31 @@ const ProfileEdit = () => {
     confirmPassword: false,
   });
 
+  // States for interactive profile photo actions
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isWebcamModalOpen, setIsWebcamModalOpen] = useState(false);
+  const [webcamStream, setWebcamStream] = useState(null);
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [isSavingWebcam, setIsSavingWebcam] = useState(false);
+
+  // Close photo menu when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      const dropdown = document.querySelector(".profile-photo-dropdown");
+      const triggerBtn = document.getElementById("profile-camera-trigger");
+      if (dropdown && !dropdown.contains(event.target) && triggerBtn && !triggerBtn.contains(event.target)) {
+        setShowPhotoMenu(false);
+      }
+    };
+    if (showPhotoMenu) {
+      document.addEventListener("click", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [showPhotoMenu]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -230,6 +258,103 @@ const ProfileEdit = () => {
       setAvatarNotice({ color: "danger", message: error?.message || "Gagal menghapus foto profil." });
     } finally {
       setIsSavingAvatar(false);
+    }
+  };
+
+  const handleViewPhoto = () => {
+    setShowPhotoMenu(false);
+    if (profile.avatar) {
+      setIsLightboxOpen(true);
+    } else {
+      setAvatarNotice({ color: "warning", message: "Anda belum memiliki foto profil untuk dilihat." });
+    }
+  };
+
+  const handleOpenCamera = async () => {
+    setShowPhotoMenu(false);
+    setIsWebcamModalOpen(true);
+    setCapturedImage(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480, facingMode: "user" }
+      });
+      setWebcamStream(stream);
+      // Wait a tick for the video tag to be rendered in the DOM
+      setTimeout(() => {
+        const videoElement = document.getElementById("sadar-webcam-element");
+        if (videoElement) {
+          videoElement.srcObject = stream;
+        }
+      }, 300);
+    } catch (err) {
+      console.error("Gagal mengakses kamera:", err);
+      setAvatarNotice({ color: "danger", message: "Gagal mengakses kamera. Silakan periksa izin kamera perangkat Anda." });
+      setIsWebcamModalOpen(false);
+    }
+  };
+
+  const handleCapturePhoto = () => {
+    const videoElement = document.getElementById("sadar-webcam-element");
+    if (!videoElement) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = videoElement.videoWidth || 640;
+    canvas.height = videoElement.videoHeight || 480;
+    const ctx = canvas.getContext("2d");
+    
+    // Mirror horizontally so it feels natural like a camera mirror
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    setCapturedImage(dataUrl);
+  };
+
+  const handleRetakePhoto = () => {
+    setCapturedImage(null);
+    // Restart the video feed just in case, or make sure it plays
+    setTimeout(() => {
+      const videoElement = document.getElementById("sadar-webcam-element");
+      if (videoElement && webcamStream) {
+        videoElement.srcObject = webcamStream;
+      }
+    }, 100);
+  };
+
+  const handleCloseWebcam = () => {
+    if (webcamStream) {
+      webcamStream.getTracks().forEach((track) => track.stop());
+      setWebcamStream(null);
+    }
+    setIsWebcamModalOpen(false);
+    setCapturedImage(null);
+  };
+
+  const handleSaveWebcamPhoto = async () => {
+    if (!capturedImage) return;
+    setIsSavingWebcam(true);
+    setAvatarNotice(null);
+
+    try {
+      const response = await fetch(capturedImage);
+      const blob = await response.blob();
+      const file = new File([blob], `avatar-${Date.now()}.jpg`, { type: "image/jpeg" });
+      
+      const formData = new FormData();
+      formData.append("avatar", file);
+      
+      const updatedUser = await authApi.updateAvatar(formData);
+      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
+      setAvatarNotice({ color: "success", message: "Foto profil berhasil diperbarui dari kamera." });
+      setAvatarFile(null);
+      
+      updateSessionUser(updatedUser);
+      dispatch(profileSuccess({ data: updatedUser, status: "success" }));
+      handleCloseWebcam();
+    } catch (error) {
+      setAvatarNotice({ color: "danger", message: error?.message || "Gagal menyimpan foto dari kamera." });
+    } finally {
+      setIsSavingWebcam(false);
     }
   };
 
@@ -393,13 +518,67 @@ const ProfileEdit = () => {
                       )}
                     </div>
                     <Input id="edit-profile-photo" type="file" accept="image/png,image/jpeg,image/webp" className="d-none" onChange={handleAvatarChange} />
-                    <Label 
-                      htmlFor="edit-profile-photo" 
-                      className="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow mb-0" 
+                    <button
+                      id="profile-camera-trigger"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowPhotoMenu(!showPhotoMenu);
+                      }}
+                      className="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow mb-0 border-0" 
                       style={{ width: "34px", height: "34px", cursor: "pointer", border: "3px solid #fff" }}
+                      aria-label="Ubah foto profil"
                     >
                       <i className="ri-camera-line fs-14"></i>
-                    </Label>
+                    </button>
+
+                    {showPhotoMenu && (
+                      <div className="profile-photo-dropdown shadow-lg">
+                        <button 
+                          type="button" 
+                          className="profile-photo-dropdown-item"
+                          onClick={handleViewPhoto}
+                        >
+                          <i className="ri-eye-line"></i>
+                          <span>Lihat foto</span>
+                        </button>
+                        <button 
+                          type="button" 
+                          className="profile-photo-dropdown-item"
+                          onClick={handleOpenCamera}
+                        >
+                          <i className="ri-camera-line"></i>
+                          <span>Ambil foto</span>
+                        </button>
+                        <button 
+                          type="button" 
+                          className="profile-photo-dropdown-item"
+                          onClick={() => {
+                            document.getElementById("edit-profile-photo").click();
+                            setShowPhotoMenu(false);
+                          }}
+                        >
+                          <i className="ri-folder-open-line"></i>
+                          <span>Unggah foto</span>
+                        </button>
+                        {profile.avatar && (
+                          <>
+                            <div className="profile-photo-dropdown-divider"></div>
+                            <button 
+                              type="button" 
+                              className="profile-photo-dropdown-item text-danger"
+                              onClick={() => {
+                                handleDeleteAvatar();
+                                setShowPhotoMenu(false);
+                              }}
+                            >
+                              <i className="ri-delete-bin-line"></i>
+                              <span>Hapus foto</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <h4 className="fw-bold mb-1 text-dark">{profile.name}</h4>
@@ -415,19 +594,6 @@ const ProfileEdit = () => {
                     <div className="mt-3 px-3">
                       <Button color="success" size="sm" className="w-100" onClick={handleSaveAvatar} disabled={isSavingAvatar}>
                         {isSavingAvatar ? "Menyimpan..." : "Terapkan Foto Baru"}
-                      </Button>
-                    </div>
-                  )}
-
-                  {profile.avatar && (
-                    <div className="mt-2 text-center">
-                      <Button 
-                        color="link" 
-                        className="text-danger p-0 fs-13 text-decoration-none" 
-                        onClick={handleDeleteAvatar} 
-                        disabled={isSavingAvatar}
-                      >
-                        <i className="ri-delete-bin-line align-middle me-1"></i> Hapus Foto
                       </Button>
                     </div>
                   )}
@@ -686,6 +852,90 @@ const ProfileEdit = () => {
           </Col>
         </Row>
       </Container>
+
+      {/* Lightbox Modal */}
+      <Modal 
+        isOpen={isLightboxOpen} 
+        toggle={() => setIsLightboxOpen(false)} 
+        centered 
+        className="sadar-photo-lightbox-modal"
+      >
+        <ModalBody className="sadar-photo-lightbox-body">
+          <button 
+            type="button" 
+            className="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow" 
+            onClick={() => setIsLightboxOpen(false)}
+            aria-label="Tutup"
+            style={{ zIndex: 1060 }}
+          ></button>
+          <img 
+            src={profile.avatar} 
+            alt="Foto profil ukuran penuh" 
+            className="sadar-photo-lightbox-img" 
+          />
+        </ModalBody>
+      </Modal>
+
+      {/* Webcam Capture Modal */}
+      <Modal 
+        isOpen={isWebcamModalOpen} 
+        toggle={handleCloseWebcam} 
+        centered
+        backdrop="static"
+        keyboard={false}
+      >
+        <ModalHeader toggle={handleCloseWebcam} className="border-bottom border-light">
+          <span className="fw-semibold fs-16"><i className="ri-camera-line me-2 text-primary"></i>Ambil Foto Profil</span>
+        </ModalHeader>
+        <ModalBody className="p-4">
+          {!capturedImage ? (
+            <div>
+              <div className="sadar-webcam-preview-wrapper mb-3 shadow-inner">
+                <video 
+                  id="sadar-webcam-element" 
+                  autoPlay 
+                  playsInline 
+                  className="sadar-webcam-video"
+                  style={{ transform: "scaleX(-1)" }} // Mirror effect
+                ></video>
+              </div>
+              <div className="d-flex justify-content-center">
+                <Button color="primary" onClick={handleCapturePhoto} className="px-4 py-2 d-flex align-items-center gap-2 rounded-pill">
+                  <i className="ri-camera-lens-line fs-18"></i>
+                  <span>Tangkap Foto</span>
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="sadar-webcam-preview-wrapper mb-3 shadow">
+                <img 
+                  src={capturedImage} 
+                  alt="Hasil tangkapan kamera" 
+                  className="sadar-webcam-captured" 
+                />
+              </div>
+              <div className="d-flex justify-content-center gap-3">
+                <Button color="light" onClick={handleRetakePhoto} className="px-3 rounded-pill" disabled={isSavingWebcam}>
+                  <i className="ri-refresh-line me-1"></i> Ulangi
+                </Button>
+                <Button color="success" onClick={handleSaveWebcamPhoto} className="px-4 rounded-pill" disabled={isSavingWebcam}>
+                  {isSavingWebcam ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-checkbox-circle-line me-1"></i> Gunakan Foto
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </ModalBody>
+      </Modal>
     </div>
   );
 };
