@@ -97,6 +97,14 @@ class UserRepository {
     );
     return result.rows[0] || null;
   }
+
+  async delete(id) {
+    const result = await query(
+      `DELETE FROM users WHERE users_id = $1 RETURNING users_id`,
+      [id]
+    );
+    return result.rows[0] || null;
+  }
 }
 
 module.exports = new UserRepository();

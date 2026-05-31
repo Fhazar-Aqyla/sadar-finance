@@ -189,6 +189,7 @@ export const authApi = {
   updateAvatar: (formData) => apiClient.post("/auth/profile-picture", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }).then(unwrapData),
+  deleteAccount: (password) => apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
 };
 
 export const accountApi = {

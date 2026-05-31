@@ -182,6 +182,29 @@ class AuthService {
     return this._sanitizeUser(user);
   }
 
+  async deleteAccount(userId, password) {
+    if (!password) {
+      throw new BadRequestError('Password is required to delete your account');
+    }
+
+    const user = await userRepository.findByIdWithPassword(userId);
+    if (!user) {
+      throw new UnauthorizedError('User not found');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      throw new UnauthorizedError('Password yang Anda masukkan salah. Gagal menghapus akun.');
+    }
+
+    const deleted = await userRepository.delete(userId);
+    if (!deleted) {
+      throw new BadRequestError('Failed to delete account');
+    }
+
+    return { success: true };
+  }
+
   /**
    * Generate a JWT token.
    */

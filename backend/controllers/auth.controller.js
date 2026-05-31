@@ -158,6 +158,14 @@ const uploadProfilePicture = asyncHandler(async (req, res) => {
   });
 });
 
+const deleteAccount = asyncHandler(async (req, res) => {
+  const result = await authService.deleteAccount(req.user.id, req.body.password);
+  return success(res, {
+    data: result,
+    message: 'Account deleted successfully',
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -166,4 +174,5 @@ module.exports = {
   updateProfile,
   changePassword,
   uploadProfilePicture,
+  deleteAccount,
 };

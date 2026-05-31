@@ -113,6 +113,11 @@ const ProfileEdit = () => {
   });
 
   const [activeTab, setActiveTab] = useState("details");
+  const [confirmDeletePassword, setConfirmDeletePassword] = useState("");
+  const [understandDeleteConsequences, setUnderstandDeleteConsequences] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [deleteNotice, setDeleteNotice] = useState(null);
+  const [showConfirmDeletePassword, setShowConfirmDeletePassword] = useState(false);
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
@@ -457,6 +462,35 @@ const ProfileEdit = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!understandDeleteConsequences) {
+      setDeleteNotice({ color: "warning", message: "Anda harus mencentang kotak persetujuan konsekuensi terlebih dahulu." });
+      return;
+    }
+
+    if (!confirmDeletePassword) {
+      setDeleteNotice({ color: "warning", message: "Masukkan password Anda untuk mengonfirmasi penghapusan akun." });
+      return;
+    }
+
+    setIsDeletingAccount(true);
+    setDeleteNotice(null);
+
+    try {
+      await authApi.deleteAccount(confirmDeletePassword);
+      setDeleteNotice({ color: "success", message: "Akun Anda berhasil dihapus selamanya. Mengalihkan..." });
+      
+      sessionStorage.removeItem("authUser");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
+    } catch (error) {
+      setDeleteNotice({ color: "danger", message: error?.message || "Gagal menghapus akun. Pastikan password yang dimasukkan benar." });
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
   const renderPasswordField = ({ id, label, field, placeholder }) => (
     <div className="mb-3">
       <Label htmlFor={id} className="form-label">{label}</Label>
@@ -675,6 +709,15 @@ const ProfileEdit = () => {
                       <i className="ri-lock-password-line align-middle me-1"></i> Keamanan Akun
                     </NavLink>
                   </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={`fs-14 py-3 fw-semibold ${activeTab === "delete" ? "active text-danger" : "text-muted"}`}
+                      onClick={() => setActiveTab("delete")}
+                      style={{ cursor: "pointer", border: "none" }}
+                    >
+                      <i className="ri-delete-bin-line align-middle me-1"></i> Hapus Akun
+                    </NavLink>
+                  </NavItem>
                 </Nav>
               </CardHeader>
               <CardBody className="p-4">
@@ -843,6 +886,145 @@ const ProfileEdit = () => {
                       <Button tag={Link} to="/profile-account" color="light">Batal</Button>
                       <Button color="primary" onClick={handleSaveSecurity} disabled={isSavingSecurity}>
                         {isSavingSecurity ? "Memproses..." : "Simpan Password Baru"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "delete" && (
+                  <div>
+                    {deleteNotice && (
+                      <Alert color={deleteNotice.color} className="sadar-notice py-2 mb-4">
+                        {deleteNotice.message}
+                      </Alert>
+                    )}
+
+                    {/* Warning Card dengan Desain Premium */}
+                    <div className="p-4 bg-danger-subtle bg-opacity-25 border border-danger-subtle border-start border-4 border-start-danger rounded mb-4 shadow-sm">
+                      <div className="d-flex gap-3 align-items-start">
+                        <div className="avatar-sm flex-shrink-0">
+                          <span className="avatar-title bg-danger text-white rounded-circle fs-20 shadow-sm" style={{ width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <i className="ri-error-warning-line"></i>
+                          </span>
+                        </div>
+                        <div>
+                          <h5 className="text-danger fw-bold mb-2 fs-15">Tindakan Bahaya: Hapus Akun Permanen</h5>
+                          <p className="text-muted fs-13 mb-0" style={{ lineHeight: "1.6" }}>
+                            Setelah Anda menghapus akun, seluruh data keuangan Anda (rekening, anggaran, catatan transaksi, pemasukan, dan analisis perilaku finansial) akan <strong>dihapus secara permanen dari server SADAR Finance</strong>. Tindakan ini bersifat final dan tidak dapat dibatalkan dengan cara apa pun.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interactive Choice Container (Clickable Box Card) */}
+                    <div 
+                      className={`p-3 rounded border mb-4 d-flex align-items-center gap-3 transition-all cursor-pointer ${
+                        understandDeleteConsequences 
+                          ? "bg-danger-subtle bg-opacity-15 border-danger shadow-sm" 
+                          : "bg-light border-light"
+                      }`}
+                      onClick={() => setUnderstandDeleteConsequences(!understandDeleteConsequences)}
+                      style={{ transition: "all 0.25s ease", borderStyle: understandDeleteConsequences ? "solid" : "dashed" }}
+                    >
+                      <div className="form-check custom-checkbox mb-0 d-flex align-items-center">
+                        <Input
+                          type="checkbox"
+                          className="form-check-input border-danger cursor-pointer"
+                          id="confirm-delete-checkbox"
+                          checked={understandDeleteConsequences}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            setUnderstandDeleteConsequences(e.target.checked);
+                          }}
+                          style={{ width: "20px", height: "20px", marginTop: 0 }}
+                        />
+                      </div>
+                      <Label 
+                        className="form-check-label text-dark fw-semibold fs-13 mb-0 cursor-pointer flex-grow-1 select-none" 
+                        htmlFor="confirm-delete-checkbox"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Saya memahami seluruh konsekuensi di atas dan ingin menghapus akun saya beserta seluruh datanya selamanya.
+                      </Label>
+                    </div>
+
+                    {/* Password Verifikasi dengan Icon Lock */}
+                    <div className="mb-4" style={{ opacity: understandDeleteConsequences ? 1 : 0.5, transition: "opacity 0.25s ease" }}>
+                      <Label htmlFor="delete-account-password" className="form-label text-dark fw-bold mb-2 fs-13">
+                        Konfirmasi Kata Sandi Anda
+                      </Label>
+                      <InputGroup className={`shadow-sm border-0 ${!understandDeleteConsequences ? "opacity-75" : ""}`}>
+                        <InputGroupText className="bg-light border-light-subtle text-muted px-3">
+                          <i className="ri-lock-2-line fs-15"></i>
+                        </InputGroupText>
+                        <Input
+                          id="delete-account-password"
+                          type={showConfirmDeletePassword ? "text" : "password"}
+                          value={confirmDeletePassword}
+                          onChange={(e) => setConfirmDeletePassword(e.target.value)}
+                          placeholder={
+                            understandDeleteConsequences 
+                              ? "Masukkan kata sandi akun Anda untuk memvalidasi identitas" 
+                              : "Centang kotak persetujuan di atas terlebih dahulu"
+                          }
+                          disabled={!understandDeleteConsequences}
+                          className="form-control-lg fs-14 py-2-5 border-start-0"
+                          style={{
+                            backgroundColor: understandDeleteConsequences ? "#fff" : "#f8f9fa",
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0
+                          }}
+                        />
+                        <InputGroupText
+                          tag="button"
+                          type="button"
+                          className="sadar-password-toggle btn btn-light border-light-subtle px-3"
+                          onClick={() => setShowConfirmDeletePassword(!showConfirmDeletePassword)}
+                          disabled={!understandDeleteConsequences}
+                          aria-label={showConfirmDeletePassword ? "Sembunyikan password" : "Tampilkan password"}
+                        >
+                          <i className={showConfirmDeletePassword ? "ri-eye-off-line text-muted" : "ri-eye-line text-muted"}></i>
+                        </InputGroupText>
+                      </InputGroup>
+                      {understandDeleteConsequences && (
+                        <small className="text-muted d-block mt-2 fs-11">
+                          <i className="ri-information-line align-middle me-1 text-primary"></i>
+                          Demi keamanan akun Anda, tindakan pembersihan data ini memerlukan verifikasi sandi yang valid.
+                        </small>
+                      )}
+                    </div>
+
+                    {/* Tombol Aksi dengan Desain Premium */}
+                    <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-light">
+                      <Button 
+                        tag={Link} 
+                        to="/profile-account" 
+                        color="light"
+                        className="px-4 py-2 fw-semibold rounded shadow-sm border"
+                      >
+                        Batal
+                      </Button>
+                      <Button 
+                        color="danger" 
+                        onClick={handleDeleteAccount} 
+                        disabled={isDeletingAccount || !understandDeleteConsequences || !confirmDeletePassword}
+                        className="px-4 py-2 fw-semibold rounded shadow-sm d-flex align-items-center gap-2"
+                        style={{
+                          opacity: (understandDeleteConsequences && confirmDeletePassword) ? 1 : 0.6,
+                          transition: "all 0.2s ease"
+                        }}
+                      >
+                        {isDeletingAccount ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span>Menghapus Akun...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i className="ri-delete-bin-3-line fs-15"></i>
+                            <span>Hapus Akun Saya</span>
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>

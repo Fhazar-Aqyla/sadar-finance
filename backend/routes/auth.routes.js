@@ -25,5 +25,6 @@ router.put('/me', authenticate, validate(updateProfileSchema), authController.up
 router.put('/password', authenticate, validate(changePasswordSchema), authController.changePassword);
 router.post('/change-password', authenticate, validate(changePasswordSchema), authController.changePassword);
 router.post('/profile-picture', authenticate, upload.any(), authController.uploadProfilePicture);
+router.delete('/me', authenticate, authController.deleteAccount);
 
 module.exports = router;
