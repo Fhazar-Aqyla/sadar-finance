@@ -90,6 +90,7 @@ const Register = () => {
 
     useEffect(() => {
         document.title = "Daftar | SADAR Finance";
+        document.documentElement.setAttribute("data-bs-theme", "light");
     }, []);
 
     return (

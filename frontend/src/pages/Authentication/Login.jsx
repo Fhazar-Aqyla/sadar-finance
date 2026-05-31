@@ -67,6 +67,7 @@ const Login = () => {
 
     useEffect(() => {
         document.title = "Masuk | SADAR Finance";
+        document.documentElement.setAttribute("data-bs-theme", "light");
     }, []);
 
     return (

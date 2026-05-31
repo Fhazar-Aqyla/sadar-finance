@@ -53,7 +53,10 @@ const ForgetPasswordPage = props => {
   } = useSelector(selectLayoutProperties);
 
 
-document.title="Reset Password | SADAR Finance";
+  React.useEffect(() => {
+    document.title = "Reset Password | SADAR Finance";
+    document.documentElement.setAttribute("data-bs-theme", "light");
+  }, []);
 
   return (
     <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
