@@ -10,6 +10,11 @@
   --sadar-danger: #ef4444;
 }
 
+.sadar-loading-screen {
+  min-height: 100vh !important;
+}
+
+
 .sadar-page .container-fluid {
   max-width: 1480px;
 }
@@ -530,9 +535,9 @@
 }
 
 .sadar-table-pagination .page-item.active .page-link {
-  border-color: var(--sadar-primary);
-  color: #ffffff;
-  background: var(--sadar-primary);
+  border-color: #25a0e2 !important;
+  color: #ffffff !important;
+  background: #25a0e2 !important;
 }
 
 .sadar-table-pagination .page-item.disabled .page-link {
@@ -1543,8 +1548,9 @@ html[data-bs-theme="dark"] .sadar-password-toggle:hover {
 }
 
 html[data-bs-theme="dark"] .sadar-table-pagination .page-item.active .page-link {
-  border-color: #3b82f6 !important;
-  background: #2563eb !important;
+  border-color: #38bdf8 !important;
+  color: #0f172a !important;
+  background: #38bdf8 !important;
 }
 
 html[data-bs-theme="dark"] .sadar-table-pagination .page-item.disabled .page-link {
@@ -2183,5 +2189,94 @@ html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
   .sadar-summary-card h2 {
     margin-top: 0.75rem;
   }
+}
+
+/* Global Reusable Mode Toggle & Segment Control Button Group */
+.sadar-mode-toggle {
+  gap: 0;
+  padding: 0.2rem;
+  border: 1px solid #e5edf6;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.sadar-mode-toggle .btn {
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px !important;
+  color: #475569;
+  background: transparent;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.sadar-mode-toggle .btn:hover {
+  color: #25a0e2;
+  background: #eef5ff;
+}
+
+.sadar-mode-toggle .btn.active {
+  color: #25a0e2;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+html[data-bs-theme="dark"] .sadar-mode-toggle {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: #18212c;
+}
+
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn {
+  color: #cbd5e1;
+}
+
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn:hover {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn.active {
+  color: #7dd3fc;
+  background: #243041;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22);
+}
+
+.sadar-table-filter-btn {
+  height: 30px;
+  min-height: 30px;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid #dbe3ee !important;
+  border-radius: 6px !important;
+  color: #475569 !important;
+  background-color: #ffffff !important;
+  font-weight: 650;
+  font-size: 0.78rem;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+}
+
+.sadar-table-filter-btn:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+.sadar-table-filter-btn strong {
+  color: #0f172a;
+  font-weight: 750;
+}
+
+html[data-bs-theme="dark"] .sadar-table-filter-btn {
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #cbd5e1 !important;
+  background-color: #1f2a37 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-table-filter-btn:hover {
+  background-color: #2d3748 !important;
+  border-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+html[data-bs-theme="dark"] .sadar-table-filter-btn strong {
+  color: #f8fafc;
 }
 

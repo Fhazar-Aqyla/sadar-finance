@@ -26,7 +26,11 @@ import {
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { profileSuccess } from "../../slices/auth/profile/reducer";
-import { accountApi, analyticsApi, authApi } from "../../Components/services/api";
+import {
+  accountApi,
+  analyticsApi,
+  authApi,
+} from "../../Components/services/api";
 
 import "../SadarShared/sadar-pages.css";
 
@@ -51,7 +55,8 @@ const rupiah = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const sumBy = (rows, getValue) => rows.reduce((total, row) => total + getValue(row), 0);
+const sumBy = (rows, getValue) =>
+  rows.reduce((total, row) => total + getValue(row), 0);
 
 const onlyDigits = (value) => String(value || "").replace(/\D/g, "");
 
@@ -87,8 +92,14 @@ const getStoredUserProfile = () => {
     const user = authUser?.user || authUser?.data?.user || {};
     const firstName = user.first_name || user.firstName || "";
     const lastName = user.last_name || user.lastName || "";
-    const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
-    const name = `${firstName} ${cleanLastName}`.trim() || user.name || user.username || user.email || defaultProfile.name;
+    const cleanLastName =
+      lastName === "User" || lastName === "user" ? "" : lastName;
+    const name =
+      `${firstName} ${cleanLastName}`.trim() ||
+      user.name ||
+      user.username ||
+      user.email ||
+      defaultProfile.name;
 
     return {
       id: user.users_id || user.id || defaultProfile.id,
@@ -104,10 +115,14 @@ const getStoredUserProfile = () => {
 const normalizeProfile = (user) => {
   const firstName = user?.first_name || user?.firstName || "";
   const lastName = user?.last_name || user?.lastName || "";
-  const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
+  const cleanLastName =
+    lastName === "User" || lastName === "user" ? "" : lastName;
   return {
     id: user?.users_id || user?.id || defaultProfile.id,
-    name: `${firstName} ${cleanLastName}`.trim() || user?.email || defaultProfile.name,
+    name:
+      `${firstName} ${cleanLastName}`.trim() ||
+      user?.email ||
+      defaultProfile.name,
     email: user?.email || defaultProfile.email,
     avatar: user?.profile_picture || user?.profilePicture || "",
   };
@@ -183,9 +198,24 @@ const EmptyProfileAccount = () => {
     { value: "E-wallet", label: "Dompet digital" },
   ];
   const budgetTargets = [
-    { category: "Needs", label: "Kebutuhan", helper: "Kebutuhan utama", percent: 50 },
-    { category: "Wants", label: "Keinginan", helper: "Keinginan dan hiburan", percent: 30 },
-    { category: "Savings", label: "Tabungan", helper: "Tabungan dan dana darurat", percent: 20 },
+    {
+      category: "Needs",
+      label: "Kebutuhan",
+      helper: "Kebutuhan utama",
+      percent: 50,
+    },
+    {
+      category: "Wants",
+      label: "Keinginan",
+      helper: "Keinginan dan hiburan",
+      percent: 30,
+    },
+    {
+      category: "Savings",
+      label: "Tabungan",
+      helper: "Tabungan dan dana darurat",
+      percent: 20,
+    },
   ];
   const [accounts, setAccounts] = useState([]);
   const [accountNotice, setAccountNotice] = useState("");
@@ -220,17 +250,20 @@ const EmptyProfileAccount = () => {
     setAccounts((items) =>
       items.map((account) =>
         account.id === id
-          ? { ...account, [field]: field === "balance" ? Number(value || 0) : value }
+          ? {
+              ...account,
+              [field]: field === "balance" ? Number(value || 0) : value,
+            }
           : account,
       ),
     );
   };
 
-
-
   const deleteAccount = (id) => {
     if (accounts.length <= 1) {
-      setAccountNotice("Minimal satu akun diperlukan untuk mencatat pemasukan dan transaksi.");
+      setAccountNotice(
+        "Minimal satu akun diperlukan untuk mencatat pemasukan dan transaksi.",
+      );
       return;
     }
 
@@ -241,7 +274,9 @@ const EmptyProfileAccount = () => {
   const confirmDeleteAccount = () => {
     if (!pendingDeleteAccount) return;
 
-    setAccounts((items) => items.filter((account) => account.id !== pendingDeleteAccount.id));
+    setAccounts((items) =>
+      items.filter((account) => account.id !== pendingDeleteAccount.id),
+    );
     setAccountNotice("");
     setPendingDeleteAccount(null);
   };
@@ -251,17 +286,23 @@ const EmptyProfileAccount = () => {
     setBudgetNotice("");
     setBudgetRows((items) =>
       items.map((budget) =>
-        budget.category === category ? { ...budget, limit: Number(value || 0) } : budget,
+        budget.category === category
+          ? { ...budget, limit: Number(value || 0) }
+          : budget,
       ),
     );
   };
 
   const saveBudget = () => {
-    const hasEmptyBudget = budgetRows.some((budget) => Number(budget.limit) <= 0);
+    const hasEmptyBudget = budgetRows.some(
+      (budget) => Number(budget.limit) <= 0,
+    );
 
     if (hasEmptyBudget) {
       setIsBudgetSaved(false);
-      setBudgetNotice("Isi nominal anggaran untuk kebutuhan, keinginan, dan tabungan terlebih dahulu.");
+      setBudgetNotice(
+        "Isi nominal anggaran untuk kebutuhan, keinginan, dan tabungan terlebih dahulu.",
+      );
       return;
     }
 
@@ -278,13 +319,19 @@ const EmptyProfileAccount = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Data Profil</h4>
-                  <p className="text-muted mb-0">Ringkasan identitas akun SADAR kamu</p>
+                  <p className="text-muted mb-0">
+                    Ringkasan identitas akun SADAR kamu
+                  </p>
                 </div>
               </CardHeader>
               <CardBody className="sadar-profile-body">
                 <div className="sadar-profile-photo-row">
                   <div className="sadar-profile-avatar">
-                    {profile.avatar ? <img src={profile.avatar} alt="Foto profil" /> : profile.name.slice(0, 1).toUpperCase()}
+                    {profile.avatar ? (
+                      <img src={profile.avatar} alt="Foto profil" />
+                    ) : (
+                      profile.name.slice(0, 1).toUpperCase()
+                    )}
                   </div>
                   <div className="sadar-profile-photo-copy">
                     <h5>{profile.name}</h5>
@@ -298,7 +345,9 @@ const EmptyProfileAccount = () => {
                   </div>
                   <div className="sadar-profile-summary-item">
                     <span>Total Saldo</span>
-                    <strong>{rupiah(sumBy(accounts, (account) => account.balance))}</strong>
+                    <strong>
+                      {rupiah(sumBy(accounts, (account) => account.balance))}
+                    </strong>
                   </div>
                 </div>
               </CardBody>
@@ -309,7 +358,9 @@ const EmptyProfileAccount = () => {
               <CardHeader className="d-flex align-items-center justify-content-between">
                 <div>
                   <h4 className="card-title mb-1">Kelola Akun</h4>
-                  <p className="text-muted mb-0">Tunai, bank, dan dompet digital yang kamu pakai</p>
+                  <p className="text-muted mb-0">
+                    Tunai, bank, dan dompet digital yang kamu pakai
+                  </p>
                 </div>
                 {accounts.length > 0 && (
                   <Button color="primary" size="sm" onClick={addAccount}>
@@ -319,31 +370,76 @@ const EmptyProfileAccount = () => {
                 )}
               </CardHeader>
               <CardBody className="sadar-account-body">
-                {accountNotice && <div className="alert alert-warning py-2 mb-3">{accountNotice}</div>}
+                {accountNotice && (
+                  <div className="alert alert-warning py-2 mb-3">
+                    {accountNotice}
+                  </div>
+                )}
                 {accounts.length === 0 ? (
                   <div className="sadar-empty-state sadar-empty-state-center">
-                    <span className="sadar-empty-state-icon"><Wallet className="h-5 w-5" /></span>
+                    <span className="sadar-empty-state-icon">
+                      <Wallet className="h-5 w-5" />
+                    </span>
                     <h4>Belum ada akun yang ditambahkan.</h4>
-                    <p>Tambahkan sumber uang pertama agar pemasukan dan transaksi bisa tercatat dengan benar.</p>
-                    <Button color="primary" onClick={addAccount}>Tambah Akun</Button>
+                    <p>
+                      Tambahkan sumber uang pertama agar pemasukan dan transaksi
+                      bisa tercatat dengan benar.
+                    </p>
+                    <Button color="primary" onClick={addAccount}>
+                      Tambah Akun
+                    </Button>
                   </div>
                 ) : (
                   <div className="sadar-insight-list sadar-account-list">
                     {accounts.map((account) => (
-                      <div className="sadar-insight-item sadar-account-item" key={account.id}>
+                      <div
+                        className="sadar-insight-item sadar-account-item"
+                        key={account.id}
+                      >
                         <span className="sadar-card-icon">
-                          <i className={account.type === "Bank" ? "ri-bank-line" : account.type === "E-wallet" ? "ri-wallet-3-line" : "ri-cash-line"}></i>
+                          <i
+                            className={
+                              account.type === "Bank"
+                                ? "ri-bank-line"
+                                : account.type === "E-wallet"
+                                  ? "ri-wallet-3-line"
+                                  : "ri-cash-line"
+                            }
+                          ></i>
                         </span>
                         <div className="sadar-account-fields">
                           <div className="sadar-form-grid sadar-account-form-grid">
                             <div>
                               <Label>Nama Akun</Label>
-                              <Input value={account.name} onChange={(event) => updateAccount(account.id, "name", event.target.value)} />
+                              <Input
+                                value={account.name}
+                                onChange={(event) =>
+                                  updateAccount(
+                                    account.id,
+                                    "name",
+                                    event.target.value,
+                                  )
+                                }
+                              />
                             </div>
                             <div>
                               <Label>Tipe</Label>
-                              <Input type="select" value={account.type} onChange={(event) => updateAccount(account.id, "type", event.target.value)}>
-                                {accountTypes.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+                              <Input
+                                type="select"
+                                value={account.type}
+                                onChange={(event) =>
+                                  updateAccount(
+                                    account.id,
+                                    "type",
+                                    event.target.value,
+                                  )
+                                }
+                              >
+                                {accountTypes.map((type) => (
+                                  <option key={type.value} value={type.value}>
+                                    {type.label}
+                                  </option>
+                                ))}
                               </Input>
                             </div>
                             <div>
@@ -353,12 +449,22 @@ const EmptyProfileAccount = () => {
                                 inputMode="numeric"
                                 pattern="[0-9.]*"
                                 value={formatNumberInput(account.balance)}
-                                onChange={(event) => updateAccount(account.id, "balance", onlyDigits(event.target.value))}
+                                onChange={(event) =>
+                                  updateAccount(
+                                    account.id,
+                                    "balance",
+                                    onlyDigits(event.target.value),
+                                  )
+                                }
                                 placeholder="Contoh: 500.000"
                               />
                             </div>
                             <div className="d-flex align-items-end justify-content-end gap-2">
-                              <Button color="light" className="text-danger" onClick={() => deleteAccount(account.id)}>
+                              <Button
+                                color="light"
+                                className="text-danger"
+                                onClick={() => deleteAccount(account.id)}
+                              >
                                 <i className="ri-delete-bin-line align-bottom me-1"></i>
                                 Hapus
                               </Button>
@@ -379,35 +485,62 @@ const EmptyProfileAccount = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Atur Anggaran</h4>
-                  <p className="text-muted mb-0">Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan ini.</p>
+                  <p className="text-muted mb-0">
+                    Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan
+                    ini.
+                  </p>
                 </div>
               </CardHeader>
               <CardBody>
                 {!isBudgetOpen ? (
                   <div className="sadar-empty-state sadar-empty-state-center">
-                    <span className="sadar-empty-state-icon"><PieChart className="h-5 w-5" /></span>
+                    <span className="sadar-empty-state-icon">
+                      <PieChart className="h-5 w-5" />
+                    </span>
                     <h4>Anggaran belum diatur.</h4>
-                    <p>Prinsip 50/30/20 membantu membagi pemasukan menjadi 50% kebutuhan, 30% keinginan, dan 20% tabungan.</p>
-                    <Button color="primary" onClick={() => setIsBudgetOpen(true)}>Atur Anggaran 50/30/20</Button>
+                    <p>
+                      Prinsip 50/30/20 membantu membagi pemasukan menjadi 50%
+                      kebutuhan, 30% keinginan, dan 20% tabungan.
+                    </p>
+                    <Button
+                      color="primary"
+                      onClick={() => setIsBudgetOpen(true)}
+                    >
+                      Atur Anggaran 50/30/20
+                    </Button>
                   </div>
                 ) : (
                   <>
                     <div className="sadar-budget-helper mb-3">
                       <strong>Atur alokasi awal</strong>
-                      <span>Gunakan prinsip 50/30/20 sebagai patokan, lalu isi nominal anggaran sesuai rencana bulan ini.</span>
+                      <span>
+                        Gunakan prinsip 50/30/20 sebagai patokan, lalu isi
+                        nominal anggaran sesuai rencana bulan ini.
+                      </span>
                     </div>
-                    {budgetNotice && <div className="alert alert-warning py-2 mb-3">{budgetNotice}</div>}
+                    {budgetNotice && (
+                      <div className="alert alert-warning py-2 mb-3">
+                        {budgetNotice}
+                      </div>
+                    )}
                     <div className="sadar-budget-grid">
                       {budgetRows.map((budget) => {
-                        const target = budgetTargets.find((item) => item.category === budget.category);
+                        const target = budgetTargets.find(
+                          (item) => item.category === budget.category,
+                        );
                         return (
-                          <div className="sadar-insight-item d-block" key={budget.id}>
+                          <div
+                            className="sadar-insight-item d-block"
+                            key={budget.id}
+                          >
                             <div className="d-flex align-items-start justify-content-between gap-3 mb-3">
                               <div>
                                 <strong>{target?.label}</strong>
                                 <p>{target?.helper}</p>
                               </div>
-                              <span className="sadar-score-status">{target?.percent}%</span>
+                              <span className="sadar-score-status">
+                                {target?.percent}%
+                              </span>
                             </div>
                             <Label>Batas Anggaran</Label>
                             <Input
@@ -415,17 +548,30 @@ const EmptyProfileAccount = () => {
                               inputMode="numeric"
                               pattern="[0-9.]*"
                               value={formatNumberInput(budget.limit)}
-                              onChange={(event) => updateBudget(budget.category, onlyDigits(event.target.value))}
+                              onChange={(event) =>
+                                updateBudget(
+                                  budget.category,
+                                  onlyDigits(event.target.value),
+                                )
+                              }
                               placeholder="Contoh: 2.500.000"
                             />
-                            <p className="text-muted mt-2 mb-0">Isi nominal anggaran sesuai rencana bulananmu.</p>
+                            <p className="text-muted mt-2 mb-0">
+                              Isi nominal anggaran sesuai rencana bulananmu.
+                            </p>
                           </div>
                         );
                       })}
                     </div>
                     <div className="d-flex flex-wrap align-items-center gap-3 mt-4">
-                      <Button color="primary" onClick={saveBudget}>Simpan Anggaran</Button>
-                      {isBudgetSaved && <span className="text-success fw-semibold">Anggaran berhasil disimpan.</span>}
+                      <Button color="primary" onClick={saveBudget}>
+                        Simpan Anggaran
+                      </Button>
+                      {isBudgetSaved && (
+                        <span className="text-success fw-semibold">
+                          Anggaran berhasil disimpan.
+                        </span>
+                      )}
                     </div>
                   </>
                 )}
@@ -447,8 +593,9 @@ const EmptyProfileAccount = () => {
           </div>
           <h4>Hapus akun ini?</h4>
           <p>
-            Akun <strong>{pendingDeleteAccount?.name || "ini"}</strong> akan dihapus dari daftar pengaturan awal kamu.
-            Tindakan ini tidak bisa dibatalkan.
+            Akun <strong>{pendingDeleteAccount?.name || "ini"}</strong> akan
+            dihapus dari daftar pengaturan awal kamu. Tindakan ini tidak bisa
+            dibatalkan.
           </p>
         </ModalBody>
         <ModalFooter>
@@ -465,9 +612,24 @@ const EmptyProfileAccount = () => {
 };
 
 const budgetTargets = [
-  { category: "Needs", label: "Kebutuhan", helper: "Kebutuhan utama", percent: 50 },
-  { category: "Wants", label: "Keinginan", helper: "Keinginan dan hiburan", percent: 30 },
-  { category: "Savings", label: "Tabungan", helper: "Tabungan dan dana darurat", percent: 20 },
+  {
+    category: "Needs",
+    label: "Kebutuhan",
+    helper: "Kebutuhan utama",
+    percent: 50,
+  },
+  {
+    category: "Wants",
+    label: "Keinginan",
+    helper: "Keinginan dan hiburan",
+    percent: 30,
+  },
+  {
+    category: "Savings",
+    label: "Tabungan",
+    helper: "Tabungan dan dana darurat",
+    percent: 20,
+  },
 ];
 
 const accountTypes = [
@@ -478,9 +640,13 @@ const accountTypes = [
 
 const SadarLoadingScreen = () => {
   return (
-    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
       <div className="text-center">
-        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "2.5rem", height: "2.5rem" }}
+        >
           <span className="visually-hidden">Memuat...</span>
         </div>
         <p className="mt-3 text-muted fw-semibold">Memuat profil dan akun...</p>
@@ -512,19 +678,26 @@ const ProfileAccountWithData = () => {
 
   const dispatch = useDispatch();
   const [profile, setProfile] = useState(getStoredUserProfile);
-  const totalBalance = useMemo(() => sumBy(accounts, (account) => account.balance), [accounts]);
-  const totalIncome = useMemo(() => sumBy(budgetRows, (budget) => budget.limit), [budgetRows]);
+  const totalBalance = useMemo(
+    () => sumBy(accounts, (account) => account.balance),
+    [accounts],
+  );
+  const totalIncome = useMemo(
+    () => sumBy(budgetRows, (budget) => budget.limit),
+    [budgetRows],
+  );
 
   useEffect(() => {
     let isMounted = true;
 
     const loadProfileAccount = async () => {
       try {
-        const [profileResponse, accountRows, budgetResponse] = await Promise.all([
-          authApi.me(),
-          accountApi.list(),
-          analyticsApi.latestBudget().catch(() => null),
-        ]);
+        const [profileResponse, accountRows, budgetResponse] =
+          await Promise.all([
+            authApi.me(),
+            accountApi.list(),
+            analyticsApi.latestBudget().catch(() => null),
+          ]);
 
         if (isMounted) {
           const normalizedAccounts = (accountRows || []).map(normalizeAccount);
@@ -532,17 +705,23 @@ const ProfileAccountWithData = () => {
 
           setProfile(normalizeProfile(profileResponse));
           updateSessionUser(profileResponse);
-          dispatch(profileSuccess({ data: profileResponse, status: "success" }));
+          dispatch(
+            profileSuccess({ data: profileResponse, status: "success" }),
+          );
           setAccounts(normalizedAccounts);
-          setBudgetRows(apiBudgetRows.length ? apiBudgetRows : budgetTargets.map((item) => {
-            return {
-              id: `budget_${item.category}`,
-              category: item.category,
-              label: item.label,
-              limit: 0,
-              used: 0,
-            };
-          }));
+          setBudgetRows(
+            apiBudgetRows.length
+              ? apiBudgetRows
+              : budgetTargets.map((item) => {
+                  return {
+                    id: `budget_${item.category}`,
+                    category: item.category,
+                    label: item.label,
+                    limit: 0,
+                    used: 0,
+                  };
+                }),
+          );
         }
       } catch {
         if (isMounted) {
@@ -569,7 +748,10 @@ const ProfileAccountWithData = () => {
     setAccounts((items) =>
       items.map((account) =>
         account.id === id
-          ? { ...account, [field]: field === "balance" ? Number(value || 0) : value }
+          ? {
+              ...account,
+              [field]: field === "balance" ? Number(value || 0) : value,
+            }
           : account,
       ),
     );
@@ -706,8 +888,8 @@ const ProfileAccountWithData = () => {
                 balance,
                 accountNumber: editAccountForm.accountNumber.trim(),
               }
-            : acc
-        )
+            : acc,
+        ),
       );
       setIsEditAccountOpen(false);
       setEditingAccount(null);
@@ -731,7 +913,9 @@ const ProfileAccountWithData = () => {
 
   const deleteAccount = (id) => {
     if (accounts.length <= 1) {
-      setAccountNotice("Minimal satu akun diperlukan untuk mencatat pemasukan dan transaksi.");
+      setAccountNotice(
+        "Minimal satu akun diperlukan untuk mencatat pemasukan dan transaksi.",
+      );
       return;
     }
 
@@ -745,7 +929,9 @@ const ProfileAccountWithData = () => {
 
     try {
       await accountApi.remove(pendingDeleteAccount.id);
-      setAccounts((items) => items.filter((account) => account.id !== pendingDeleteAccount.id));
+      setAccounts((items) =>
+        items.filter((account) => account.id !== pendingDeleteAccount.id),
+      );
       setAccountNotice("");
       setPendingDeleteAccount(null);
       setDeleteConfirmText("");
@@ -761,7 +947,9 @@ const ProfileAccountWithData = () => {
     setIsBudgetSaved(false);
     setBudgetRows((items) =>
       items.map((budget) =>
-        budget.category === category ? { ...budget, limit: Number(value || 0) } : budget,
+        budget.category === category
+          ? { ...budget, limit: Number(value || 0) }
+          : budget,
       ),
     );
   };
@@ -771,25 +959,42 @@ const ProfileAccountWithData = () => {
     setIsBudgetSaved(false);
     setBudgetRows((items) =>
       items.map((budget) => {
-        const target = budgetTargets.find((item) => item.category === budget.category);
-        return { ...budget, limit: target ? Math.round((totalIncome * target.percent) / 100) : budget.limit };
+        const target = budgetTargets.find(
+          (item) => item.category === budget.category,
+        );
+        return {
+          ...budget,
+          limit: target
+            ? Math.round((totalIncome * target.percent) / 100)
+            : budget.limit,
+        };
       }),
     );
   };
 
   const saveBudget = async () => {
-    const hasEmptyBudget = budgetRows.some((budget) => Number(budget.limit) <= 0);
+    const hasEmptyBudget = budgetRows.some(
+      (budget) => Number(budget.limit) <= 0,
+    );
 
     if (hasEmptyBudget) {
       setIsBudgetSaved(false);
-      setBudgetNotice("Isi nominal anggaran untuk kebutuhan, keinginan, dan tabungan terlebih dahulu.");
+      setBudgetNotice(
+        "Isi nominal anggaran untuk kebutuhan, keinginan, dan tabungan terlebih dahulu.",
+      );
       return;
     }
 
     try {
-      const needsAmount = Number(budgetRows.find((budget) => budget.category === "Needs")?.limit || 0);
-      const wantsAmount = Number(budgetRows.find((budget) => budget.category === "Wants")?.limit || 0);
-      const savingsAmount = Number(budgetRows.find((budget) => budget.category === "Savings")?.limit || 0);
+      const needsAmount = Number(
+        budgetRows.find((budget) => budget.category === "Needs")?.limit || 0,
+      );
+      const wantsAmount = Number(
+        budgetRows.find((budget) => budget.category === "Wants")?.limit || 0,
+      );
+      const savingsAmount = Number(
+        budgetRows.find((budget) => budget.category === "Savings")?.limit || 0,
+      );
 
       await analyticsApi.createBudget({
         needsAmount,
@@ -819,16 +1024,29 @@ const ProfileAccountWithData = () => {
               <CardHeader className="d-flex align-items-center justify-content-between">
                 <div>
                   <h4 className="card-title mb-1">Data Profil</h4>
-                  <p className="text-muted mb-0">Ringkasan identitas akun SADAR kamu</p>
+                  <p className="text-muted mb-0">
+                    Ringkasan identitas akun SADAR kamu
+                  </p>
                 </div>
-                <Button tag={Link} to="/profile-account/edit" color="light" size="sm" className="sadar-table-action" aria-label="Edit profil">
+                <Button
+                  tag={Link}
+                  to="/profile-account/edit"
+                  color="light"
+                  size="sm"
+                  className="sadar-table-action"
+                  aria-label="Edit profil"
+                >
                   <i className="ri-pencil-line align-bottom"></i>
                 </Button>
               </CardHeader>
               <CardBody className="sadar-profile-body">
                 <div className="sadar-profile-photo-row">
                   <div className="sadar-profile-avatar">
-                    {profile.avatar ? <img src={profile.avatar} alt="Foto profil" /> : profile.name.slice(0, 1).toUpperCase()}
+                    {profile.avatar ? (
+                      <img src={profile.avatar} alt="Foto profil" />
+                    ) : (
+                      profile.name.slice(0, 1).toUpperCase()
+                    )}
                   </div>
                   <div className="sadar-profile-photo-copy">
                     <h5>{profile.name}</h5>
@@ -855,41 +1073,99 @@ const ProfileAccountWithData = () => {
               <CardHeader className="d-flex align-items-center justify-content-between">
                 <div>
                   <h4 className="card-title mb-1">Kelola Akun</h4>
-                  <p className="text-muted mb-0">Tunai, bank, dan dompet digital yang kamu pakai</p>
+                  <p className="text-muted mb-0">
+                    Tunai, bank, dan dompet digital yang kamu pakai
+                  </p>
                 </div>
-                <Button color="primary" size="sm" className="sadar-add-account-btn" onClick={openAddAccountModal}>
+                <Button
+                  color="primary"
+                  size="sm"
+                  className="sadar-add-account-btn"
+                  onClick={openAddAccountModal}
+                >
                   <i className="ri-add-line align-bottom me-1"></i>
                   Tambah Akun
                 </Button>
               </CardHeader>
               <CardBody className="sadar-account-body">
-                {accountNotice && <div className="alert alert-warning py-2 mb-3">{accountNotice}</div>}
+                {accountNotice && (
+                  <div className="alert alert-warning py-2 mb-3">
+                    {accountNotice}
+                  </div>
+                )}
                 <div className="sadar-insight-list sadar-account-list">
                   {accounts.map((account) => (
-                    <div className="sadar-insight-item sadar-account-item" key={account.id}>
+                    <div
+                      className="sadar-insight-item sadar-account-item"
+                      key={account.id}
+                    >
                       <span className="sadar-card-icon">
-                        <i className={account.type === "Bank" ? "ri-bank-line" : account.type === "E-wallet" ? "ri-wallet-3-line" : "ri-cash-line"}></i>
+                        <i
+                          className={
+                            account.type === "Bank"
+                              ? "ri-bank-line"
+                              : account.type === "E-wallet"
+                                ? "ri-wallet-3-line"
+                                : "ri-cash-line"
+                          }
+                        ></i>
                       </span>
                       <div className="sadar-account-fields">
                         <div className="sadar-form-grid sadar-account-form-grid">
                           <div>
                             <Label>Nama Akun</Label>
-                            <Input value={account.name} onChange={(event) => updateAccount(account.id, "name", event.target.value)} onBlur={() => persistAccount(account)} />
+                            <Input
+                              value={account.name}
+                              onChange={(event) =>
+                                updateAccount(
+                                  account.id,
+                                  "name",
+                                  event.target.value,
+                                )
+                              }
+                              onBlur={() => persistAccount(account)}
+                            />
                           </div>
                           <div>
                             <Label>Tipe</Label>
-                            <Input type="select" value={account.type} onChange={(event) => updateAccount(account.id, "type", event.target.value)} onBlur={() => persistAccount(account)}>
-                              {accountTypes.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+                            <Input
+                              type="select"
+                              value={account.type}
+                              onChange={(event) =>
+                                updateAccount(
+                                  account.id,
+                                  "type",
+                                  event.target.value,
+                                )
+                              }
+                              onBlur={() => persistAccount(account)}
+                            >
+                              {accountTypes.map((type) => (
+                                <option key={type.value} value={type.value}>
+                                  {type.label}
+                                </option>
+                              ))}
                             </Input>
                           </div>
                           <div>
                             <Label>Saldo Berjalan</Label>
-                            <Input type="text" inputMode="numeric" value={formatNumberInput(account.balance)} readOnly />
+                            <Input
+                              type="text"
+                              inputMode="numeric"
+                              value={formatNumberInput(account.balance)}
+                              readOnly
+                            />
                           </div>
                           <div className="d-flex align-items-end justify-content-end">
                             <Dropdown
                               isOpen={openActionAccountId === account.id}
-                              toggle={() => setOpenActionAccountId(openActionAccountId === account.id ? "" : account.id)}
+                              toggle={() =>
+                                setOpenActionAccountId(
+                                  openActionAccountId === account.id
+                                    ? ""
+                                    : account.id,
+                                )
+                              }
                             >
                               <DropdownToggle
                                 className="sadar-row-action-toggle btn-sm"
@@ -898,12 +1174,20 @@ const ProfileAccountWithData = () => {
                               >
                                 <i className="ri-more-fill align-bottom"></i>
                               </DropdownToggle>
-                              <DropdownMenu end className="sadar-row-action-menu">
-                                <DropdownItem onClick={() => openEditAccountModal(account)}>
+                              <DropdownMenu
+                                end
+                                className="sadar-row-action-menu"
+                              >
+                                <DropdownItem
+                                  onClick={() => openEditAccountModal(account)}
+                                >
                                   <i className="ri-pencil-line align-bottom me-2"></i>
                                   Ubah
                                 </DropdownItem>
-                                <DropdownItem className="text-danger" onClick={() => deleteAccount(account.id)}>
+                                <DropdownItem
+                                  className="text-danger"
+                                  onClick={() => deleteAccount(account.id)}
+                                >
                                   <i className="ri-delete-bin-line align-bottom me-2"></i>
                                   Hapus
                                 </DropdownItem>
@@ -926,24 +1210,42 @@ const ProfileAccountWithData = () => {
               <CardHeader className="d-flex align-items-center justify-content-between">
                 <div>
                   <h4 className="card-title mb-1">Atur Anggaran</h4>
-                  <p className="text-muted mb-0">Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan ini.</p>
+                  <p className="text-muted mb-0">
+                    Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan
+                    ini.
+                  </p>
                 </div>
-                <Button color="light" onClick={applyBudgetTarget}>Terapkan 50/30/20</Button>
+                <Button color="light" onClick={applyBudgetTarget}>
+                  Terapkan 50/30/20
+                </Button>
               </CardHeader>
               <CardBody>
-                {budgetNotice && <div className="alert alert-warning py-2 mb-3">{budgetNotice}</div>}
+                {budgetNotice && (
+                  <div className="alert alert-warning py-2 mb-3">
+                    {budgetNotice}
+                  </div>
+                )}
                 <div className="sadar-budget-grid">
                   {budgetRows.map((budget) => {
-                    const target = budgetTargets.find((item) => item.category === budget.category);
-                    const usage = budget.limit ? (budget.used / budget.limit) * 100 : 0;
+                    const target = budgetTargets.find(
+                      (item) => item.category === budget.category,
+                    );
+                    const usage = budget.limit
+                      ? (budget.used / budget.limit) * 100
+                      : 0;
                     return (
-                      <div className="sadar-insight-item d-block" key={budget.id}>
+                      <div
+                        className="sadar-insight-item d-block"
+                        key={budget.id}
+                      >
                         <div className="d-flex align-items-start justify-content-between gap-3 mb-3">
                           <div>
                             <strong>{target?.label || budget.label}</strong>
                             <p>{target?.helper}</p>
                           </div>
-                          <span className="sadar-score-status">{target?.percent}%</span>
+                          <span className="sadar-score-status">
+                            {target?.percent}%
+                          </span>
                         </div>
                         <Label>Batas Anggaran</Label>
                         <Input
@@ -951,27 +1253,43 @@ const ProfileAccountWithData = () => {
                           inputMode="numeric"
                           pattern="[0-9.]*"
                           value={formatNumberInput(budget.limit)}
-                          onChange={(event) => updateBudget(budget.category, onlyDigits(event.target.value))}
+                          onChange={(event) =>
+                            updateBudget(
+                              budget.category,
+                              onlyDigits(event.target.value),
+                            )
+                          }
                         />
                         <div className="d-flex justify-content-between mt-3">
                           <span className="text-muted">Terpakai</span>
                           <strong>{rupiah(budget.used)}</strong>
                         </div>
-                        <Progress value={Math.min(usage, 100)} color={getBudgetProgressColor(usage)} className="sadar-progress mt-2" />
-                        <p className="text-muted mt-2 mb-0">{usage.toFixed(1)}% dari {rupiah(budget.limit)}</p>
+                        <Progress
+                          value={Math.min(usage, 100)}
+                          color={getBudgetProgressColor(usage)}
+                          className="sadar-progress mt-2"
+                        />
+                        <p className="text-muted mt-2 mb-0">
+                          {usage.toFixed(1)}% dari {rupiah(budget.limit)}
+                        </p>
                       </div>
                     );
                   })}
                 </div>
                 <div className="d-flex flex-wrap align-items-center gap-3 mt-4">
-                  <Button color="primary" onClick={saveBudget}>Simpan Anggaran</Button>
-                  {isBudgetSaved && <span className="text-success fw-semibold">Anggaran berhasil disimpan.</span>}
+                  <Button color="primary" onClick={saveBudget}>
+                    Simpan Anggaran
+                  </Button>
+                  {isBudgetSaved && (
+                    <span className="text-success fw-semibold">
+                      Anggaran berhasil disimpan.
+                    </span>
+                  )}
                 </div>
               </CardBody>
             </Card>
           </Col>
         </Row>
-
       </Container>
 
       <Modal
@@ -980,9 +1298,7 @@ const ProfileAccountWithData = () => {
         centered
         className="sadar-history-modal sadar-account-modal"
       >
-        <ModalHeader toggle={closeAddAccountModal}>
-          Tambah Akun
-        </ModalHeader>
+        <ModalHeader toggle={closeAddAccountModal}>Tambah Akun</ModalHeader>
         <Form onSubmit={submitNewAccount} noValidate>
           <ModalBody>
             <div className="sadar-history-edit-grid">
@@ -991,7 +1307,12 @@ const ProfileAccountWithData = () => {
                 <Input
                   id="new-account-name"
                   value={newAccountForm.name}
-                  onChange={(event) => setNewAccountForm((current) => ({ ...current, name: event.target.value }))}
+                  onChange={(event) =>
+                    setNewAccountForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
                   placeholder="Contoh: BCA Utama"
                   autoFocus
                   required
@@ -1003,10 +1324,17 @@ const ProfileAccountWithData = () => {
                   id="new-account-type"
                   type="select"
                   value={newAccountForm.type}
-                  onChange={(event) => setNewAccountForm((current) => ({ ...current, type: event.target.value }))}
+                  onChange={(event) =>
+                    setNewAccountForm((current) => ({
+                      ...current,
+                      type: event.target.value,
+                    }))
+                  }
                 >
                   {accountTypes.map((type) => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
                   ))}
                 </Input>
               </div>
@@ -1015,7 +1343,12 @@ const ProfileAccountWithData = () => {
                 <Input
                   id="new-account-number"
                   value={newAccountForm.accountNumber}
-                  onChange={(event) => setNewAccountForm((current) => ({ ...current, accountNumber: event.target.value }))}
+                  onChange={(event) =>
+                    setNewAccountForm((current) => ({
+                      ...current,
+                      accountNumber: event.target.value,
+                    }))
+                  }
                   placeholder="Opsional"
                 />
               </div>
@@ -1027,7 +1360,12 @@ const ProfileAccountWithData = () => {
                   inputMode="numeric"
                   pattern="[0-9.]*"
                   value={formatNumberInput(newAccountForm.balance)}
-                  onChange={(event) => setNewAccountForm((current) => ({ ...current, balance: onlyDigits(event.target.value) }))}
+                  onChange={(event) =>
+                    setNewAccountForm((current) => ({
+                      ...current,
+                      balance: onlyDigits(event.target.value),
+                    }))
+                  }
                   placeholder="Contoh: 500.000"
                 />
               </div>
@@ -1037,7 +1375,12 @@ const ProfileAccountWithData = () => {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button type="button" color="light" onClick={closeAddAccountModal} disabled={isSavingAccount}>
+            <Button
+              type="button"
+              color="light"
+              onClick={closeAddAccountModal}
+              disabled={isSavingAccount}
+            >
               Batal
             </Button>
             <Button type="submit" color="primary" disabled={isSavingAccount}>
@@ -1053,9 +1396,7 @@ const ProfileAccountWithData = () => {
         centered
         className="sadar-history-modal sadar-account-modal"
       >
-        <ModalHeader toggle={closeEditAccountModal}>
-          Edit Akun
-        </ModalHeader>
+        <ModalHeader toggle={closeEditAccountModal}>Edit Akun</ModalHeader>
         <Form onSubmit={submitEditAccount} noValidate>
           <ModalBody>
             <div className="sadar-history-edit-grid">
@@ -1064,7 +1405,12 @@ const ProfileAccountWithData = () => {
                 <Input
                   id="edit-account-name"
                   value={editAccountForm.name}
-                  onChange={(event) => setEditAccountForm((current) => ({ ...current, name: event.target.value }))}
+                  onChange={(event) =>
+                    setEditAccountForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
                   placeholder="Contoh: BCA Utama"
                   autoFocus
                   required
@@ -1076,10 +1422,17 @@ const ProfileAccountWithData = () => {
                   id="edit-account-type"
                   type="select"
                   value={editAccountForm.type}
-                  onChange={(event) => setEditAccountForm((current) => ({ ...current, type: event.target.value }))}
+                  onChange={(event) =>
+                    setEditAccountForm((current) => ({
+                      ...current,
+                      type: event.target.value,
+                    }))
+                  }
                 >
                   {accountTypes.map((type) => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
                   ))}
                 </Input>
               </div>
@@ -1088,7 +1441,12 @@ const ProfileAccountWithData = () => {
                 <Input
                   id="edit-account-number"
                   value={editAccountForm.accountNumber}
-                  onChange={(event) => setEditAccountForm((current) => ({ ...current, accountNumber: event.target.value }))}
+                  onChange={(event) =>
+                    setEditAccountForm((current) => ({
+                      ...current,
+                      accountNumber: event.target.value,
+                    }))
+                  }
                   placeholder="Opsional"
                 />
               </div>
@@ -1100,7 +1458,12 @@ const ProfileAccountWithData = () => {
                   inputMode="numeric"
                   pattern="[0-9.]*"
                   value={formatNumberInput(editAccountForm.balance)}
-                  onChange={(event) => setEditAccountForm((current) => ({ ...current, balance: onlyDigits(event.target.value) }))}
+                  onChange={(event) =>
+                    setEditAccountForm((current) => ({
+                      ...current,
+                      balance: onlyDigits(event.target.value),
+                    }))
+                  }
                   placeholder="Contoh: 500.000"
                 />
               </div>
@@ -1110,7 +1473,12 @@ const ProfileAccountWithData = () => {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button type="button" color="light" onClick={closeEditAccountModal} disabled={isSavingAccount}>
+            <Button
+              type="button"
+              color="light"
+              onClick={closeEditAccountModal}
+              disabled={isSavingAccount}
+            >
               Batal
             </Button>
             <Button type="submit" color="primary" disabled={isSavingAccount}>
@@ -1135,12 +1503,16 @@ const ProfileAccountWithData = () => {
           </div>
           <h4>Hapus akun ini?</h4>
           <p>
-            Akun <strong>{pendingDeleteAccount?.name || "ini"}</strong> akan dihapus dari daftar akun kamu.
-            Tindakan ini tidak bisa dibatalkan.
+            Akun <strong>{pendingDeleteAccount?.name || "ini"}</strong> akan
+            dihapus dari daftar akun kamu. Tindakan ini tidak bisa dibatalkan.
           </p>
           <div className="mt-3 text-start">
-            <Label htmlFor="delete-confirm-input" className="form-label text-muted fs-13">
-              Ketik nama akun <strong>{pendingDeleteAccount?.name}</strong> di bawah untuk konfirmasi:
+            <Label
+              htmlFor="delete-confirm-input"
+              className="form-label text-muted fs-13"
+            >
+              Ketik nama akun <strong>{pendingDeleteAccount?.name}</strong> di
+              bawah untuk konfirmasi:
             </Label>
             <Input
               id="delete-confirm-input"
@@ -1153,10 +1525,13 @@ const ProfileAccountWithData = () => {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="light" onClick={() => {
-            setPendingDeleteAccount(null);
-            setDeleteConfirmText("");
-          }}>
+          <Button
+            color="light"
+            onClick={() => {
+              setPendingDeleteAccount(null);
+              setDeleteConfirmText("");
+            }}
+          >
             Batal
           </Button>
           <Button

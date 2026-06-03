@@ -968,12 +968,12 @@ const createCategoryOptions = (labels, colors, setActiveCategory) => ({
 
 const SadarLoadingScreen = () => {
   return (
-    <div className="page-content sadar-dashboard d-flex align-items-center justify-content-center" style={{ minHeight: "80vh" }}>
+    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
       <div className="text-center">
-        <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
+        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
           <span className="visually-hidden">Memuat...</span>
         </div>
-        <p className="mt-3 text-muted fw-semibold fs-15">Menyiapkan dashboard keuangan Anda...</p>
+        <p className="mt-3 text-muted fw-semibold">Menyiapkan dashboard keuangan Anda...</p>
       </div>
     </div>
   );

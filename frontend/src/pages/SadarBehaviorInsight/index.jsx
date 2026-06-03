@@ -198,7 +198,7 @@ const toCategoryPrimary = (category) => {
 
 const SadarLoadingScreen = () => {
   return (
-    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
       <div className="text-center">
         <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
           <span className="visually-hidden">Memuat...</span>

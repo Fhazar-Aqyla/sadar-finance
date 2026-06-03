@@ -148,6 +148,13 @@ const TransactionInput = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [notice, setNotice] = useState(null);
 
+  // States for manual receipt upload
+  const [manualReceiptFile, setManualReceiptFile] = useState(null);
+  const [manualPreviewUrl, setManualPreviewUrl] = useState("");
+  const [manualScanId, setManualScanId] = useState(null);
+  const [isUploadingManual, setIsUploadingManual] = useState(false);
+  const [manualUploadNotice, setManualUploadNotice] = useState(null);
+
   useEffect(() => {
     document.title = "Catat Keuangan | SADAR Finance";
   }, []);
@@ -157,8 +164,11 @@ const TransactionInput = () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+      if (manualPreviewUrl) {
+        URL.revokeObjectURL(manualPreviewUrl);
+      }
     };
-  }, [previewUrl]);
+  }, [previewUrl, manualPreviewUrl]);
 
   const parsedItems = useMemo(() => {
     const parsed = normalizeParsedData(scanResult);
@@ -233,6 +243,55 @@ const TransactionInput = () => {
       URL.revokeObjectURL(previewUrl);
     }
     setPreviewUrl(file ? URL.createObjectURL(file) : "");
+  };
+
+  const handleManualFileChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setManualReceiptFile(file);
+    setManualScanId(null);
+    setManualUploadNotice(null);
+
+    if (manualPreviewUrl) {
+      URL.revokeObjectURL(manualPreviewUrl);
+    }
+    setManualPreviewUrl(URL.createObjectURL(file));
+
+    // Upload receipt to backend in background
+    setIsUploadingManual(true);
+    try {
+      const body = new FormData();
+      body.append("image", file);
+
+      const uploadedScan = await ocrApi.upload(body);
+      const scanId = getScanId(uploadedScan);
+
+      if (!scanId) {
+        throw new Error("Gagal mengunggah berkas.");
+      }
+
+      await pollScanResult(scanId);
+      setManualScanId(scanId);
+      setManualUploadNotice({ color: "success", message: "Struk siap dilampirkan." });
+    } catch (error) {
+      setManualUploadNotice({
+        color: "danger",
+        message: getErrorMessage(error, "Gagal mengunggah struk."),
+      });
+    } finally {
+      setIsUploadingManual(false);
+    }
+  };
+
+  const handleClearManualFile = () => {
+    setManualReceiptFile(null);
+    setManualScanId(null);
+    setManualUploadNotice(null);
+    if (manualPreviewUrl) {
+      URL.revokeObjectURL(manualPreviewUrl);
+      setManualPreviewUrl("");
+    }
   };
 
   const applyScanToForm = (scan) => {
@@ -334,7 +393,7 @@ const TransactionInput = () => {
         amount: Number(form.amount),
       };
 
-      const scanId = mode === "ocr" ? getScanId(scanResult) : "";
+      const scanId = mode === "ocr" ? getScanId(scanResult) : manualScanId;
       if (scanId) {
         await ocrApi.confirmTransaction(scanId, payload);
       } else {
@@ -351,6 +410,15 @@ const TransactionInput = () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
         setPreviewUrl("");
+      }
+
+      // Reset manual states
+      setManualReceiptFile(null);
+      setManualScanId(null);
+      setManualUploadNotice(null);
+      if (manualPreviewUrl) {
+        URL.revokeObjectURL(manualPreviewUrl);
+        setManualPreviewUrl("");
       }
     } catch (error) {
       setNotice({ color: "danger", message: getErrorMessage(error, "Pengeluaran gagal disimpan.") });
@@ -516,12 +584,73 @@ const TransactionInput = () => {
                   )}
 
                   {entryType === "transaction" && mode === "manual" && (
-                    <div className="sadar-manual-state">
-                      <span className="sadar-dropzone-icon">
-                        <i className="ri-keyboard-line" />
-                      </span>
-                      <strong>Input manual aktif</strong>
-                      <p>Isi detail transaksi langsung pada formulir di sebelah kanan.</p>
+                    <div className="sadar-ocr-state">
+                      <Label htmlFor="manual-receipt-image" className="form-label">Gambar Struk (Opsional)</Label>
+                      <Input
+                        id="manual-receipt-image"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/heic"
+                        onChange={handleManualFileChange}
+                        className="d-none"
+                      />
+
+                      <Label htmlFor="manual-receipt-image" className={`sadar-receipt-dropzone ${manualPreviewUrl ? "has-preview" : ""}`}>
+                        {manualPreviewUrl ? (
+                          <img
+                            src={manualPreviewUrl}
+                            alt="Pratinjau struk manual"
+                            className="sadar-receipt-preview"
+                          />
+                        ) : (
+                          <div className="sadar-dropzone-empty">
+                            <span className="sadar-dropzone-icon">
+                              <i className="ri-upload-cloud-2-line" />
+                            </span>
+                            <strong>Unggah gambar struk</strong>
+                            <span>PNG, JPG, WEBP, atau HEIC (Opsional)</span>
+                          </div>
+                        )}
+                      </Label>
+
+                      <div className="sadar-file-meta">
+                        <div className="d-flex justify-content-between align-items-center w-100">
+                          <span className="text-truncate" style={{ maxWidth: "80%" }}>
+                            {manualReceiptFile?.name || "Belum ada file dipilih"}
+                          </span>
+                          {manualReceiptFile && (
+                            <Button
+                              color="link"
+                              className="text-danger p-0 ms-2"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleClearManualFile();
+                              }}
+                              style={{ fontSize: "12px", textDecoration: "none" }}
+                            >
+                              Hapus
+                            </Button>
+                          )}
+                        </div>
+                        <small className="d-block mt-1">
+                          {isUploadingManual ? (
+                            <span className="text-primary">
+                              <Spinner size="sm" className="me-1" style={{ width: "12px", height: "12px" }} />
+                              Mengunggah & memproses berkas...
+                            </span>
+                          ) : manualUploadNotice ? (
+                            <span className={manualUploadNotice.color === "success" ? "text-success" : "text-danger"}>
+                              {manualUploadNotice.color === "success" ? (
+                                <i className="ri-checkbox-circle-line me-1" />
+                              ) : (
+                                <i className="ri-error-warning-line me-1" />
+                              )}
+                              {manualUploadNotice.message}
+                            </span>
+                          ) : (
+                            "Struk akan dilampirkan langsung ke transaksi manual"
+                          )}
+                        </small>
+                      </div>
                     </div>
                   )}
 
@@ -679,12 +808,27 @@ const TransactionInput = () => {
                       <Button
                         type="button"
                         className="sadar-reset-button"
-                        onClick={() => setForm({ ...initialForm, accountId: form.accountId, source: mode === "ocr" ? "ocr" : "manual" })}
+                        onClick={() => {
+                          setForm({ ...initialForm, accountId: form.accountId, source: mode === "ocr" ? "ocr" : "manual" });
+                          setScanResult(null);
+                          setReceiptFile(null);
+                          if (previewUrl) {
+                            URL.revokeObjectURL(previewUrl);
+                            setPreviewUrl("");
+                          }
+                          setManualReceiptFile(null);
+                          setManualScanId(null);
+                          setManualUploadNotice(null);
+                          if (manualPreviewUrl) {
+                            URL.revokeObjectURL(manualPreviewUrl);
+                            setManualPreviewUrl("");
+                          }
+                        }}
                       >
                         <i className="ri-refresh-line align-bottom me-1" />
                         Atur Ulang
                       </Button>
-                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length}>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length || isUploadingManual}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
                         Simpan Pengeluaran
                       </Button>

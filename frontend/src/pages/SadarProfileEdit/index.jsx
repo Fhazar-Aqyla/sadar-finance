@@ -72,17 +72,21 @@ const resolveAvatarUrl = (url) => {
 const normalizeProfile = (user) => {
   const firstName = user?.first_name || user?.firstName || "";
   const lastName = user?.last_name || user?.lastName || "";
-  const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
+  const cleanLastName =
+    lastName === "User" || lastName === "user" ? "" : lastName;
   const rawAvatar = user?.profile_picture || user?.profilePicture || "";
-  
+
   return {
     firstName: firstName,
     lastName: cleanLastName,
-    name: `${firstName} ${cleanLastName}`.trim() || user?.email || "Pengguna SADAR",
+    name:
+      `${firstName} ${cleanLastName}`.trim() || user?.email || "Pengguna SADAR",
     email: user?.email || "",
     avatar: resolveAvatarUrl(rawAvatar),
     phoneNumber: user?.phone_number || user?.phoneNumber || "",
-    dateOfBirth: user?.date_of_birth ? String(user.date_of_birth || "").slice(0, 10) : "",
+    dateOfBirth: user?.date_of_birth
+      ? String(user.date_of_birth || "").slice(0, 10)
+      : "",
     address: user?.address || "",
     occupation: user?.occupation || "",
     gender: user?.gender || "",
@@ -113,11 +117,6 @@ const ProfileEdit = () => {
   });
 
   const [activeTab, setActiveTab] = useState("details");
-  const [confirmDeletePassword, setConfirmDeletePassword] = useState("");
-  const [understandDeleteConsequences, setUnderstandDeleteConsequences] = useState(false);
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [deleteNotice, setDeleteNotice] = useState(null);
-  const [showConfirmDeletePassword, setShowConfirmDeletePassword] = useState(false);
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
@@ -149,7 +148,12 @@ const ProfileEdit = () => {
     const handleOutsideClick = (event) => {
       const dropdown = document.querySelector(".profile-photo-dropdown");
       const triggerBtn = document.getElementById("profile-camera-trigger");
-      if (dropdown && !dropdown.contains(event.target) && triggerBtn && !triggerBtn.contains(event.target)) {
+      if (
+        dropdown &&
+        !dropdown.contains(event.target) &&
+        triggerBtn &&
+        !triggerBtn.contains(event.target)
+      ) {
         setShowPhotoMenu(false);
       }
     };
@@ -176,7 +180,11 @@ const ProfileEdit = () => {
         dispatch(profileSuccess({ data: user, status: "success" }));
       } catch {
         if (isMounted) {
-          setIdentityNotice({ color: "warning", message: "Profil server belum bisa dimuat. Data lokal ditampilkan sementara." });
+          setIdentityNotice({
+            color: "warning",
+            message:
+              "Profil server belum bisa dimuat. Data lokal ditampilkan sementara.",
+          });
         }
       }
     };
@@ -198,15 +206,22 @@ const ProfileEdit = () => {
     if (!file) return;
     setAvatarFile(file);
     setAvatarNotice(null);
-    setProfile((current) => ({ ...current, avatar: URL.createObjectURL(file) }));
+    setProfile((current) => ({
+      ...current,
+      avatar: URL.createObjectURL(file),
+    }));
   };
 
   const togglePasswordVisibility = (field) => {
-    setVisiblePasswords((current) => ({ ...current, [field]: !current[field] }));
+    setVisiblePasswords((current) => ({
+      ...current,
+      [field]: !current[field],
+    }));
   };
 
   const passwordHasMinimumLength = profile.newPassword.length >= 8;
-  const passwordHasLetterAndNumber = /[A-Za-z]/.test(profile.newPassword) && /\d/.test(profile.newPassword);
+  const passwordHasLetterAndNumber =
+    /[A-Za-z]/.test(profile.newPassword) && /\d/.test(profile.newPassword);
 
   const calculateCompleteness = () => {
     let score = 0;
@@ -222,7 +237,10 @@ const ProfileEdit = () => {
 
   const handleSaveAvatar = async () => {
     if (!avatarFile) {
-      setAvatarNotice({ color: "warning", message: "Pilih file foto profil terlebih dahulu." });
+      setAvatarNotice({
+        color: "warning",
+        message: "Pilih file foto profil terlebih dahulu.",
+      });
       return;
     }
     setIsSavingAvatar(true);
@@ -232,15 +250,24 @@ const ProfileEdit = () => {
       const formData = new FormData();
       formData.append("avatar", avatarFile);
       const updatedUser = await authApi.updateAvatar(formData);
-      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
-      setAvatarNotice({ color: "success", message: "Foto profil berhasil diperbarui." });
+      setProfile((current) => ({
+        ...current,
+        ...normalizeProfile(updatedUser),
+      }));
+      setAvatarNotice({
+        color: "success",
+        message: "Foto profil berhasil diperbarui.",
+      });
       setAvatarFile(null);
-      
+
       // Update sessionStorage and Redux state to sync header avatar instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
-      setAvatarNotice({ color: "danger", message: error?.message || "Foto profil gagal disimpan." });
+      setAvatarNotice({
+        color: "danger",
+        message: error?.message || "Foto profil gagal disimpan.",
+      });
     } finally {
       setIsSavingAvatar(false);
     }
@@ -252,15 +279,24 @@ const ProfileEdit = () => {
 
     try {
       const updatedUser = await authApi.updateMe({ profilePicture: null });
-      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
-      setAvatarNotice({ color: "success", message: "Foto profil berhasil dihapus." });
+      setProfile((current) => ({
+        ...current,
+        ...normalizeProfile(updatedUser),
+      }));
+      setAvatarNotice({
+        color: "success",
+        message: "Foto profil berhasil dihapus.",
+      });
       setAvatarFile(null);
-      
+
       // Update sessionStorage and Redux state to sync header avatar instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
-      setAvatarNotice({ color: "danger", message: error?.message || "Gagal menghapus foto profil." });
+      setAvatarNotice({
+        color: "danger",
+        message: error?.message || "Gagal menghapus foto profil.",
+      });
     } finally {
       setIsSavingAvatar(false);
     }
@@ -271,7 +307,10 @@ const ProfileEdit = () => {
     if (profile.avatar) {
       setIsLightboxOpen(true);
     } else {
-      setAvatarNotice({ color: "warning", message: "Anda belum memiliki foto profil untuk dilihat." });
+      setAvatarNotice({
+        color: "warning",
+        message: "Anda belum memiliki foto profil untuk dilihat.",
+      });
     }
   };
 
@@ -281,7 +320,7 @@ const ProfileEdit = () => {
     setCapturedImage(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: "user" }
+        video: { width: 640, height: 480, facingMode: "user" },
       });
       setWebcamStream(stream);
       // Wait a tick for the video tag to be rendered in the DOM
@@ -293,7 +332,11 @@ const ProfileEdit = () => {
       }, 300);
     } catch (err) {
       console.error("Gagal mengakses kamera:", err);
-      setAvatarNotice({ color: "danger", message: "Gagal mengakses kamera. Silakan periksa izin kamera perangkat Anda." });
+      setAvatarNotice({
+        color: "danger",
+        message:
+          "Gagal mengakses kamera. Silakan periksa izin kamera perangkat Anda.",
+      });
       setIsWebcamModalOpen(false);
     }
   };
@@ -305,11 +348,11 @@ const ProfileEdit = () => {
     canvas.width = videoElement.videoWidth || 640;
     canvas.height = videoElement.videoHeight || 480;
     const ctx = canvas.getContext("2d");
-    
+
     // Mirror horizontally so it feels natural like a camera mirror
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
-    
+
     ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
     setCapturedImage(dataUrl);
@@ -343,21 +386,32 @@ const ProfileEdit = () => {
     try {
       const response = await fetch(capturedImage);
       const blob = await response.blob();
-      const file = new File([blob], `avatar-${Date.now()}.jpg`, { type: "image/jpeg" });
-      
+      const file = new File([blob], `avatar-${Date.now()}.jpg`, {
+        type: "image/jpeg",
+      });
+
       const formData = new FormData();
       formData.append("avatar", file);
-      
+
       const updatedUser = await authApi.updateAvatar(formData);
-      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
-      setAvatarNotice({ color: "success", message: "Foto profil berhasil diperbarui dari kamera." });
+      setProfile((current) => ({
+        ...current,
+        ...normalizeProfile(updatedUser),
+      }));
+      setAvatarNotice({
+        color: "success",
+        message: "Foto profil berhasil diperbarui dari kamera.",
+      });
       setAvatarFile(null);
-      
+
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
       handleCloseWebcam();
     } catch (error) {
-      setAvatarNotice({ color: "danger", message: error?.message || "Gagal menyimpan foto dari kamera." });
+      setAvatarNotice({
+        color: "danger",
+        message: error?.message || "Gagal menyimpan foto dari kamera.",
+      });
     } finally {
       setIsSavingWebcam(false);
     }
@@ -373,7 +427,10 @@ const ProfileEdit = () => {
     setFieldErrors(nextErrors);
 
     if (Object.keys(nextErrors).length) {
-      setIdentityNotice({ color: "warning", message: "Periksa kembali isian formulir Anda." });
+      setIdentityNotice({
+        color: "warning",
+        message: "Periksa kembali isian formulir Anda.",
+      });
       return;
     }
 
@@ -390,14 +447,23 @@ const ProfileEdit = () => {
         occupation: profile.occupation || null,
         gender: profile.gender || null,
       });
-      setProfile((current) => ({ ...current, ...normalizeProfile(updatedUser) }));
-      setIdentityNotice({ color: "success", message: "Identitas pribadi berhasil disimpan." });
-      
+      setProfile((current) => ({
+        ...current,
+        ...normalizeProfile(updatedUser),
+      }));
+      setIdentityNotice({
+        color: "success",
+        message: "Identitas pribadi berhasil disimpan.",
+      });
+
       // Update sessionStorage and Redux state to sync header user details instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
-      setIdentityNotice({ color: "danger", message: error?.message || "Identitas pribadi gagal disimpan." });
+      setIdentityNotice({
+        color: "danger",
+        message: error?.message || "Identitas pribadi gagal disimpan.",
+      });
     } finally {
       setIsSavingIdentity(false);
     }
@@ -427,7 +493,10 @@ const ProfileEdit = () => {
     setFieldErrors(nextErrors);
 
     if (Object.keys(nextErrors).length) {
-      setSecurityNotice({ color: "warning", message: "Periksa kembali aturan password sebelum menyimpan." });
+      setSecurityNotice({
+        color: "warning",
+        message: "Periksa kembali aturan password sebelum menyimpan.",
+      });
       return;
     }
 
@@ -439,7 +508,10 @@ const ProfileEdit = () => {
         currentPassword: profile.currentPassword,
         newPassword: profile.newPassword,
       });
-      setSecurityNotice({ color: "success", message: "Sandi akun berhasil diperbarui secara aman." });
+      setSecurityNotice({
+        color: "success",
+        message: "Sandi akun berhasil diperbarui secara aman.",
+      });
       setProfile((current) => ({
         ...current,
         currentPassword: "",
@@ -453,47 +525,26 @@ const ProfileEdit = () => {
           fieldMap[d.field] = d.message;
         });
         setFieldErrors(fieldMap);
-        setSecurityNotice({ color: "danger", message: "Validasi gagal. Periksa kembali input Anda." });
+        setSecurityNotice({
+          color: "danger",
+          message: "Validasi gagal. Periksa kembali input Anda.",
+        });
       } else {
-        setSecurityNotice({ color: "danger", message: error?.message || "Gagal memperbarui sandi." });
+        setSecurityNotice({
+          color: "danger",
+          message: error?.message || "Gagal memperbarui sandi.",
+        });
       }
     } finally {
       setIsSavingSecurity(false);
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (!understandDeleteConsequences) {
-      setDeleteNotice({ color: "warning", message: "Anda harus mencentang kotak persetujuan konsekuensi terlebih dahulu." });
-      return;
-    }
-
-    if (!confirmDeletePassword) {
-      setDeleteNotice({ color: "warning", message: "Masukkan password Anda untuk mengonfirmasi penghapusan akun." });
-      return;
-    }
-
-    setIsDeletingAccount(true);
-    setDeleteNotice(null);
-
-    try {
-      await authApi.deleteAccount(confirmDeletePassword);
-      setDeleteNotice({ color: "success", message: "Akun Anda berhasil dihapus selamanya. Mengalihkan..." });
-      
-      sessionStorage.removeItem("authUser");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    } catch (error) {
-      setDeleteNotice({ color: "danger", message: error?.message || "Gagal menghapus akun. Pastikan password yang dimasukkan benar." });
-    } finally {
-      setIsDeletingAccount(false);
-    }
-  };
-
   const renderPasswordField = ({ id, label, field, placeholder }) => (
     <div className="mb-3">
-      <Label htmlFor={id} className="form-label">{label}</Label>
+      <Label htmlFor={id} className="form-label">
+        {label}
+      </Label>
       <InputGroup className={fieldErrors[field] ? "is-invalid" : ""}>
         <Input
           id={id}
@@ -508,12 +559,22 @@ const ProfileEdit = () => {
           type="button"
           className="sadar-password-toggle btn btn-light"
           onClick={() => togglePasswordVisibility(field)}
-          aria-label={visiblePasswords[field] ? "Sembunyikan password" : "Tampilkan password"}
+          aria-label={
+            visiblePasswords[field]
+              ? "Sembunyikan password"
+              : "Tampilkan password"
+          }
         >
-          <i className={visiblePasswords[field] ? "ri-eye-off-line" : "ri-eye-line"}></i>
+          <i
+            className={
+              visiblePasswords[field] ? "ri-eye-off-line" : "ri-eye-line"
+            }
+          ></i>
         </InputGroupText>
       </InputGroup>
-      {fieldErrors[field] && <FormFeedback className="d-block">{fieldErrors[field]}</FormFeedback>}
+      {fieldErrors[field] && (
+        <FormFeedback className="d-block">{fieldErrors[field]}</FormFeedback>
+      )}
     </div>
   );
 
@@ -524,12 +585,20 @@ const ProfileEdit = () => {
       <Container fluid>
         <div className="sadar-page-header sadar-edit-profile-header mb-4">
           <div className="d-flex align-items-center gap-3">
-            <Button tag={Link} to="/profile-account" color="light" className="sadar-table-action btn-icon rounded-circle" aria-label="Kembali">
+            <Button
+              tag={Link}
+              to="/profile-account"
+              color="light"
+              className="sadar-table-action btn-icon rounded-circle"
+              aria-label="Kembali"
+            >
               <i className="ri-arrow-left-line"></i>
             </Button>
             <div>
               <h1 className="h3 mb-1">Pengaturan Profil</h1>
-              <p className="text-muted mb-0">Kelola identitas diri, foto profil, dan kata sandi akun Anda.</p>
+              <p className="text-muted mb-0">
+                Kelola identitas diri, foto profil, dan kata sandi akun Anda.
+              </p>
             </div>
           </div>
         </div>
@@ -541,17 +610,36 @@ const ProfileEdit = () => {
               <CardBody className="text-center py-4 d-flex flex-column justify-content-between h-100">
                 <div>
                   <div className="position-relative d-inline-block mb-3">
-                    <div 
-                      className="sadar-profile-avatar mx-auto d-flex align-items-center justify-content-center bg-primary text-white rounded-circle shadow" 
-                      style={{ width: "120px", height: "120px", fontSize: "36px", overflow: "hidden" }}
+                    <div
+                      className="sadar-profile-avatar mx-auto d-flex align-items-center justify-content-center bg-primary text-white rounded-circle shadow"
+                      style={{
+                        width: "120px",
+                        height: "120px",
+                        fontSize: "36px",
+                        overflow: "hidden",
+                      }}
                     >
                       {profile.avatar ? (
-                        <img src={profile.avatar} alt="Foto profil" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img
+                          src={profile.avatar}
+                          alt="Foto profil"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
                       ) : (
                         profile.name.slice(0, 1).toUpperCase()
                       )}
                     </div>
-                    <Input id="edit-profile-photo" type="file" accept="image/png,image/jpeg,image/webp" className="d-none" onChange={handleAvatarChange} />
+                    <Input
+                      id="edit-profile-photo"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="d-none"
+                      onChange={handleAvatarChange}
+                    />
                     <button
                       id="profile-camera-trigger"
                       type="button"
@@ -559,8 +647,13 @@ const ProfileEdit = () => {
                         e.stopPropagation();
                         setShowPhotoMenu(!showPhotoMenu);
                       }}
-                      className="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow mb-0 border-0" 
-                      style={{ width: "34px", height: "34px", cursor: "pointer", border: "3px solid #fff" }}
+                      className="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow mb-0 border-0"
+                      style={{
+                        width: "34px",
+                        height: "34px",
+                        cursor: "pointer",
+                        border: "3px solid #fff",
+                      }}
                       aria-label="Ubah foto profil"
                     >
                       <i className="ri-camera-line fs-14"></i>
@@ -568,27 +661,29 @@ const ProfileEdit = () => {
 
                     {showPhotoMenu && (
                       <div className="profile-photo-dropdown shadow-lg">
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="profile-photo-dropdown-item"
                           onClick={handleViewPhoto}
                         >
                           <i className="ri-eye-line"></i>
                           <span>Lihat foto</span>
                         </button>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="profile-photo-dropdown-item"
                           onClick={handleOpenCamera}
                         >
                           <i className="ri-camera-line"></i>
                           <span>Ambil foto</span>
                         </button>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="profile-photo-dropdown-item"
                           onClick={() => {
-                            document.getElementById("edit-profile-photo").click();
+                            document
+                              .getElementById("edit-profile-photo")
+                              .click();
                             setShowPhotoMenu(false);
                           }}
                         >
@@ -598,8 +693,8 @@ const ProfileEdit = () => {
                         {profile.avatar && (
                           <>
                             <div className="profile-photo-dropdown-divider"></div>
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               className="profile-photo-dropdown-item text-danger"
                               onClick={() => {
                                 handleDeleteAvatar();
@@ -616,17 +711,30 @@ const ProfileEdit = () => {
                   </div>
 
                   <h4 className="fw-bold mb-1 text-dark">{profile.name}</h4>
-                  <p className="text-muted mb-0 fs-14">{profile.occupation || "Pengguna SADAR Finance"}</p>
+                  <p className="text-muted mb-0 fs-14">
+                    {profile.occupation || "Pengguna SADAR Finance"}
+                  </p>
 
                   {avatarNotice && (
                     <div className="mt-3 px-3">
-                      <Alert color={avatarNotice.color} className="py-2 mb-2 fs-12">{avatarNotice.message}</Alert>
+                      <Alert
+                        color={avatarNotice.color}
+                        className="py-2 mb-2 fs-12"
+                      >
+                        {avatarNotice.message}
+                      </Alert>
                     </div>
                   )}
 
                   {avatarFile && (
                     <div className="mt-3 px-3">
-                      <Button color="success" size="sm" className="w-100" onClick={handleSaveAvatar} disabled={isSavingAvatar}>
+                      <Button
+                        color="success"
+                        size="sm"
+                        className="w-100"
+                        onClick={handleSaveAvatar}
+                        disabled={isSavingAvatar}
+                      >
                         {isSavingAvatar ? "Menyimpan..." : "Terapkan Foto Baru"}
                       </Button>
                     </div>
@@ -634,8 +742,10 @@ const ProfileEdit = () => {
 
                   {/* Ringkasan Profil Real-time Preview */}
                   <div className="text-start mt-4 pt-3 border-top border-light">
-                    <h6 className="fs-11 text-uppercase fw-bold text-muted mb-3">Ringkasan Akun</h6>
-                    
+                    <h6 className="fs-11 text-uppercase fw-bold text-muted mb-3">
+                      Ringkasan Akun
+                    </h6>
+
                     <div className="d-flex align-items-center gap-3 mb-3">
                       <div className="avatar-xs flex-shrink-0">
                         <span className="avatar-title bg-light rounded text-muted fs-16">
@@ -643,8 +753,12 @@ const ProfileEdit = () => {
                         </span>
                       </div>
                       <div className="flex-grow-1 min-width-0">
-                        <small className="text-muted d-block fs-11 lh-1">Email</small>
-                        <span className="fs-13 text-dark fw-medium text-truncate d-block mt-1">{profile.email || "-"}</span>
+                        <small className="text-muted d-block fs-11 lh-1">
+                          Email
+                        </small>
+                        <span className="fs-13 text-dark fw-medium text-truncate d-block mt-1">
+                          {profile.email || "-"}
+                        </span>
                       </div>
                     </div>
 
@@ -655,8 +769,12 @@ const ProfileEdit = () => {
                         </span>
                       </div>
                       <div className="flex-grow-1">
-                        <small className="text-muted d-block fs-11 lh-1">Nomor Telepon</small>
-                        <span className="fs-13 text-dark fw-medium d-block mt-1">{profile.phoneNumber || "-"}</span>
+                        <small className="text-muted d-block fs-11 lh-1">
+                          Nomor Telepon
+                        </small>
+                        <span className="fs-13 text-dark fw-medium d-block mt-1">
+                          {profile.phoneNumber || "-"}
+                        </span>
                       </div>
                     </div>
 
@@ -667,8 +785,12 @@ const ProfileEdit = () => {
                         </span>
                       </div>
                       <div className="flex-grow-1">
-                        <small className="text-muted d-block fs-11 lh-1">Kota / Alamat</small>
-                        <span className="fs-13 text-dark fw-medium d-block mt-1">{profile.address || "-"}</span>
+                        <small className="text-muted d-block fs-11 lh-1">
+                          Kota / Alamat
+                        </small>
+                        <span className="fs-13 text-dark fw-medium d-block mt-1">
+                          {profile.address || "-"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -676,11 +798,23 @@ const ProfileEdit = () => {
 
                 <div className="border-top border-light pt-3 mt-4 text-start">
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span className="fs-13 fw-semibold text-dark">Lengkapi Profil Anda</span>
-                    <span className="badge bg-primary-subtle text-primary">{profileProgress}%</span>
+                    <span className="fs-13 fw-semibold text-dark">
+                      Lengkapi Profil Anda
+                    </span>
+                    <span className="badge bg-primary-subtle text-primary">
+                      {profileProgress}%
+                    </span>
                   </div>
-                  <Progress value={profileProgress} color="primary" className="animated-progess progress-sm mb-2" style={{ height: "6px" }} />
-                  <p className="text-muted fs-11 mb-0">Isi seluruh kolom identitas pribadi untuk menyempurnakan visualisasi data finansial Anda.</p>
+                  <Progress
+                    value={profileProgress}
+                    color="primary"
+                    className="animated-progess progress-sm mb-2"
+                    style={{ height: "6px" }}
+                  />
+                  <p className="text-muted fs-11 mb-0">
+                    Isi seluruh kolom identitas pribadi untuk menyempurnakan
+                    visualisasi data finansial Anda.
+                  </p>
                 </div>
               </CardBody>
             </Card>
@@ -690,14 +824,18 @@ const ProfileEdit = () => {
           <Col xl={8} lg={8}>
             <Card className="sadar-panel shadow-sm border-0 h-100">
               <CardHeader className="p-0 border-bottom border-light">
-                <Nav tabs className="nav-tabs-custom rounded card-header-tabs border-bottom-0 mx-3 mt-3">
+                <Nav
+                  tabs
+                  className="nav-tabs-custom rounded card-header-tabs border-bottom-0 mx-3 mt-3"
+                >
                   <NavItem>
                     <NavLink
                       className={`fs-14 py-3 fw-semibold ${activeTab === "details" ? "active text-primary" : "text-muted"}`}
                       onClick={() => setActiveTab("details")}
                       style={{ cursor: "pointer", border: "none" }}
                     >
-                      <i className="ri-user-line align-middle me-1"></i> Detail Pribadi
+                      <i className="ri-user-line align-middle me-1"></i> Detail
+                      Pribadi
                     </NavLink>
                   </NavItem>
                   <NavItem>
@@ -706,16 +844,8 @@ const ProfileEdit = () => {
                       onClick={() => setActiveTab("security")}
                       style={{ cursor: "pointer", border: "none" }}
                     >
-                      <i className="ri-lock-password-line align-middle me-1"></i> Keamanan Akun
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className={`fs-14 py-3 fw-semibold ${activeTab === "delete" ? "active text-danger" : "text-muted"}`}
-                      onClick={() => setActiveTab("delete")}
-                      style={{ cursor: "pointer", border: "none" }}
-                    >
-                      <i className="ri-delete-bin-line align-middle me-1"></i> Hapus Akun
+                      <i className="ri-lock-password-line align-middle me-1"></i>{" "}
+                      Keamanan Akun
                     </NavLink>
                   </NavItem>
                 </Nav>
@@ -724,44 +854,72 @@ const ProfileEdit = () => {
                 {activeTab === "details" && (
                   <div>
                     {identityNotice && (
-                      <Alert color={identityNotice.color} className="sadar-notice py-2 mb-4">
+                      <Alert
+                        color={identityNotice.color}
+                        className="sadar-notice py-2 mb-4"
+                      >
                         {identityNotice.message}
                       </Alert>
                     )}
 
                     <Row className="g-3">
                       <Col md={6}>
-                        <Label htmlFor="profile-firstName" className="form-label">Nama Depan</Label>
+                        <Label
+                          htmlFor="profile-firstName"
+                          className="form-label"
+                        >
+                          Nama Depan
+                        </Label>
                         <Input
                           id="profile-firstName"
                           value={profile.firstName}
-                          onChange={(e) => handleChange("firstName", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("firstName", e.target.value)
+                          }
                           invalid={Boolean(fieldErrors.firstName)}
                         />
-                        {fieldErrors.firstName && <FormFeedback>{fieldErrors.firstName}</FormFeedback>}
+                        {fieldErrors.firstName && (
+                          <FormFeedback>{fieldErrors.firstName}</FormFeedback>
+                        )}
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-lastName" className="form-label">Nama Belakang</Label>
+                        <Label
+                          htmlFor="profile-lastName"
+                          className="form-label"
+                        >
+                          Nama Belakang
+                        </Label>
                         <Input
                           id="profile-lastName"
                           value={profile.lastName}
-                          onChange={(e) => handleChange("lastName", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("lastName", e.target.value)
+                          }
                         />
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-phoneNumber" className="form-label">Nomor Telepon</Label>
+                        <Label
+                          htmlFor="profile-phoneNumber"
+                          className="form-label"
+                        >
+                          Nomor Telepon
+                        </Label>
                         <Input
                           id="profile-phoneNumber"
                           value={profile.phoneNumber}
-                          onChange={(e) => handleChange("phoneNumber", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("phoneNumber", e.target.value)
+                          }
                           placeholder="+628123456789"
                         />
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-email" className="form-label">Alamat Email</Label>
+                        <Label htmlFor="profile-email" className="form-label">
+                          Alamat Email
+                        </Label>
                         <Input
                           id="profile-email"
                           type="email"
@@ -769,26 +927,39 @@ const ProfileEdit = () => {
                           disabled
                           className="bg-light"
                         />
-                        <small className="text-muted d-block mt-1">Alamat email utama terdaftar tidak dapat diubah.</small>
+                        <small className="text-muted d-block mt-1">
+                          Alamat email utama terdaftar tidak dapat diubah.
+                        </small>
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-dateOfBirth" className="form-label">Tanggal Lahir</Label>
+                        <Label
+                          htmlFor="profile-dateOfBirth"
+                          className="form-label"
+                        >
+                          Tanggal Lahir
+                        </Label>
                         <Input
                           id="profile-dateOfBirth"
                           type="date"
                           value={profile.dateOfBirth}
-                          onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("dateOfBirth", e.target.value)
+                          }
                         />
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-gender" className="form-label">Jenis Kelamin</Label>
+                        <Label htmlFor="profile-gender" className="form-label">
+                          Jenis Kelamin
+                        </Label>
                         <Input
                           id="profile-gender"
                           type="select"
                           value={profile.gender}
-                          onChange={(e) => handleChange("gender", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("gender", e.target.value)
+                          }
                         >
                           <option value="">Pilih Jenis Kelamin</option>
                           <option value="male">Laki-laki</option>
@@ -798,30 +969,49 @@ const ProfileEdit = () => {
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-occupation" className="form-label">Pekerjaan / Jabatan</Label>
+                        <Label
+                          htmlFor="profile-occupation"
+                          className="form-label"
+                        >
+                          Pekerjaan / Jabatan
+                        </Label>
                         <Input
                           id="profile-occupation"
                           value={profile.occupation}
-                          onChange={(e) => handleChange("occupation", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("occupation", e.target.value)
+                          }
                           placeholder="Contoh: Lead Designer / Developer"
                         />
                       </Col>
 
                       <Col md={6}>
-                        <Label htmlFor="profile-address" className="form-label">Kota / Alamat</Label>
+                        <Label htmlFor="profile-address" className="form-label">
+                          Kota / Alamat
+                        </Label>
                         <Input
                           id="profile-address"
                           value={profile.address}
-                          onChange={(e) => handleChange("address", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("address", e.target.value)
+                          }
                           placeholder="Contoh: Jakarta, Indonesia"
                         />
                       </Col>
                     </Row>
 
                     <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-light">
-                      <Button tag={Link} to="/profile-account" color="light">Batal</Button>
-                      <Button color="primary" onClick={handleSaveIdentity} disabled={isSavingIdentity}>
-                        {isSavingIdentity ? "Menyimpan..." : "Simpan Detail Pribadi"}
+                      <Button tag={Link} to="/profile-account" color="light">
+                        Batal
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={handleSaveIdentity}
+                        disabled={isSavingIdentity}
+                      >
+                        {isSavingIdentity
+                          ? "Menyimpan..."
+                          : "Simpan Detail Pribadi"}
                       </Button>
                     </div>
                   </div>
@@ -830,7 +1020,10 @@ const ProfileEdit = () => {
                 {activeTab === "security" && (
                   <div>
                     {securityNotice && (
-                      <Alert color={securityNotice.color} className="sadar-notice py-2 mb-4">
+                      <Alert
+                        color={securityNotice.color}
+                        className="sadar-notice py-2 mb-4"
+                      >
                         {securityNotice.message}
                       </Alert>
                     )}
@@ -841,7 +1034,7 @@ const ProfileEdit = () => {
                           id: "profile-current-password",
                           label: "Password Saat Ini",
                           field: "currentPassword",
-                          placeholder: "Masukkan kata sandi lama Anda"
+                          placeholder: "Masukkan kata sandi lama Anda",
                         })}
                       </Col>
 
@@ -850,7 +1043,8 @@ const ProfileEdit = () => {
                           id: "profile-new-password",
                           label: "Password Baru",
                           field: "newPassword",
-                          placeholder: "Masukkan kata sandi baru (min. 8 karakter)"
+                          placeholder:
+                            "Masukkan kata sandi baru (min. 8 karakter)",
                         })}
                       </Col>
 
@@ -859,172 +1053,68 @@ const ProfileEdit = () => {
                           id: "profile-confirm-password",
                           label: "Konfirmasi Password Baru",
                           field: "confirmPassword",
-                          placeholder: "Ketik ulang kata sandi baru Anda"
+                          placeholder: "Ketik ulang kata sandi baru Anda",
                         })}
                       </Col>
                     </Row>
 
                     <div className="sadar-password-rules mt-3 mb-4 p-3 bg-light rounded">
-                      <strong className="d-block mb-2 text-dark fs-13">Aturan Sandi yang Aman:</strong>
+                      <strong className="d-block mb-2 text-dark fs-13">
+                        Aturan Sandi yang Aman:
+                      </strong>
                       <div className="d-flex flex-wrap gap-3">
-                        <span className={`d-flex align-items-center gap-1 fs-12 ${passwordHasMinimumLength ? "text-success fw-medium" : "text-muted"}`}>
-                          <i className={passwordHasMinimumLength ? "ri-checkbox-circle-fill text-success" : "ri-circle-line text-muted"}></i>
+                        <span
+                          className={`d-flex align-items-center gap-1 fs-12 ${passwordHasMinimumLength ? "text-success fw-medium" : "text-muted"}`}
+                        >
+                          <i
+                            className={
+                              passwordHasMinimumLength
+                                ? "ri-checkbox-circle-fill text-success"
+                                : "ri-circle-line text-muted"
+                            }
+                          ></i>
                           Minimal 8 karakter
                         </span>
-                        <span className={`d-flex align-items-center gap-1 fs-12 ${passwordHasLetterAndNumber ? "text-success fw-medium" : "text-muted"}`}>
-                          <i className={passwordHasLetterAndNumber ? "ri-checkbox-circle-fill text-success" : "ri-circle-line text-muted"}></i>
+                        <span
+                          className={`d-flex align-items-center gap-1 fs-12 ${passwordHasLetterAndNumber ? "text-success fw-medium" : "text-muted"}`}
+                        >
+                          <i
+                            className={
+                              passwordHasLetterAndNumber
+                                ? "ri-checkbox-circle-fill text-success"
+                                : "ri-circle-line text-muted"
+                            }
+                          ></i>
                           Kombinasi huruf & angka
                         </span>
-                        <span className={`d-flex align-items-center gap-1 fs-12 ${(profile.confirmPassword && profile.newPassword === profile.confirmPassword) ? "text-success fw-medium" : "text-muted"}`}>
-                          <i className={(profile.confirmPassword && profile.newPassword === profile.confirmPassword) ? "ri-checkbox-circle-fill text-success" : "ri-circle-line text-muted"}></i>
+                        <span
+                          className={`d-flex align-items-center gap-1 fs-12 ${profile.confirmPassword && profile.newPassword === profile.confirmPassword ? "text-success fw-medium" : "text-muted"}`}
+                        >
+                          <i
+                            className={
+                              profile.confirmPassword &&
+                              profile.newPassword === profile.confirmPassword
+                                ? "ri-checkbox-circle-fill text-success"
+                                : "ri-circle-line text-muted"
+                            }
+                          ></i>
                           Konfirmasi sesuai
                         </span>
                       </div>
                     </div>
 
                     <div className="d-flex justify-content-end gap-2 pt-3 border-top border-light">
-                      <Button tag={Link} to="/profile-account" color="light">Batal</Button>
-                      <Button color="primary" onClick={handleSaveSecurity} disabled={isSavingSecurity}>
-                        {isSavingSecurity ? "Memproses..." : "Simpan Password Baru"}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === "delete" && (
-                  <div>
-                    {deleteNotice && (
-                      <Alert color={deleteNotice.color} className="sadar-notice py-2 mb-4">
-                        {deleteNotice.message}
-                      </Alert>
-                    )}
-
-                    {/* Warning Card dengan Desain Premium */}
-                    <div className="p-4 bg-danger-subtle bg-opacity-25 border border-danger-subtle border-start border-4 border-start-danger rounded mb-4 shadow-sm">
-                      <div className="d-flex gap-3 align-items-start">
-                        <div className="avatar-sm flex-shrink-0">
-                          <span className="avatar-title bg-danger text-white rounded-circle fs-20 shadow-sm" style={{ width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <i className="ri-error-warning-line"></i>
-                          </span>
-                        </div>
-                        <div>
-                          <h5 className="text-danger fw-bold mb-2 fs-15">Tindakan Bahaya: Hapus Akun Permanen</h5>
-                          <p className="text-muted fs-13 mb-0" style={{ lineHeight: "1.6" }}>
-                            Setelah Anda menghapus akun, seluruh data keuangan Anda (rekening, anggaran, catatan transaksi, pemasukan, dan analisis perilaku finansial) akan <strong>dihapus secara permanen dari server SADAR Finance</strong>. Tindakan ini bersifat final dan tidak dapat dibatalkan dengan cara apa pun.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Interactive Choice Container (Clickable Box Card) */}
-                    <div 
-                      className={`p-3 rounded border mb-4 d-flex align-items-center gap-3 transition-all cursor-pointer ${
-                        understandDeleteConsequences 
-                          ? "bg-danger-subtle bg-opacity-15 border-danger shadow-sm" 
-                          : "bg-light border-light"
-                      }`}
-                      onClick={() => setUnderstandDeleteConsequences(!understandDeleteConsequences)}
-                      style={{ transition: "all 0.25s ease", borderStyle: understandDeleteConsequences ? "solid" : "dashed" }}
-                    >
-                      <div className="form-check custom-checkbox mb-0 d-flex align-items-center">
-                        <Input
-                          type="checkbox"
-                          className="form-check-input border-danger cursor-pointer"
-                          id="confirm-delete-checkbox"
-                          checked={understandDeleteConsequences}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            setUnderstandDeleteConsequences(e.target.checked);
-                          }}
-                          style={{ width: "20px", height: "20px", marginTop: 0 }}
-                        />
-                      </div>
-                      <Label 
-                        className="form-check-label text-dark fw-semibold fs-13 mb-0 cursor-pointer flex-grow-1 select-none" 
-                        htmlFor="confirm-delete-checkbox"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Saya memahami seluruh konsekuensi di atas dan ingin menghapus akun saya beserta seluruh datanya selamanya.
-                      </Label>
-                    </div>
-
-                    {/* Password Verifikasi dengan Icon Lock */}
-                    <div className="mb-4" style={{ opacity: understandDeleteConsequences ? 1 : 0.5, transition: "opacity 0.25s ease" }}>
-                      <Label htmlFor="delete-account-password" className="form-label text-dark fw-bold mb-2 fs-13">
-                        Konfirmasi Kata Sandi Anda
-                      </Label>
-                      <InputGroup className={`shadow-sm border-0 ${!understandDeleteConsequences ? "opacity-75" : ""}`}>
-                        <InputGroupText className="bg-light border-light-subtle text-muted px-3">
-                          <i className="ri-lock-2-line fs-15"></i>
-                        </InputGroupText>
-                        <Input
-                          id="delete-account-password"
-                          type={showConfirmDeletePassword ? "text" : "password"}
-                          value={confirmDeletePassword}
-                          onChange={(e) => setConfirmDeletePassword(e.target.value)}
-                          placeholder={
-                            understandDeleteConsequences 
-                              ? "Masukkan kata sandi akun Anda untuk memvalidasi identitas" 
-                              : "Centang kotak persetujuan di atas terlebih dahulu"
-                          }
-                          disabled={!understandDeleteConsequences}
-                          className="form-control-lg fs-14 py-2-5 border-start-0"
-                          style={{
-                            backgroundColor: understandDeleteConsequences ? "#fff" : "#f8f9fa",
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0
-                          }}
-                        />
-                        <InputGroupText
-                          tag="button"
-                          type="button"
-                          className="sadar-password-toggle btn btn-light border-light-subtle px-3"
-                          onClick={() => setShowConfirmDeletePassword(!showConfirmDeletePassword)}
-                          disabled={!understandDeleteConsequences}
-                          aria-label={showConfirmDeletePassword ? "Sembunyikan password" : "Tampilkan password"}
-                        >
-                          <i className={showConfirmDeletePassword ? "ri-eye-off-line text-muted" : "ri-eye-line text-muted"}></i>
-                        </InputGroupText>
-                      </InputGroup>
-                      {understandDeleteConsequences && (
-                        <small className="text-muted d-block mt-2 fs-11">
-                          <i className="ri-information-line align-middle me-1 text-primary"></i>
-                          Demi keamanan akun Anda, tindakan pembersihan data ini memerlukan verifikasi sandi yang valid.
-                        </small>
-                      )}
-                    </div>
-
-                    {/* Tombol Aksi dengan Desain Premium */}
-                    <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-light">
-                      <Button 
-                        tag={Link} 
-                        to="/profile-account" 
-                        color="light"
-                        className="px-4 py-2 fw-semibold rounded shadow-sm border"
-                      >
+                      <Button tag={Link} to="/profile-account" color="light">
                         Batal
                       </Button>
-                      <Button 
-                        color="danger" 
-                        onClick={handleDeleteAccount} 
-                        disabled={isDeletingAccount || !understandDeleteConsequences || !confirmDeletePassword}
-                        className="px-4 py-2 fw-semibold rounded shadow-sm d-flex align-items-center gap-2"
-                        style={{
-                          opacity: (understandDeleteConsequences && confirmDeletePassword) ? 1 : 0.6,
-                          transition: "all 0.2s ease"
-                        }}
+                      <Button
+                        color="primary"
+                        onClick={handleSaveSecurity}
+                        disabled={isSavingSecurity}
                       >
-                        {isDeletingAccount ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            <span>Menghapus Akun...</span>
-                          </>
-                        ) : (
-                          <>
-                            <i className="ri-delete-bin-3-line fs-15"></i>
-                            <span>Hapus Akun Saya</span>
-                          </>
-                        )}
+                        {isSavingSecurity
+                          ? "Memproses..."
+                          : "Simpan Password Baru"}
                       </Button>
                     </div>
                   </div>
@@ -1036,53 +1126,63 @@ const ProfileEdit = () => {
       </Container>
 
       {/* Lightbox Modal */}
-      <Modal 
-        isOpen={isLightboxOpen} 
-        toggle={() => setIsLightboxOpen(false)} 
-        centered 
+      <Modal
+        isOpen={isLightboxOpen}
+        toggle={() => setIsLightboxOpen(false)}
+        centered
         className="sadar-photo-lightbox-modal"
       >
         <ModalBody className="sadar-photo-lightbox-body">
-          <button 
-            type="button" 
-            className="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow" 
+          <button
+            type="button"
+            className="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow"
             onClick={() => setIsLightboxOpen(false)}
             aria-label="Tutup"
             style={{ zIndex: 1060 }}
           ></button>
-          <img 
-            src={profile.avatar} 
-            alt="Foto profil ukuran penuh" 
-            className="sadar-photo-lightbox-img" 
+          <img
+            src={profile.avatar}
+            alt="Foto profil ukuran penuh"
+            className="sadar-photo-lightbox-img"
           />
         </ModalBody>
       </Modal>
 
       {/* Webcam Capture Modal */}
-      <Modal 
-        isOpen={isWebcamModalOpen} 
-        toggle={handleCloseWebcam} 
+      <Modal
+        isOpen={isWebcamModalOpen}
+        toggle={handleCloseWebcam}
         centered
         backdrop="static"
         keyboard={false}
       >
-        <ModalHeader toggle={handleCloseWebcam} className="border-bottom border-light">
-          <span className="fw-semibold fs-16"><i className="ri-camera-line me-2 text-primary"></i>Ambil Foto Profil</span>
+        <ModalHeader
+          toggle={handleCloseWebcam}
+          className="border-bottom border-light"
+        >
+          <span className="fw-semibold fs-16">
+            <i className="ri-camera-line me-2 text-primary"></i>Ambil Foto
+            Profil
+          </span>
         </ModalHeader>
         <ModalBody className="p-4">
           {!capturedImage ? (
             <div>
               <div className="sadar-webcam-preview-wrapper mb-3 shadow-inner">
-                <video 
-                  id="sadar-webcam-element" 
-                  autoPlay 
-                  playsInline 
+                <video
+                  id="sadar-webcam-element"
+                  autoPlay
+                  playsInline
                   className="sadar-webcam-video"
                   style={{ transform: "scaleX(-1)" }} // Mirror effect
                 ></video>
               </div>
               <div className="d-flex justify-content-center">
-                <Button color="primary" onClick={handleCapturePhoto} className="px-4 py-2 d-flex align-items-center gap-2 rounded-pill">
+                <Button
+                  color="primary"
+                  onClick={handleCapturePhoto}
+                  className="px-4 py-2 d-flex align-items-center gap-2 rounded-pill"
+                >
                   <i className="ri-camera-lens-line fs-18"></i>
                   <span>Tangkap Foto</span>
                 </Button>
@@ -1091,25 +1191,40 @@ const ProfileEdit = () => {
           ) : (
             <div>
               <div className="sadar-webcam-preview-wrapper mb-3 shadow">
-                <img 
-                  src={capturedImage} 
-                  alt="Hasil tangkapan kamera" 
-                  className="sadar-webcam-captured" 
+                <img
+                  src={capturedImage}
+                  alt="Hasil tangkapan kamera"
+                  className="sadar-webcam-captured"
                 />
               </div>
               <div className="d-flex justify-content-center gap-3">
-                <Button color="light" onClick={handleRetakePhoto} className="px-3 rounded-pill" disabled={isSavingWebcam}>
+                <Button
+                  color="light"
+                  onClick={handleRetakePhoto}
+                  className="px-3 rounded-pill"
+                  disabled={isSavingWebcam}
+                >
                   <i className="ri-refresh-line me-1"></i> Ulangi
                 </Button>
-                <Button color="success" onClick={handleSaveWebcamPhoto} className="px-4 rounded-pill" disabled={isSavingWebcam}>
+                <Button
+                  color="success"
+                  onClick={handleSaveWebcamPhoto}
+                  className="px-4 rounded-pill"
+                  disabled={isSavingWebcam}
+                >
                   {isSavingWebcam ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       Menyimpan...
                     </>
                   ) : (
                     <>
-                      <i className="ri-checkbox-circle-line me-1"></i> Gunakan Foto
+                      <i className="ri-checkbox-circle-line me-1"></i> Gunakan
+                      Foto
                     </>
                   )}
                 </Button>

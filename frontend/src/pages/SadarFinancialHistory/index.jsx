@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Receipt, Search, Loader2 } from "lucide-react";
 import {
   Badge,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   CardHeader,
@@ -173,7 +174,7 @@ const readFileAsReceipt = (file) =>
 
 const SadarLoadingScreen = () => {
   return (
-    <div className="page-content sadar-page d-flex align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
+    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
       <div className="text-center">
         <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
           <span className="visually-hidden">Memuat...</span>
@@ -191,10 +192,12 @@ const SadarFinancialHistory = () => {
   const [currentTransactionPage, setCurrentTransactionPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [historyFilter, setHistoryFilter] = useState("all");
   const [notice, setNotice] = useState("");
   const [receiptMap, setReceiptMap] = useState(() => loadStoredReceipts());
   const [ocrReceiptMap, setOcrReceiptMap] = useState({});
   const [openActionKey, setOpenActionKey] = useState("");
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [receiptModal, setReceiptModal] = useState({ isOpen: false, transaction: null });
   const [editModal, setEditModal] = useState({ isOpen: false, transaction: null });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, transaction: null });
@@ -245,7 +248,7 @@ const SadarFinancialHistory = () => {
     };
   }, []);
 
-  const resolveAccountName = (accountId) => accounts.find((account) => account.id === accountId)?.name || "-";
+  const resolveAccountName = useCallback((accountId) => accounts.find((account) => account.id === accountId)?.name || "-", [accounts]);
 
   const userTransactions = useMemo(() => {
     const expenseRows = transactionRows.map((transaction) => ({
@@ -281,11 +284,19 @@ const SadarFinancialHistory = () => {
   }, [incomesRows, ocrReceiptMap, receiptMap, transactionRows]);
 
   const filteredTransactions = useMemo(() => {
+    let result = userTransactions;
+
+    // Filter by transaction type
+    if (historyFilter === "income") {
+      result = result.filter((t) => t.type === "income");
+    } else if (historyFilter === "expense") {
+      result = result.filter((t) => t.type === "expense");
+    }
+
     const keyword = searchTerm.trim().toLowerCase();
+    if (!keyword) return result;
 
-    if (!keyword) return userTransactions;
-
-    return userTransactions.filter((transaction) => {
+    return result.filter((transaction) => {
       const isIncome = transaction.type === "income";
       const searchable = [
         transaction.name,
@@ -301,11 +312,9 @@ const SadarFinancialHistory = () => {
 
       return searchable.includes(keyword);
     });
-  }, [searchTerm, userTransactions, accounts]);
+  }, [historyFilter, searchTerm, userTransactions, resolveAccountName]);
 
-  useEffect(() => {
-    setCurrentTransactionPage(1);
-  }, [searchTerm]);
+
 
   const totalTransactionPages = Math.max(1, Math.ceil(filteredTransactions.length / TRANSACTION_PAGE_SIZE));
   const activePage = Math.min(currentTransactionPage, totalTransactionPages);
@@ -543,7 +552,10 @@ const SadarFinancialHistory = () => {
                     <Input
                       type="search"
                       value={searchTerm}
-                      onChange={(event) => setSearchTerm(event.target.value)}
+                      onChange={(event) => {
+                        setSearchTerm(event.target.value);
+                        setCurrentTransactionPage(1);
+                      }}
                       placeholder="Cari catatan, kategori, akun..."
                       aria-label="Cari riwayat keuangan"
                     />
@@ -562,12 +574,63 @@ const SadarFinancialHistory = () => {
                 ) : (
                   <>
                     <div className="sadar-table-pagination">
-                      <span>
-                        {searchTerm.trim()
-                          ? `Ditemukan ${filteredTransactions.length} dari ${userTransactions.length} catatan`
-                          : `Menampilkan ${transactionStartNumber}-${transactionEndNumber} dari ${filteredTransactions.length} catatan`}
-                      </span>
-                      {filteredTransactions.length > TRANSACTION_PAGE_SIZE && (
+                      <div className="d-flex align-items-center gap-3">
+                        <span>
+                          {searchTerm.trim()
+                            ? `Ditemukan ${filteredTransactions.length} dari ${userTransactions.length} catatan`
+                            : `Menampilkan ${transactionStartNumber}-${transactionEndNumber} dari ${filteredTransactions.length} catatan`}
+                        </span>
+
+                        <Dropdown
+                          isOpen={isFilterDropdownOpen}
+                          toggle={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                        >
+                          <DropdownToggle
+                            color="light"
+                            className="sadar-table-filter-btn d-flex align-items-center gap-2"
+                          >
+                            <i className="ri-filter-3-line text-primary fs-13"></i>
+                            <span>Tipe: <strong>{historyFilter === "all" ? "Semua" : historyFilter === "income" ? "Pemasukan" : "Pengeluaran"}</strong></span>
+                            <i className="ri-arrow-down-s-line fs-12 text-muted"></i>
+                          </DropdownToggle>
+                          <DropdownMenu end className="sadar-row-action-menu">
+                            <DropdownItem
+                              active={historyFilter === "all"}
+                              onClick={() => {
+                                setHistoryFilter("all");
+                                setCurrentTransactionPage(1);
+                              }}
+                              className="d-flex align-items-center justify-content-between py-2 fs-12"
+                            >
+                              <span>Semua Catatan</span>
+                              {historyFilter === "all" && <i className="ri-check-line text-primary"></i>}
+                            </DropdownItem>
+                            <DropdownItem
+                              active={historyFilter === "income"}
+                              onClick={() => {
+                                setHistoryFilter("income");
+                                setCurrentTransactionPage(1);
+                              }}
+                              className="d-flex align-items-center justify-content-between py-2 fs-12"
+                            >
+                              <span>Pemasukan</span>
+                              {historyFilter === "income" && <i className="ri-check-line text-primary"></i>}
+                            </DropdownItem>
+                            <DropdownItem
+                              active={historyFilter === "expense"}
+                              onClick={() => {
+                                setHistoryFilter("expense");
+                                setCurrentTransactionPage(1);
+                              }}
+                              className="d-flex align-items-center justify-content-between py-2 fs-12"
+                            >
+                              <span>Pengeluaran</span>
+                              {historyFilter === "expense" && <i className="ri-check-line text-primary"></i>}
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
+                      {filteredTransactions.length > 0 && (
                         <ul className="pagination pagination-separated pagination-sm mb-0">
                           <li className={`page-item ${currentTransactionPage === 1 ? "disabled" : ""}`}>
                             <button
@@ -658,10 +721,12 @@ const SadarFinancialHistory = () => {
                                         <i className="ri-more-fill"></i>
                                       </DropdownToggle>
                                       <DropdownMenu end className="sadar-row-action-menu">
-                                        <DropdownItem onClick={() => openReceiptViewer(transaction)}>
-                                          <i className="ri-image-line"></i>
-                                          Lihat Struk
-                                        </DropdownItem>
+                                        {!isIncome && (
+                                          <DropdownItem onClick={() => openReceiptViewer(transaction)}>
+                                            <i className="ri-image-line"></i>
+                                            Lihat Struk
+                                          </DropdownItem>
+                                        )}
                                         <DropdownItem onClick={() => openEditTransaction(transaction)}>
                                           <i className="ri-pencil-line"></i>
                                           Edit
@@ -800,18 +865,20 @@ const SadarFinancialHistory = () => {
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="history-receipt">Upload Struk</Label>
-                <Input
-                  id="history-receipt"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/heic"
-                  onChange={handleReceiptFileChange}
-                />
-                <small className="text-muted d-block mt-2">Upload manual saja. OCR dan NLP tidak aktif di edit ini.</small>
-              </div>
+              {editModal.transaction?.type !== "income" && (
+                <div>
+                  <Label htmlFor="history-receipt">Upload Struk</Label>
+                  <Input
+                    id="history-receipt"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/heic"
+                    onChange={handleReceiptFileChange}
+                  />
+                  <small className="text-muted d-block mt-2">Upload manual saja. OCR dan NLP tidak aktif di edit ini.</small>
+                </div>
+              )}
             </div>
-            {editForm.receiptPreview && (
+            {editModal.transaction?.type !== "income" && editForm.receiptPreview && (
               <div className="sadar-receipt-preview mt-3">
                 <img src={editForm.receiptPreview} alt="Preview struk" />
                 <span>{editForm.receiptName || "Preview struk"}</span>
