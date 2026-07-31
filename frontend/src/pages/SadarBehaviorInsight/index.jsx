@@ -670,7 +670,8 @@ const BehaviorInsightWithData = () => {
     }, {});
     const trendRows = Object.entries(byDate)
       .sort(([a], [b]) => new Date(`${a}T00:00:00`) - new Date(`${b}T00:00:00`))
-      .map(([date, amount]) => ({ date, amount }));
+      .map(([date, amount]) => ({ date, amount }))
+      .slice(-10);
 
     const wantsExpense = sumBy(
       expenseTransactions.filter((item) => item.budget_group === "Wants"),

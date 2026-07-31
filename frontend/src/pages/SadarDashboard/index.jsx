@@ -1158,7 +1158,8 @@ const DashboardWithData = () => {
       }, {}),
     )
       .sort(([a], [b]) => new Date(`${a}T00:00:00`) - new Date(`${b}T00:00:00`))
-      .map(([date, amount]) => ({ date, amount }));
+      .map(([date, amount]) => ({ date, amount }))
+      .slice(-10);
     const trendSeriesData = trendRows.map((item) => Math.round(item.amount / 1000));
     const trendMaxValue = Math.max(100, Math.ceil((Math.max(...trendSeriesData, 0) * 1.2) / 500) * 500);
     const dominantCategoryEntry = Object.entries(categoryRows).sort((a, b) => b[1] - a[1])[0] || ["-", 0];
