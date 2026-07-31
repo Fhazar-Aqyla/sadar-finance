@@ -374,19 +374,22 @@ const StepDashboardPreview = () => (
 const stepInsightItems = [
   {
     icon: "ri-lightbulb-flash-line",
-    iconBg: "bg-teal-50 text-[#14B8A6]",
+    bgColor: "#E6FFFA",
+    textColor: "#0D9488",
     title: "Kurangi jajan 15%",
     subtitle: "Target tabungan bulan ini bisa naik Rp 180 rb.",
   },
   {
     icon: "ri-file-search-line",
-    iconBg: "bg-amber-50 text-[#F59E0B]",
+    bgColor: "#FEF3C7",
+    textColor: "#D97706",
     title: "Evaluasi langganan bulanan",
     subtitle: "Hemat hingga Rp 99 rb dari hiburan & aplikasi tak terpakai.",
   },
   {
     icon: "ri-shield-check-line",
-    iconBg: "bg-blue-50 text-[#1E3A8A]",
+    bgColor: "#E0F2FE",
+    textColor: "#0284C7",
     title: "Alokasi otomatis 20% ke tabungan",
     subtitle: "Amankan alokasi di awal bulan agar keuangan tetap seimbang.",
   },
@@ -399,9 +402,12 @@ const StepInsightPreview = () => (
         key={item.title}
         className="rounded-[12px] border border-[#DDE8F2] bg-[#FBFDFF] p-3 transition-all hover:border-[#14B8A6]/30 hover:shadow-sm"
       >
-        <div className="flex items-start gap-3">
-          <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${item.iconBg}`}>
-            <i className={`${item.icon} text-[16px]`} aria-hidden="true"></i>
+        <div className="flex items-center gap-3">
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+            style={{ backgroundColor: item.bgColor, color: item.textColor }}
+          >
+            <i className={`${item.icon} text-[18px]`} aria-hidden="true"></i>
           </span>
           <div>
             <p className="m-0 text-[11px] font-extrabold text-[#1E3A8A]">
