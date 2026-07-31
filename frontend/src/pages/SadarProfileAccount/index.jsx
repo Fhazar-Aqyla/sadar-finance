@@ -31,6 +31,8 @@ import {
   analyticsApi,
   authApi,
 } from "../../Components/services/api";
+import AccountFormModal from "../../Components/AccountModal/AccountFormModal";
+import { findInstitutionByName, inferAccountType } from "../../constants/bankData";
 
 import "../SadarShared/sadar-pages.css";
 
@@ -39,13 +41,6 @@ const defaultProfile = {
   name: "SADAR",
   email: "",
   avatar: "",
-};
-
-const defaultAccountForm = {
-  name: "",
-  type: "Bank",
-  accountNumber: "",
-  balance: "",
 };
 
 const rupiah = (value) =>
@@ -150,14 +145,18 @@ const updateSessionUser = (updatedUser) => {
   }
 };
 
-const normalizeAccount = (account) => ({
-  id: account.account_id || account.id,
-  name: account.account_name || account.accountName || account.name || "Akun",
-  type: account.account_type || account.type || "Bank",
-  balance: Number(account.balance || 0),
-  accountNumber: account.account_number || account.accountNumber || "",
-  isPersisted: Boolean(account.account_id || account.id),
-});
+const normalizeAccount = (account) => {
+  const name = account.account_name || account.accountName || account.name || "Akun";
+  const inferredType = account.account_type || account.type || inferAccountType(name);
+  return {
+    id: account.account_id || account.id,
+    name,
+    type: inferredType,
+    balance: Number(account.balance || 0),
+    accountNumber: account.account_number || account.accountNumber || "",
+    isPersisted: Boolean(account.account_id || account.id),
+  };
+};
 
 const buildBudgetRows = (budget) => {
   if (!budget) return [];
@@ -632,12 +631,6 @@ const budgetTargets = [
   },
 ];
 
-const accountTypes = [
-  { value: "Cash", label: "Tunai" },
-  { value: "Bank", label: "Bank" },
-  { value: "E-wallet", label: "Dompet digital" },
-];
-
 const SadarLoadingScreen = () => {
   return (
     <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
@@ -669,8 +662,6 @@ const ProfileAccountWithData = () => {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const [isEditAccountOpen, setIsEditAccountOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
-  const [newAccountForm, setNewAccountForm] = useState(defaultAccountForm);
-  const [editAccountForm, setEditAccountForm] = useState(defaultAccountForm);
   const [isSavingAccount, setIsSavingAccount] = useState(false);
   const [budgetRows, setBudgetRows] = useState([]);
   const [budgetNotice, setBudgetNotice] = useState("");
@@ -743,83 +734,43 @@ const ProfileAccountWithData = () => {
     };
   }, [dispatch]);
 
-  const updateAccount = (id, field, value) => {
-    setAccountNotice("");
-    setAccounts((items) =>
-      items.map((account) =>
-        account.id === id
-          ? {
-              ...account,
-              [field]: field === "balance" ? Number(value || 0) : value,
-            }
-          : account,
-      ),
-    );
-  };
-
-  const persistAccount = async (account) => {
-    try {
-      await accountApi.update(account.id, {
-        accountName: account.name,
-        accountNumber: account.accountNumber || "",
-        balance: Number(account.balance || 0),
-      });
-    } catch (error) {
-      setAccountNotice(error?.message || "Perubahan akun gagal disimpan.");
-    }
-  };
-
   const openAddAccountModal = () => {
     setAccountNotice("");
-    setNewAccountForm(defaultAccountForm);
     setIsAddAccountOpen(true);
   };
 
   const closeAddAccountModal = () => {
     if (isSavingAccount) return;
     setIsAddAccountOpen(false);
-    setNewAccountForm(defaultAccountForm);
   };
 
-  const submitNewAccount = async (event) => {
-    event.preventDefault();
-
-    const accountName = newAccountForm.name.trim();
-    const balance = Number(onlyDigits(newAccountForm.balance));
-
-    if (!accountName) {
-      await showAccountAlert({
-        icon: "warning",
-        title: "Nama akun belum diisi",
-        text: "Isi nama akun terlebih dahulu sebelum menyimpan.",
-      });
-      return;
-    }
-
+  const handleSaveAddAccount = async (formData) => {
+    const { name, accountNumber, balance, type } = formData;
     setIsSavingAccount(true);
     setAccountNotice("");
 
     try {
       const account = await accountApi.create({
-        accountName,
-        accountNumber: newAccountForm.accountNumber.trim(),
+        accountName: name,
+        accountNumber,
         balance,
       });
+
       setAccounts((items) => [
         ...items,
         {
           ...normalizeAccount(account),
-          type: newAccountForm.type,
+          name,
+          type,
           balance,
-          accountNumber: newAccountForm.accountNumber.trim(),
+          accountNumber,
         },
       ]);
       setIsAddAccountOpen(false);
-      setNewAccountForm(defaultAccountForm);
       await showAccountAlert({
         icon: "success",
         title: "Akun berhasil ditambahkan",
-        text: `${accountName} sudah masuk ke daftar akun kamu.`,
+        text: `${name} sudah masuk ke daftar akun kamu.`,
       });
     } catch (error) {
       const message = error?.message || "Akun gagal dibuat.";
@@ -837,12 +788,6 @@ const ProfileAccountWithData = () => {
   const openEditAccountModal = (account) => {
     setAccountNotice("");
     setEditingAccount(account);
-    setEditAccountForm({
-      name: account.name,
-      type: account.type || "Bank",
-      accountNumber: account.accountNumber || "",
-      balance: String(account.balance || ""),
-    });
     setIsEditAccountOpen(true);
   };
 
@@ -850,31 +795,18 @@ const ProfileAccountWithData = () => {
     if (isSavingAccount) return;
     setIsEditAccountOpen(false);
     setEditingAccount(null);
-    setEditAccountForm(defaultAccountForm);
   };
 
-  const submitEditAccount = async (event) => {
-    event.preventDefault();
-
-    const accountName = editAccountForm.name.trim();
-    const balance = Number(onlyDigits(editAccountForm.balance));
-
-    if (!accountName) {
-      await showAccountAlert({
-        icon: "warning",
-        title: "Nama akun belum diisi",
-        text: "Isi nama akun terlebih dahulu sebelum menyimpan.",
-      });
-      return;
-    }
-
+  const handleSaveEditAccount = async (formData) => {
+    if (!editingAccount) return;
+    const { name, accountNumber, balance, type } = formData;
     setIsSavingAccount(true);
     setAccountNotice("");
 
     try {
       await accountApi.update(editingAccount.id, {
-        accountName,
-        accountNumber: editAccountForm.accountNumber.trim(),
+        accountName: name,
+        accountNumber,
         balance,
       });
 
@@ -883,10 +815,10 @@ const ProfileAccountWithData = () => {
           acc.id === editingAccount.id
             ? {
                 ...acc,
-                name: accountName,
-                type: editAccountForm.type,
+                name,
+                type,
                 balance,
-                accountNumber: editAccountForm.accountNumber.trim(),
+                accountNumber,
               }
             : acc,
         ),
@@ -896,7 +828,7 @@ const ProfileAccountWithData = () => {
       await showAccountAlert({
         icon: "success",
         title: "Akun berhasil diperbarui",
-        text: `${accountName} sudah diperbarui.`,
+        text: `${name} sudah diperbarui.`,
       });
     } catch (error) {
       const message = error?.message || "Akun gagal diperbarui.";
@@ -1094,110 +1026,71 @@ const ProfileAccountWithData = () => {
                   </div>
                 )}
                 <div className="sadar-insight-list sadar-account-list">
-                  {accounts.map((account) => (
-                    <div
-                      className="sadar-insight-item sadar-account-item"
-                      key={account.id}
-                    >
-                      <span className="sadar-card-icon">
-                        <i
-                          className={
-                            account.type === "Bank"
-                              ? "ri-bank-line"
-                              : account.type === "E-wallet"
-                                ? "ri-wallet-3-line"
-                                : "ri-cash-line"
-                          }
-                        ></i>
-                      </span>
-                      <div className="sadar-account-fields">
-                        <div className="sadar-form-grid sadar-account-form-grid">
+                  {accounts.map((account) => {
+                    const inst = findInstitutionByName(account.name);
+                    const icon = inst ? inst.icon : (account.type === "Bank" ? "🏦" : "💳");
+                    return (
+                      <div
+                        className="sadar-insight-item sadar-account-item d-flex align-items-center justify-content-between gap-3 p-3 mb-2 rounded-3 border"
+                        key={account.id}
+                      >
+                        <div className="d-flex align-items-center gap-3">
+                          <span className="sadar-card-icon fs-20 d-flex align-items-center justify-content-center">
+                            {icon}
+                          </span>
                           <div>
-                            <Label>Nama Akun</Label>
-                            <Input
-                              value={account.name}
-                              onChange={(event) =>
-                                updateAccount(
-                                  account.id,
-                                  "name",
-                                  event.target.value,
-                                )
-                              }
-                              onBlur={() => persistAccount(account)}
-                            />
-                          </div>
-                          <div>
-                            <Label>Tipe</Label>
-                            <Input
-                              type="select"
-                              value={account.type}
-                              onChange={(event) =>
-                                updateAccount(
-                                  account.id,
-                                  "type",
-                                  event.target.value,
-                                )
-                              }
-                              onBlur={() => persistAccount(account)}
-                            >
-                              {accountTypes.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                  {type.label}
-                                </option>
-                              ))}
-                            </Input>
-                          </div>
-                          <div>
-                            <Label>Saldo Berjalan</Label>
-                            <Input
-                              type="text"
-                              inputMode="numeric"
-                              value={formatNumberInput(account.balance)}
-                              readOnly
-                            />
-                          </div>
-                          <div className="d-flex align-items-end justify-content-end">
-                            <Dropdown
-                              isOpen={openActionAccountId === account.id}
-                              toggle={() =>
-                                setOpenActionAccountId(
-                                  openActionAccountId === account.id
-                                    ? ""
-                                    : account.id,
-                                )
-                              }
-                            >
-                              <DropdownToggle
-                                className="sadar-row-action-toggle btn-sm"
-                                color="light"
-                                aria-label={`Aksi untuk ${account.name}`}
-                              >
-                                <i className="ri-more-fill align-bottom"></i>
-                              </DropdownToggle>
-                              <DropdownMenu
-                                end
-                                className="sadar-row-action-menu"
-                              >
-                                <DropdownItem
-                                  onClick={() => openEditAccountModal(account)}
-                                >
-                                  <i className="ri-pencil-line align-bottom me-2"></i>
-                                  Ubah
-                                </DropdownItem>
-                                <DropdownItem
-                                  className="text-danger"
-                                  onClick={() => deleteAccount(account.id)}
-                                >
-                                  <i className="ri-delete-bin-line align-bottom me-2"></i>
-                                  Hapus
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
+                            <div className="d-flex align-items-center gap-2">
+                              <h6 className="mb-0 fw-semibold text-dark">{account.name}</h6>
+                              <Badge color={account.type === "Bank" ? "primary" : "info"} className="badge-soft">
+                                {account.type}
+                              </Badge>
+                            </div>
+                            <p className="text-muted fs-12 mb-0 mt-1">
+                              {account.accountNumber
+                                ? `No. Akun: ${account.accountNumber}`
+                                : "Tanpa nomor akun"}
+                            </p>
                           </div>
                         </div>
+
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="text-end">
+                            <span className="text-muted fs-11 d-block">Saldo Berjalan</span>
+                            <strong className="fs-14 text-dark">{rupiah(account.balance)}</strong>
+                          </div>
+                          <Dropdown
+                            isOpen={openActionAccountId === account.id}
+                            toggle={() =>
+                              setOpenActionAccountId(
+                                openActionAccountId === account.id ? "" : account.id
+                              )
+                            }
+                          >
+                            <DropdownToggle
+                              className="sadar-row-action-toggle btn-sm"
+                              color="light"
+                              aria-label={`Aksi untuk ${account.name}`}
+                            >
+                              <i className="ri-more-fill align-bottom"></i>
+                            </DropdownToggle>
+                            <DropdownMenu end className="sadar-row-action-menu">
+                              <DropdownItem onClick={() => openEditAccountModal(account)}>
+                                <i className="ri-pencil-line align-bottom me-2"></i>
+                                Ubah
+                              </DropdownItem>
+                              <DropdownItem
+                                className="text-danger"
+                                onClick={() => deleteAccount(account.id)}
+                              >
+                                <i className="ri-delete-bin-line align-bottom me-2"></i>
+                                Hapus
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardBody>
             </Card>
@@ -1292,201 +1185,22 @@ const ProfileAccountWithData = () => {
         </Row>
       </Container>
 
-      <Modal
+      <AccountFormModal
         isOpen={isAddAccountOpen}
         toggle={closeAddAccountModal}
-        centered
-        className="sadar-history-modal sadar-account-modal"
-      >
-        <ModalHeader toggle={closeAddAccountModal}>Tambah Akun</ModalHeader>
-        <Form onSubmit={submitNewAccount} noValidate>
-          <ModalBody>
-            <div className="sadar-history-edit-grid">
-              <div>
-                <Label htmlFor="new-account-name">Nama Akun</Label>
-                <Input
-                  id="new-account-name"
-                  value={newAccountForm.name}
-                  onChange={(event) =>
-                    setNewAccountForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                  placeholder="Contoh: BCA Utama"
-                  autoFocus
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="new-account-type">Tipe</Label>
-                <Input
-                  id="new-account-type"
-                  type="select"
-                  value={newAccountForm.type}
-                  onChange={(event) =>
-                    setNewAccountForm((current) => ({
-                      ...current,
-                      type: event.target.value,
-                    }))
-                  }
-                >
-                  {accountTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </Input>
-              </div>
-              <div>
-                <Label htmlFor="new-account-number">Nomor Akun</Label>
-                <Input
-                  id="new-account-number"
-                  value={newAccountForm.accountNumber}
-                  onChange={(event) =>
-                    setNewAccountForm((current) => ({
-                      ...current,
-                      accountNumber: event.target.value,
-                    }))
-                  }
-                  placeholder="Opsional"
-                />
-              </div>
-              <div>
-                <Label htmlFor="new-account-balance">Saldo Awal</Label>
-                <Input
-                  id="new-account-balance"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9.]*"
-                  value={formatNumberInput(newAccountForm.balance)}
-                  onChange={(event) =>
-                    setNewAccountForm((current) => ({
-                      ...current,
-                      balance: onlyDigits(event.target.value),
-                    }))
-                  }
-                  placeholder="Contoh: 500.000"
-                />
-              </div>
-            </div>
-            <p className="text-muted mb-0 mt-3">
-              Akun baru akan disimpan setelah kamu menekan tombol simpan.
-            </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              type="button"
-              color="light"
-              onClick={closeAddAccountModal}
-              disabled={isSavingAccount}
-            >
-              Batal
-            </Button>
-            <Button type="submit" color="primary" disabled={isSavingAccount}>
-              {isSavingAccount ? "Menyimpan..." : "Simpan Akun"}
-            </Button>
-          </ModalFooter>
-        </Form>
-      </Modal>
+        mode="add"
+        onSave={handleSaveAddAccount}
+        isSaving={isSavingAccount}
+      />
 
-      <Modal
+      <AccountFormModal
         isOpen={isEditAccountOpen}
         toggle={closeEditAccountModal}
-        centered
-        className="sadar-history-modal sadar-account-modal"
-      >
-        <ModalHeader toggle={closeEditAccountModal}>Edit Akun</ModalHeader>
-        <Form onSubmit={submitEditAccount} noValidate>
-          <ModalBody>
-            <div className="sadar-history-edit-grid">
-              <div>
-                <Label htmlFor="edit-account-name">Nama Akun</Label>
-                <Input
-                  id="edit-account-name"
-                  value={editAccountForm.name}
-                  onChange={(event) =>
-                    setEditAccountForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                  placeholder="Contoh: BCA Utama"
-                  autoFocus
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-account-type">Tipe</Label>
-                <Input
-                  id="edit-account-type"
-                  type="select"
-                  value={editAccountForm.type}
-                  onChange={(event) =>
-                    setEditAccountForm((current) => ({
-                      ...current,
-                      type: event.target.value,
-                    }))
-                  }
-                >
-                  {accountTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </Input>
-              </div>
-              <div>
-                <Label htmlFor="edit-account-number">Nomor Akun</Label>
-                <Input
-                  id="edit-account-number"
-                  value={editAccountForm.accountNumber}
-                  onChange={(event) =>
-                    setEditAccountForm((current) => ({
-                      ...current,
-                      accountNumber: event.target.value,
-                    }))
-                  }
-                  placeholder="Opsional"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-account-balance">Saldo Berjalan</Label>
-                <Input
-                  id="edit-account-balance"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9.]*"
-                  value={formatNumberInput(editAccountForm.balance)}
-                  onChange={(event) =>
-                    setEditAccountForm((current) => ({
-                      ...current,
-                      balance: onlyDigits(event.target.value),
-                    }))
-                  }
-                  placeholder="Contoh: 500.000"
-                />
-              </div>
-            </div>
-            <p className="text-muted mb-0 mt-3">
-              Perubahan akun akan disimpan setelah kamu menekan tombol simpan.
-            </p>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              type="button"
-              color="light"
-              onClick={closeEditAccountModal}
-              disabled={isSavingAccount}
-            >
-              Batal
-            </Button>
-            <Button type="submit" color="primary" disabled={isSavingAccount}>
-              {isSavingAccount ? "Menyimpan..." : "Simpan Perubahan"}
-            </Button>
-          </ModalFooter>
-        </Form>
-      </Modal>
+        mode="edit"
+        initialData={editingAccount}
+        onSave={handleSaveEditAccount}
+        isSaving={isSavingAccount}
+      />
 
       <Modal
         isOpen={Boolean(pendingDeleteAccount)}

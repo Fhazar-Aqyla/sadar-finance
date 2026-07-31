@@ -328,7 +328,7 @@ const setupSteps = [
   {
     title: "Catat Pemasukan Pertama",
     checklistLabel: "Catat Pemasukan Pertama",
-    description: "Masukkan pemasukan pertamamu agar SADAR bisa membantu menghitung saldo dan rekomendasi anggaran awal.",
+    description: "Catat pemasukan pertamamu agar SADAR dapat menghitung saldo dan rekomendasi anggaran.",
     cta: "Catat Pemasukan",
     to: "/catat-keuangan?type=income",
     icon: "ri-arrow-down-circle-line",
@@ -336,7 +336,7 @@ const setupSteps = [
   {
     title: "Atur Anggaran 50/30/20",
     checklistLabel: "Atur Anggaran 50/30/20",
-    description: "Bagi pemasukanmu menjadi 50% kebutuhan, 30% keinginan, dan 20% tabungan agar pengeluaran lebih terarah.",
+    description: "Alokasikan 50% kebutuhan, 30% keinginan, dan 20% tabungan agar finansial lebih sehat.",
     cta: "Atur Anggaran",
     to: "/profile-account#atur-budget",
     icon: "ri-pie-chart-2-line",
@@ -344,15 +344,15 @@ const setupSteps = [
   {
     title: "Catat Transaksi Pertama",
     checklistLabel: "Catat Transaksi Pertama",
-    description: "Mulai catat pengeluaran pertamamu agar dashboard, insight, dan peringatan bisa mulai bekerja.",
+    description: "Mulai catat pengeluaran pertamamu agar dashboard, insight, dan analisis bisa bekerja.",
     cta: "Catat Transaksi",
     to: "/catat-keuangan",
-    icon: "ri-receipt-line",
+    icon: "ri-bank-card-line",
   },
   {
     title: "Dashboard Kamu Siap Digunakan",
     checklistLabel: "Lihat Dashboard",
-    description: "Setelah data mulai terisi, SADAR akan membantu menampilkan ringkasan keuangan, pola pengeluaran, skor finansial, dan peringatan secara bertahap.",
+    description: "Setelah data terisi, SADAR akan menampilkan ringkasan, analisis, dan skor finansialmu.",
     cta: "Lihat Dashboard",
     to: "/dashboard",
     icon: "ri-dashboard-3-line",
@@ -443,14 +443,30 @@ const SetupGuideModal = ({ isOpen, onComplete, onSkip }) => {
           Langkah {Math.min(activeStep + 1, 4)} dari 4
         </div>
         <div className="sadar-stepper-progress" aria-hidden="true">
-          {setupSteps.slice(0, 4).map((item, index) => (
-            <span className={index <= activeStep ? "is-active" : ""} key={item.title}></span>
-          ))}
+          {setupSteps.slice(0, 4).map((item, index) => {
+            const isCompleted = index < activeStep;
+            const isActive = index === activeStep;
+            const className = isCompleted
+              ? "is-completed"
+              : isActive
+              ? "is-active"
+              : "";
+            return <span className={className} key={item.title}></span>;
+          })}
         </div>
         <div className="sadar-stepper-content">
-          <span className="sadar-stepper-badge">{isFinalStep ? "OK" : `0${activeStep + 1}`}</span>
-          <h4>{step.title}</h4>
-          <p>{step.description}</p>
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <div className="sadar-stepper-icon-box">
+              <i className={`${step.icon || "ri-checkbox-circle-line"} fs-20`}></i>
+            </div>
+            <span className="sadar-stepper-badge">
+              {isFinalStep ? "SELESAI" : `0${activeStep + 1} / 04`}
+            </span>
+          </div>
+          <div>
+            <h4>{step.title}</h4>
+            <p className="mt-1">{step.description}</p>
+          </div>
         </div>
       </ModalBody>
       <ModalFooter className="sadar-stepper-footer">

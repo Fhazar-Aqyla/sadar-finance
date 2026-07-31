@@ -14,7 +14,6 @@
   min-height: 100vh !important;
 }
 
-
 .sadar-page .container-fluid {
   max-width: 1480px;
 }
@@ -865,7 +864,9 @@
 }
 
 .sadar-account-form-grid {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1fr) max-content;
+  grid-template-columns:
+    minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1fr)
+    max-content;
   gap: 0.75rem;
   align-items: end;
 }
@@ -937,8 +938,9 @@
   background: #fee2e2;
 }
 
-.sadar-account-modal .modal-content {
-  overflow: hidden;
+.sadar-account-modal .modal-content,
+.sadar-account-modal .modal-body {
+  overflow: visible !important;
 }
 
 .sadar-swal-popup {
@@ -1502,7 +1504,9 @@ html[data-bs-theme="dark"] .sadar-recommend-card div > span {
 }
 
 html[data-bs-theme="dark"] .sadar-progress,
-html[data-bs-theme="dark"] .sadar-stepper-progress span {
+html[data-bs-theme="dark"]
+  .sadar-stepper-progress
+  span:not(.is-active):not(.is-completed) {
   background-color: #334155;
 }
 
@@ -1547,13 +1551,19 @@ html[data-bs-theme="dark"] .sadar-password-toggle:hover {
   background: var(--sadar-dark-surface-soft) !important;
 }
 
-html[data-bs-theme="dark"] .sadar-table-pagination .page-item.active .page-link {
+html[data-bs-theme="dark"]
+  .sadar-table-pagination
+  .page-item.active
+  .page-link {
   border-color: #38bdf8 !important;
   color: #0f172a !important;
   background: #38bdf8 !important;
 }
 
-html[data-bs-theme="dark"] .sadar-table-pagination .page-item.disabled .page-link {
+html[data-bs-theme="dark"]
+  .sadar-table-pagination
+  .page-item.disabled
+  .page-link {
   color: #64748b !important;
   background: #1a2430 !important;
 }
@@ -1674,7 +1684,9 @@ html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control::placeholder {
   color: #8a97aa;
 }
 
-html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control[type="file"]::file-selector-button {
+html[data-bs-theme="dark"]
+  .sadar-history-edit-grid
+  .form-control[type="file"]::file-selector-button {
   border-right-color: rgba(148, 163, 184, 0.42);
   color: var(--sadar-dark-heading);
   background: #2b3442;
@@ -2153,7 +2165,7 @@ html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
     padding: 0.7rem 0.75rem !important;
     font-size: 0.82rem !important;
   }
-  
+
   .sadar-table-pagination {
     flex-direction: column-reverse;
     align-items: stretch;
@@ -2278,5 +2290,308 @@ html[data-bs-theme="dark"] .sadar-table-filter-btn:hover {
 
 html[data-bs-theme="dark"] .sadar-table-filter-btn strong {
   color: #f8fafc;
+}
+
+/* ==========================================================================
+   Account Modal & Searchable Select Component Styles
+   ========================================================================== */
+.sadar-account-modal .modal-content,
+.sadar-account-modal .modal-body {
+  overflow: visible !important;
+}
+
+.sadar-account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem 1.25rem;
+  align-items: start;
+}
+
+.sadar-account-form-grid .sadar-form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.sadar-account-form-grid .form-control,
+.sadar-account-form-grid .form-select,
+.sadar-account-form-grid .input-group-text {
+  min-height: 48px;
+  height: 48px;
+  border-color: #d6deeb;
+  border-radius: 8px;
+  color: #172033;
+}
+
+.sadar-account-form-grid .input-group {
+  align-items: stretch;
+}
+
+.sadar-account-form-grid .input-group .input-group-text {
+  border-top-left-radius: 8px !important;
+  border-bottom-left-radius: 8px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-color: #d6deeb;
+  background-color: #f8fafc;
+}
+
+.sadar-account-form-grid .input-group .form-control {
+  border-top-right-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-color: #d6deeb;
+}
+
+.sadar-account-form-grid .invalid-feedback {
+  min-height: 18px;
+}
+
+@media (max-width: 575.98px) {
+  .sadar-account-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Searchable Select Trigger & Container */
+.sadar-searchable-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.sadar-searchable-select-container.open {
+  z-index: 1070;
+}
+
+.sadar-searchable-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  height: 48px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #d6deeb;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #172033;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sadar-searchable-select-trigger:focus,
+.sadar-searchable-select-container.open .sadar-searchable-select-trigger {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  outline: none;
+}
+
+.sadar-searchable-select-trigger.is-invalid {
+  border-color: #ef4444 !important;
+  background-image: none !important;
+}
+
+.sadar-searchable-select-trigger.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.sadar-select-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sadar-institution-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.sadar-select-chevron {
+  font-size: 1.25rem;
+  color: #64748b;
+  transition: transform 0.2s ease;
+  margin-left: 0.5rem;
+}
+
+.sadar-select-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* Searchable Select Menu Dropdown */
+.sadar-searchable-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1075;
+  max-height: 200px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.22);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: sadarDropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes sadarDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sadar-select-search-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.sadar-select-search-header .search-icon {
+  position: absolute;
+  left: 1.1rem;
+  color: #94a3b8;
+  font-size: 1.05rem;
+  pointer-events: none;
+}
+
+.sadar-select-search-input {
+  width: 100%;
+  padding: 0.45rem 1.8rem 0.45rem 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #1e293b;
+  background: #ffffff;
+}
+
+.sadar-select-search-input:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
+}
+
+.sadar-select-clear-search {
+  position: absolute;
+  right: 1.1rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sadar-select-clear-search:hover {
+  color: #475569;
+}
+
+.sadar-select-options-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.35rem 0;
+}
+
+.sadar-select-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.sadar-select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.875rem;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sadar-select-option:hover,
+.sadar-select-option.highlighted {
+  background-color: #f0f9ff;
+  color: #0369a1;
+}
+
+.sadar-select-option.selected {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  font-weight: 650;
+}
+
+.sadar-select-option .option-icon {
+  font-size: 1.1rem;
+}
+
+.sadar-select-option .option-check {
+  color: #0284c7;
+  font-weight: bold;
+}
+
+.sadar-select-empty-state {
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+/* Dark Mode Styles for SearchableSelect */
+html[data-bs-theme="dark"] .sadar-searchable-select-trigger {
+  background-color: #1a2332;
+  border-color: #2e3a4e;
+  color: #f1f5f9;
+}
+
+html[data-bs-theme="dark"] .sadar-searchable-select-menu {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+html[data-bs-theme="dark"] .sadar-select-search-header {
+  background: #111827;
+  border-bottom-color: #1f2937;
+}
+
+html[data-bs-theme="dark"] .sadar-select-search-input {
+  background: #1e293b;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+html[data-bs-theme="dark"] .sadar-select-group-header {
+  background: #111827;
+  color: #9ca3af;
+}
+
+html[data-bs-theme="dark"] .sadar-select-option {
+  color: #e2e8f0;
+}
+
+html[data-bs-theme="dark"] .sadar-select-option:hover,
+html[data-bs-theme="dark"] .sadar-select-option.highlighted {
+  background-color: #1e3a5f;
+  color: #38bdf8;
+}
+
+html[data-bs-theme="dark"] .sadar-select-option.selected {
+  background-color: #0c4a6e;
+  color: #38bdf8;
 }
 

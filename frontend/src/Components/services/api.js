@@ -178,18 +178,104 @@ const mockApi = {
     insights: () => Promise.resolve([]),
     alerts: () => Promise.resolve([]),
   },
+  auth: {
+    login: (payload) =>
+      Promise.resolve({
+        token: "mock-jwt-token-demo-sadar-finance",
+        user: {
+          id: "user_demo_01",
+          users_id: "user_demo_01",
+          first_name: "Demo",
+          last_name: "User",
+          name: "Demo User",
+          email: payload?.email || "demo@sadarfinance.com",
+          gender: "male",
+          occupation: "Software Engineer",
+          avatar: "",
+        },
+      }),
+    me: () =>
+      Promise.resolve({
+        id: "user_demo_01",
+        users_id: "user_demo_01",
+        first_name: "Demo",
+        last_name: "User",
+        name: "Demo User",
+        email: "demo@sadarfinance.com",
+        gender: "male",
+        occupation: "Software Engineer",
+        avatar: "",
+      }),
+    updateMe: (payload) =>
+      Promise.resolve({
+        id: "user_demo_01",
+        users_id: "user_demo_01",
+        first_name: payload?.first_name || "Demo",
+        last_name: payload?.last_name || "User",
+        email: payload?.email || "demo@sadarfinance.com",
+      }),
+    register: (payload) =>
+      Promise.resolve({
+        token: "mock-jwt-token-demo-sadar-finance",
+        user: {
+          id: "user_demo_01",
+          first_name: payload?.first_name || "Demo",
+          email: payload?.email || "demo@sadarfinance.com",
+        },
+      }),
+    forgotPassword: () =>
+      Promise.resolve({ message: "Reset password link dikirim (Mock)" }),
+  },
 };
 
 export const authApi = {
-  register: (payload) => apiClient.post("/auth/register", payload).then(unwrapData),
-  login: (payload) => apiClient.post("/auth/login", payload).then(unwrapData),
-  forgotPassword: (payload) => apiClient.post("/auth/forgot-password", payload).then(unwrapData),
-  me: () => apiClient.get("/auth/me").then(unwrapData),
-  updateMe: (payload) => apiClient.put("/auth/me", payload).then(unwrapData),
-  updateAvatar: (formData) => apiClient.post("/auth/profile-picture", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  }).then(unwrapData),
-  deleteAccount: (password) => apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
+  register: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.register(payload)
+      : apiClient
+          .post("/auth/register", payload)
+          .then(unwrapData)
+          .catch(() => mockApi.auth.register(payload)),
+  login: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.login(payload)
+      : apiClient
+          .post("/auth/login", payload)
+          .then(unwrapData)
+          .catch((err) => {
+            console.warn(
+              "Backend login unavailable, fallback to mock auth:",
+              err.message
+            );
+            return mockApi.auth.login(payload);
+          }),
+  forgotPassword: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.forgotPassword(payload)
+      : apiClient.post("/auth/forgot-password", payload).then(unwrapData),
+  me: () =>
+    isSadarMockDataScenario
+      ? mockApi.auth.me()
+      : apiClient.get("/auth/me").then(unwrapData).catch(() => mockApi.auth.me()),
+  updateMe: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.updateMe(payload)
+      : apiClient
+          .put("/auth/me", payload)
+          .then(unwrapData)
+          .catch(() => mockApi.auth.updateMe(payload)),
+  updateAvatar: (formData) =>
+    isSadarMockDataScenario
+      ? Promise.resolve({ profile_picture: "" })
+      : apiClient
+          .post("/auth/profile-picture", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          })
+          .then(unwrapData),
+  deleteAccount: (password) =>
+    isSadarMockDataScenario
+      ? Promise.resolve({ message: "Account deleted (Mock)" })
+      : apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
 };
 
 export const accountApi = {

@@ -1,8 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
-import { Button, Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
-import { analyticsApi, incomeApi, transactionApi } from "../../Components/services/api";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Row,
+} from "reactstrap";
+import {
+  analyticsApi,
+  incomeApi,
+  transactionApi,
+} from "../../Components/services/api";
 
 import "../SadarShared/sadar-pages.css";
 
@@ -13,7 +25,8 @@ const rupiah = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const sumBy = (rows, getValue) => rows.reduce((total, row) => total + getValue(row), 0);
+const sumBy = (rows, getValue) =>
+  rows.reduce((total, row) => total + getValue(row), 0);
 
 const groupSumBy = (rows, key) =>
   rows.reduce((result, row) => {
@@ -23,7 +36,9 @@ const groupSumBy = (rows, key) =>
   }, {});
 
 const getDayName = (date) =>
-  new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(new Date(`${date}T00:00:00`));
+  new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(
+    new Date(`${date}T00:00:00`),
+  );
 
 const isWeekend = (date) => {
   const day = new Date(`${date}T00:00:00`).getDay();
@@ -31,13 +46,16 @@ const isWeekend = (date) => {
 };
 
 const formatShortDate = (date) =>
-  new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(new Date(`${date}T00:00:00`));
+  new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(
+    new Date(`${date}T00:00:00`),
+  );
 
 const chartBase = {
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
-    fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily:
+      "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
   },
   dataLabels: { enabled: false },
   grid: { borderColor: "#edf2f7", strokeDashArray: 4 },
@@ -49,20 +67,50 @@ const chartBase = {
 const getTopEntry = (object) =>
   Object.entries(object).sort((a, b) => b[1] - a[1])[0] || ["-", 0];
 
-const dashboardCategoryLabels = ["Makanan", "Transportasi", "Belanja", "Hiburan", "Lainnya"];
-const dashboardCategoryColors = ["#1E3A8A", "#14B8A6", "#F59E0B", "#22C55E", "#94a3b8"];
+const dashboardCategoryLabels = [
+  "Makanan",
+  "Transportasi",
+  "Belanja",
+  "Hiburan",
+  "Lainnya",
+];
+const dashboardCategoryColors = [
+  "#1E3A8A",
+  "#14B8A6",
+  "#F59E0B",
+  "#22C55E",
+  "#94a3b8",
+];
 
 const normalizeCategoryToDashboard = (category) => {
   const text = String(category || "").toLowerCase();
-  if (/makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(text)) return "Makanan";
-  if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text)) return "Transportasi";
-  if (/belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(text)) return "Belanja";
-  if (/hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(text)) return "Hiburan";
+  if (
+    /makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(
+      text,
+    )
+  )
+    return "Makanan";
+  if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text))
+    return "Transportasi";
+  if (
+    /belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(
+      text,
+    )
+  )
+    return "Belanja";
+  if (
+    /hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(
+      text,
+    )
+  )
+    return "Hiburan";
   return "Lainnya";
 };
 
 const isBudgetBucketCategory = (category) =>
-  ["needs", "wants", "savings", "investment"].includes(String(category || "").toLowerCase());
+  ["needs", "wants", "savings", "investment"].includes(
+    String(category || "").toLowerCase(),
+  );
 
 const inferCategoryFromTransaction = (row) =>
   normalizeCategoryToDashboard(
@@ -74,7 +122,9 @@ const inferCategoryFromTransaction = (row) =>
       row.category,
       row.category_name,
       row.categoryName,
-    ].filter(Boolean).join(" "),
+    ]
+      .filter(Boolean)
+      .join(" "),
   );
 
 const getTransactionCategory = (row) => {
@@ -110,7 +160,8 @@ const normalizePrediction = (prediction) => {
     prediction.probability ??
     prediction.overspending_probability ??
     null;
-  const probabilityNumber = rawProbability == null ? null : Number(rawProbability);
+  const probabilityNumber =
+    rawProbability == null ? null : Number(rawProbability);
   const spikeProbability =
     probabilityNumber == null || Number.isNaN(probabilityNumber)
       ? null
@@ -119,9 +170,17 @@ const normalizePrediction = (prediction) => {
         : probabilityNumber;
 
   return {
-    riskLevel: prediction.riskLevel || prediction.risk_level || prediction.risk || "medium",
+    riskLevel:
+      prediction.riskLevel ||
+      prediction.risk_level ||
+      prediction.risk ||
+      "medium",
     spikeProbability,
-    recommendation: prediction.recommendation || prediction.message || prediction.insight || "",
+    recommendation:
+      prediction.recommendation ||
+      prediction.message ||
+      prediction.insight ||
+      "",
     source: prediction.source || prediction.model_source || "auto",
   };
 };
@@ -133,7 +192,8 @@ const splitRecommendationText = (text) => {
   if (!cleanText) {
     return {
       title: "Pantau pola berikutnya",
-      description: "Tambahkan transaksi rutin agar rekomendasi bisa lebih spesifik.",
+      description:
+        "Tambahkan transaksi rutin agar rekomendasi bisa lebih spesifik.",
     };
   }
 
@@ -145,8 +205,14 @@ const splitRecommendationText = (text) => {
   }
 
   return {
-    title: cleanText.length > 180 ? `${cleanText.slice(0, 177).trim()}...` : cleanText,
-    description: cleanText.length > 180 ? cleanText : "Aksi ini bisa membantu menjaga arus kas tetap terkendali.",
+    title:
+      cleanText.length > 180
+        ? `${cleanText.slice(0, 177).trim()}...`
+        : cleanText,
+    description:
+      cleanText.length > 180
+        ? cleanText
+        : "Aksi ini bisa membantu menjaga arus kas tetap terkendali.",
   };
 };
 
@@ -163,9 +229,21 @@ const toRecommendationCard = (item, index) => {
 
   const text = splitRecommendationText(item);
   const presets = [
-    { action: "Prioritaskan minggu ini", tone: "teal", icon: "ri-focus-2-line" },
-    { action: "Terapkan batas harian", tone: "warning", icon: "ri-calendar-check-line" },
-    { action: "Review sebelum belanja", tone: "primary", icon: "ri-wallet-3-line" },
+    {
+      action: "Prioritaskan minggu ini",
+      tone: "teal",
+      icon: "ri-focus-2-line",
+    },
+    {
+      action: "Terapkan batas harian",
+      tone: "warning",
+      icon: "ri-calendar-check-line",
+    },
+    {
+      action: "Review sebelum belanja",
+      tone: "primary",
+      icon: "ri-wallet-3-line",
+    },
     { action: "Pantau ulang", tone: "success", icon: "ri-check-double-line" },
   ];
 
@@ -191,7 +269,8 @@ const toDashboardCategoryRows = (byCategory) => {
 
 const toCategoryPrimary = (category) => {
   const text = String(category || "").toLowerCase();
-  if (/tagihan|makanan|transport|kesehatan|pendidikan/.test(text)) return "Needs";
+  if (/tagihan|makanan|transport|kesehatan|pendidikan/.test(text))
+    return "Needs";
   if (/tabungan|invest|dana darurat/.test(text)) return "Investment";
   return "Wants";
 };
@@ -200,10 +279,16 @@ const SadarLoadingScreen = () => {
   return (
     <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
       <div className="text-center">
-        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "2.5rem", height: "2.5rem" }}
+        >
           <span className="visually-hidden">Memuat...</span>
         </div>
-        <p className="mt-3 text-muted fw-semibold">Memuat analisis perilaku...</p>
+        <p className="mt-3 text-muted fw-semibold">
+          Memuat analisis perilaku...
+        </p>
       </div>
     </div>
   );
@@ -220,8 +305,14 @@ const EmptyBehaviorInsight = () => {
                 <i className="ri-line-chart-line"></i>
               </span>
               <h4>Belum Ada Pola yang Bisa Dianalisis</h4>
-              <p>Insight akan muncul setelah kamu mulai mencatat transaksi secara rutin.</p>
-              <div className="sadar-empty-state-note">Insight akan lebih akurat setelah tersedia data transaksi minimal 14 hari.</div>
+              <p>
+                Insight akan muncul setelah kamu mulai mencatat transaksi secara
+                rutin.
+              </p>
+              <div className="sadar-empty-state-note">
+                Insight akan lebih akurat setelah tersedia data transaksi
+                minimal 14 hari.
+              </div>
               <Button color="primary" tag={Link} to="/catat-keuangan">
                 Catat Transaksi Pertama
               </Button>
@@ -382,9 +473,12 @@ const BehaviorInsightWithData = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const data = useMemo(() => {
-    const expenseTransactions = backendTransactions.filter((item) => item.budget_group !== "Savings");
+    const expenseTransactions = backendTransactions.filter(
+      (item) => item.budget_group !== "Savings",
+    );
     const userIncomes = backendIncomes;
-    const distinctDays = new Set(expenseTransactions.map((item) => item.date)).size;
+    const distinctDays = new Set(expenseTransactions.map((item) => item.date))
+      .size;
     const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
     const totalIncome = sumBy(userIncomes, (item) => item.amount);
     const byCategory = groupSumBy(expenseTransactions, "category");
@@ -428,7 +522,10 @@ const BehaviorInsightWithData = () => {
         type: "behavior",
       },
       {
-        title: weekendExpense > weekdayExpense ? "Pengeluaran akhir pekan lebih tinggi" : "Pengeluaran hari kerja lebih dominan",
+        title:
+          weekendExpense > weekdayExpense
+            ? "Pengeluaran akhir pekan lebih tinggi"
+            : "Pengeluaran hari kerja lebih dominan",
         description:
           weekendExpense > weekdayExpense
             ? `Pengeluaran akhir pekan mencapai ${rupiah(weekendExpense)}, lebih tinggi dari hari kerja.`
@@ -437,7 +534,8 @@ const BehaviorInsightWithData = () => {
       },
       {
         title: `Transaksi paling sering terjadi pada hari ${mostActiveDay}`,
-        description: "Pola ini bisa membantu menentukan hari yang perlu lebih dipantau.",
+        description:
+          "Pola ini bisa membantu menentukan hari yang perlu lebih dipantau.",
         type: "behavior",
       },
     ];
@@ -460,12 +558,15 @@ const BehaviorInsightWithData = () => {
         : "Porsi keinginan masih terkendali, tetap cek sebelum melakukan belanja tambahan.",
     ];
 
-    const behaviorCandidate = [...expenseTransactions].sort((a, b) => b.amount - a.amount)[0] || null;
+    const behaviorCandidate =
+      [...expenseTransactions].sort((a, b) => b.amount - a.amount)[0] || null;
     const rolling7dSpending = behaviorCandidate
       ? sumBy(
           expenseTransactions.filter((item) => {
             const itemDate = new Date(`${item.date}T00:00:00`);
-            const candidateDate = new Date(`${behaviorCandidate.date}T00:00:00`);
+            const candidateDate = new Date(
+              `${behaviorCandidate.date}T00:00:00`,
+            );
             const diffDays = (candidateDate - itemDate) / (1000 * 60 * 60 * 24);
             return diffDays >= 0 && diffDays <= 7;
           }),
@@ -559,14 +660,23 @@ const BehaviorInsightWithData = () => {
     return () => {
       isMounted = false;
     };
-  }, [data.behaviorCandidate, data.rolling7dSpending, data.userTransactions.length]);
+  }, [
+    data.behaviorCandidate,
+    data.rolling7dSpending,
+    data.userTransactions.length,
+  ]);
 
   const hasEnoughData = data.distinctDays >= 14;
   const categoryRows = toDashboardCategoryRows(data.byCategory);
   const categoryLabels = dashboardCategoryLabels;
   const categoryValues = categoryLabels.map((label) => categoryRows[label]);
-  const trendSeriesData = data.trendRows.map((item) => Math.round(item.amount / 1000));
-  const trendMaxValue = Math.max(100, Math.ceil((Math.max(...trendSeriesData, 0) * 1.2) / 500) * 500);
+  const trendSeriesData = data.trendRows.map((item) =>
+    Math.round(item.amount / 1000),
+  );
+  const trendMaxValue = Math.max(
+    100,
+    Math.ceil((Math.max(...trendSeriesData, 0) * 1.2) / 500) * 500,
+  );
   const trendOptions = createTrendOptions(
     data.trendRows.map((item) => formatShortDate(item.date)),
     trendMaxValue,
@@ -578,24 +688,29 @@ const BehaviorInsightWithData = () => {
   };
   const normalizedPrediction = normalizePrediction(behaviorPrediction);
   const modelRiskLabel = normalizedPrediction?.riskLevel
-    ? riskLabelMap[String(normalizedPrediction.riskLevel).toLowerCase()] || "Sedang"
+    ? riskLabelMap[String(normalizedPrediction.riskLevel).toLowerCase()] ||
+      "Sedang"
     : null;
-  const predictionPercent = normalizedPrediction?.spikeProbability != null
-    ? Math.round(normalizedPrediction.spikeProbability * 100)
-    : null;
+  const predictionPercent =
+    normalizedPrediction?.spikeProbability != null
+      ? Math.round(normalizedPrediction.spikeProbability * 100)
+      : null;
   const modelRiskTone = getRiskTone(normalizedPrediction?.riskLevel);
-  const predictionSourceLabel = normalizedPrediction?.source === "ai-service"
-    ? "Model AI"
-    : normalizedPrediction?.source === "rule-based-fallback"
-      ? "Cadangan berbasis aturan"
-      : "Prediksi otomatis";
+  const predictionSourceLabel =
+    normalizedPrediction?.source === "ai-service"
+      ? "Model AI"
+      : normalizedPrediction?.source === "rule-based-fallback"
+        ? "Cadangan berbasis aturan"
+        : "Prediksi otomatis";
   const insightItems = normalizedPrediction
     ? [
         {
           title: `Prediksi perilaku membaca risiko ${modelRiskLabel}`,
-          description: predictionPercent != null
-            ? `${data.behaviorCandidate?.name || "Transaksi terbesar"} memiliki probabilitas lonjakan sebesar ${predictionPercent}%.`
-            : normalizedPrediction.recommendation || "Model membaca pola transaksi terbaru untuk memberi sinyal risiko.",
+          description:
+            predictionPercent != null
+              ? `${data.behaviorCandidate?.name || "Transaksi terbesar"} memiliki probabilitas lonjakan sebesar ${predictionPercent}%.`
+              : normalizedPrediction.recommendation ||
+                "Model membaca pola transaksi terbaru untuk memberi sinyal risiko.",
           type: modelRiskTone,
           sourceLabel: predictionSourceLabel,
         },
@@ -620,7 +735,8 @@ const BehaviorInsightWithData = () => {
       <Container fluid>
         {!hasEnoughData && (
           <div className="sadar-empty-state mb-3">
-            Insight akan lebih akurat setelah data transaksi minimal 14 hari tersedia.
+            Insight akan lebih akurat setelah data transaksi minimal 14 hari
+            tersedia.
           </div>
         )}
 
@@ -630,7 +746,9 @@ const BehaviorInsightWithData = () => {
               <CardBody>
                 <div className="sadar-summary-label">
                   Kategori dominan
-                  <span className="sadar-card-icon"><i className="ri-pie-chart-2-line"></i></span>
+                  <span className="sadar-card-icon">
+                    <i className="ri-pie-chart-2-line"></i>
+                  </span>
                 </div>
                 <h2>{data.dominantCategory}</h2>
                 <p>{rupiah(data.dominantAmount)} bulan ini</p>
@@ -642,7 +760,9 @@ const BehaviorInsightWithData = () => {
               <CardBody>
                 <div className="sadar-summary-label">
                   Rata-rata harian
-                  <span className="sadar-card-icon teal"><i className="ri-calendar-check-line"></i></span>
+                  <span className="sadar-card-icon teal">
+                    <i className="ri-calendar-check-line"></i>
+                  </span>
                 </div>
                 <h2>{rupiah(data.dailyAverage)}</h2>
                 <p>Berdasarkan {data.distinctDays} hari transaksi</p>
@@ -654,7 +774,9 @@ const BehaviorInsightWithData = () => {
               <CardBody>
                 <div className="sadar-summary-label">
                   Hari tersering
-                  <span className="sadar-card-icon"><i className="ri-calendar-event-line"></i></span>
+                  <span className="sadar-card-icon">
+                    <i className="ri-calendar-event-line"></i>
+                  </span>
                 </div>
                 <h2>{data.mostActiveDay}</h2>
                 <p>Hari dengan frekuensi transaksi tertinggi</p>
@@ -666,9 +788,14 @@ const BehaviorInsightWithData = () => {
               <CardBody>
                 <div className="sadar-summary-label">
                   Potensi boros
-                  <span className={`sadar-card-icon ${modelRiskTone}`}><i className="ri-alert-line"></i></span>
+                  <span className={`sadar-card-icon ${modelRiskTone}`}>
+                    <i className="ri-alert-line"></i>
+                  </span>
                 </div>
-                <h2>{modelRiskLabel || (data.wantsRatio > 30 ? "Perlu Dipantau" : "Terkendali")}</h2>
+                <h2>
+                  {modelRiskLabel ||
+                    (data.wantsRatio > 30 ? "Perlu Dipantau" : "Terkendali")}
+                </h2>
                 <p>
                   {predictionPercent != null
                     ? `Spike probability ${predictionPercent}% dari model AI`
@@ -685,7 +812,9 @@ const BehaviorInsightWithData = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Kategori Pengeluaran</h4>
-                  <p className="text-muted mb-0">Distribusi pengeluaran bulan ini</p>
+                  <p className="text-muted mb-0">
+                    Distribusi pengeluaran bulan ini
+                  </p>
                 </div>
               </CardHeader>
               <CardBody className="category-chart-body">
@@ -730,19 +859,28 @@ const BehaviorInsightWithData = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Hari Kerja vs Akhir Pekan</h4>
-                  <p className="text-muted mb-0">Bandingkan waktu pengeluaran terbesar</p>
+                  <p className="text-muted mb-0">
+                    Bandingkan waktu pengeluaran terbesar
+                  </p>
                 </div>
               </CardHeader>
               <CardBody>
                 <ReactApexChart
                   type="bar"
                   height={300}
-                  series={[{ name: "Pengeluaran", data: [data.weekdayExpense, data.weekendExpense] }]}
+                  series={[
+                    {
+                      name: "Pengeluaran",
+                      data: [data.weekdayExpense, data.weekendExpense],
+                    },
+                  ]}
                   options={{
                     ...chartBase,
                     colors: ["#14B8A6"],
                     xaxis: { categories: ["Hari Kerja", "Akhir Pekan"] },
-                    plotOptions: { bar: { borderRadius: 8, columnWidth: "42%" } },
+                    plotOptions: {
+                      bar: { borderRadius: 8, columnWidth: "42%" },
+                    },
                   }}
                 />
               </CardBody>
@@ -756,7 +894,9 @@ const BehaviorInsightWithData = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Tren Pengeluaran</h4>
-                  <p className="text-muted mb-0">Pantau pola pengeluaran dari transaksi terbaru</p>
+                  <p className="text-muted mb-0">
+                    Pantau pola pengeluaran dari transaksi terbaru
+                  </p>
                 </div>
               </CardHeader>
               <CardBody className="sadar-expense-trend-body">
@@ -777,19 +917,26 @@ const BehaviorInsightWithData = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Insight Perilaku</h4>
-                  <p className="text-muted mb-0">Ringkasan berbasis transaksi; badge AI muncul jika prediksi model tersedia</p>
+                  <p className="text-muted mb-0">
+                    Ringkasan berbasis transaksi; badge AI muncul jika prediksi
+                    model tersedia
+                  </p>
                 </div>
               </CardHeader>
               <CardBody>
                 <div className="sadar-insight-list">
                   {insightItems.map((item) => (
                     <div className="sadar-insight-item" key={item.title}>
-                      <span className={`sadar-dot ${["success", "warning", "danger"].includes(item.type) ? item.type : ""}`}></span>
+                      <span
+                        className={`sadar-dot ${["success", "warning", "danger"].includes(item.type) ? item.type : ""}`}
+                      ></span>
                       <div>
                         <div className="sadar-insight-title-row">
                           <strong>{item.title}</strong>
                           {item.sourceLabel && (
-                            <span className={`sadar-source-badge ${normalizedPrediction?.source === "ai-service" ? "ai" : "fallback"}`}>
+                            <span
+                              className={`sadar-source-badge ${normalizedPrediction?.source === "ai-service" ? "ai" : "fallback"}`}
+                            >
                               {item.sourceLabel}
                             </span>
                           )}
@@ -807,13 +954,18 @@ const BehaviorInsightWithData = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Rekomendasi Ringan</h4>
-                  <p className="text-muted mb-0">Saran otomatis dari pola transaksi dan anggaran</p>
+                  <p className="text-muted mb-0">
+                    Saran otomatis dari pola transaksi dan anggaran
+                  </p>
                 </div>
               </CardHeader>
               <CardBody>
                 <div className="sadar-recommend-list">
                   {recommendationCards.map((item, index) => (
-                    <div className="sadar-recommend-card" key={`${item.title}-${index}`}>
+                    <div
+                      className="sadar-recommend-card"
+                      key={`${item.title}-${index}`}
+                    >
                       <span className={`sadar-recommend-icon ${item.tone}`}>
                         <i className={item.icon}></i>
                       </span>
