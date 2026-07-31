@@ -45,11 +45,6 @@ const isWeekend = (date) => {
   return day === 0 || day === 6;
 };
 
-const formatShortDate = (date) =>
-  new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(
-    new Date(`${date}T00:00:00`),
-  );
-
 const chartBase = {
   chart: {
     toolbar: { show: false },
@@ -682,13 +677,23 @@ const BehaviorInsightWithData = () => {
       (item) => item.amount,
     );
 
-    const byDate = expenseTransactions.reduce((result, item) => {
-      result[item.date] = (result[item.date] || 0) + item.amount;
+    const byMonth = expenseTransactions.reduce((result, item) => {
+      const monthKey = String(item.date || "").slice(0, 7);
+      if (monthKey && monthKey.length === 7) {
+        result[monthKey] = (result[monthKey] || 0) + item.amount;
+      }
       return result;
     }, {});
-    const trendRows = Object.entries(byDate)
-      .sort(([a], [b]) => new Date(`${a}T00:00:00`) - new Date(`${b}T00:00:00`))
-      .map(([date, amount]) => ({ date, amount }));
+    const trendRows = Object.entries(byMonth)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([monthKey, amount]) => {
+        const [year, month] = monthKey.split("-");
+        const date = new Date(Number(year), Number(month) - 1, 1);
+        const formatter = new Intl.DateTimeFormat("id-ID", { month: "short" });
+        const rawLabel = formatter.format(date).replace(".", "");
+        const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+        return { label, amount };
+      });
 
     const wantsExpense = sumBy(
       currentMonthExpenses.filter((item) => item.budget_group === "Wants"),
@@ -884,7 +889,7 @@ const BehaviorInsightWithData = () => {
     Math.ceil((Math.max(...trendSeriesData, 0) * 1.2) / 500) * 500,
   );
   const trendOptions = createTrendOptions(
-    data.trendRows.map((item) => formatShortDate(item.date)),
+    data.trendRows.map((item) => item.label),
     trendMaxValue,
   );
   const riskLabelMap = {
