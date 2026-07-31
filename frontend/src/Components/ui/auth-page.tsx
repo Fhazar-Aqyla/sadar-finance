@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Col } from "reactstrap";
 
 const financeQuotes = [
@@ -38,6 +39,11 @@ export function AuthPage() {
       <div className="relative flex h-full min-h-[720px] overflow-hidden bg-[#1E3A8A] p-10 text-white max-lg:min-h-[320px] max-lg:p-6">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(20,184,166,0.18),transparent_20rem),radial-gradient(circle_at_76%_18%,rgba(20,184,166,0.18),transparent_18rem),linear-gradient(180deg,#2563EB_0%,#1E3A8A_46%,#111E3F_100%)]" />
         
+        <div className="absolute inset-0 opacity-65">
+          <FloatingPaths position={1} />
+          <FloatingPaths position={-1} />
+        </div>
+
         <div className="relative z-10 flex w-full flex-col">
           <div className="max-w-[680px] pt-12 max-lg:max-w-[560px] max-lg:pt-4">
             <blockquote className="m-0">
@@ -52,5 +58,52 @@ export function AuthPage() {
         </div>
       </div>
     </Col>
+  );
+}
+
+function FloatingPaths({ position }: { position: number }) {
+  const paths = Array.from({ length: 36 }, (_, i) => ({
+    id: i,
+    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
+      380 - i * 5 * position
+    } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
+      152 - i * 5 * position
+    } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
+      684 - i * 5 * position
+    } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
+    width: 0.5 + i * 0.03,
+  }));
+
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <svg
+        className="h-full w-full text-white"
+        viewBox="0 0 696 316"
+        fill="none"
+      >
+        <title>Background Paths</title>
+        {paths.map((path) => (
+          <motion.path
+            key={path.id}
+            d={path.d}
+            stroke="currentColor"
+            strokeWidth={path.width}
+            strokeOpacity={0.1 + path.id * 0.03}
+            initial={{ pathLength: 0.3, opacity: 0.6 }}
+            animate={{
+              pathLength: 1,
+              opacity: [0.3, 0.6, 0.3],
+              pathOffset: [0, 1, 0],
+            }}
+            transition={{
+              duration: 20 + Math.random() * 10,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
+          />
+        ))}
+      </svg>
+    </div>
   );
 }
