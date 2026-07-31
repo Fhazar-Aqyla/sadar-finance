@@ -157,6 +157,7 @@ const seed = async () => {
         [gopayAccId, 'Wants', 'Food & Dining', 18, 'Kopi & Roti Kenangan', 50000 + (m * 3000)],
         [gopayAccId, 'Needs', 'Healthcare', 22, 'Beli Vitamin & Obat Apotek', 40000 + (m * 2000)],
         [bcaAccId, 'Wants', 'Food & Dining', 25, m % 2 === 0 ? 'Makan Malam Solaria' : 'Makan Malam Senopati', 150000 + (m * 30000)],
+        [mandiriAccId, 'Savings', 'Investment', 27, 'Investasi Reksadana Bibit', 2000000],
         [bcaAccId, 'Needs', 'Transportation', 28, 'Bensin & Service Motor', 150000 + (m * 10000)]
       ];
 
