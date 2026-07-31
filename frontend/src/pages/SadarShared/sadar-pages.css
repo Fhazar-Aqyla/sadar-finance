@@ -2382,7 +2382,9 @@ html[data-bs-theme="dark"] .sadar-table-filter-btn strong {
   color: #172033;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sadar-searchable-select-trigger:focus,
@@ -2528,7 +2530,9 @@ html[data-bs-theme="dark"] .sadar-table-filter-btn strong {
   font-size: 0.875rem;
   color: #334155;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .sadar-select-option:hover,
@@ -2667,9 +2671,18 @@ html[data-bs-theme="dark"] .sadar-select-option.selected {
   animation: sadar-pulse-icon 2s infinite ease-in-out;
 }
 @keyframes sadar-pulse-icon {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.8; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 }
 .sadar-step-title {
   color: #0f172a;
@@ -2715,12 +2728,22 @@ html[data-bs-theme="dark"] .sadar-select-option.selected {
   height: 8px;
   border-radius: 50%;
 }
-.dot-indicator.success { background-color: var(--sadar-success); }
-.dot-indicator.warning { background-color: var(--sadar-warning); }
-.dot-indicator.danger { background-color: var(--sadar-danger); }
+.dot-indicator.success {
+  background-color: var(--sadar-success);
+}
+.dot-indicator.warning {
+  background-color: var(--sadar-warning);
+}
+.dot-indicator.danger {
+  background-color: var(--sadar-danger);
+}
 
-.font-size-12 { font-size: 12px !important; }
-.font-size-13 { font-size: 13px !important; }
+.font-size-12 {
+  font-size: 12px !important;
+}
+.font-size-13 {
+  font-size: 13px !important;
+}
 
 /* Dark Mode Support */
 html[data-bs-theme="dark"] .sadar-progress-bar-track {

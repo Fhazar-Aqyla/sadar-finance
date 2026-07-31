@@ -294,31 +294,190 @@ const SadarLoadingScreen = () => {
   );
 };
 
-const EmptyBehaviorInsight = () => {
+const EmptyBehaviorInsight = ({ hasIncome, hasBudget, hasTransactions }) => {
+  useEffect(() => {
+    document.title = "Insight Perilaku | SADAR Finance";
+  }, []);
+
+  const completedSteps = [hasIncome, hasBudget, hasTransactions].filter(Boolean).length;
+  const totalSteps = 3;
+  const progressPercentage = Math.round((completedSteps / totalSteps) * 100);
+
+  const steps = [
+    {
+      key: "income",
+      title: "Catat Pemasukan",
+      description: "Tambahkan pemasukan agar SADAR dapat memahami arus uang yang masuk.",
+      completed: hasIncome,
+      ctaLabel: "Catat Pemasukan",
+      to: "/catat-keuangan?type=income",
+      icon: "ri-arrow-down-circle-line",
+    },
+    {
+      key: "budget",
+      title: "Atur Anggaran",
+      description: "Tentukan batas pengeluaran untuk membantu mengukur kesehatan pengelolaan keuanganmu.",
+      completed: hasBudget,
+      ctaLabel: "Atur Anggaran",
+      to: "/profile-account#atur-budget",
+      icon: "ri-wallet-line",
+    },
+    {
+      key: "transactions",
+      title: "Catat Transaksi",
+      description: "Bangun riwayat transaksi agar pola pengeluaranmu dapat dianalisis.",
+      completed: hasTransactions,
+      ctaLabel: "Catat Transaksi",
+      to: "/catat-keuangan?type=expense",
+      icon: "ri-exchange-dollar-line",
+    },
+  ];
+
+  // Find the first uncompleted step to set as nextStep (priority CTA)
+  const nextStep = steps.find((step) => !step.completed);
+
   return (
     <div className="page-content sadar-page">
       <Container fluid>
-        <Card className="sadar-panel">
-          <CardBody>
-            <div className="sadar-empty-state sadar-empty-state-center">
-              <span className="sadar-empty-state-icon">
-                <i className="ri-line-chart-line"></i>
-              </span>
-              <h4>Belum Ada Pola yang Bisa Dianalisis</h4>
-              <p>
-                Insight akan muncul setelah kamu mulai mencatat transaksi secara
-                rutin.
-              </p>
-              <div className="sadar-empty-state-note">
-                Insight akan lebih akurat setelah tersedia data transaksi
-                minimal 14 hari.
-              </div>
-              <Button color="primary" tag={Link} to="/catat-keuangan">
-                Catat Transaksi Pertama
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
+        <div className="sadar-page-header">
+          <div>
+            <h1>Lengkapi Data untuk Melihat Insight Perilaku</h1>
+            <p>
+              Insight dan analisis perilaku keuanganmu akan tersedia setelah data mencukupi.
+            </p>
+          </div>
+          <div className="sadar-header-icon">
+            <i className="ri-line-chart-line"></i>
+          </div>
+        </div>
+
+        <Row className="g-3 align-items-stretch">
+          <Col lg={7} xl={8} className="d-flex">
+            <Card className="sadar-panel flex-fill">
+              <CardBody className="d-flex flex-column justify-content-between p-4">
+                <div>
+                  {/* Onboarding Progress */}
+                  <div className="sadar-onboarding-progress-section mb-4">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="fw-semibold text-muted font-size-13">Langkah Penyelesaian</span>
+                      <span className="fw-bold text-primary font-size-13">{completedSteps} dari {totalSteps} langkah selesai</span>
+                    </div>
+                    <div className="sadar-progress-bar-track">
+                      <div
+                        className="sadar-progress-bar-fill"
+                        style={{ width: `${progressPercentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Checklist cards */}
+                  <div className="sadar-step-cards-list d-flex flex-column gap-3">
+                    {steps.map((step) => {
+                      const isNext = nextStep && nextStep.key === step.key;
+                      return (
+                        <div
+                          key={step.key}
+                          className={`sadar-step-card ${step.completed ? "completed" : ""} ${isNext ? "active" : ""}`}
+                        >
+                          <div className="d-flex align-items-start gap-3 w-100">
+                            <div className="sadar-step-icon-wrapper">
+                              {step.completed ? (
+                                <span className="sadar-step-status-icon success-icon">
+                                  <i className="ri-checkbox-circle-fill"></i>
+                                </span>
+                              ) : (
+                                <span className={`sadar-step-status-icon pending-icon ${isNext ? "pulse" : ""}`}>
+                                  <i className="ri-checkbox-blank-circle-line"></i>
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex-grow-1">
+                              <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <h5 className="sadar-step-title mb-1 fw-bold">
+                                  {step.title}
+                                </h5>
+                                {step.completed ? (
+                                  <span className="badge bg-success-subtle text-success px-2.5 py-1.5 rounded-pill fw-bold font-size-12">
+                                    Sudah Selesai
+                                  </span>
+                                ) : (
+                                  <Button
+                                    tag={Link}
+                                    to={step.to}
+                                    color={isNext ? "primary" : "outline-secondary"}
+                                    size="sm"
+                                    className="sadar-step-cta px-3 font-size-12 fw-semibold"
+                                  >
+                                    {step.ctaLabel}
+                                  </Button>
+                                )}
+                              </div>
+                              <p className="sadar-step-desc text-muted mb-0 font-size-13 mt-1">
+                                {step.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+
+          <Col lg={5} xl={4} className="d-flex">
+            <Card className="sadar-panel flex-fill">
+              <CardBody className="d-flex flex-column justify-content-between p-4">
+                <div>
+                  <h4 className="fw-bold mb-3">Apa yang dideteksi oleh Insight Perilaku?</h4>
+                  <p className="text-muted mb-4 font-size-13">
+                    Insight Perilaku memantau kebiasaan transaksimu secara real-time dan memberikan analisis mendalam.
+                  </p>
+
+                  <div className="sadar-factor-mini-list d-flex flex-column gap-3 mb-4">
+                    <div className="d-flex align-items-start gap-3">
+                      <div className="sadar-factor-icon-wrapper teal">
+                        <i className="ri-pie-chart-2-line"></i>
+                      </div>
+                      <div>
+                        <h6 className="fw-bold mb-1">Kategori Dominan</h6>
+                        <p className="text-muted mb-0 font-size-12">Mendeteksi ke mana sebagian besar pengeluaranmu mengalir.</p>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-start gap-3">
+                      <div className="sadar-factor-icon-wrapper blue">
+                        <i className="ri-calendar-check-line"></i>
+                      </div>
+                      <div>
+                        <h6 className="fw-bold mb-1">Rata-rata & Frekuensi Harian</h6>
+                        <p className="text-muted mb-0 font-size-12">Menemukan hari belanja teraktifmu secara otomatis.</p>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-start gap-3">
+                      <div className="sadar-factor-icon-wrapper orange">
+                        <i className="ri-mind-map"></i>
+                      </div>
+                      <div>
+                        <h6 className="fw-bold mb-1">Prediksi Risiko & Spike AI</h6>
+                        <p className="text-muted mb-0 font-size-12">Peringatan dini dari model AI jika terdapat indikasi pengeluaran berlebih.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-top pt-3 mt-3">
+                  <h6 className="fw-bold mb-2">Konsistensi & Keakuratan</h6>
+                  <p className="text-muted mb-0 font-size-12 leading-relaxed">
+                    Prediksi perilaku dan rekomendasi akan menjadi jauh lebih akurat setelah kamu memiliki catatan transaksi minimal selama <strong>14 hari</strong> secara rutin.
+                  </p>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
       </Container>
     </div>
   );
@@ -471,6 +630,11 @@ const BehaviorInsightWithData = () => {
   const [backendIncomes, setBackendIncomes] = useState([]);
   const [behaviorPrediction, setBehaviorPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [checklist, setChecklist] = useState({
+    hasIncome: false,
+    hasBudget: false,
+    hasTransactions: false,
+  });
 
   const data = useMemo(() => {
     const expenseTransactions = backendTransactions.filter(
@@ -599,18 +763,42 @@ const BehaviorInsightWithData = () => {
 
     const fetchApiData = async () => {
       try {
-        const [rows, incomeRows] = await Promise.all([
-          transactionApi.list({ limit: 100 }),
-          incomeApi.list({ limit: 100 }),
+        const [rows, incomeRows, budgetResponse] = await Promise.all([
+          transactionApi.list({ limit: 100 }).catch(() => []),
+          incomeApi.list({ limit: 100 }).catch(() => []),
+          analyticsApi.latestBudget().catch(() => null),
         ]);
         if (isMounted) {
-          setBackendTransactions((rows || []).map(normalizeBackendTransaction));
-          setBackendIncomes((incomeRows || []).map(normalizeBackendIncome));
+          const mappedTransactions = (rows || []).map(normalizeBackendTransaction);
+          const mappedIncomes = (incomeRows || []).map(normalizeBackendIncome);
+          
+          setBackendTransactions(mappedTransactions);
+          setBackendIncomes(mappedIncomes);
+
+          const hasIncome = mappedIncomes.length > 0;
+          const hasBudget = budgetResponse !== null && (
+            Number(budgetResponse.needs_amount || budgetResponse.needsAmount || 0) > 0 ||
+            Number(budgetResponse.wants_amount || budgetResponse.wantsAmount || 0) > 0 ||
+            Number(budgetResponse.savings_amount || budgetResponse.savingsAmount || 0) > 0
+          );
+          const hasTransactions = mappedTransactions.length > 0;
+
+          setChecklist({
+            hasIncome,
+            hasBudget,
+            hasTransactions,
+          });
         }
-      } catch {
+      } catch (err) {
+        console.error("fetchApiData error:", err);
         if (isMounted) {
           setBackendTransactions([]);
           setBackendIncomes([]);
+          setChecklist({
+            hasIncome: false,
+            hasBudget: false,
+            hasTransactions: false,
+          });
         }
       } finally {
         if (isMounted) {
@@ -726,8 +914,15 @@ const BehaviorInsightWithData = () => {
     return <SadarLoadingScreen />;
   }
 
-  if (data.userTransactions.length === 0) {
-    return <EmptyBehaviorInsight />;
+  const isInsufficient = !checklist.hasIncome || !checklist.hasBudget || !checklist.hasTransactions;
+  if (isInsufficient) {
+    return (
+      <EmptyBehaviorInsight
+        hasIncome={checklist.hasIncome}
+        hasBudget={checklist.hasBudget}
+        hasTransactions={checklist.hasTransactions}
+      />
+    );
   }
 
   return (
