@@ -148,7 +148,7 @@ const seed = async () => {
 
       // C. Seed Expenses (Transactions)
       const monthlyExpenses = [
-        [bcaAccId, 'Needs', 'Rent', 2, 'Bayar Kos Bulanan', 1500000],
+        [bcaAccId, 'Needs', 'Shopping', 2, 'Belanja Kebutuhan Rumah', 1500000],
         [bcaAccId, 'Needs', 'Bills & Utilities', 3, 'Bayar Listrik & Internet', 400000 + (m * 15000)],
         [bcaAccId, 'Needs', 'Food & Dining', 5, 'Belanja Bulanan Superindo', 500000 + (m * 10000)],
         [gopayAccId, 'Wants', 'Entertainment', 8, 'Langganan Netflix & Spotify', 99000],

@@ -73,11 +73,13 @@ const inferCategoryFromTransaction = (transaction) =>
 
 const getTransactionCategory = (transaction) => {
   const explicitCategory =
+    transaction.category_detail ||
+    transaction.categoryDetail ||
+    transaction.category_name ||
+    transaction.categoryName ||
     transaction.category_group ||
     transaction.categoryGroup ||
     transaction.category ||
-    transaction.category_name ||
-    transaction.categoryName ||
     "";
 
   if (!explicitCategory || isBudgetBucketCategory(explicitCategory)) {
