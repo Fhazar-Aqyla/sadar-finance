@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Col } from "reactstrap";
 
 const financeQuotes = [
@@ -18,8 +17,6 @@ const financeQuotes = [
     author: "Benjamin Franklin",
   },
 ];
-
-const getPathDuration = (index: number) => 20 + ((index * 7) % 10);
 
 export function AuthPage() {
   const [quoteIndex, setQuoteIndex] = useState(0);
@@ -40,82 +37,20 @@ export function AuthPage() {
     <Col lg={6} className="sadar-auth-visual-panel d-none d-lg-block">
       <div className="relative flex h-full min-h-[720px] overflow-hidden bg-[#1E3A8A] p-10 text-white max-lg:min-h-[320px] max-lg:p-6">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(20,184,166,0.18),transparent_20rem),radial-gradient(circle_at_76%_18%,rgba(20,184,166,0.18),transparent_18rem),linear-gradient(180deg,#2563EB_0%,#1E3A8A_46%,#111E3F_100%)]" />
-        <div className="absolute inset-0 opacity-65">
-          <FloatingPaths position={1} />
-          <FloatingPaths position={-1} />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#111E3F] via-[#111E3F]/78 to-transparent" />
-
+        
         <div className="relative z-10 flex w-full flex-col">
           <div className="max-w-[680px] pt-12 max-lg:max-w-[560px] max-lg:pt-4">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.blockquote
-                key={activeQuote.author}
-                className="m-0"
-                initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
-                transition={{ duration: 0.42, ease: "easeOut" }}
-              >
-                <p className="m-0 text-[24px] font-semibold leading-[1.45] tracking-normal text-white/92 max-xl:text-[22px] max-lg:text-[18px]">
-                  &ldquo;{activeQuote.quote}&rdquo;
-                </p>
-                <footer className="mt-5 font-mono text-[15px] font-bold text-white/86 max-lg:text-[13px]">
-                  ~ {activeQuote.author}
-                </footer>
-              </motion.blockquote>
-            </AnimatePresence>
+            <blockquote className="m-0">
+              <p className="m-0 text-[24px] font-semibold leading-[1.45] tracking-normal text-white/92 max-xl:text-[22px] max-lg:text-[18px]">
+                &ldquo;{activeQuote.quote}&rdquo;
+              </p>
+              <footer className="mt-5 font-mono text-[15px] font-bold text-white/86 max-lg:text-[13px]">
+                ~ {activeQuote.author}
+              </footer>
+            </blockquote>
           </div>
         </div>
       </div>
     </Col>
-  );
-}
-
-function FloatingPaths({ position }: { position: number }) {
-  const paths = Array.from({ length: 36 }, (_, i) => ({
-    id: i,
-    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
-      380 - i * 5 * position
-    } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
-      152 - i * 5 * position
-    } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
-      684 - i * 5 * position
-    } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
-    duration: getPathDuration(i),
-    width: 0.5 + i * 0.03,
-  }));
-
-  return (
-    <div className="pointer-events-none absolute inset-0">
-      <svg
-        className="h-full w-full text-[#D7F4E7]"
-        viewBox="0 0 696 316"
-        fill="none"
-      >
-        <title>Background Paths</title>
-        {paths.map((path) => (
-          <motion.path
-            key={path.id}
-            d={path.d}
-            stroke="currentColor"
-            strokeWidth={path.width}
-            strokeOpacity={0.1 + path.id * 0.03}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.3, 0.6, 0.3],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              duration: path.duration,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </svg>
-    </div>
   );
 }
