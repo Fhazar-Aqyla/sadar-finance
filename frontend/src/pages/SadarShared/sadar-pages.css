@@ -2599,5 +2599,159 @@ html[data-bs-theme="dark"] .sadar-select-option.highlighted {
 html[data-bs-theme="dark"] .sadar-select-option.selected {
   background-color: #0c4a6e;
   color: #38bdf8;
+  font-weight: 650;
 }
 
+/* Onboarding Empty State Skor Finansial */
+.sadar-onboarding-progress-section {
+  width: 100%;
+}
+.sadar-progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.sadar-progress-bar-fill {
+  height: 100%;
+  background-color: var(--sadar-primary);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.sadar-step-card {
+  display: flex;
+  padding: 1.15rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+  transition: all 0.25s ease;
+}
+.sadar-step-card.active {
+  border-color: #b9cbe7;
+  background-color: #fcfdfe;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.04);
+}
+.sadar-step-card.active:hover {
+  border-color: #93b2e0;
+  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.06);
+}
+.sadar-step-card.completed {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  opacity: 0.9;
+}
+.sadar-step-icon-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+.sadar-step-status-icon {
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sadar-step-status-icon.success-icon {
+  color: var(--sadar-success);
+}
+.sadar-step-status-icon.pending-icon {
+  color: #94a3b8;
+}
+.sadar-step-status-icon.pending-icon.pulse {
+  color: var(--sadar-primary);
+  animation: sadar-pulse-icon 2s infinite ease-in-out;
+}
+@keyframes sadar-pulse-icon {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+.sadar-step-title {
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+.sadar-step-desc {
+  color: #64748b;
+  font-size: 0.825rem;
+  line-height: 1.45;
+}
+
+/* Factor Icon Wrappers */
+.sadar-factor-mini-list {
+  display: flex;
+  flex-direction: column;
+}
+.sadar-factor-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.sadar-factor-icon-wrapper.teal {
+  color: var(--sadar-teal);
+  background-color: rgba(20, 184, 166, 0.1);
+}
+.sadar-factor-icon-wrapper.blue {
+  color: var(--sadar-primary);
+  background-color: rgba(30, 58, 138, 0.1);
+}
+.sadar-factor-icon-wrapper.orange {
+  color: var(--sadar-warning);
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.dot-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.dot-indicator.success { background-color: var(--sadar-success); }
+.dot-indicator.warning { background-color: var(--sadar-warning); }
+.dot-indicator.danger { background-color: var(--sadar-danger); }
+
+.font-size-12 { font-size: 12px !important; }
+.font-size-13 { font-size: 13px !important; }
+
+/* Dark Mode Support */
+html[data-bs-theme="dark"] .sadar-progress-bar-track {
+  background-color: #334155;
+}
+html[data-bs-theme="dark"] .sadar-progress-bar-fill {
+  background-color: #38bdf8;
+}
+html[data-bs-theme="dark"] .sadar-step-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+html[data-bs-theme="dark"] .sadar-step-card.active {
+  background-color: #1e2e4a;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+html[data-bs-theme="dark"] .sadar-step-card.completed {
+  background-color: #131b2e;
+  border-color: #1e293b;
+}
+html[data-bs-theme="dark"] .sadar-step-title {
+  color: #f1f5f9;
+}
+html[data-bs-theme="dark"] .sadar-step-desc {
+  color: #94a3b8;
+}
+html[data-bs-theme="dark"] .sadar-step-status-icon.pending-icon.pulse {
+  color: #38bdf8;
+}
+html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
+  color: #38bdf8;
+  background-color: rgba(56, 189, 248, 0.15);
+}
