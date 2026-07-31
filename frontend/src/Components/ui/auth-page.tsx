@@ -103,8 +103,8 @@ function FloatingPaths({ position }: { position: number }) {
             d={path.d}
             stroke="currentColor"
             strokeWidth={path.width}
-            strokeOpacity={0.15}
-            opacity={0.3}
+            strokeOpacity={0.3}
+            opacity={0.65}
           />
         ))}
       </svg>
