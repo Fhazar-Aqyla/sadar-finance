@@ -643,14 +643,29 @@ const BehaviorInsightWithData = () => {
       (item) => item.budget_group !== "Savings",
     );
     const userIncomes = backendIncomes;
-    const distinctDays = new Set(expenseTransactions.map((item) => item.date))
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    const currentMonthIncomes = userIncomes.filter((item) => {
+      const d = new Date(`${item.date}T00:00:00`);
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    });
+
+    const currentMonthExpenses = expenseTransactions.filter((item) => {
+      const d = new Date(`${item.date}T00:00:00`);
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    });
+
+    const distinctDays = new Set(currentMonthExpenses.map((item) => item.date))
       .size;
-    const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
-    const totalIncome = sumBy(userIncomes, (item) => item.amount);
-    const byCategory = groupSumBy(expenseTransactions, "category");
+    const totalExpense = sumBy(currentMonthExpenses, (item) => item.amount);
+    const totalIncome = sumBy(currentMonthIncomes, (item) => item.amount);
+    const byCategory = groupSumBy(currentMonthExpenses, "category");
     const [dominantCategory, dominantAmount] = getTopEntry(byCategory);
 
-    const byDay = expenseTransactions.reduce((result, item) => {
+    const byDay = currentMonthExpenses.reduce((result, item) => {
       const day = getDayName(item.date);
       result[day] = (result[day] || 0) + 1;
       return result;
@@ -658,15 +673,15 @@ const BehaviorInsightWithData = () => {
     const [mostActiveDay] = getTopEntry(byDay);
 
     const weekdayExpense = sumBy(
-      expenseTransactions.filter((item) => !isWeekend(item.date)),
+      currentMonthExpenses.filter((item) => !isWeekend(item.date)),
       (item) => item.amount,
     );
     const weekendExpense = sumBy(
-      expenseTransactions.filter((item) => isWeekend(item.date)),
+      currentMonthExpenses.filter((item) => isWeekend(item.date)),
       (item) => item.amount,
     );
 
-    const byDate = expenseTransactions.reduce((result, item) => {
+    const byDate = currentMonthExpenses.reduce((result, item) => {
       result[item.date] = (result[item.date] || 0) + item.amount;
       return result;
     }, {});
@@ -676,7 +691,7 @@ const BehaviorInsightWithData = () => {
       .slice(-10);
 
     const wantsExpense = sumBy(
-      expenseTransactions.filter((item) => item.budget_group === "Wants"),
+      currentMonthExpenses.filter((item) => item.budget_group === "Wants"),
       (item) => item.amount,
     );
     const wantsRatio = totalIncome ? (wantsExpense / totalIncome) * 100 : 0;

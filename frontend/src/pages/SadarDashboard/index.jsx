@@ -1080,9 +1080,24 @@ const DashboardWithData = () => {
     const userBudgets = apiRows.budgets;
     const healthScore = apiRows.healthScore;
     const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    const currentMonthIncomes = userIncomes.filter((item) => {
+      const d = new Date(`${item.date}T00:00:00`);
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    });
+
+    const currentMonthExpenses = expenseTransactions.filter((item) => {
+      const d = new Date(`${item.date}T00:00:00`);
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    });
+
     const totalSaldo = sumBy(userAccounts, (item) => item.balance);
-    const totalIncome = sumBy(userIncomes, (item) => item.amount);
-    const totalExpense = sumBy(expenseTransactions, (item) => item.amount);
+    const totalIncome = sumBy(currentMonthIncomes, (item) => item.amount);
+    const totalExpense = sumBy(currentMonthExpenses, (item) => item.amount);
     const budgetLimit = sumBy(userBudgets, (item) => item.limit);
     const budgetUsed = sumBy(userBudgets, (item) => item.used);
     const budgetUsage = budgetLimit ? (budgetUsed / budgetLimit) * 100 : 0;
@@ -1094,7 +1109,7 @@ const DashboardWithData = () => {
         usage: budget.limit ? (budget.used / budget.limit) * 100 : 0,
       }))
       .sort((a, b) => b.usage - a.usage)[0];
-    const byCategory = groupSumBy(expenseTransactions, "category");
+    const byCategory = groupSumBy(currentMonthExpenses, "category");
     const categoryRows = categoryLabels.reduce((result, label) => {
       result[label] = 0;
       return result;
