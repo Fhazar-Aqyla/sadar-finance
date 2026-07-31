@@ -33,6 +33,7 @@ import {
 } from "../../Components/services/api";
 import AccountFormModal from "../../Components/AccountModal/AccountFormModal";
 import { findInstitutionByName, inferAccountType } from "../../constants/bankData";
+import { formatAccountNumberInput } from "../../utils/accountValidation";
 
 import "../SadarShared/sadar-pages.css";
 
@@ -1047,7 +1048,7 @@ const ProfileAccountWithData = () => {
                             </div>
                             <p className="text-muted fs-12 mb-0 mt-1">
                               {account.accountNumber
-                                ? `No. Akun: ${account.accountNumber}`
+                                ? `${account.type === "Bank" ? "No. Rekening" : "No. Akun"}: ${formatAccountNumberInput(account.accountNumber, account.type)}`
                                 : "Tanpa nomor akun"}
                             </p>
                           </div>

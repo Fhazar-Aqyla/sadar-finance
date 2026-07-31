@@ -14,6 +14,8 @@ import {
   validateAccountForm,
   sanitizeDigitsOnly,
   formatRupiahInput,
+  formatAccountNumberInput,
+  INSTITUTION_RULES,
 } from "../../utils/accountValidation";
 import { findInstitutionByName, inferAccountType, INSTITUTION_TYPES } from "../../constants/bankData";
 
@@ -57,12 +59,36 @@ const AccountFormModal = ({
   const handleBankChange = (selectedItem) => {
     const bankName = typeof selectedItem === "object" ? selectedItem.name : selectedItem;
     const inferredType = typeof selectedItem === "object" ? selectedItem.type : inferAccountType(bankName);
+    const selectedInst = typeof selectedItem === "object" ? selectedItem : findInstitutionByName(bankName);
 
-    setFormState((prev) => ({
-      ...prev,
-      bank: bankName,
-      type: inferredType,
-    }));
+    setFormState((prev) => {
+      let cleanNum = prev.accountNumber;
+
+      if (inferredType === INSTITUTION_TYPES.E_WALLET || String(inferredType).toLowerCase() === "e-wallet") {
+        if (cleanNum.length > 0) {
+          if (!/^(0|08|6|62|628)/.test(cleanNum)) {
+            cleanNum = "";
+          } else {
+            const maxDigits = cleanNum.startsWith("62") ? 14 : 13;
+            if (cleanNum.length > maxDigits) {
+              cleanNum = cleanNum.slice(0, maxDigits);
+            }
+          }
+        }
+      } else if (selectedInst && INSTITUTION_RULES[selectedInst.id]) {
+        const rule = INSTITUTION_RULES[selectedInst.id];
+        if (cleanNum.length > rule.maxLength) {
+          cleanNum = cleanNum.slice(0, rule.maxLength);
+        }
+      }
+
+      return {
+        ...prev,
+        bank: bankName,
+        type: inferredType,
+        accountNumber: cleanNum,
+      };
+    });
 
     if (errors.bank) {
       setErrors((prev) => ({ ...prev, bank: "" }));
@@ -78,10 +104,43 @@ const AccountFormModal = ({
     const rawVal = e.target.value;
     const digitsOnly = sanitizeDigitsOnly(rawVal);
 
+    // Resolve rules for current bank/e-wallet
+    const currentInst = findInstitutionByName(formState.bank);
+    const resolvedType = formState.type;
+
+    if (resolvedType === INSTITUTION_TYPES.E_WALLET || String(resolvedType).toLowerCase() === "e-wallet") {
+      // E-Wallet validation rules during typing:
+      // Must match prefix pattern (starts with 0, 08, 6, 62, 628)
+      if (digitsOnly.length > 0) {
+        const isValidPrefix = /^(0|08|6|62|628)\d*$/.test(digitsOnly);
+        if (!isValidPrefix) {
+          return;
+        }
+      }
+      
+      // Check maximum digit count
+      const maxDigits = digitsOnly.startsWith("62") ? 14 : 13;
+      if (digitsOnly.length > maxDigits) {
+        return;
+      }
+    } else if (currentInst && INSTITUTION_RULES[currentInst.id]) {
+      // Bank validation rules during typing:
+      const rule = INSTITUTION_RULES[currentInst.id];
+      if (digitsOnly.length > rule.maxLength) {
+        return;
+      }
+    } else {
+      // Fallback maximum length
+      if (digitsOnly.length > 18) {
+        return;
+      }
+    }
+
     setFormState((prev) => ({ ...prev, accountNumber: digitsOnly }));
 
-    // Real-time inline feedback if user tried typing letters
-    if (/[^\d]/.test(rawVal)) {
+    // Show feedback if non-digit characters (other than separators) are entered
+    const rawWithoutFormat = rawVal.replace(/[- ]/g, "");
+    if (/[^\d]/.test(rawWithoutFormat)) {
       setErrors((prev) => ({
         ...prev,
         accountNumber: "Nomor akun hanya boleh berisi angka.",
@@ -175,7 +234,7 @@ const AccountFormModal = ({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                value={formState.accountNumber}
+                value={formatAccountNumberInput(formState.accountNumber, formState.type)}
                 onChange={handleAccountNumberChange}
                 placeholder={
                   isBankSelected
