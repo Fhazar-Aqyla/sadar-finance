@@ -357,8 +357,8 @@ class AnalyticsService {
 
     const toPrimaryBucket = (categoryGroup) => {
       const text = String(categoryGroup || '').toLowerCase();
-      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
-      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
+      if (/needs|^needs$/.test(text) || /tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
+      if (/savings|^savings$/.test(text) || /tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
       return 'wants';
     };
 
@@ -576,8 +576,8 @@ class AnalyticsService {
 
     const toPrimaryBucket = (categoryGroup) => {
       const text = String(categoryGroup || '').toLowerCase();
-      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
-      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
+      if (/needs|^needs$/.test(text) || /tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
+      if (/savings|^savings$/.test(text) || /tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
       return 'wants';
     };
 
