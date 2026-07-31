@@ -84,95 +84,94 @@ const seed = async () => {
     const gopayAccId = accountResult.rows.find(acc => acc.account_name === 'GoPay').account_id;
     const mandiriAccId = accountResult.rows.find(acc => acc.account_name === 'Mandiri').account_id;
 
-    // ── 3. Seed Demo Incomes (Coherent cash flow) ───────────────────────────
-    // Previous Month Incomes
-    const incPrev1 = await client.query(
-      `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
-       VALUES ($1, $2, 10000000, $3, 'Gaji Bulanan') RETURNING income_id, amount, income_date, source`,
-      [userId, bcaAccId, dateInPreviousMonth(1)]
-    );
-    const incPrev2 = await client.query(
-      `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
-       VALUES ($1, $2, 2500000, $3, 'Freelance Project Web') RETURNING income_id, amount, income_date, source`,
-      [userId, bcaAccId, dateInPreviousMonth(15)]
-    );
+    // ── 3. Seed Monthly Data (January to Current Month) ──────────────────────
+    for (let m = 0; m <= currentMonth; m++) {
+      // Calculate dynamic date helper for day X in month m
+      const dateInMonth = (day) => {
+        // Prevent returning future dates for the current month
+        let targetDay = day;
+        if (m === currentMonth) {
+          targetDay = Math.min(day, currentDate.getDate());
+        }
+        return new Date(currentYear, m, targetDay);
+      };
 
-    // Current Month Incomes (recurrent)
-    const incCurr1 = await client.query(
-      `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
-       VALUES ($1, $2, 10000000, $3, 'Gaji Bulanan') RETURNING income_id, amount, income_date, source`,
-      [userId, bcaAccId, dateInCurrentMonth(1)]
-    );
-    const incCurr2 = await client.query(
-      `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
-       VALUES ($1, $2, 1800000, $3, 'Freelance Project Design') RETURNING income_id, amount, income_date, source`,
-      [userId, bcaAccId, dateInCurrentMonth(15)]
-    );
-
-    // ── 4. Seed Demo Transactions (Coherent, chronological expenses) ────────
-    // Previous Month Expenses
-    const prevExpenses = [
-      [bcaAccId, 'Needs', 'Rent', dateInPreviousMonth(2), 'Bayar Kos Bulanan', 1500000],
-      [bcaAccId, 'Needs', 'Bills & Utilities', dateInPreviousMonth(3), 'Bayar Listrik & Internet', 450000],
-      [bcaAccId, 'Needs', 'Food & Dining', dateInPreviousMonth(5), 'Belanja Bulanan Superindo', 600000],
-      [gopayAccId, 'Wants', 'Entertainment', dateInPreviousMonth(8), 'Langganan Netflix & Spotify', 99000],
-      [bcaAccId, 'Needs', 'Transportation', dateInPreviousMonth(12), 'Bensin Pertamax', 150000],
-      [gopayAccId, 'Wants', 'Shopping', dateInPreviousMonth(18), 'Beli Baju Uniqlo', 399000],
-      [gopayAccId, 'Needs', 'Healthcare', dateInPreviousMonth(22), 'Beli Vitamin & Obat Apotek', 85000],
-      [gopayAccId, 'Wants', 'Food & Dining', dateInPreviousMonth(25), 'Makan Malam Solaria', 120000],
-      [bcaAccId, 'Needs', 'Transportation', dateInPreviousMonth(28), 'Service Motor Berkala', 250000]
-    ];
-
-    // Current Month Expenses (Up to today)
-    const currExpenses = [
-      [bcaAccId, 'Needs', 'Rent', dateInCurrentMonth(2), 'Bayar Kos Bulanan', 1500000],
-      [bcaAccId, 'Needs', 'Bills & Utilities', dateInCurrentMonth(3), 'Bayar Listrik & Internet', 480000],
-      [bcaAccId, 'Needs', 'Food & Dining', dateInCurrentMonth(5), 'Belanja Bulanan Superindo', 550000],
-      [gopayAccId, 'Wants', 'Entertainment', dateInCurrentMonth(8), 'Langganan Netflix & Spotify', 99000],
-      [bcaAccId, 'Wants', 'Shopping', dateInCurrentMonth(10), 'Beli Sepatu Olahraga', 599000],
-      [bcaAccId, 'Needs', 'Transportation', dateInCurrentMonth(12), 'Bensin Pertamax', 150000],
-      [gopayAccId, 'Wants', 'Food & Dining', dateInCurrentMonth(18), 'Kopi Kenangan & Roti', 65000],
-      [gopayAccId, 'Needs', 'Healthcare', dateInCurrentMonth(22), 'Beli Obat Flu & Demam', 45000],
-      [bcaAccId, 'Wants', 'Food & Dining', dateInCurrentMonth(25), 'Makan Malam Senopati', 350000],
-      [bcaAccId, 'Needs', 'Transportation', dateInCurrentMonth(28), 'Bensin Pertamax', 150000],
-      [gopayAccId, 'Needs', 'Food & Dining', dateInCurrentMonth(30), 'Makan Siang Nasi Padang', 35000]
-    ];
-
-    const allExpenses = [...prevExpenses, ...currExpenses];
-    for (const exp of allExpenses) {
-      await client.query(
-        `INSERT INTO transactions (user_id, account_id, category_group, category_detail, transaction_date, description, source, amount)
-         VALUES ($1, $2, $3, $4, $5, $6, 'manual', $7)`,
-        [userId, exp[0], exp[1], exp[2], exp[3], exp[4], exp[5]]
+      // A. Seed Incomes (Gaji Bulanan)
+      const gajiResult = await client.query(
+        `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
+         VALUES ($1, $2, 10000000, $3, 'Gaji Bulanan') RETURNING income_id, amount, income_date, source`,
+        [userId, bcaAccId, dateInMonth(1)]
       );
+      const gajiIncome = gajiResult.rows[0];
+
+      let totalMonthlyIncome = 10000000;
+
+      // Add freelance income on the 15th (alternating amounts/sources for realism)
+      const sideIncomeAmount = m % 2 === 0 ? 2500000 : 1800000;
+      const sideIncomeSource = m % 2 === 0 ? 'Freelance Project Web' : 'Freelance Project Design';
+      
+      if (m < currentMonth || currentDate.getDate() >= 15) {
+        await client.query(
+          `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [userId, bcaAccId, sideIncomeAmount, dateInMonth(15), sideIncomeSource]
+        );
+        totalMonthlyIncome += sideIncomeAmount;
+      }
+
+      // B. Seed Budgets for this month (Needs 50%, Wants 30%, Savings 20%)
+      const needsBudget = totalMonthlyIncome * 0.5;
+      const wantsBudget = totalMonthlyIncome * 0.3;
+      const savingsBudget = totalMonthlyIncome * 0.2;
+      
+      await client.query(
+        `INSERT INTO budgets (
+           user_id, income_id, needs_budget, wants_budget, investment_budget,
+           income_amount, budget_limit, source, income_date,
+           needs_amount, wants_amount, savings_amount, investment_amount,
+           percentage, limit_amount
+         )
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+                 $3, $4, $5, $5, 50, $7)`,
+        [
+          userId, 
+          gajiIncome.income_id, 
+          needsBudget, 
+          wantsBudget, 
+          savingsBudget, 
+          totalMonthlyIncome, 
+          totalMonthlyIncome, 
+          gajiIncome.source, 
+          gajiIncome.income_date
+        ]
+      );
+
+      // C. Seed Expenses (Transactions)
+      const monthlyExpenses = [
+        [bcaAccId, 'Needs', 'Rent', 2, 'Bayar Kos Bulanan', 1500000],
+        [bcaAccId, 'Needs', 'Bills & Utilities', 3, 'Bayar Listrik & Internet', 400000 + (m * 15000)],
+        [bcaAccId, 'Needs', 'Food & Dining', 5, 'Belanja Bulanan Superindo', 500000 + (m * 10000)],
+        [gopayAccId, 'Wants', 'Entertainment', 8, 'Langganan Netflix & Spotify', 99000],
+        [bcaAccId, 'Wants', 'Shopping', 10, m % 2 === 0 ? 'Beli Baju Uniqlo' : 'Beli Sepatu Olahraga', 300000 + (m * 25000)],
+        [bcaAccId, 'Needs', 'Transportation', 12, 'Bensin Pertamax', 150000],
+        [gopayAccId, 'Wants', 'Food & Dining', 18, 'Kopi & Roti Kenangan', 50000 + (m * 3000)],
+        [gopayAccId, 'Needs', 'Healthcare', 22, 'Beli Vitamin & Obat Apotek', 40000 + (m * 2000)],
+        [bcaAccId, 'Wants', 'Food & Dining', 25, m % 2 === 0 ? 'Makan Malam Solaria' : 'Makan Malam Senopati', 150000 + (m * 30000)],
+        [bcaAccId, 'Needs', 'Transportation', 28, 'Bensin & Service Motor', 150000 + (m * 10000)]
+      ];
+
+      for (const exp of monthlyExpenses) {
+        const expenseDay = exp[3];
+        // Only insert if this day has passed in the current month
+        if (m < currentMonth || currentDate.getDate() >= expenseDay) {
+          await client.query(
+            `INSERT INTO transactions (user_id, account_id, category_group, category_detail, transaction_date, description, source, amount)
+             VALUES ($1, $2, $3, $4, $5, $6, 'manual', $7)`,
+            [userId, exp[0], exp[1], exp[2], dateInMonth(expenseDay), exp[4], exp[5]]
+          );
+        }
+      }
     }
-
-    // ── 5. Seed Demo Budgets (Needs 50%, Wants 30%, Savings/Investment 20%) ─
-    // Budget for previous month
-    await client.query(
-      `INSERT INTO budgets (
-         user_id, income_id, needs_budget, wants_budget, investment_budget,
-         income_amount, budget_limit, source, income_date,
-         needs_amount, wants_amount, savings_amount, investment_amount,
-         percentage, limit_amount
-       )
-       VALUES ($1, $2, 6250000, 3750000, 2500000, $3, 10000000, $4, $5,
-               6250000, 3750000, 2500000, 2500000, 50, 10000000)`,
-      [userId, incPrev1.rows[0].income_id, Number(incPrev1.rows[0].amount), incPrev1.rows[0].source, incPrev1.rows[0].income_date]
-    );
-
-    // Budget for current month
-    await client.query(
-      `INSERT INTO budgets (
-         user_id, income_id, needs_budget, wants_budget, investment_budget,
-         income_amount, budget_limit, source, income_date,
-         needs_amount, wants_amount, savings_amount, investment_amount,
-         percentage, limit_amount
-       )
-       VALUES ($1, $2, 5900000, 3540000, 2360000, $3, 11800000, $4, $5,
-               5900000, 3540000, 2360000, 2360000, 50, 11800000)`,
-      [userId, incCurr1.rows[0].income_id, Number(incCurr1.rows[0].amount) + Number(incCurr2.rows[0]?.amount || 0), incCurr1.rows[0].source, incCurr1.rows[0].income_date]
-    );
 
     // ── 6. Seed Demo Insights ───────────────────────────────────────────────
     await client.query(
