@@ -158,7 +158,7 @@ const seed = async () => {
        )
        VALUES ($1, $2, 6250000, 3750000, 2500000, $3, 10000000, $4, $5,
                6250000, 3750000, 2500000, 2500000, 50, 10000000)`,
-      [userId, incPrev1.rows[0].income_id, incPrev1.rows[0].amount, incPrev1.rows[0].source, incPrev1.rows[0].income_date]
+      [userId, incPrev1.rows[0].income_id, Number(incPrev1.rows[0].amount), incPrev1.rows[0].source, incPrev1.rows[0].income_date]
     );
 
     // Budget for current month
@@ -171,7 +171,7 @@ const seed = async () => {
        )
        VALUES ($1, $2, 5900000, 3540000, 2360000, $3, 11800000, $4, $5,
                5900000, 3540000, 2360000, 2360000, 50, 11800000)`,
-      [userId, incCurr1.rows[0].income_id, incCurr1.rows[0].amount + (incCurr2.rows[0]?.amount || 0), incCurr1.rows[0].source, incCurr1.rows[0].income_date]
+      [userId, incCurr1.rows[0].income_id, Number(incCurr1.rows[0].amount) + Number(incCurr2.rows[0]?.amount || 0), incCurr1.rows[0].source, incCurr1.rows[0].income_date]
     );
 
     // ── 6. Seed Demo Insights ───────────────────────────────────────────────
