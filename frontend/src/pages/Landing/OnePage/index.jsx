@@ -371,26 +371,49 @@ const StepDashboardPreview = () => (
   </div>
 );
 
+const stepInsightItems = [
+  {
+    icon: "ri-lightbulb-flash-line",
+    iconBg: "bg-teal-50 text-[#14B8A6]",
+    title: "Kurangi jajan 15%",
+    subtitle: "Target tabungan bulan ini bisa naik Rp 180 rb.",
+  },
+  {
+    icon: "ri-file-search-line",
+    iconBg: "bg-amber-50 text-[#F59E0B]",
+    title: "Evaluasi langganan bulanan",
+    subtitle: "Hemat hingga Rp 99 rb dari hiburan & aplikasi tak terpakai.",
+  },
+  {
+    icon: "ri-shield-check-line",
+    iconBg: "bg-blue-50 text-[#1E3A8A]",
+    title: "Alokasi otomatis 20% ke tabungan",
+    subtitle: "Amankan alokasi di awal bulan agar keuangan tetap seimbang.",
+  },
+];
+
 const StepInsightPreview = () => (
-  <div className="mt-5 grid gap-2">
-    <div className="rounded-[12px] border border-[#DDE8F2] bg-[#FBFDFF] p-3">
-      <div className="flex items-start gap-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-teal-50 text-[#14B8A6]">
-          <i
-            className="ri-lightbulb-flash-line text-[16px]"
-            aria-hidden="true"
-          ></i>
-        </span>
-        <div>
-          <p className="m-0 text-[11px] font-extrabold text-[#1E3A8A]">
-            Kurangi jajan 15%
-          </p>
-          <p className="m-0 mt-1 text-[10px] leading-4 text-[#7A8795]">
-            Target tabungan bulan ini bisa naik Rp 180 rb.
-          </p>
+  <div className="mt-5 grid gap-2.5">
+    {stepInsightItems.map((item) => (
+      <div
+        key={item.title}
+        className="rounded-[12px] border border-[#DDE8F2] bg-[#FBFDFF] p-3 transition-all hover:border-[#14B8A6]/30 hover:shadow-sm"
+      >
+        <div className="flex items-start gap-3">
+          <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${item.iconBg}`}>
+            <i className={`${item.icon} text-[16px]`} aria-hidden="true"></i>
+          </span>
+          <div>
+            <p className="m-0 text-[11px] font-extrabold text-[#1E3A8A]">
+              {item.title}
+            </p>
+            <p className="m-0 mt-0.5 text-[10px] leading-4 text-[#7A8795]">
+              {item.subtitle}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    ))}
   </div>
 );
 
