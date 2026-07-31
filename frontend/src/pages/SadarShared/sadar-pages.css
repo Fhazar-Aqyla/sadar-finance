@@ -2342,6 +2342,12 @@ html[data-bs-theme="dark"] .sadar-table-filter-btn strong {
   border-color: #d6deeb;
 }
 
+.sadar-account-form-grid .form-control.is-invalid {
+  background-image: none !important;
+  padding-right: 0.9rem !important;
+  border-color: #ef4444 !important;
+}
+
 .sadar-account-form-grid .invalid-feedback {
   min-height: 18px;
 }
