@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { Col } from "reactstrap";
 
 const financeQuotes = [
@@ -21,12 +20,20 @@ const financeQuotes = [
 
 export function AuthPage() {
   const [quoteIndex, setQuoteIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setQuoteIndex(
-        (currentIndex) => (currentIndex + 1) % financeQuotes.length,
-      );
+      // Mulai fade out
+      setIsVisible(false);
+      
+      // Ganti quote dan fade in setelah transisi selesai (500ms)
+      setTimeout(() => {
+        setQuoteIndex(
+          (currentIndex) => (currentIndex + 1) % financeQuotes.length,
+        );
+        setIsVisible(true);
+      }, 500);
     }, 5200);
 
     return () => window.clearInterval(timer);
@@ -46,7 +53,14 @@ export function AuthPage() {
 
         <div className="relative z-10 flex w-full flex-col">
           <div className="max-w-[680px] pt-12 max-lg:max-w-[560px] max-lg:pt-4">
-            <blockquote className="m-0">
+            <blockquote 
+              className="m-0"
+              style={{
+                transition: "opacity 0.5s ease-in-out, transform 0.5s ease-in-out",
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? "translateY(0)" : "translateY(10px)",
+              }}
+            >
               <p className="m-0 text-[24px] font-semibold leading-[1.45] tracking-normal text-white/92 max-xl:text-[22px] max-lg:text-[18px]">
                 &ldquo;{activeQuote.quote}&rdquo;
               </p>
@@ -71,7 +85,7 @@ function FloatingPaths({ position }: { position: number }) {
     } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
       684 - i * 5 * position
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
+    color: `rgba(255,255,255,${0.03 + i * 0.005})`,
     width: 0.5 + i * 0.03,
   }));
 
@@ -84,23 +98,13 @@ function FloatingPaths({ position }: { position: number }) {
       >
         <title>Background Paths</title>
         {paths.map((path) => (
-          <motion.path
+          <path
             key={path.id}
             d={path.d}
             stroke="currentColor"
             strokeWidth={path.width}
-            strokeOpacity={0.1 + path.id * 0.03}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.3, 0.6, 0.3],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
+            strokeOpacity={0.15}
+            opacity={0.3}
           />
         ))}
       </svg>
