@@ -50,10 +50,21 @@ const seed = async () => {
     // ── 1. Seed Demo User ───────────────────────────────────────────────────
     const hashedPassword = await bcrypt.hash('Demo@12345', 12);
     const userResult = await client.query(
-      `INSERT INTO users (first_name, last_name, gender, email, password_hash, phone_number, date_of_birth, address, occupation, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active')
+      `INSERT INTO users (first_name, last_name, gender, email, password_hash, phone_number, date_of_birth, address, profile_picture, occupation, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active')
        RETURNING users_id`,
-      ['Demo', 'User', 'male', 'demo@sadarfinance.com', hashedPassword, '+628123456789', '2000-01-15', 'Jakarta, Indonesia', 'Software Engineer']
+      [
+        'Sadar',
+        'Finance',
+        'male',
+        'demo@sadarfinance.com',
+        hashedPassword,
+        '+628123456789',
+        '2000-01-15',
+        'Jakarta, Indonesia',
+        'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=256&h=256&q=80',
+        'Financial Assistant'
+      ]
     );
     const userId = userResult.rows[0].users_id;
 
@@ -61,17 +72,17 @@ const seed = async () => {
     const accountResult = await client.query(
       `INSERT INTO accounts (user_id, account_name, account_number, balance)
        VALUES
-         ($1, 'BCA Utama', '1234567890', 16500000),
-         ($1, 'Gopay', '0812345678', 650000),
-         ($1, 'Dana Darurat (Mandiri)', '9876543210', 8000000)
+         ($1, 'BCA', '1234567890', 12000000),
+         ($1, 'GoPay', '0812345678', 650000),
+         ($1, 'Mandiri', '9876543210', 8000000)
        RETURNING account_id, account_name`,
       [userId]
     );
     
     // Map account ids
-    const bcaAccId = accountResult.rows.find(acc => acc.account_name === 'BCA Utama').account_id;
-    const gopayAccId = accountResult.rows.find(acc => acc.account_name === 'Gopay').account_id;
-    const mandiriAccId = accountResult.rows.find(acc => acc.account_name === 'Dana Darurat (Mandiri)').account_id;
+    const bcaAccId = accountResult.rows.find(acc => acc.account_name === 'BCA').account_id;
+    const gopayAccId = accountResult.rows.find(acc => acc.account_name === 'GoPay').account_id;
+    const mandiriAccId = accountResult.rows.find(acc => acc.account_name === 'Mandiri').account_id;
 
     // ── 3. Seed Demo Incomes (Coherent cash flow) ───────────────────────────
     // Previous Month Incomes
