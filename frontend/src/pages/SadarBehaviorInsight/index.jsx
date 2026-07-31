@@ -545,6 +545,7 @@ const createTrendOptions = (categories, maxValue) => ({
   xaxis: {
     categories,
     tickPlacement: "between",
+    tickAmount: 8,
     axisBorder: {
       show: true,
       color: "#d7dee8",
@@ -681,14 +682,13 @@ const BehaviorInsightWithData = () => {
       (item) => item.amount,
     );
 
-    const byDate = currentMonthExpenses.reduce((result, item) => {
+    const byDate = expenseTransactions.reduce((result, item) => {
       result[item.date] = (result[item.date] || 0) + item.amount;
       return result;
     }, {});
     const trendRows = Object.entries(byDate)
       .sort(([a], [b]) => new Date(`${a}T00:00:00`) - new Date(`${b}T00:00:00`))
-      .map(([date, amount]) => ({ date, amount }))
-      .slice(-10);
+      .map(([date, amount]) => ({ date, amount }));
 
     const wantsExpense = sumBy(
       currentMonthExpenses.filter((item) => item.budget_group === "Wants"),
