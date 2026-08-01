@@ -659,14 +659,16 @@ const BehaviorInsightWithData = () => {
       return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
     });
 
-    const distinctDays = new Set(currentMonthExpenses.map((item) => item.date))
-      .size;
-    const totalExpense = sumBy(currentMonthExpenses, (item) => item.amount);
-    const totalIncome = sumBy(currentMonthIncomes, (item) => item.amount);
-    const byCategory = groupSumBy(currentMonthExpenses, "category");
+    const activeExpenses = currentMonthExpenses.length >= 3 ? currentMonthExpenses : expenseTransactions;
+    const activeIncomes = currentMonthIncomes.length > 0 ? currentMonthIncomes : userIncomes;
+
+    const distinctDays = new Set(activeExpenses.map((item) => item.date)).size;
+    const totalExpense = sumBy(activeExpenses, (item) => item.amount);
+    const totalIncome = sumBy(activeIncomes, (item) => item.amount);
+    const byCategory = groupSumBy(activeExpenses, "category");
     const [dominantCategory, dominantAmount] = getTopEntry(byCategory);
 
-    const byDay = currentMonthExpenses.reduce((result, item) => {
+    const byDay = activeExpenses.reduce((result, item) => {
       const day = getDayName(item.date);
       result[day] = (result[day] || 0) + 1;
       return result;
@@ -674,11 +676,11 @@ const BehaviorInsightWithData = () => {
     const [mostActiveDay] = getTopEntry(byDay);
 
     const weekdayExpense = sumBy(
-      currentMonthExpenses.filter((item) => !isWeekend(item.date)),
+      activeExpenses.filter((item) => !isWeekend(item.date)),
       (item) => item.amount,
     );
     const weekendExpense = sumBy(
-      currentMonthExpenses.filter((item) => isWeekend(item.date)),
+      activeExpenses.filter((item) => isWeekend(item.date)),
       (item) => item.amount,
     );
 
