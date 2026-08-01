@@ -86,7 +86,10 @@ const parseAmountValue = (value) => {
 };
 
 const toIsoDate = (dateValue) => {
-  const date = new Date(`${dateValue}T00:00:00`);
+  const rawDate = String(dateValue || "").trim();
+  if (!rawDate) return "";
+  const cleanDate = rawDate.slice(0, 10);
+  const date = new Date(`${cleanDate}T12:00:00.000Z`);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 };
 
