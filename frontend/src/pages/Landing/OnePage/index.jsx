@@ -9,8 +9,8 @@ import ModernTeamShowcase from "@/Components/ui/cybernetic-team-showcase";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
-import girlPhone from "../../../assets/images/landing/cewek-hp.png";
-import boyLaptop from "../../../assets/images/landing/cowok-laptop.png";
+import girlPhone from "../../../assets/images/landing/cewek-hp.webp";
+import boyLaptop from "../../../assets/images/landing/cowok-laptop.webp";
 import dashboardPreview from "../../../assets/images/landing/dashboard-preview.png";
 import diahAvatar from "../../../assets/images/users/diah.png";
 import marselaAvatar from "../../../assets/images/users/marsela.png";
@@ -674,7 +674,7 @@ const OnePage = () => {
             </p>
           </motion.div>
 
-          <div className="mx-auto mt-16 grid max-w-[1100px] grid-cols-[250px_240px_240px_250px] items-end justify-center gap-10 max-xl:grid-cols-[235px_225px_225px_235px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-14 max-sm:grid-cols-1">
+          <div className="mx-auto mt-16 grid max-w-[1140px] grid-cols-[250px_240px_240px_250px] items-end justify-center gap-10 xl:gap-12 max-xl:grid-cols-[235px_225px_225px_235px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-14 max-sm:grid-cols-1">
             <motion.div 
               variants={slideFromLeftVariants} 
               initial="offscreen" 
@@ -707,7 +707,7 @@ const OnePage = () => {
               <img
                 src={girlPhone}
                 alt="Pengguna SADAR memegang ponsel"
-                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-1/2 max-xl:h-[370px] max-md:h-[390px]"
+                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto max-w-none -translate-x-1/2 object-contain pointer-events-none select-none max-xl:h-[370px] max-md:h-[390px]"
               />
             </motion.div>
 
@@ -723,7 +723,7 @@ const OnePage = () => {
               <img
                 src={boyLaptop}
                 alt="Pengguna SADAR memakai laptop"
-                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto -translate-x-[45%] max-xl:h-[370px] max-md:h-[390px]"
+                className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto max-w-none -translate-x-1/2 object-contain pointer-events-none select-none max-xl:h-[370px] max-md:h-[390px]"
               />
             </motion.div>
 
@@ -732,7 +732,7 @@ const OnePage = () => {
               initial="offscreen" 
               whileInView="onscreen" 
               viewport={{ once: true, amount: 0.2 }} 
-              className="pb-9 text-left max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-center max-sm:order-none max-sm:pt-0"
+              className="pb-9 text-left lg:pl-4 xl:pl-6 max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-center max-sm:order-none max-sm:pt-0"
             >
               <h3
                 className={`${headingClass} m-0 text-[22px] leading-[1.22] max-md:text-[21px]`}
