@@ -26,8 +26,8 @@ import {
 } from "reactstrap";
 import { api } from "../../config";
 import { accountApi, incomeApi, ocrApi, transactionApi } from "../../Components/services/api";
-
 import "../SadarShared/sadar-pages.css";
+import { FinancialHistorySkeleton } from "../../Components/Skeleton";
 
 const TRANSACTION_PAGE_SIZE = 10;
 const RECEIPT_STORAGE_KEY = "sadar-financial-history-receipts";
@@ -174,18 +174,7 @@ const readFileAsReceipt = (file) =>
     reader.readAsDataURL(file);
   });
 
-const SadarLoadingScreen = () => {
-  return (
-    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
-      <div className="text-center">
-        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
-          <span className="visually-hidden">Memuat...</span>
-        </div>
-        <p className="mt-3 text-muted fw-semibold">Memuat riwayat keuangan...</p>
-      </div>
-    </div>
-  );
-};
+const SadarLoadingScreen = () => <FinancialHistorySkeleton />;
 
 const SadarFinancialHistory = () => {
   const [accounts, setAccounts] = useState([]);

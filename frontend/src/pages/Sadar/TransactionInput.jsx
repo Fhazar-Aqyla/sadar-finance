@@ -19,6 +19,7 @@ import {
 import { accountApi, incomeApi, ocrApi, transactionApi } from "../../Components/services/api";
 import "../SadarShared/sadar-pages.css";
 import "./transaction-input.css";
+import { TransactionInputSkeleton } from "../../Components/Skeleton";
 
 const categories = [
   { value: "food_and_beverage", label: "Makanan & Minuman" },
@@ -470,6 +471,10 @@ const TransactionInput = () => {
       setIsSaving(false);
     }
   };
+
+  if (isLoadingAccounts && accounts.length === 0) {
+    return <TransactionInputSkeleton />;
+  }
 
   return (
     <div className="page-content sadar-page sadar-transaction-page">

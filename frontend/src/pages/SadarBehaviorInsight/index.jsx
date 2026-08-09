@@ -17,6 +17,7 @@ import {
 } from "../../Components/services/api";
 
 import "../SadarShared/sadar-pages.css";
+import { BehaviorInsightSkeleton } from "../../Components/Skeleton";
 
 const rupiah = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -277,24 +278,7 @@ const toCategoryPrimary = (category) => {
   return "Wants";
 };
 
-const SadarLoadingScreen = () => {
-  return (
-    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
-      <div className="text-center">
-        <div
-          className="spinner-border text-primary"
-          role="status"
-          style={{ width: "2.5rem", height: "2.5rem" }}
-        >
-          <span className="visually-hidden">Memuat...</span>
-        </div>
-        <p className="mt-3 text-muted fw-semibold">
-          Memuat analisis perilaku...
-        </p>
-      </div>
-    </div>
-  );
-};
+const SadarLoadingScreen = () => <BehaviorInsightSkeleton />;
 
 const EmptyBehaviorInsight = ({ hasIncome, hasBudget, hasTransactions }) => {
   useEffect(() => {

@@ -36,6 +36,7 @@ import { findInstitutionByName, inferAccountType } from "../../constants/bankDat
 import { formatAccountNumberInput } from "../../utils/accountValidation";
 
 import "../SadarShared/sadar-pages.css";
+import { ProfileAccountSkeleton } from "../../Components/Skeleton";
 
 const defaultProfile = {
   id: "",
@@ -632,22 +633,7 @@ const budgetTargets = [
   },
 ];
 
-const SadarLoadingScreen = () => {
-  return (
-    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
-      <div className="text-center">
-        <div
-          className="spinner-border text-primary"
-          role="status"
-          style={{ width: "2.5rem", height: "2.5rem" }}
-        >
-          <span className="visually-hidden">Memuat...</span>
-        </div>
-        <p className="mt-3 text-muted fw-semibold">Memuat profil dan akun...</p>
-      </div>
-    </div>
-  );
-};
+const SadarLoadingScreen = () => <ProfileAccountSkeleton />;
 
 const ProfileAccountWithData = () => {
   useEffect(() => {

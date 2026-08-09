@@ -24,6 +24,7 @@ import { accountApi, analyticsApi, authApi, incomeApi, transactionApi } from "..
 
 import "./sadar-dashboard.css";
 import "../SadarShared/sadar-pages.css";
+import { DashboardSkeleton } from "../../Components/Skeleton";
 
 const rupiah = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -984,18 +985,7 @@ const createCategoryOptions = (labels, colors, setActiveCategory) => ({
   },
 });
 
-const SadarLoadingScreen = () => {
-  return (
-    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
-      <div className="text-center">
-        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
-          <span className="visually-hidden">Memuat...</span>
-        </div>
-        <p className="mt-3 text-muted fw-semibold">Menyiapkan dashboard keuangan Anda...</p>
-      </div>
-    </div>
-  );
-};
+const SadarLoadingScreen = () => <DashboardSkeleton />;
 
 const DashboardWithData = () => {
   const dispatch = useDispatch();

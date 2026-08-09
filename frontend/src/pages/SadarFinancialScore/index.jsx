@@ -17,6 +17,7 @@ import {
   incomeApi,
   transactionApi,
 } from "../../Components/services/api";
+import { FinancialScoreSkeleton } from "../../Components/Skeleton";
 
 const sumBy = (rows, getValue) =>
   rows.reduce((total, row) => total + getValue(row), 0);
@@ -464,18 +465,7 @@ const EmptyFinancialScore = ({ hasIncome, hasBudget, hasTransactions }) => {
   );
 };
 
-const SadarLoadingScreen = () => {
-  return (
-    <div className="page-content sadar-page sadar-loading-screen d-flex align-items-center justify-content-center">
-      <div className="text-center">
-        <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }}>
-          <span className="visually-hidden">Memuat...</span>
-        </div>
-        <p className="mt-3 text-muted fw-semibold">Memuat skor finansial...</p>
-      </div>
-    </div>
-  );
-};
+const SadarLoadingScreen = () => <FinancialScoreSkeleton />;
 
 const FinancialScoreWithData = () => {
   useEffect(() => {

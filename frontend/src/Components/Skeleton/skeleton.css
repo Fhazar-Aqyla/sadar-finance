@@ -1,0 +1,61 @@
+/* ==========================================================================
+   SADAR Finance — Skeleton Loading Styles (Shimmer Effect)
+   ========================================================================== */
+
+.sadar-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.65) 0%,
+    rgba(241, 245, 249, 0.95) 50%,
+    rgba(226, 232, 240, 0.65) 100%
+  );
+  background-size: 200% 100%;
+  animation: sadar-shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+  display: block;
+  flex-shrink: 0;
+}
+
+[data-bs-theme="dark"] .sadar-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.7) 0%,
+    rgba(51, 65, 85, 0.9) 50%,
+    rgba(30, 41, 59, 0.7) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes sadar-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.sadar-skeleton-card {
+  border: 1px solid rgba(12, 57, 84, 0.08);
+  border-radius: 12px;
+  background-color: var(--vz-card-bg, #ffffff);
+  box-shadow: 0 4px 18px rgba(12, 57, 84, 0.05);
+  overflow: hidden;
+}
+
+[data-bs-theme="dark"] .sadar-skeleton-card {
+  border-color: rgba(255, 255, 255, 0.08);
+  background-color: #1e222d;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+}
+
+.sadar-skeleton-banner {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.06) 0%, rgba(14, 165, 233, 0.06) 100%);
+  border: 1px solid rgba(30, 58, 138, 0.12);
+  border-radius: 14px;
+}
+
+[data-bs-theme="dark"] .sadar-skeleton-banner {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.2) 0%, rgba(14, 165, 233, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
