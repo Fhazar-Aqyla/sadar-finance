@@ -7,11 +7,12 @@ import { Cta4 } from "@/Components/ui/cta-4";
 import { Footer } from "@/Components/ui/footer";
 import ModernTeamShowcase from "@/Components/ui/cybernetic-team-showcase";
 // eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
 import girlPhone from "../../../assets/images/landing/cewek-hp.webp";
 import boyLaptop from "../../../assets/images/landing/cowok-laptop.webp";
 import dashboardPreview from "../../../assets/images/landing/dashboard-preview.png";
+import dashboardMobilePreview from "../../../assets/images/landing/dashboard-mobile-preview.webp";
 import diahAvatar from "../../../assets/images/users/diah.png";
 import marselaAvatar from "../../../assets/images/users/marsela.png";
 import dzakyAvatar from "../../../assets/images/users/dzaky.png";
@@ -219,11 +220,20 @@ const stepTitleClass = `${headingClass} mt-2 text-[16px] leading-[1.25] text-[#1
 const stepBodyClass = "mt-2 max-w-[280px] text-[12px] leading-5 text-[#7A8795]";
 
 const DashboardPreview = () => (
-  <img
-    src={dashboardPreview}
-    alt="SADAR Finance Dashboard"
-    className="h-full w-full object-cover object-top"
-  />
+  <>
+    {/* Desktop & Tablet Preview */}
+    <img
+      src={dashboardPreview}
+      alt="SADAR Finance Dashboard Desktop"
+      className="hidden md:block h-full w-full object-cover object-top"
+    />
+    {/* Mobile Smartphone Preview */}
+    <img
+      src={dashboardMobilePreview}
+      alt="SADAR Finance Dashboard Mobile"
+      className="block md:hidden h-full w-full object-cover object-top"
+    />
+  </>
 );
 
 const StepTransactionPreview = () => (
@@ -926,14 +936,15 @@ const OnePage = () => {
             </h2>
           </div>
 
-          <div className="mt-9 grid h-[456px] content-start gap-3 max-md:h-[408px] max-sm:h-[388px]">
+          <div className="mt-9 flex flex-col gap-3.5">
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
 
               return (
-                <article
+                <motion.article
                   key={faq.question}
-                  className={`overflow-hidden rounded-[12px] bg-white shadow-[0_10px_26px_rgba(30,58,138,0.04)] transition border-2 ${
+                  layout
+                  className={`overflow-hidden rounded-[14px] bg-white shadow-[0_10px_26px_rgba(30,58,138,0.04)] transition-colors duration-300 border-2 ${
                     isOpen
                       ? "border-[#1E3A8A] bg-[#F5F9FF]"
                       : "border-[#E4ECF3]"
@@ -942,22 +953,40 @@ const OnePage = () => {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                    className="flex min-h-[56px] w-full items-center justify-between gap-4 border-0 bg-transparent px-5 py-3 text-left text-[16px] font-extrabold leading-snug !text-[#1E3A8A] max-sm:min-h-[52px] max-sm:px-4 max-sm:text-[14px]"
+                    className="flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-4 border-0 bg-transparent px-5 py-3.5 text-left text-[16px] font-extrabold leading-snug !text-[#1E3A8A] max-sm:min-h-[52px] max-sm:px-4 max-sm:text-[14px]"
+                    aria-expanded={isOpen}
                   >
                     <span>{faq.question}</span>
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white !text-[#1E3A8A] shadow-[0_4px_10px_rgba(30,58,138,0.03)]">
+                    <motion.span
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white !text-[#1E3A8A] shadow-[0_4px_10px_rgba(30,58,138,0.03)]"
+                    >
                       <i
-                        className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-[18px]`}
+                        className={`${isOpen ? "ri-subtract-line" : "ri-add-line"} text-[18px] font-bold`}
                         aria-hidden="true"
                       ></i>
-                    </span>
+                    </motion.span>
                   </button>
-                  {isOpen && (
-                    <p className="m-0 max-w-[720px] px-5 pb-5 text-[13px] leading-6 text-[#667085] max-sm:px-4 max-sm:text-[12px] max-sm:leading-6">
-                      {faq.answer}
-                    </p>
-                  )}
-                </article>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="faq-content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 pb-5 max-sm:px-4 max-sm:pb-4">
+                          <p className="m-0 max-w-[720px] text-[13px] leading-6 text-[#667085] max-sm:text-[12px] max-sm:leading-6">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.article>
               );
             })}
           </div>
