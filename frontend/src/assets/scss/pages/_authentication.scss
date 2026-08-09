@@ -102,8 +102,9 @@
 
 .sadar-auth-cover {
     background: linear-gradient(120deg, #0bb9a8 0%, #2c9be0 100%);
-    overflow: hidden;
+    min-height: 100vh;
     padding: 0 !important;
+    position: relative;
 
     > .bg-overlay {
         background-image:
@@ -116,20 +117,23 @@
     }
 
     .auth-page-content {
-        height: 100vh;
+        min-height: 100vh;
+        width: 100%;
         padding: 0 !important;
     }
 
     .container {
         max-width: 100%;
-        height: 100%;
+        width: 100%;
+        min-height: 100vh;
         padding-right: 0;
         padding-left: 0;
     }
 
     .container > .row,
     .container > .row > [class*="col-"] {
-        height: 100%;
+        min-height: 100vh;
+        padding: 0;
     }
 
     .card {
@@ -138,98 +142,149 @@
     }
 
     .sadar-auth-card {
-        height: 100vh;
         min-height: 100vh;
+        width: 100%;
+        border-radius: 0;
+        margin: 0;
 
         > .row {
-            height: 100%;
+            min-height: 100vh;
+            margin: 0;
         }
     }
 
-    @media (min-width: 992px) {
+    // DESKTOP (>= 1024px)
+    @media (min-width: 1024px) {
+        height: 100vh;
+        overflow: hidden;
+
+        .auth-page-content {
+            height: 100vh;
+        }
+
+        .container {
+            height: 100vh;
+        }
+
+        .container > .row,
+        .container > .row > [class*="col-"] {
+            height: 100vh;
+        }
+
         .sadar-auth-card {
+            height: 100vh;
+
             > .row {
+                height: 100vh;
                 flex-direction: row-reverse;
             }
         }
 
         .sadar-auth-form-panel {
-            flex: 0 0 40%;
-            max-width: 40%;
+            flex: 0 0 44%;
+            max-width: 44%;
+            width: 44%;
+            height: 100vh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            overflow-y: auto;
+            background-color: var(--#{$prefix}card-bg-custom, #ffffff);
+
+            @media (min-width: 1400px) {
+                flex: 0 0 40%;
+                max-width: 40%;
+                width: 40%;
+                padding: 2rem 3.5rem;
+            }
         }
 
         .sadar-auth-visual-panel {
-            flex: 0 0 60%;
-            max-width: 60%;
+            flex: 0 0 56%;
+            max-width: 56%;
+            width: 56%;
+            height: 100vh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+
+            @media (min-width: 1400px) {
+                flex: 0 0 60%;
+                max-width: 60%;
+                width: 60%;
+            }
         }
     }
 
-    .sadar-auth-form-panel {
-        --sadar-auth-content-width: min(calc(100% - 96px), 580px);
-        --sadar-auth-content-padding: 3rem;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        min-height: 0;
-
-        > div {
-            width: var(--sadar-auth-content-width);
-            max-width: var(--sadar-auth-content-width);
-            margin-right: auto;
-            margin-left: auto;
-        }
-
-        .form-label {
-            margin-bottom: 0.35rem;
-        }
-
-        .form-control.is-invalid,
-        .was-validated .form-control:invalid {
-            background-image: none;
-            padding-right: 0.9rem;
-        }
-
-        .p-lg-5 {
-            padding-top: 0 !important;
-            padding-bottom: 2rem !important;
-        }
-
-        .p-2 {
-            padding: 0 !important;
-        }
-
-        .mt-4 {
-            margin-top: 1rem !important;
-        }
-
-        .mt-5 {
-            margin-top: 1.5rem !important;
-        }
-
-        .mb-3 {
-            margin-bottom: 0.85rem !important;
-        }
-
-        .mb-4 {
-            margin-bottom: 1rem !important;
-        }
+    .sadar-auth-form-container {
+        width: 100%;
+        max-width: 410px;
+        margin-top: auto;
+        margin-bottom: auto;
+        padding: 0.5rem 0;
     }
 
     .sadar-auth-panel-logo {
-        display: flex;
-        width: var(--sadar-auth-content-width);
-        max-width: var(--sadar-auth-content-width);
-        margin: 0 auto 1.5rem;
-        padding: 0 var(--sadar-auth-content-padding);
+        display: block;
+        margin-bottom: 1.15rem;
 
         img {
             height: 34px;
             width: auto;
-            flex: 0 0 auto;
+            display: block;
         }
+    }
+
+    .form-label {
+        margin-bottom: 0.3rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .form-control {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.85rem;
+    }
+
+    .form-control.is-invalid,
+    .was-validated .form-control:invalid {
+        background-image: none;
+        padding-right: 0.9rem;
+    }
+
+    .p-lg-5 {
+        padding: 0 !important;
+    }
+
+    .p-4 {
+        padding: 0 !important;
+    }
+
+    .p-2 {
+        padding: 0 !important;
+    }
+
+    .mt-4 {
+        margin-top: 0.9rem !important;
+    }
+
+    .mt-5 {
+        margin-top: 1.15rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.6rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 0.75rem !important;
     }
 
     .text-primary,
@@ -246,6 +301,12 @@
         --#{$prefix}btn-active-border-color: #1E3A8A;
         --#{$prefix}btn-disabled-bg: #4f63a0;
         --#{$prefix}btn-disabled-border-color: #4f63a0;
+        padding: 0.55rem 1rem;
+        font-weight: 600;
+    }
+
+    .footer {
+        display: none !important;
     }
 
     .sadar-auth-slider {
@@ -276,32 +337,51 @@
         background-color: var(--#{$prefix}secondary-bg);
     }
 
-    @media (max-width: 991.98px) {
-        overflow: auto;
+    // TABLET & MOBILE (< 1024px)
+    @media (max-width: 1023.98px) {
+        overflow-y: auto;
+
+        .sadar-auth-visual-panel {
+            display: none !important;
+        }
 
         .auth-page-content,
         .container,
         .container > .row,
         .container > .row > [class*="col-"] {
-            height: auto;
             min-height: 100vh;
+            height: auto;
         }
 
         .sadar-auth-card {
-            height: auto;
             min-height: 100vh;
+            height: auto;
+
+            > .row {
+                min-height: 100vh;
+                height: auto;
+            }
         }
 
         .sadar-auth-form-panel {
+            flex: 0 0 100%;
+            max-width: 100%;
+            width: 100%;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            --sadar-auth-content-width: #{min(calc(100% - 48px), 460px)};
-            --sadar-auth-content-padding: 1.5rem;
+            align-items: center;
+            padding: 3rem 1.5rem;
+            background-color: var(--#{$prefix}card-bg-custom, #ffffff);
+        }
+
+        .sadar-auth-form-container {
+            max-width: 440px;
+            margin: auto;
         }
 
         .sadar-auth-panel-logo {
-            margin-top: 1.5rem;
             margin-bottom: 1.25rem;
         }
 

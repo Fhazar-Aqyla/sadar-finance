@@ -72,7 +72,7 @@ export function AuthPage() {
 
   return (
     <Col lg={6} className="sadar-auth-visual-panel d-none d-lg-block">
-      <div className="relative flex h-full min-h-[720px] overflow-hidden bg-[#1E3A8A] p-10 text-white max-lg:min-h-[320px] max-lg:p-6">
+      <div className="relative flex h-full min-h-full w-full overflow-hidden bg-[#1E3A8A] p-8 lg:p-12 xl:p-16 text-white justify-center items-center">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(20,184,166,0.18),transparent_20rem),radial-gradient(circle_at_76%_18%,rgba(20,184,166,0.18),transparent_18rem),linear-gradient(180deg,#2563EB_0%,#1E3A8A_46%,#111E3F_100%)]" />
 
         <div className="absolute inset-0">
@@ -82,8 +82,8 @@ export function AuthPage() {
         </div>
         <GradientWave />
 
-        <div className="relative z-10 flex w-full flex-col">
-          <div className="max-w-[680px] pt-12 max-lg:max-w-[560px] max-lg:pt-4">
+        <div className="relative z-10 flex w-full flex-col my-auto max-w-[620px]">
+          <div>
             <blockquote
               className="m-0"
               style={{

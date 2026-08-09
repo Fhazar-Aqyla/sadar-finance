@@ -59,47 +59,48 @@ const ForgetPasswordPage = props => {
   }, []);
 
   return (
-    <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+    <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover d-flex justify-content-center align-items-center min-vh-100">
       <div className="bg-overlay"></div>
-      <div className="auth-page-content overflow-hidden pt-lg-5">
+      <div className="auth-page-content">
         <Container>
           <Row>
             <Col lg={12}>
-              <Card className="sadar-auth-card overflow-hidden border-0 m-0">
+              <Card className="sadar-auth-card border-0 m-0">
                 <Row className="g-0">
                   <AuthSlider />
 
                   <Col lg={6} className="sadar-auth-form-panel">
-                    <Link to="/" aria-label="SADAR Finance" className="sadar-auth-panel-logo">
-                      <img src={sadarLogo} alt="SADAR Finance" />
-                    </Link>
-                    <div className="w-100 p-lg-5 p-4">
+                    <div className="sadar-auth-form-container">
+                      <Link to="/" aria-label="SADAR Finance" className="sadar-auth-panel-logo">
+                        <img src={sadarLogo} alt="SADAR Finance" />
+                      </Link>
                       <div>
                         <h5 className="text-primary">Lupa password?</h5>
                         <p className="text-muted">Masukkan email akun untuk menerima instruksi reset.</p>
 
-                        <lord-icon
-                          src="https://cdn.lordicon.com/rhvddzym.json"
-                          trigger="loop"
-                          colors="primary:#00bd9d"
-                          className="avatar-xl"
-                          style={{ width: "120px", height: "120px" }}
-                        >
-                        </lord-icon>
-
+                        <div className="text-center my-2">
+                          <lord-icon
+                            src="https://cdn.lordicon.com/rhvddzym.json"
+                            trigger="loop"
+                            colors="primary:#00bd9d"
+                            className="avatar-xl"
+                            style={{ width: "90px", height: "90px" }}
+                          >
+                          </lord-icon>
+                        </div>
                       </div>
 
-                      <Alert className="border-0 alert-warning text-center mb-2 mx-2" role="alert">
+                      <Alert className="border-0 alert-warning text-center mb-2" role="alert">
                         Link reset akan dikirim ke email yang terhubung dengan akun SADAR.
                       </Alert>
-                      <div className="p-2">
+                      <div className="mt-2">
                         {forgetError && forgetError ? (
-                          <Alert color="danger" style={{ marginTop: "13px" }}>
+                          <Alert color="danger" className="mb-2">
                             {forgetError}
                           </Alert>
                         ) : null}
                         {forgetSuccessMsg ? (
-                          <Alert color="success" style={{ marginTop: "13px" }}>
+                          <Alert color="success" className="mb-2">
                             {forgetSuccessMsg}
                           </Alert>
                         ) : null}
@@ -110,7 +111,7 @@ const ForgetPasswordPage = props => {
                             return false;
                           }}
                         >
-                          <div className="mb-4">
+                          <div className="mb-3">
                             <Label className="form-label">Email</Label>
                             <Input
                               name="email"
@@ -129,16 +130,15 @@ const ForgetPasswordPage = props => {
                             ) : null}
                           </div>
 
-                          <div className="text-center mt-4">
+                          <div className="text-center mt-3">
                             <button className="btn btn-success w-100" type="submit">Kirim Link Reset</button>
                           </div>
                         </Form>
                       </div>
 
-                      <div className="mt-5 text-center">
-                        <p className="mb-0">Sudah ingat password? <Link to="/login" className="fw-semibold text-primary text-decoration-underline">Kembali masuk</Link></p>
+                      <div className="mt-4 text-center">
+                        <p className="mb-0 fs-13">Sudah ingat password? <Link to="/login" className="fw-semibold text-primary text-decoration-underline">Kembali masuk</Link></p>
                       </div>
-
                     </div>
                   </Col>
                 </Row>
