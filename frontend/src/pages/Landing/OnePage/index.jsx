@@ -231,7 +231,7 @@ const DashboardPreview = () => (
     <img
       src={dashboardMobilePreview}
       alt="SADAR Finance Dashboard Mobile"
-      className="block md:hidden h-full w-full object-cover object-top"
+      className="block md:hidden h-full w-full object-fill"
     />
   </>
 );
