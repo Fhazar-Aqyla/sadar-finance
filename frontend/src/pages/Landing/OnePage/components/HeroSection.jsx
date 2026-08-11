@@ -1,13 +1,7 @@
 import React, { useRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  ShieldCheck,
-  Sparkles,
-  Zap,
-  CheckCircle2,
-  ChevronRight,
-} from "lucide-react";
+import { ArrowRight, ShieldCheck, Sparkles, CheckCircle2, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
@@ -30,7 +24,7 @@ export const HeroSection = () => {
             opacity: 0,
             duration: 0.8,
           },
-          "-=0.3",
+          "-=0.3"
         )
         .from(
           ".hero-desc",
@@ -39,7 +33,7 @@ export const HeroSection = () => {
             opacity: 0,
             duration: 0.7,
           },
-          "-=0.5",
+          "-=0.5"
         )
         .from(
           ".hero-cta",
@@ -49,7 +43,7 @@ export const HeroSection = () => {
             stagger: 0.15,
             duration: 0.6,
           },
-          "-=0.4",
+          "-=0.4"
         )
         .from(
           ".hero-trust",
@@ -57,10 +51,10 @@ export const HeroSection = () => {
             opacity: 0,
             duration: 0.8,
           },
-          "-=0.2",
+          "-=0.2"
         );
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   return (
@@ -75,15 +69,17 @@ export const HeroSection = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {/* Release Pill Badge */}
-        <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-500/30 bg-teal-50/80 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 text-xs sm:text-sm font-semibold mb-6 backdrop-blur-sm shadow-sm hover:border-teal-500/50 transition-colors cursor-default">
+        <motion.div
+          whileHover={{ scale: 1.03 }}
+          className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-500/30 bg-teal-50/80 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 text-xs sm:text-sm font-semibold mb-6 backdrop-blur-sm shadow-sm cursor-default"
+        >
           <span className="flex h-2 w-2 rounded-full bg-teal-500 animate-ping" />
           <span className="font-bold">SADAR v1.0</span>
           <span className="text-slate-300 dark:text-slate-600">•</span>
           <span className="flex items-center gap-1">
-            Personal Finance Cerdas & Sadar Finansial{" "}
-            <ChevronRight className="w-3.5 h-3.5" />
+            Personal Finance Cerdas & Sadar Finansial <ChevronRight className="w-3.5 h-3.5" />
           </span>
-        </div>
+        </motion.div>
 
         {/* Hero Main Headline */}
         <h1 className="hero-title text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.15] sm:leading-[1.12]">
@@ -95,26 +91,36 @@ export const HeroSection = () => {
 
         {/* Hero Subtitle */}
         <p className="hero-desc mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-          SADAR Finance mengekstrak struk belanja dengan OCR, membaca pola
-          kebiasaan pengeluaranmu, dan menghitung skor kesehatan finansial
-          secara objektif.
+          SADAR Finance mengekstrak struk belanja dengan OCR, membaca pola kebiasaan pengeluaranmu, dan menghitung skor kesehatan finansial secara objektif.
         </p>
 
-        {/* Call to Actions */}
+        {/* Call to Actions with Framer Motion spring physics */}
         <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
-          <Link
-            to="/auth/register"
-            className="hero-cta w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-900 via-teal-700 to-teal-600 text-white font-bold text-base shadow-xl shadow-teal-700/25 hover:shadow-teal-700/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full sm:w-auto"
           >
-            Mulai Gratis Sekarang <ArrowRight className="w-5 h-5" />
-          </Link>
-          <a
-            href="#features"
-            className="hero-cta w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border border-slate-200 bg-white/80 text-slate-700 font-semibold text-base shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
+            <Link
+              to="/auth/register"
+              className="hero-cta w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-900 via-teal-700 to-teal-600 text-white font-bold text-base shadow-xl shadow-teal-700/25 transition-all"
+            >
+              Mulai Gratis Sekarang <ArrowRight className="w-5 h-5" />
+            </Link>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full sm:w-auto"
           >
-            Jelajahi Fitur{" "}
-            <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-          </a>
+            <a
+              href="#features"
+              className="hero-cta w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border border-slate-200 bg-white/80 text-slate-700 font-semibold text-base shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
+            >
+              Jelajahi Fitur <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            </a>
+          </motion.div>
         </div>
 
         {/* Trust Badges */}

@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Wallet,
-  Coffee,
-  PiggyBank,
-  Sparkles,
-  CheckCircle2,
-  ArrowRight,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { Wallet, Coffee, PiggyBank, Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const InteractiveBudgetSlider = () => {
@@ -43,26 +36,33 @@ export const InteractiveBudgetSlider = () => {
             Hitung Alokasi Gaji Idealmu
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Geser slider atau pilih estimasi pemasukan bulananmu untuk melihat
-            alokasi sehat.
+            Geser slider atau pilih estimasi pemasukan bulananmu untuk melihat alokasi sehat.
           </p>
         </div>
 
-        {/* Quick Presets */}
-        <div className="flex flex-wrap items-center gap-2">
-          {presets.map((preset) => (
-            <button
-              key={preset.value}
-              onClick={() => setIncome(preset.value)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                income === preset.value
-                  ? "bg-teal-600 text-white shadow-md shadow-teal-600/30"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-              }`}
-            >
-              {preset.label}
-            </button>
-          ))}
+        {/* Quick Presets with Framer Motion layoutId */}
+        <div className="flex flex-wrap items-center gap-2 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl">
+          {presets.map((preset) => {
+            const isSelected = income === preset.value;
+            return (
+              <button
+                key={preset.value}
+                onClick={() => setIncome(preset.value)}
+                className="relative px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors z-10"
+              >
+                {isSelected && (
+                  <motion.div
+                    layoutId="activePresetPill"
+                    transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                    className="absolute inset-0 bg-teal-600 rounded-lg shadow-md shadow-teal-600/30 -z-10"
+                  />
+                )}
+                <span className={isSelected ? "text-white font-bold" : "text-slate-600 dark:text-slate-300"}>
+                  {preset.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -72,9 +72,15 @@ export const InteractiveBudgetSlider = () => {
           <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
             Total Pemasukan Bulanan:
           </span>
-          <span className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400 tracking-tight">
+          <motion.span
+            key={income}
+            initial={{ scale: 1.08 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400 tracking-tight"
+          >
             {formatRupiah(income)}
-          </span>
+          </motion.span>
         </div>
         <input
           type="range"
@@ -85,17 +91,20 @@ export const InteractiveBudgetSlider = () => {
           onChange={(e) => setIncome(Number(e.target.value))}
           className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600 dark:bg-slate-800 transition-all"
         />
-        <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1">
+        <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1.5 font-medium">
           <span>Rp 1,5 Jt</span>
           <span>Rp 15 Jt</span>
           <span>Rp 35 Jt</span>
         </div>
       </div>
 
-      {/* Result Cards Grid */}
+      {/* Result Cards Grid with Framer Motion */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Needs Card */}
-        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4.5 dark:border-blue-900/30 dark:bg-blue-950/20 transition-all hover:scale-[1.02]">
+        <motion.div
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+          className="rounded-xl border border-blue-100 bg-blue-50/50 p-4.5 dark:border-blue-900/30 dark:bg-blue-950/20 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-lg bg-blue-600 text-white shadow-sm">
@@ -113,16 +122,23 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(needs)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi,
-            transportasi kerja.
+            Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi, transportasi kerja.
           </p>
           <div className="w-full bg-blue-200/60 dark:bg-blue-950 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-blue-600 h-full w-1/2 rounded-full" />
+            <motion.div
+              initial={{ width: "0%" }}
+              animate={{ width: "50%" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="bg-blue-600 h-full rounded-full"
+            />
           </div>
-        </div>
+        </motion.div>
 
         {/* Wants Card */}
-        <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4.5 dark:border-amber-900/30 dark:bg-amber-950/20 transition-all hover:scale-[1.02]">
+        <motion.div
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+          className="rounded-xl border border-amber-100 bg-amber-50/50 p-4.5 dark:border-amber-900/30 dark:bg-amber-950/20 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-lg bg-amber-500 text-white shadow-sm">
@@ -140,16 +156,23 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(wants)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi
-            akhir pekan.
+            Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi akhir pekan.
           </p>
           <div className="w-full bg-amber-200/60 dark:bg-amber-950 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-amber-500 h-full w-[30%] rounded-full" />
+            <motion.div
+              initial={{ width: "0%" }}
+              animate={{ width: "30%" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="bg-amber-500 h-full rounded-full"
+            />
           </div>
-        </div>
+        </motion.div>
 
         {/* Savings Card */}
-        <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4.5 dark:border-emerald-900/30 dark:bg-emerald-950/20 transition-all hover:scale-[1.02]">
+        <motion.div
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+          className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4.5 dark:border-emerald-900/30 dark:bg-emerald-950/20 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-lg bg-emerald-600 text-white shadow-sm">
@@ -167,29 +190,30 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(savings)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Dana darurat, tabungan impian, reksadana, emas, atau investasi masa
-            depan.
+            Dana darurat, tabungan impian, reksadana, emas, atau investasi masa depan.
           </p>
           <div className="w-full bg-emerald-200/60 dark:bg-emerald-950 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-emerald-500 h-full w-[20%] rounded-full" />
+            <motion.div
+              initial={{ width: "0%" }}
+              animate={{ width: "20%" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="bg-emerald-500 h-full rounded-full"
+            />
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Footer Call to Action */}
       <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>
-            SADAR Finance otomatis memantau kepatuhan batas ini di setiap
-            transaksi.
-          </span>
+          <span>SADAR Finance otomatis memantau kepatuhan batas ini di setiap transaksi.</span>
         </div>
         <Link
           to="/auth/register"
-          className="inline-flex items-center gap-1 font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400 hover:underline shrink-0"
+          className="inline-flex items-center gap-1 font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400 hover:underline shrink-0 group"
         >
-          Kunci Budgetmu Sekarang <ArrowRight className="w-3.5 h-3.5" />
+          Kunci Budgetmu Sekarang <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </div>

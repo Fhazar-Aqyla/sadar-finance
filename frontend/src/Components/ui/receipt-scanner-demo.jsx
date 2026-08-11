@@ -1,15 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Receipt,
-  Scan,
-  Sparkles,
-  Check,
-  ArrowRight,
-  Tag,
-  Calendar,
-  Store,
-} from "lucide-react";
+import { Receipt, Scan, Sparkles, ArrowRight, Tag, Calendar, Store, CheckCircle } from "lucide-react";
 
 export const ReceiptScannerDemo = () => {
   const receipts = [
@@ -22,8 +13,7 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 68500,
       categoryGroup: "Needs",
       categoryDetail: "Kebutuhan Pokok",
-      badgeColor:
-        "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
+      badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
       items: [
         { name: "Susu UHT Full Cream 1L", price: "Rp 21.000" },
         { name: "Roti Tawar Gandum", price: "Rp 17.500" },
@@ -39,8 +29,7 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 38000,
       categoryGroup: "Wants",
       categoryDetail: "Gaya Hidup / Kuliner",
-      badgeColor:
-        "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
+      badgeColor: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
       items: [
         { name: "Kopi Kenangan Mantan Large", price: "Rp 24.000" },
         { name: "Cinnamon Roll Toast", price: "Rp 14.000" },
@@ -55,9 +44,10 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 150000,
       categoryGroup: "Needs",
       categoryDetail: "Transportasi",
-      badgeColor:
-        "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
-      items: [{ name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" }],
+      badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
+      items: [
+        { name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" },
+      ],
     },
   ];
 
@@ -70,12 +60,12 @@ export const ReceiptScannerDemo = () => {
     setTimeout(() => {
       setActiveReceipt(r);
       setIsScanning(false);
-    }, 450);
+    }, 380);
   };
 
   return (
     <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-      {/* Header Tabs */}
+      {/* Header Tabs with Framer Motion layoutId */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400">
@@ -86,27 +76,34 @@ export const ReceiptScannerDemo = () => {
               Simulasi Ekstraksi Struk Belanja
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Pilih contoh struk fisik di bawah ini untuk melihat cara kerja OCR
-              SADAR.
+              Pilih contoh struk fisik di bawah ini untuk melihat cara kerja OCR SADAR.
             </p>
           </div>
         </div>
 
-        {/* Receipt Switcher Pills */}
+        {/* Receipt Switcher Pills with springy layoutId */}
         <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto">
-          {receipts.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => handleSelect(r)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                activeReceipt.id === r.id
-                  ? "bg-white text-teal-700 shadow-sm dark:bg-slate-900 dark:text-teal-400"
-                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              }`}
-            >
-              {r.title}
-            </button>
-          ))}
+          {receipts.map((r) => {
+            const isSelected = activeReceipt.id === r.id;
+            return (
+              <button
+                key={r.id}
+                onClick={() => handleSelect(r)}
+                className="relative px-3 py-1 text-xs font-semibold rounded-lg transition-colors z-10"
+              >
+                {isSelected && (
+                  <motion.div
+                    layoutId="activeReceiptTab"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    className="absolute inset-0 bg-white dark:bg-slate-900 rounded-lg shadow-sm -z-10"
+                  />
+                )}
+                <span className={isSelected ? "text-teal-700 dark:text-teal-400 font-bold" : "text-slate-600 dark:text-slate-400"}>
+                  {r.title}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -114,15 +111,18 @@ export const ReceiptScannerDemo = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
         {/* Visual Simulated Receipt (Left) */}
         <div className="lg:col-span-5 relative rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-950/50 font-mono text-xs overflow-hidden">
-          {/* Laser Scanning Line */}
-          {isScanning && (
-            <motion.div
-              initial={{ top: "0%" }}
-              animate={{ top: "100%" }}
-              transition={{ duration: 0.45, ease: "linear" }}
-              className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-teal-400 to-transparent shadow-[0_0_12px_rgba(20,184,166,0.8)] z-20"
-            />
-          )}
+          {/* Laser Scanning Line with Framer Motion */}
+          <AnimatePresence>
+            {isScanning && (
+              <motion.div
+                initial={{ top: "0%" }}
+                animate={{ top: ["0%", "100%", "0%"] }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.75, ease: "easeInOut" }}
+                className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-teal-400 to-transparent shadow-[0_0_15px_rgba(20,184,166,0.9)] z-20"
+              />
+            )}
+          </AnimatePresence>
 
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2 mb-3">
             <span className="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -131,10 +131,14 @@ export const ReceiptScannerDemo = () => {
             <Receipt className="w-3.5 h-3.5 text-slate-400" />
           </div>
 
-          <div className="space-y-1 text-slate-600 dark:text-slate-400 text-[11px]">
-            <p className="font-semibold text-slate-800 dark:text-slate-200">
-              {activeReceipt.merchant}
-            </p>
+          <motion.div
+            key={activeReceipt.id}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-1 text-slate-600 dark:text-slate-400 text-[11px]"
+          >
+            <p className="font-semibold text-slate-800 dark:text-slate-200">{activeReceipt.merchant}</p>
             <p>Tgl: {activeReceipt.date} • Kasir #04</p>
             <div className="border-t border-slate-200 dark:border-slate-800 my-2 pt-2">
               {activeReceipt.items.map((item, idx) => (
@@ -146,11 +150,9 @@ export const ReceiptScannerDemo = () => {
             </div>
             <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex justify-between font-bold text-slate-900 dark:text-white text-xs">
               <span>TOTAL</span>
-              <span className="text-teal-600 dark:text-teal-400">
-                {activeReceipt.total}
-              </span>
+              <span className="text-teal-600 dark:text-teal-400">{activeReceipt.total}</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Arrow Transition */}
@@ -165,48 +167,55 @@ export const ReceiptScannerDemo = () => {
               <Sparkles className="w-3.5 h-3.5 text-teal-500" />
               Ekstraksi Cerdas Terdeteksi
             </div>
-            <span
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}
-            >
+            <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}>
               {activeReceipt.categoryGroup}
             </span>
           </div>
 
-          <div className="space-y-2.5 text-xs">
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                <Store className="w-3.5 h-3.5 text-slate-400" /> Merchant
-              </span>
-              <span className="font-semibold text-slate-900 dark:text-white">
-                {activeReceipt.merchant}
-              </span>
-            </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeReceipt.id}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-2.5 text-xs"
+            >
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Store className="w-3.5 h-3.5 text-slate-400" /> Merchant
+                </span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {activeReceipt.merchant}
+                </span>
+              </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal
-              </span>
-              <span className="font-semibold text-slate-900 dark:text-white">
-                {activeReceipt.date}
-              </span>
-            </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal
+                </span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {activeReceipt.date}
+                </span>
+              </div>
 
-            <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-slate-400" /> Pos & Detail
-              </span>
-              <span className="font-semibold text-slate-900 dark:text-white">
-                {activeReceipt.categoryDetail}
-              </span>
-            </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-slate-400" /> Pos & Detail
+                </span>
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {activeReceipt.categoryDetail}
+                </span>
+              </div>
 
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-teal-600 text-white shadow-sm font-medium">
-              <span className="text-teal-100">Nominal Terbaca</span>
-              <span className="text-base font-extrabold">
-                {activeReceipt.total}
-              </span>
-            </div>
-          </div>
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-teal-600 text-white shadow-sm font-medium">
+                <span className="text-teal-100 flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5 text-teal-200" /> Nominal Terbaca
+                </span>
+                <span className="text-base font-extrabold">{activeReceipt.total}</span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

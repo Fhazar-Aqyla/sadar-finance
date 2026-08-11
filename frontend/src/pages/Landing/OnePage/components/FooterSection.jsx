@@ -19,10 +19,7 @@ export const FooterSection = () => {
             </div>
             <div>
               <span className="font-extrabold text-slate-900 dark:text-white tracking-tight text-base">
-                SADAR{" "}
-                <span className="text-teal-600 dark:text-teal-400">
-                  FINANCE
-                </span>
+                SADAR <span className="text-teal-600 dark:text-teal-400">FINANCE</span>
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Smart AI-Driven Automated Receipt & Personal Finance Management
@@ -32,40 +29,22 @@ export const FooterSection = () => {
 
           {/* Quick Nav Links */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <a
-              href="#home"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
+            <a href="#home" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
               Beranda
             </a>
-            <a
-              href="#features"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
+            <a href="#features" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
               Fitur
             </a>
-            <a
-              href="#simulator"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
+            <a href="#simulator" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
               Simulasi
             </a>
-            <a
-              href="#how-it-works"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
+            <a href="#how-it-works" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
               Cara Kerja
             </a>
-            <a
-              href="#team"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
+            <a href="#team" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
               Tim
             </a>
-            <a
-              href="#faq"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
+            <a href="#faq" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
               FAQ
             </a>
           </div>
@@ -73,9 +52,7 @@ export const FooterSection = () => {
 
         {/* Bottom Legal & Credits */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-500">
-          <p>
-            © {new Date().getFullYear()} SADAR Finance. Hak Cipta Dilindungi.
-          </p>
+          <p>© {new Date().getFullYear()} SADAR Finance. Hak Cipta Dilindungi.</p>
           <div className="flex items-center gap-1">
             <span>Dibuat dengan</span>
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline-block" />

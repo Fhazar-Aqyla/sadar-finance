@@ -2,13 +2,7 @@ import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  ArrowUpRight,
-  Shield,
-  Sparkles,
-  TrendingUp,
-  AlertTriangle,
-} from "lucide-react";
+import { ArrowUpRight, Shield, Sparkles, TrendingUp, AlertTriangle } from "lucide-react";
 import dashboardPreview from "@/assets/images/landing/dashboard-preview.png";
 import dashboardMobilePreview from "@/assets/images/landing/dashboard-mobile-preview.webp";
 
@@ -41,7 +35,7 @@ export const ScrollShowcase = () => {
             end: "top 25%",
             scrub: 1.2,
           },
-        },
+        }
       );
 
       // Stagger floating badge entrance
@@ -57,14 +51,11 @@ export const ScrollShowcase = () => {
         },
       });
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   return (
-    <section
-      ref={containerRef}
-      className="relative py-12 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
-    >
+    <section ref={containerRef} className="relative py-12 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Decorative Blur Background */}
       <div className="absolute inset-0 max-w-5xl mx-auto h-[450px] bg-gradient-to-r from-teal-500/10 via-blue-600/15 to-emerald-500/10 blur-3xl -z-10 rounded-3xl" />
 
@@ -107,12 +98,8 @@ export const ScrollShowcase = () => {
             <TrendingUp className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-              Gaji Masuk
-            </p>
-            <p className="text-sm font-bold text-slate-900 dark:text-white">
-              +Rp 8.000.000
-            </p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Gaji Masuk</p>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">+Rp 8.000.000</p>
           </div>
         </div>
 
@@ -121,12 +108,8 @@ export const ScrollShowcase = () => {
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-              Financial Score
-            </p>
-            <p className="text-sm font-bold text-teal-600 dark:text-teal-400">
-              84 • Kondisi Sehat
-            </p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Financial Score</p>
+            <p className="text-sm font-bold text-teal-600 dark:text-teal-400">84 • Kondisi Sehat</p>
           </div>
         </div>
 
@@ -135,12 +118,8 @@ export const ScrollShowcase = () => {
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-              Smart Alert
-            </p>
-            <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
-              Budget Wants 82%
-            </p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Smart Alert</p>
+            <p className="text-sm font-bold text-amber-600 dark:text-amber-400">Budget Wants 82%</p>
           </div>
         </div>
       </div>

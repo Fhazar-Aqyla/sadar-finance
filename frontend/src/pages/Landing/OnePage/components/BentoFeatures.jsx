@@ -18,32 +18,15 @@ export const BentoFeatures = () => {
   const [activeScore, setActiveScore] = useState(84);
 
   const getScoreStatus = (val) => {
-    if (val <= 40)
-      return {
-        label: "Perlu Perhatian",
-        color: "text-rose-500",
-        bg: "bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300",
-      };
-    if (val <= 70)
-      return {
-        label: "Cukup Sehat",
-        color: "text-amber-500",
-        bg: "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300",
-      };
-    return {
-      label: "Kondisi Sehat",
-      color: "text-emerald-500",
-      bg: "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
-    };
+    if (val <= 40) return { label: "Perlu Perhatian", color: "text-rose-500", bg: "bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300" };
+    if (val <= 70) return { label: "Cukup Sehat", color: "text-amber-500", bg: "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300" };
+    return { label: "Kondisi Sehat", color: "text-emerald-500", bg: "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300" };
   };
 
   const status = getScoreStatus(activeScore);
 
   return (
-    <section
-      id="features"
-      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-    >
+    <section id="features" className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-14">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 text-xs font-bold uppercase tracking-wider mb-3">
@@ -57,8 +40,7 @@ export const BentoFeatures = () => {
           </span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-          Dirancang khusus untuk gaya hidup modern. Bekerja otomatis di latar
-          belakang tanpa chatbot rumit.
+          Dirancang khusus untuk gaya hidup modern. Bekerja otomatis di latar belakang tanpa chatbot rumit.
         </p>
       </div>
 
@@ -76,9 +58,7 @@ export const BentoFeatures = () => {
                 Foto Struk Kasir, Biarkan AI Menginput
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-                Tidak perlu lagi mengetik satu per satu barang belanjaan. Ambil
-                foto struk dari Indomaret, kafe, atau SPBU, dan nominal serta
-                pos kebutuhan otomatis terdeteksi.
+                Tidak perlu lagi mengetik satu per satu barang belanjaan. Ambil foto struk dari Indomaret, kafe, atau SPBU, dan nominal serta pos kebutuhan otomatis terdeteksi.
               </p>
             </div>
             <ReceiptScannerDemo />
@@ -97,8 +77,7 @@ export const BentoFeatures = () => {
                 Skor Kesehatan Finansial 0–100
               </h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Kalkulasi objektif dari rasio tabungan, disiplin budget, dan
-                kontrol pengeluaran.
+                Kalkulasi objektif dari rasio tabungan, disiplin budget, dan kontrol pengeluaran.
               </p>
 
               {/* Interactive Speedometer Simulation */}
@@ -106,15 +85,11 @@ export const BentoFeatures = () => {
                 <div className="relative inline-flex items-center justify-center">
                   <div className="text-5xl font-black text-slate-900 dark:text-white tracking-tight">
                     {activeScore}
-                    <span className="text-xl text-slate-400 font-normal">
-                      /100
-                    </span>
+                    <span className="text-xl text-slate-400 font-normal">/100</span>
                   </div>
                 </div>
                 <div className="mt-3">
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${status.bg}`}
-                  >
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${status.bg}`}>
                     {status.label}
                   </span>
                 </div>
@@ -163,16 +138,11 @@ export const BentoFeatures = () => {
                   Deteksi Dini Overspending
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  SADAR memproyeksikan laju belanja hingga akhir bulan. Jika
-                  tren pengeluaran diprediksi melebihi budget, kamu langsung
-                  mendapat peringatan.
+                  SADAR memproyeksikan laju belanja hingga akhir bulan. Jika tren pengeluaran diprediksi melebihi budget, kamu langsung mendapat peringatan.
                 </p>
                 <div className="mt-3 p-3 rounded-xl bg-amber-50/70 border border-amber-200/60 dark:bg-amber-950/30 dark:border-amber-800/50 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300">
                   <span className="font-bold">⚠️ Alert Simulasi:</span>
-                  <span>
-                    Pengeluaran Kopi & Jajan pekan ini telah menyerap 82% kuota
-                    Wants.
-                  </span>
+                  <span>Pengeluaran Kopi & Jajan pekan ini telah menyerap 82% kuota Wants.</span>
                 </div>
               </div>
             </div>
@@ -189,8 +159,7 @@ export const BentoFeatures = () => {
                   Kelola Dompet, Bank & E-Wallet
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  Pantau saldo Cash, Rekening BCA/Mandiri, hingga GoPay/OVO
-                  dalam satu ringkasan saldo gabungan yang selalu sinkron.
+                  Pantau saldo Cash, Rekening BCA/Mandiri, hingga GoPay/OVO dalam satu ringkasan saldo gabungan yang selalu sinkron.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
