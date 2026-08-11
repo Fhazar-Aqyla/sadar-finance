@@ -1,0 +1,197 @@
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Wallet,
+  Coffee,
+  PiggyBank,
+  Sparkles,
+  CheckCircle2,
+  ArrowRight,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+export const InteractiveBudgetSlider = () => {
+  const [income, setIncome] = useState(6000000);
+
+  const presets = [
+    { label: "Rp 3 Jt", value: 3000000 },
+    { label: "Rp 6 Jt", value: 6000000 },
+    { label: "Rp 12 Jt", value: 12000000 },
+    { label: "Rp 25 Jt", value: 25000000 },
+  ];
+
+  const needs = income * 0.5;
+  const wants = income * 0.3;
+  const savings = income * 0.2;
+
+  const formatRupiah = (val) =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(val);
+
+  return (
+    <div className="w-full rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white via-slate-50/50 to-white p-6 sm:p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-950 dark:shadow-none">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold dark:bg-teal-950/60 dark:text-teal-300 mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 animate-pulse" />
+            Simulasi Rumus 50 / 30 / 20
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+            Hitung Alokasi Gaji Idealmu
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Geser slider atau pilih estimasi pemasukan bulananmu untuk melihat
+            alokasi sehat.
+          </p>
+        </div>
+
+        {/* Quick Presets */}
+        <div className="flex flex-wrap items-center gap-2">
+          {presets.map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => setIncome(preset.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                income === preset.value
+                  ? "bg-teal-600 text-white shadow-md shadow-teal-600/30"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Slider Input */}
+      <div className="my-6">
+        <div className="flex justify-between items-baseline mb-3">
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+            Total Pemasukan Bulanan:
+          </span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400 tracking-tight">
+            {formatRupiah(income)}
+          </span>
+        </div>
+        <input
+          type="range"
+          min="1500000"
+          max="35000000"
+          step="500000"
+          value={income}
+          onChange={(e) => setIncome(Number(e.target.value))}
+          className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600 dark:bg-slate-800 transition-all"
+        />
+        <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1">
+          <span>Rp 1,5 Jt</span>
+          <span>Rp 15 Jt</span>
+          <span>Rp 35 Jt</span>
+        </div>
+      </div>
+
+      {/* Result Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Needs Card */}
+        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4.5 dark:border-blue-900/30 dark:bg-blue-950/20 transition-all hover:scale-[1.02]">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-blue-600 text-white shadow-sm">
+                <Wallet className="w-4 h-4" />
+              </div>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
+                Kebutuhan Pokok
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold dark:bg-blue-900/50 dark:text-blue-300">
+              50%
+            </span>
+          </div>
+          <div className="text-xl font-bold text-slate-900 dark:text-white mt-1 mb-2">
+            {formatRupiah(needs)}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi,
+            transportasi kerja.
+          </p>
+          <div className="w-full bg-blue-200/60 dark:bg-blue-950 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="bg-blue-600 h-full w-1/2 rounded-full" />
+          </div>
+        </div>
+
+        {/* Wants Card */}
+        <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4.5 dark:border-amber-900/30 dark:bg-amber-950/20 transition-all hover:scale-[1.02]">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-amber-500 text-white shadow-sm">
+                <Coffee className="w-4 h-4" />
+              </div>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
+                Gaya Hidup & Santai
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold dark:bg-amber-900/50 dark:text-amber-300">
+              30%
+            </span>
+          </div>
+          <div className="text-xl font-bold text-slate-900 dark:text-white mt-1 mb-2">
+            {formatRupiah(wants)}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi
+            akhir pekan.
+          </p>
+          <div className="w-full bg-amber-200/60 dark:bg-amber-950 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="bg-amber-500 h-full w-[30%] rounded-full" />
+          </div>
+        </div>
+
+        {/* Savings Card */}
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4.5 dark:border-emerald-900/30 dark:bg-emerald-950/20 transition-all hover:scale-[1.02]">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-emerald-600 text-white shadow-sm">
+                <PiggyBank className="w-4 h-4" />
+              </div>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
+                Tabungan & Investasi
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold dark:bg-emerald-900/50 dark:text-emerald-300">
+              20%
+            </span>
+          </div>
+          <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 mb-2">
+            {formatRupiah(savings)}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            Dana darurat, tabungan impian, reksadana, emas, atau investasi masa
+            depan.
+          </p>
+          <div className="w-full bg-emerald-200/60 dark:bg-emerald-950 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="bg-emerald-500 h-full w-[20%] rounded-full" />
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Call to Action */}
+      <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+          <span>
+            SADAR Finance otomatis memantau kepatuhan batas ini di setiap
+            transaksi.
+          </span>
+        </div>
+        <Link
+          to="/auth/register"
+          className="inline-flex items-center gap-1 font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400 hover:underline shrink-0"
+        >
+          Kunci Budgetmu Sekarang <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </div>
+  );
+};
