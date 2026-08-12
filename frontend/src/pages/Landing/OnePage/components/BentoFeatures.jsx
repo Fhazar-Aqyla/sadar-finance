@@ -29,16 +29,16 @@ export const BentoFeatures = () => {
     restDelta: 0.001,
   });
 
-  // Subtle Parallax offsets for cards
-  const yCard1 = useTransform(smoothProgress, [0, 1], [20, -20]);
-  const yBottomGrid = useTransform(smoothProgress, [0, 1], [30, -30]);
+  // Parallax offsets for cards
+  const yCard1 = useTransform(smoothProgress, [0, 1], [30, -25]);
+  const yBottomGrid = useTransform(smoothProgress, [0, 1], [40, -30]);
 
   const getScoreData = (val) => {
     if (val <= 45) {
       return {
         label: "Perlu Perhatian",
         tag: "Kritis",
-        color: "text-rose-600",
+        color: "text-rose-600 dark:text-rose-400",
         stroke: "#e11d48",
         glow: "border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900",
         recommendation:
@@ -55,7 +55,7 @@ export const BentoFeatures = () => {
       return {
         label: "Cukup Sehat",
         tag: "Waspada",
-        color: "text-amber-600",
+        color: "text-amber-600 dark:text-amber-400",
         stroke: "#d97706",
         glow: "border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900",
         recommendation: "Tingkatkan alokasi tabungan rutin ke 20% dari total pendapatan.",
@@ -75,7 +75,7 @@ export const BentoFeatures = () => {
     return {
       label: "Kondisi Prima",
       tag: "Prima",
-      color: "text-emerald-600",
+      color: "text-emerald-600 dark:text-emerald-400",
       stroke: "#059669",
       glow: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-900",
       recommendation: "Alokasi 50/30/20 berada di tingkat optimal & cadangan dana darurat aman.",
@@ -110,9 +110,13 @@ export const BentoFeatures = () => {
       ref={containerRef}
       className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
+      {/* Background ambient lighting */}
+      <div className="absolute top-1/3 left-10 w-96 h-96 bg-blue-500/5 dark:bg-sky-400/5 blur-[100px] pointer-events-none rounded-full" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-emerald-500/5 blur-[100px] pointer-events-none rounded-full" />
+
       {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
+      <div className="text-center max-w-3xl mx-auto mb-16 relative z-10">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs border border-blue-100 dark:border-blue-900/40">
           <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Teknologi & Fitur Utama
         </div>
@@ -129,10 +133,10 @@ export const BentoFeatures = () => {
       </div>
 
       {/* Bento Grid Layout */}
-      <div className="space-y-6 lg:space-y-8">
+      <div className="space-y-6 lg:space-y-8 relative z-10">
         {/* Card 1: Interactive OCR Scanner (Full-Width Large Card) */}
         <motion.div style={{ y: yCard1 }}>
-          <SpotlightCard className="p-6 sm:p-8 lg:p-10 border-slate-200/90 dark:border-slate-800 shadow-sm">
+          <SpotlightCard className="p-6 sm:p-8 lg:p-10 border-slate-200/90 dark:border-slate-800 shadow-md">
             <div className="max-w-2xl mb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 mb-2.5 border border-blue-100 dark:border-blue-900/30">
                 <Scan className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
@@ -157,7 +161,7 @@ export const BentoFeatures = () => {
           className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch"
         >
           {/* Card 2: Interactive Financial Health Score */}
-          <SpotlightCard className="h-full flex flex-col justify-between p-6 sm:p-8 border-slate-200/90 dark:border-slate-800 shadow-sm">
+          <SpotlightCard className="h-full flex flex-col justify-between p-6 sm:p-8 border-slate-200/90 dark:border-slate-800 shadow-md">
             <div>
               {/* Header Badge & Title */}
               <div className="flex items-center justify-between gap-2 mb-3">
@@ -180,7 +184,7 @@ export const BentoFeatures = () => {
               </p>
 
               {/* Modern Radial Gauge & Score Visualization Card */}
-              <div className="my-5 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 relative overflow-hidden">
+              <div className="my-5 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 relative overflow-hidden shadow-inner">
                 {/* SVG Radial Arc Visualizer */}
                 <div className="relative flex flex-col items-center justify-center pt-2">
                   <div className="relative w-44 h-36 flex items-center justify-center">
@@ -200,7 +204,7 @@ export const BentoFeatures = () => {
                         strokeLinecap="round"
                         className="text-slate-200 dark:text-slate-800"
                       />
-                      {/* Animated Progress Arc */}
+                      {/* Animated Progress Arc with Spring Physics */}
                       <circle
                         cx="80"
                         cy="80"
@@ -211,16 +215,22 @@ export const BentoFeatures = () => {
                         strokeDasharray={`${arcLength} ${circumference}`}
                         strokeDashoffset={strokeDashoffset}
                         strokeLinecap="round"
-                        className="transition-all duration-500 ease-out"
+                        className="transition-all duration-700 ease-out"
                       />
                     </svg>
 
                     {/* Center Score Number */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pt-5">
                       <div className="flex items-baseline">
-                        <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                        <motion.span
+                          key={activeScore}
+                          initial={{ scale: 1.15, opacity: 0.8 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight"
+                        >
                           {activeScore}
-                        </span>
+                        </motion.span>
                         <span className="text-base sm:text-lg font-medium text-slate-400 ml-0.5">
                           /100
                         </span>
@@ -237,7 +247,7 @@ export const BentoFeatures = () => {
                   </div>
 
                   {/* AI Recommendation Summary Line */}
-                  <p className="text-xs text-slate-600 dark:text-slate-400 text-center mt-2 px-2 italic">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 text-center mt-2 px-2 italic font-medium">
                     "{scoreData.recommendation}"
                   </p>
                 </div>
@@ -263,15 +273,15 @@ export const BentoFeatures = () => {
                   />
 
                   {/* Quick Preset Buttons */}
-                  <div className="flex items-center justify-between gap-1.5 mt-3 pt-1">
+                  <div className="grid grid-cols-4 gap-1.5 mt-3 pt-1">
                     {scorePresets.map((preset) => (
                       <button
                         key={preset.score}
                         type="button"
                         onClick={() => setActiveScore(preset.score)}
-                        className={`flex-1 py-1 px-1.5 text-[11px] font-semibold rounded-lg border transition-all text-center ${
+                        className={`py-1.5 px-1 text-[11px] font-bold rounded-lg border transition-all text-center truncate ${
                           activeScore === preset.score
-                            ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm"
+                            ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-xs"
                             : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -286,14 +296,15 @@ export const BentoFeatures = () => {
             {/* 4 Assessment Factors Matrix (2x2 Grid) */}
             <div className="grid grid-cols-2 gap-2.5 pt-2">
               {scoreData.factors.map((f, i) => (
-                <div
+                <motion.div
                   key={i}
-                  className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between"
+                  whileHover={{ scale: 1.02 }}
+                  className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between shadow-2xs"
                 >
                   <div className="flex items-center gap-1.5 truncate">
                     <CheckCircle2
                       className={`w-3.5 h-3.5 shrink-0 ${
-                        f.ok ? "text-emerald-600" : "text-rose-500"
+                        f.ok ? "text-emerald-600 dark:text-emerald-400" : "text-rose-500"
                       }`}
                     />
                     <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
@@ -303,7 +314,7 @@ export const BentoFeatures = () => {
                   <span className="text-xs font-bold text-slate-900 dark:text-white shrink-0 ml-1.5">
                     {f.val}
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </SpotlightCard>
@@ -311,7 +322,7 @@ export const BentoFeatures = () => {
           {/* Card 3: Stacked AI Alerts & Multi-Wallet Manager */}
           <div className="flex flex-col gap-6 lg:gap-8 h-full">
             {/* Subcard A: Predictive Overspending Alert */}
-            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-md">
               <div>
                 {/* Header Badge */}
                 <div className="flex items-center justify-between gap-2 mb-3">
@@ -319,7 +330,8 @@ export const BentoFeatures = () => {
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                     Sistem Prediksi Dini
                   </div>
-                  <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40">
+                  <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
                     Peringatan Proaktif
                   </span>
                 </div>
@@ -333,7 +345,7 @@ export const BentoFeatures = () => {
                 </p>
 
                 {/* Simulated Overspending Progress Card */}
-                <div className="mt-4 p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40">
+                <div className="mt-4 p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 shadow-xs">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-amber-500" />
@@ -346,16 +358,18 @@ export const BentoFeatures = () => {
 
                   {/* Progress bar */}
                   <div className="w-full h-2 bg-amber-200/70 dark:bg-amber-950/60 rounded-full overflow-hidden mb-2">
-                    <div
-                      className="h-full bg-amber-500 rounded-full transition-all duration-500"
-                      style={{ width: "82%" }}
+                    <motion.div
+                      initial={{ width: "0%" }}
+                      animate={{ width: "82%" }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      className="h-full bg-amber-500 rounded-full"
                     />
                   </div>
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                     <span>Rp 410.000 / Rp 500.000</span>
                     <span className="font-semibold text-rose-600 dark:text-rose-400">
-                      Sisa Rp 90.000 untuk 4 Hari ke Depan
+                      Sisa Rp 90.000 untuk 4 Hari
                     </span>
                   </div>
                 </div>
@@ -375,7 +389,7 @@ export const BentoFeatures = () => {
             </SpotlightCard>
 
             {/* Subcard B: Multi-Account Management */}
-            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-md">
               <div>
                 {/* Header Badge */}
                 <div className="flex items-center justify-between gap-2 mb-3">
@@ -398,7 +412,7 @@ export const BentoFeatures = () => {
 
                 {/* Account Balances Visual Row Cards */}
                 <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                     <div className="flex items-center gap-2.5">
                       <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-sky-400 flex items-center justify-center shrink-0">
                         <Landmark className="w-4 h-4" />
@@ -423,7 +437,7 @@ export const BentoFeatures = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                     <div className="flex items-center gap-2.5">
                       <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-sky-400 flex items-center justify-center shrink-0">
                         <Smartphone className="w-4 h-4" />
@@ -466,5 +480,3 @@ export const BentoFeatures = () => {
     </section>
   );
 };
-
-

@@ -5,7 +5,8 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/Components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Sparkles, MessageCircleQuestion } from "lucide-react";
+import { motion } from "framer-motion";
 
 export const FaqSection = () => {
   const faqs = [
@@ -20,7 +21,7 @@ export const FaqSection = () => {
       id: "faq-2",
       question: "Apakah data transaksi dan privasi saya terjamin aman?",
       answer:
-        "Sangat aman. Seluruh data keuanganmu dilindungi dengan enkripsi standar industri dan terisolasi secara multi-tenant. SADAR Finance berkomitmen tidak menjual data pengguna ke pihak ketiga serta bebas dari gangguan iklan komersial.",
+        "Sangat aman. Seluruh data keuanganmu dilindungi dengan enkripsi standar industri (AES-256) dan terisolasi secara multi-tenant. SADAR Finance berkomitmen tidak menjual data pengguna ke pihak ketiga serta bebas dari gangguan iklan komersial.",
     },
     {
       id: "faq-3",
@@ -46,10 +47,13 @@ export const FaqSection = () => {
   return (
     <section
       id="faq"
-      className="py-16 lg:py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+      className="py-16 lg:py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
+      {/* Background ambient lighting */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-500/5 blur-[90px] pointer-events-none rounded-full" />
+
+      <div className="text-center mb-12 relative z-10">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs border border-blue-100 dark:border-blue-900/40">
           <HelpCircle className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Pusat Bantuan & FAQ
         </div>
@@ -61,23 +65,38 @@ export const FaqSection = () => {
         </p>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-3xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 shadow-md relative z-10"
+      >
         <Accordion
           type="single"
           collapsible
           defaultValue="faq-1"
-          className="w-full"
+          className="w-full space-y-2"
         >
           {faqs.map((faq) => (
-            <AccordionItem key={faq.id} value={faq.id}>
-              <AccordionTrigger className="text-left hover:text-[#1E3A8A] dark:hover:text-sky-400 font-semibold">{faq.question}</AccordionTrigger>
-              <AccordionContent className="text-slate-600 dark:text-slate-400 leading-relaxed">{faq.answer}</AccordionContent>
+            <AccordionItem
+              key={faq.id}
+              value={faq.id}
+              className="border-b border-slate-100 dark:border-slate-800/80 last:border-none py-1"
+            >
+              <AccordionTrigger className="text-left text-base font-bold text-slate-900 dark:text-white hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors py-4">
+                <span className="flex items-center gap-2">
+                  <MessageCircleQuestion className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400 shrink-0" />
+                  {faq.question}
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm pb-4 pl-6">
+                {faq.answer}
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
+      </motion.div>
     </section>
   );
 };
-
-

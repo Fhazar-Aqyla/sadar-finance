@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Camera, Cpu, Gauge, CheckCircle2 } from "lucide-react";
+import { Camera, Cpu, Gauge, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
@@ -18,12 +18,12 @@ export const HowItWorksSection = () => {
   });
 
   // Parallax shifts on cards
-  const yCard1 = useTransform(smoothProgress, [0, 1], [30, -30]);
-  const yCard2 = useTransform(smoothProgress, [0, 1], [10, -10]);
-  const yCard3 = useTransform(smoothProgress, [0, 1], [-20, 20]);
+  const yCard1 = useTransform(smoothProgress, [0, 1], [35, -30]);
+  const yCard2 = useTransform(smoothProgress, [0, 1], [15, -15]);
+  const yCard3 = useTransform(smoothProgress, [0, 1], [-25, 25]);
 
-  // Animated line connector
-  const lineScale = useTransform(smoothProgress, [0.2, 0.65], [0, 1]);
+  // Animated line connector with smooth progress
+  const lineScale = useTransform(smoothProgress, [0.2, 0.7], [0, 1]);
 
   const steps = [
     {
@@ -62,9 +62,13 @@ export const HowItWorksSection = () => {
       ref={containerRef}
       className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
+      {/* Background ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-80 bg-blue-500/5 dark:bg-sky-400/5 blur-[100px] pointer-events-none rounded-full" />
+
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-16 relative z-10">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs border border-blue-100 dark:border-blue-900/40">
+          <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Alur Kerja Simpel
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
@@ -78,13 +82,13 @@ export const HowItWorksSection = () => {
         </p>
       </div>
 
-      {/* Steps Container with Connecting Line */}
+      {/* Steps Container with Connecting Neon Conduit Line */}
       <div className="relative z-10">
         {/* Desktop Dynamic Connector Line */}
-        <div className="hidden md:block absolute top-1/2 left-[12%] right-[12%] h-[2px] bg-slate-200 dark:bg-slate-800 -translate-y-12 -z-0 rounded-full overflow-hidden">
+        <div className="hidden md:block absolute top-1/2 left-[12%] right-[12%] h-[3px] bg-slate-200 dark:bg-slate-800 -translate-y-12 -z-0 rounded-full overflow-hidden shadow-inner">
           <motion.div
             style={{ scaleX: lineScale }}
-            className="h-full w-full bg-[#1E3A8A] origin-left rounded-full"
+            className="h-full w-full bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-emerald-500 origin-left rounded-full shadow-[0_0_10px_#38bdf8]"
           />
         </div>
 
@@ -93,24 +97,25 @@ export const HowItWorksSection = () => {
             const Icon = step.icon;
             return (
               <motion.div key={idx} style={{ y: step.y }} className="h-full">
-                <SpotlightCard className="relative p-6 sm:p-8 flex flex-col justify-between h-full border-slate-200/90 dark:border-slate-800 transition-all duration-300 hover:-translate-y-1.5 shadow-sm hover:shadow-md">
+                <SpotlightCard className="relative p-6 sm:p-8 flex flex-col justify-between h-full border-slate-200/90 dark:border-slate-800 transition-all duration-300 hover:-translate-y-2 shadow-xs hover:shadow-xl group">
                   <div>
                     <div className="flex items-center justify-between mb-6">
-                      <div
-                        className={`w-13 h-13 p-3 rounded-xl ${step.accent} flex items-center justify-center shadow-sm`}
+                      <motion.div
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        className={`w-14 h-14 p-3.5 rounded-2xl ${step.accent} flex items-center justify-center shadow-xs transition-transform`}
                       >
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <span className="text-4xl font-black text-slate-200 dark:text-slate-800 tracking-tight">
+                        <Icon className="w-7 h-7" />
+                      </motion.div>
+                      <span className="text-4xl sm:text-5xl font-black text-slate-200 dark:text-slate-800 tracking-tight group-hover:text-[#1E3A8A]/20 dark:group-hover:text-sky-400/20 transition-colors">
                         {step.number}
                       </span>
                     </div>
 
-                    <div className="inline-block px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold dark:bg-slate-800 dark:text-slate-300 mb-2.5">
+                    <div className="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold dark:bg-slate-800 dark:text-slate-300 mb-3 border border-slate-200/60 dark:border-slate-700">
                       {step.pill}
                     </div>
 
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2.5">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2.5 group-hover:text-[#1E3A8A] dark:group-hover:text-sky-400 transition-colors">
                       {step.title}
                     </h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
@@ -119,7 +124,7 @@ export const HowItWorksSection = () => {
                   </div>
 
                   <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center text-xs font-semibold text-[#1E3A8A] dark:text-sky-400 gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>Otomatis & Realtime</span>
                   </div>
                 </SpotlightCard>
@@ -131,5 +136,3 @@ export const HowItWorksSection = () => {
     </section>
   );
 };
-
-
