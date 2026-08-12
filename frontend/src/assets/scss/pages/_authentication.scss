@@ -217,6 +217,55 @@
                 width: 60%;
             }
         }
+
+        // Keep the longer registration form inside short laptop viewports.
+        &.sadar-register-page .sadar-auth-form-panel {
+            overflow-y: hidden;
+        }
+
+        &.sadar-register-page .sadar-auth-form-container {
+            padding: 0;
+        }
+
+        @media (max-height: 760px) {
+            &.sadar-register-page .sadar-auth-form-panel {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+
+            &.sadar-register-page .sadar-auth-panel-logo {
+                margin-bottom: 0.65rem;
+
+                img {
+                    height: 30px;
+                }
+            }
+
+            &.sadar-register-page .sadar-auth-form-container > div:nth-of-type(2) {
+                margin-top: 0.55rem !important;
+            }
+
+            &.sadar-register-page .mb-3 {
+                margin-bottom: 0.5rem !important;
+            }
+
+            &.sadar-register-page .mb-2 {
+                margin-bottom: 0.4rem !important;
+            }
+
+            &.sadar-register-page .mt-3 {
+                margin-top: 0.55rem !important;
+            }
+
+            &.sadar-register-page .mt-4 {
+                margin-top: 0.65rem !important;
+            }
+
+            &.sadar-register-page .form-control {
+                padding-top: 0.42rem;
+                padding-bottom: 0.42rem;
+            }
+        }
     }
 
     .sadar-auth-form-container {
