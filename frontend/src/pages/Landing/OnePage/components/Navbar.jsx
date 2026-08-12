@@ -62,10 +62,7 @@ export const Navbar = () => {
             </motion.div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-                SADAR{" "}
-                <span className="text-[#25a0e2] font-bold">
-                  FINANCE
-                </span>
+                SADAR <span className="text-[#25a0e2] font-bold">FINANCE</span>
               </span>
               <span className="text-[10px] font-semibold text-slate-400 -mt-1 tracking-wider uppercase">
                 Mindful Spending

@@ -19,10 +19,7 @@ export const FooterSection = () => {
             </div>
             <div>
               <span className="font-extrabold text-slate-900 dark:text-white tracking-tight text-base">
-                SADAR{" "}
-                <span className="text-[#25a0e2]">
-                  FINANCE
-                </span>
+                SADAR <span className="text-[#25a0e2]">FINANCE</span>
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Smart AI-Driven Automated Receipt & Personal Finance Management

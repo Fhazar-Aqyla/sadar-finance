@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Receipt, Scan, Sparkles, ArrowRight, Tag, Calendar, Store, CheckCircle } from "lucide-react";
+import {
+  Receipt,
+  Scan,
+  Sparkles,
+  ArrowRight,
+  Tag,
+  Calendar,
+  Store,
+  CheckCircle,
+} from "lucide-react";
 
 export const ReceiptScannerDemo = () => {
   const receipts = [
@@ -13,7 +22,8 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 68500,
       categoryGroup: "Needs",
       categoryDetail: "Kebutuhan Pokok",
-      badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
+      badgeColor:
+        "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
       items: [
         { name: "Susu UHT Full Cream 1L", price: "Rp 21.000" },
         { name: "Roti Tawar Gandum", price: "Rp 17.500" },
@@ -29,7 +39,8 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 38000,
       categoryGroup: "Wants",
       categoryDetail: "Gaya Hidup / Kuliner",
-      badgeColor: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
+      badgeColor:
+        "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
       items: [
         { name: "Kopi Kenangan Mantan Large", price: "Rp 24.000" },
         { name: "Cinnamon Roll Toast", price: "Rp 14.000" },
@@ -44,10 +55,9 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 150000,
       categoryGroup: "Needs",
       categoryDetail: "Transportasi",
-      badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
-      items: [
-        { name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" },
-      ],
+      badgeColor:
+        "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
+      items: [{ name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" }],
     },
   ];
 
@@ -76,7 +86,8 @@ export const ReceiptScannerDemo = () => {
               Simulasi Ekstraksi Struk Belanja
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Pilih contoh struk fisik di bawah ini untuk melihat cara kerja OCR SADAR.
+              Pilih contoh struk fisik di bawah ini untuk melihat cara kerja OCR
+              SADAR.
             </p>
           </div>
         </div>
@@ -98,7 +109,13 @@ export const ReceiptScannerDemo = () => {
                     className="absolute inset-0 bg-white dark:bg-slate-900 rounded-lg shadow-sm -z-10"
                   />
                 )}
-                <span className={isSelected ? "text-[#25a0e2] dark:text-[#32ccff] font-bold" : "text-slate-600 dark:text-slate-400"}>
+                <span
+                  className={
+                    isSelected
+                      ? "text-[#25a0e2] dark:text-[#32ccff] font-bold"
+                      : "text-slate-600 dark:text-slate-400"
+                  }
+                >
                   {r.title}
                 </span>
               </button>
@@ -138,7 +155,9 @@ export const ReceiptScannerDemo = () => {
             transition={{ duration: 0.25 }}
             className="space-y-1 text-slate-600 dark:text-slate-400 text-[11px]"
           >
-            <p className="font-semibold text-slate-800 dark:text-slate-200">{activeReceipt.merchant}</p>
+            <p className="font-semibold text-slate-800 dark:text-slate-200">
+              {activeReceipt.merchant}
+            </p>
             <p>Tgl: {activeReceipt.date} • Kasir #04</p>
             <div className="border-t border-slate-200 dark:border-slate-800 my-2 pt-2">
               {activeReceipt.items.map((item, idx) => (
@@ -150,7 +169,9 @@ export const ReceiptScannerDemo = () => {
             </div>
             <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex justify-between font-bold text-slate-900 dark:text-white text-xs">
               <span>TOTAL</span>
-              <span className="text-[#25a0e2] dark:text-[#32ccff]">{activeReceipt.total}</span>
+              <span className="text-[#25a0e2] dark:text-[#32ccff]">
+                {activeReceipt.total}
+              </span>
             </div>
           </motion.div>
         </div>
@@ -167,7 +188,9 @@ export const ReceiptScannerDemo = () => {
               <Sparkles className="w-3.5 h-3.5 text-[#25a0e2]" />
               Ekstraksi Cerdas Terdeteksi
             </div>
-            <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}
+            >
               {activeReceipt.categoryGroup}
             </span>
           </div>
@@ -210,9 +233,12 @@ export const ReceiptScannerDemo = () => {
 
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white shadow-sm font-medium">
                 <span className="text-white/90 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-white" /> Nominal Terbaca
+                  <CheckCircle className="w-3.5 h-3.5 text-white" /> Nominal
+                  Terbaca
                 </span>
-                <span className="text-base font-extrabold">{activeReceipt.total}</span>
+                <span className="text-base font-extrabold">
+                  {activeReceipt.total}
+                </span>
               </div>
             </motion.div>
           </AnimatePresence>

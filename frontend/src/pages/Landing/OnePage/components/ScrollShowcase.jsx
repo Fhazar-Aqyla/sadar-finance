@@ -1,10 +1,6 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import {
-  TrendingUp,
-  Sparkles,
-  AlertTriangle,
-} from "lucide-react";
+import { TrendingUp, Sparkles, AlertTriangle } from "lucide-react";
 import dashboardPreview from "@/assets/images/landing/dashboard-preview.png";
 import dashboardMobilePreview from "@/assets/images/landing/dashboard-mobile-preview.webp";
 
@@ -26,7 +22,11 @@ export const ScrollShowcase = () => {
   const rotateX = useTransform(smoothProgress, [0, 0.45], [22, 0]);
   const scale = useTransform(smoothProgress, [0, 0.45, 0.9], [0.86, 1, 0.94]);
   const yMockup = useTransform(smoothProgress, [0, 1], [70, -70]);
-  const opacity = useTransform(smoothProgress, [0, 0.25, 0.9, 1], [0.75, 1, 1, 0.8]);
+  const opacity = useTransform(
+    smoothProgress,
+    [0, 0.25, 0.9, 1],
+    [0.75, 1, 1, 0.8],
+  );
 
   // Ambient Halo Parallax
   const yHalo = useTransform(smoothProgress, [0, 1], [-80, 140]);

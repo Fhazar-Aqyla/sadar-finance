@@ -53,7 +53,8 @@ export const HowItWorksSection = () => {
       title: "Ketahui Skor & Cegah Keborosan",
       desc: "Pantau kesehatan keuanganmu via Financial Score 0–100 dan terima peringatan otomatis jika pengeluaran hampir overbudget.",
       color: "from-emerald-600 to-teal-500",
-      accent: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+      accent:
+        "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
       pill: "Skor Finansial",
       y: yCard3,
     },
@@ -102,11 +103,7 @@ export const HowItWorksSection = () => {
           {steps.map((step, idx) => {
             const Icon = step.icon;
             return (
-              <motion.div
-                key={idx}
-                style={{ y: step.y }}
-                className="h-full"
-              >
+              <motion.div key={idx} style={{ y: step.y }} className="h-full">
                 <SpotlightCard className="relative p-6 sm:p-8 flex flex-col justify-between h-full border-slate-200/80 dark:border-slate-800 transition-all duration-300 hover:-translate-y-2 shadow-sm hover:shadow-2xl hover:shadow-sky-500/15">
                   <div>
                     <div className="flex items-center justify-between mb-6">

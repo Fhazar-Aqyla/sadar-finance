@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, Coffee, PiggyBank, Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
+import {
+  Wallet,
+  Coffee,
+  PiggyBank,
+  Sparkles,
+  CheckCircle2,
+  ArrowRight,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const InteractiveBudgetSlider = () => {
@@ -36,7 +43,8 @@ export const InteractiveBudgetSlider = () => {
             Hitung Alokasi Gaji Idealmu
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Geser slider atau pilih estimasi pemasukan bulananmu untuk melihat alokasi sehat.
+            Geser slider atau pilih estimasi pemasukan bulananmu untuk melihat
+            alokasi sehat.
           </p>
         </div>
 
@@ -57,7 +65,13 @@ export const InteractiveBudgetSlider = () => {
                     className="absolute inset-0 bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] rounded-lg shadow-md shadow-sky-500/25 -z-10"
                   />
                 )}
-                <span className={isSelected ? "text-white font-bold" : "text-slate-600 dark:text-slate-300"}>
+                <span
+                  className={
+                    isSelected
+                      ? "text-white font-bold"
+                      : "text-slate-600 dark:text-slate-300"
+                  }
+                >
                   {preset.label}
                 </span>
               </button>
@@ -122,7 +136,8 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(needs)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi, transportasi kerja.
+            Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi,
+            transportasi kerja.
           </p>
           <div className="w-full bg-sky-200/60 dark:bg-sky-950 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
@@ -156,7 +171,8 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(wants)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi akhir pekan.
+            Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi
+            akhir pekan.
           </p>
           <div className="w-full bg-amber-200/60 dark:bg-amber-950 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
@@ -190,7 +206,8 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(savings)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Dana darurat, tabungan impian, reksadana, emas, atau investasi masa depan.
+            Dana darurat, tabungan impian, reksadana, emas, atau investasi masa
+            depan.
           </p>
           <div className="w-full bg-emerald-200/60 dark:bg-emerald-950 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
@@ -207,13 +224,17 @@ export const InteractiveBudgetSlider = () => {
       <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-[#25a0e2] shrink-0" />
-          <span>SADAR Finance otomatis memantau kepatuhan batas ini di setiap transaksi.</span>
+          <span>
+            SADAR Finance otomatis memantau kepatuhan batas ini di setiap
+            transaksi.
+          </span>
         </div>
         <Link
           to="/register"
           className="inline-flex items-center gap-1 font-semibold text-[#25a0e2] hover:text-[#1a85be] dark:text-[#32ccff] hover:underline shrink-0 group"
         >
-          Kunci Budgetmu Sekarang <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+          Kunci Budgetmu Sekarang{" "}
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </div>
