@@ -7,13 +7,13 @@ export const BudgetSimulatorSection = () => {
     <section id="simulator" className="py-16 lg:py-24 bg-slate-50/60 dark:bg-slate-950/40 border-y border-slate-200/70 dark:border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 text-xs font-bold uppercase tracking-wider mb-3">
-            <Calculator className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3">
+            <Calculator className="w-3.5 h-3.5 text-[#25a0e2]" />
             Kalkulator Alokasi Finansial
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
             Coba Simulasi Anggaran{" "}
-            <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] bg-clip-text text-transparent">
               Sebelum Mendaftar.
             </span>
           </h2>

@@ -29,7 +29,7 @@ export const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm py-3"
+          ? "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm py-3"
           : "bg-transparent py-5"
       }`}
     >
@@ -40,17 +40,20 @@ export const Navbar = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-900 to-teal-500 p-0.5 shadow-md shadow-teal-500/20 flex items-center justify-center"
+              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] p-0.5 shadow-md shadow-sky-500/20 flex items-center justify-center"
             >
               <img
                 src={sadarLogo}
                 alt="SADAR Finance"
-                className="w-full h-full object-contain rounded-lg"
+                className="w-full h-full object-contain rounded-lg bg-white"
               />
             </motion.div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-                SADAR <span className="text-teal-600 dark:text-teal-400 font-bold">FINANCE</span>
+                SADAR{" "}
+                <span className="text-[#25a0e2] font-bold">
+                  FINANCE
+                </span>
               </span>
               <span className="text-[10px] font-semibold text-slate-400 -mt-1 tracking-wider uppercase">
                 Mindful Spending
@@ -64,25 +67,25 @@ export const Navbar = () => {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-slate-600 hover:text-teal-600 dark:text-slate-300 dark:hover:text-teal-400 transition-colors"
+                className="text-sm font-medium text-slate-600 hover:text-[#25a0e2] dark:text-slate-300 dark:hover:text-[#32ccff] transition-colors"
               >
                 {link.label}
               </a>
             ))}
           </nav>
 
-          {/* CTA Buttons (Desktop) */}
+          {/* CTA Buttons (Desktop) - Auth-consistent buttons */}
           <div className="hidden sm:flex items-center gap-3">
             <Link
-              to="/auth/login"
-              className="text-sm font-semibold text-slate-700 hover:text-teal-600 dark:text-slate-200 dark:hover:text-teal-400 px-4 py-2 rounded-xl transition-colors"
+              to="/login"
+              className="text-sm font-semibold text-slate-700 hover:text-[#25a0e2] dark:text-slate-200 dark:hover:text-[#32ccff] px-4 py-2 rounded-xl transition-colors"
             >
               Masuk
             </Link>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
-                to="/auth/register"
-                className="inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-900 via-teal-700 to-teal-600 text-white text-sm font-semibold shadow-lg shadow-teal-700/20 hover:shadow-teal-700/35 transition-all"
+                to="/register"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white text-sm font-semibold shadow-md shadow-sky-500/25 hover:shadow-lg hover:shadow-sky-500/35 transition-all"
               >
                 Mulai Sekarang <ArrowRight className="w-4 h-4" />
               </Link>
@@ -95,7 +98,11 @@ export const Navbar = () => {
             className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
@@ -114,23 +121,23 @@ export const Navbar = () => {
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-sky-50 hover:text-[#25a0e2] dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   {link.label}
                 </a>
               ))}
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
                 <Link
-                  to="/auth/login"
+                  to="/login"
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
                 >
                   Masuk
                 </Link>
                 <Link
-                  to="/auth/register"
+                  to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl bg-teal-600 text-white font-semibold text-sm shadow-md shadow-teal-600/30"
+                  className="w-full text-center py-2.5 rounded-xl bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white font-semibold text-sm shadow-md shadow-sky-500/25"
                 >
                   Daftar
                 </Link>

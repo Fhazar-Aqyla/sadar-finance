@@ -11,7 +11,8 @@ export const FaqSection = () => {
   const faqs = [
     {
       id: "faq-1",
-      question: "Apa perbedaan SADAR Finance dengan aplikasi pencatat keuangan biasa?",
+      question:
+        "Apa perbedaan SADAR Finance dengan aplikasi pencatat keuangan biasa?",
       answer:
         "SADAR Finance tidak hanya mencatat nominal, tetapi juga membantu ekstraksi data dari struk belanja fisik via OCR, mengevaluasi skor kesehatan keuangan secara objektif (0–100), dan memberikan peringatan dini jika laju pengeluaran bulananmu berpotensi overspending sebelum akhir bulan.",
     },
@@ -35,29 +36,39 @@ export const FaqSection = () => {
     },
     {
       id: "faq-5",
-      question: "Apakah saya bisa menghubungkan beberapa rekening dan e-wallet?",
+      question:
+        "Apakah saya bisa menghubungkan beberapa rekening dan e-wallet?",
       answer:
         "Ya, kamu bisa membuat dan mengelola banyak akun sekaligus, seperti Dompet Tunai (Cash), Rekening Bank (BCA, Mandiri, BRI), hingga E-Wallet (GoPay, OVO, Dana). Saldo gabungan akan terkalkulasi otomatis.",
     },
   ];
 
   return (
-    <section id="faq" className="py-16 lg:py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section
+      id="faq"
+      className="py-16 lg:py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+    >
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 text-xs font-bold uppercase tracking-wider mb-3">
-          <HelpCircle className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3">
+          <HelpCircle className="w-3.5 h-3.5 text-[#25a0e2]" />
           Pertanyaan Umum
         </div>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Frequently Asked Questions
         </h2>
         <p className="mt-3 text-base text-slate-500 dark:text-slate-400">
-          Semua yang perlu kamu ketahui tentang fitur, privasi, dan alur kerja SADAR Finance.
+          Semua yang perlu kamu ketahui tentang fitur, privasi, dan alur kerja
+          SADAR Finance.
         </p>
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
-        <Accordion type="single" collapsible defaultValue="faq-1" className="w-full">
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue="faq-1"
+          className="w-full"
+        >
           {faqs.map((faq) => (
             <AccordionItem key={faq.id} value={faq.id}>
               <AccordionTrigger>{faq.question}</AccordionTrigger>

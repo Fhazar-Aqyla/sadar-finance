@@ -13,7 +13,7 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 68500,
       categoryGroup: "Needs",
       categoryDetail: "Kebutuhan Pokok",
-      badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
+      badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
       items: [
         { name: "Susu UHT Full Cream 1L", price: "Rp 21.000" },
         { name: "Roti Tawar Gandum", price: "Rp 17.500" },
@@ -44,7 +44,7 @@ export const ReceiptScannerDemo = () => {
       rawTotal: 150000,
       categoryGroup: "Needs",
       categoryDetail: "Transportasi",
-      badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
+      badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
       items: [
         { name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" },
       ],
@@ -64,11 +64,11 @@ export const ReceiptScannerDemo = () => {
   };
 
   return (
-    <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+    <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-xl shadow-sky-500/5 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
       {/* Header Tabs with Framer Motion layoutId */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400">
+          <div className="p-2 rounded-lg bg-sky-50 text-[#25a0e2] dark:bg-sky-950/60 dark:text-[#32ccff]">
             <Scan className="w-4 h-4" />
           </div>
           <div>
@@ -98,7 +98,7 @@ export const ReceiptScannerDemo = () => {
                     className="absolute inset-0 bg-white dark:bg-slate-900 rounded-lg shadow-sm -z-10"
                   />
                 )}
-                <span className={isSelected ? "text-teal-700 dark:text-teal-400 font-bold" : "text-slate-600 dark:text-slate-400"}>
+                <span className={isSelected ? "text-[#25a0e2] dark:text-[#32ccff] font-bold" : "text-slate-600 dark:text-slate-400"}>
                   {r.title}
                 </span>
               </button>
@@ -119,7 +119,7 @@ export const ReceiptScannerDemo = () => {
                 animate={{ top: ["0%", "100%", "0%"] }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.75, ease: "easeInOut" }}
-                className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-teal-400 to-transparent shadow-[0_0_15px_rgba(20,184,166,0.9)] z-20"
+                className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#25a0e2] to-transparent shadow-[0_0_15px_rgba(37,160,226,0.9)] z-20"
               />
             )}
           </AnimatePresence>
@@ -150,21 +150,21 @@ export const ReceiptScannerDemo = () => {
             </div>
             <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex justify-between font-bold text-slate-900 dark:text-white text-xs">
               <span>TOTAL</span>
-              <span className="text-teal-600 dark:text-teal-400">{activeReceipt.total}</span>
+              <span className="text-[#25a0e2] dark:text-[#32ccff]">{activeReceipt.total}</span>
             </div>
           </motion.div>
         </div>
 
         {/* Arrow Transition */}
         <div className="hidden lg:flex lg:col-span-1 justify-center text-slate-300 dark:text-slate-600">
-          <ArrowRight className="w-5 h-5 animate-pulse text-teal-500" />
+          <ArrowRight className="w-5 h-5 animate-pulse text-[#25a0e2]" />
         </div>
 
         {/* Extracted Clean Result (Right) */}
-        <div className="lg:col-span-6 bg-gradient-to-br from-slate-50 to-teal-50/30 rounded-xl p-4.5 border border-teal-100 dark:from-slate-900 dark:to-slate-900/50 dark:border-slate-800">
+        <div className="lg:col-span-6 bg-gradient-to-br from-slate-50 to-sky-50/40 rounded-xl p-4.5 border border-sky-100 dark:from-slate-900 dark:to-slate-900/50 dark:border-slate-800">
           <div className="flex items-center justify-between mb-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-700 dark:text-teal-300">
-              <Sparkles className="w-3.5 h-3.5 text-teal-500" />
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1a85be] dark:text-sky-300">
+              <Sparkles className="w-3.5 h-3.5 text-[#25a0e2]" />
               Ekstraksi Cerdas Terdeteksi
             </div>
             <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}>
@@ -208,9 +208,9 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-teal-600 text-white shadow-sm font-medium">
-                <span className="text-teal-100 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-teal-200" /> Nominal Terbaca
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white shadow-sm font-medium">
+                <span className="text-white/90 flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5 text-white" /> Nominal Terbaca
                 </span>
                 <span className="text-base font-extrabold">{activeReceipt.total}</span>
               </div>
