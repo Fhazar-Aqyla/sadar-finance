@@ -29,8 +29,8 @@ export const HowItWorksSection = () => {
     {
       number: "01",
       icon: Camera,
-      title: "Catat atau Unggah Struk Belanja",
-      desc: "Foto struk fisik dari minimarket/restoran atau input transaksi harianmu secara manual dalam 3 detik.",
+      title: "Foto Struk atau Catat Transaksi",
+      desc: "Unggah foto struk belanjaan kasir dari minimarket/restoran atau masukkan transaksi harianmu dalam 3 detik.",
       accent: "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300",
       pill: "Deteksi Otomatis",
       y: yCard1,
@@ -39,7 +39,7 @@ export const HowItWorksSection = () => {
       number: "02",
       icon: Cpu,
       title: "AI Memproses & Mengelompokkan",
-      desc: "Sistem membaca nominal, nama merchant, dan mengelompokkan pengeluaranmu ke pos Needs, Wants, atau Tabungan.",
+      desc: "Algoritma cerdas mengenali merchant, memvalidasi total nominal, dan memetakan pos 50/30/20 secara presisi.",
       accent: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
       pill: "NLP Categorization",
       y: yCard2,
@@ -47,8 +47,8 @@ export const HowItWorksSection = () => {
     {
       number: "03",
       icon: Gauge,
-      title: "Ketahui Skor & Cegah Keborosan",
-      desc: "Pantau kesehatan keuanganmu via Financial Score 0–100 dan terima peringatan otomatis jika pengeluaran hampir overbudget.",
+      title: "Pantau Skor & Kendalikan Pengeluaran",
+      desc: "Dapatkan skor kesehatan finansial objektif dan terima peringatan otomatis sebelum kuota anggaranmu overbudget.",
       accent:
         "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
       pill: "Skor Finansial",
@@ -65,17 +65,16 @@ export const HowItWorksSection = () => {
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-16 relative z-10">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
-          Langkah Mudah
+          Alur Kerja Simpel
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          Cara Kerja SADAR Finance dalam{" "}
+          Tiga Langkah Mudah Menuju{" "}
           <span className="text-[#1E3A8A] dark:text-sky-400">
-            3 Langkah Simpel.
+            Sadar Finansial.
           </span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-          Tidak perlu spreadsheet rumit atau pencatatan berjam-jam. Mulai sadar
-          finansial dalam hitungan menit.
+          Tanpa rumus spreadsheet yang membingungkan. Mulai kelola keuangan secara sadar dan teratur dalam hitungan menit.
         </p>
       </div>
 
@@ -132,4 +131,5 @@ export const HowItWorksSection = () => {
     </section>
   );
 };
+
 

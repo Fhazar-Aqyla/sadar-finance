@@ -88,7 +88,7 @@ export const ScrollShowcase = () => {
           </div>
           <div>
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Gaji Masuk
+              Pemasukan Rutin
             </p>
             <p className="text-sm font-black text-slate-900 dark:text-white">
               +Rp 8.000.000
@@ -105,10 +105,10 @@ export const ScrollShowcase = () => {
           </div>
           <div>
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Financial Score
+              Skor Finansial
             </p>
             <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300">
-              84 • Kondisi Sehat
+              84 • Kondisi Prima
             </p>
           </div>
         </motion.div>
@@ -122,10 +122,10 @@ export const ScrollShowcase = () => {
           </div>
           <div>
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Smart Alert
+              Peringatan Anggaran
             </p>
             <p className="text-sm font-black text-amber-700 dark:text-amber-400">
-              Budget Wants 82%
+              Kuota Keinginan Capai 82%
             </p>
           </div>
         </motion.div>

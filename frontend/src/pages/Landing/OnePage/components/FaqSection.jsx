@@ -14,32 +14,32 @@ export const FaqSection = () => {
       question:
         "Apa perbedaan SADAR Finance dengan aplikasi pencatat keuangan biasa?",
       answer:
-        "SADAR Finance tidak hanya mencatat nominal, tetapi juga membantu ekstraksi data dari struk belanja fisik via OCR, mengevaluasi skor kesehatan keuangan secara objektif (0–100), dan memberikan peringatan dini jika laju pengeluaran bulananmu berpotensi overspending sebelum akhir bulan.",
+        "SADAR Finance tidak sekadar mencatat transaksi secara manual, melainkan mengotomatisasi ekstraksi data dari struk kasir fisik via AI OCR, mengevaluasi skor kesehatan finansial objektif (0–100), dan memberikan peringatan proaktif sebelum kuota anggaran bulananmu mengalami overspending.",
     },
     {
       id: "faq-2",
-      question: "Apakah data transaksi dan privasi saya aman?",
+      question: "Apakah data transaksi dan privasi saya terjamin aman?",
       answer:
-        "Sangat aman. Seluruh data keuanganmu terenkripsi dan terisolasi secara multi-tenant. SADAR Finance tidak menjual data pengguna ke pihak ketiga dan tidak menampilkan iklan berisik.",
+        "Sangat aman. Seluruh data keuanganmu dilindungi dengan enkripsi standar industri dan terisolasi secara multi-tenant. SADAR Finance berkomitmen tidak menjual data pengguna ke pihak ketiga serta bebas dari gangguan iklan komersial.",
     },
     {
       id: "faq-3",
-      question: "Bagaimana cara kerja ekstraksi struk belanja (OCR)?",
+      question: "Bagaimana cara kerja ekstraksi struk belanja (AI OCR)?",
       answer:
-        "Cukup ambil foto struk belanjaanmu dari minimarket, kafe, SPBU, atau restoran. AI SADAR secara otomatis mendeteksi nama toko, tanggal, total nominal, dan mengkategorikannya ke pos Needs atau Wants. Kamu tetap bisa mengedit nominalnya sebelum disimpan.",
+        "Cukup ambil foto struk fisik dari kasir minimarket, kafe, SPBU, atau restoran. AI SADAR secara otomatis mendeteksi nama merchant, tanggal transaksi, total nominal, serta mengelompokkannya ke pos alokasi 50/30/20. Kamu tetap memiliki kontrol penuh untuk merevisi nominal sebelum menyimpannya.",
     },
     {
       id: "faq-4",
-      question: "Apakah cocok untuk mahasiswa dan pekerja first-jobber?",
+      question: "Apakah SADAR cocok untuk mahasiswa dan pekerja first-jobber?",
       answer:
-        "Sangat cocok! SADAR dirancang dengan prinsip metode alokasi 50/30/20 yang simpel untuk membantu siapa saja yang ingin menghindari sindrom 'gaji numpang lewat'.",
+        "Sangat cocok. SADAR dirancang dengan prinsip alokasi 50/30/20 yang simpel dan intuitif untuk membantu siapa saja membangun kebiasaan finansial yang sehat dan terbebas dari sindrom 'gaji numpang lewat'.",
     },
     {
       id: "faq-5",
       question:
-        "Apakah saya bisa menghubungkan beberapa rekening dan e-wallet?",
+        "Apakah saya bisa mengelola beberapa rekening bank dan e-wallet sekaligus?",
       answer:
-        "Ya, kamu bisa membuat dan mengelola banyak akun sekaligus, seperti Dompet Tunai (Cash), Rekening Bank (BCA, Mandiri, BRI), hingga E-Wallet (GoPay, OVO, Dana). Saldo gabungan akan terkalkulasi otomatis.",
+        "Tentu saja. Kamu dapat menambahkan dan mengelola berbagai sumber dana sekaligus—mulai dari Dompet Tunai (Cash), Rekening Bank (BCA, Mandiri, BRI, BNI), hingga E-Wallet (GoPay, OVO, DANA). Total kekayaan bersih (Net Worth) akan terkalkulasi secara otomatis dan realtime.",
     },
   ];
 
@@ -51,14 +51,13 @@ export const FaqSection = () => {
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
           <HelpCircle className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-          Pertanyaan Umum
+          Pusat Bantuan & FAQ
         </div>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Frequently Asked Questions
+          Pertanyaan yang Sering Diajukan
         </h2>
         <p className="mt-3 text-base text-slate-500 dark:text-slate-400">
-          Semua yang perlu kamu ketahui tentang fitur, privasi, dan alur kerja
-          SADAR Finance.
+          Temukan jawaban lengkap seputar keamanan data, fitur OCR struk, hingga metode anggaran SADAR.
         </p>
       </div>
 
@@ -80,4 +79,5 @@ export const FaqSection = () => {
     </section>
   );
 };
+
 

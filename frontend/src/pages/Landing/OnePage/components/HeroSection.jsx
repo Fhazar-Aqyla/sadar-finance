@@ -164,13 +164,13 @@ export const HeroSection = () => {
             </div>
             <div>
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                <span>Scan OCR Terbaca</span>
+                <span>Struk Terdeteksi AI</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               </div>
               <p className="text-sm font-black text-slate-900 dark:text-white mt-0.5">
                 +Rp 68.500{" "}
                 <span className="text-[11px] font-bold text-[#1E3A8A] dark:text-sky-400 bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5 rounded-md">
-                  Needs
+                  Kebutuhan Pokok
                 </span>
               </p>
             </div>
@@ -185,12 +185,12 @@ export const HeroSection = () => {
             </div>
             <div>
               <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Financial Score
+                Skor Kesehatan Finansial
               </div>
               <div className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mt-0.5">
                 <span>84 / 100</span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-900">
-                  Sehat
+                  Kondisi Prima
                 </span>
               </div>
             </div>
@@ -205,23 +205,23 @@ export const HeroSection = () => {
             <span className="font-bold text-[#1E3A8A] dark:text-sky-400">SADAR v1.0</span>
             <span className="text-slate-300 dark:text-slate-600">•</span>
             <span className="flex items-center gap-1">
-              Personal Finance Cerdas & Sadar Finansial
+              Platform Finansial Cerdas Berbasis AI & OCR
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
             </span>
           </div>
 
           {/* Hero Main Headline */}
           <h1 className="hero-title text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-2xl xl:max-w-3xl mx-auto leading-[1.18] sm:leading-[1.14]">
-            Ketahui Ke Mana Uangmu Pergi Tanpa Ribet{" "}
+            Ketahui ke Mana Uangmu Pergi Tanpa{" "}
             <span className="text-[#1E3A8A] dark:text-sky-400">
-              Mencatat Manual.
+              Repot Mencatat Manual.
             </span>
           </h1>
 
           {/* Hero Subtitle */}
           <p className="hero-subtitle mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            SADAR Finance mengekstrak struk belanja dengan OCR, membaca pola
-            kebiasaan pengeluaranmu, dan menghitung skor kesehatan finansial
+            Ekstraksi struk kasir otomatis dengan AI OCR, pantau limit alokasi
+            50/30/20 secara realtime, dan ketahui skor kesehatan finansialmu
             secara objektif.
           </p>
 
@@ -258,15 +258,15 @@ export const HeroSection = () => {
           <div className="hero-trust mt-12 pt-8 border-t border-slate-200/80 dark:border-slate-800 max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">
             <div className="hero-trust-item flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Scan Struk Kasir Instan</span>
+              <span>Ekstraksi Struk Kasir via OCR</span>
             </div>
             <div className="hero-trust-item flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Skor Kesehatan Finansial 0–100</span>
+              <span>Skor Kesehatan Finansial Objektif</span>
             </div>
             <div className="hero-trust-item flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400" />
-              <span>Privasi Data 100% Terisolasi</span>
+              <span>Keamanan & Privasi Terisolasi</span>
             </div>
           </div>
         </div>

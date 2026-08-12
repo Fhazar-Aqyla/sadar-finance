@@ -24,8 +24,8 @@ export const Navbar = () => {
 
   const navLinks = [
     { label: "Beranda", href: "#home" },
-    { label: "Fitur Unggulan", href: "#features" },
-    { label: "Simulasi Budget", href: "#simulator" },
+    { label: "Fitur", href: "#features" },
+    { label: "Simulasi Anggaran", href: "#simulator" },
     { label: "Cara Kerja", href: "#how-it-works" },
     { label: "Tim", href: "#team" },
     { label: "FAQ", href: "#faq" },
@@ -83,7 +83,7 @@ export const Navbar = () => {
                 to="/register"
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white text-sm font-semibold shadow-sm transition-all"
               >
-                Mulai Sekarang <ArrowRight className="w-4 h-4" />
+                Mulai Gratis <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
           </div>

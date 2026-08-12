@@ -15,13 +15,13 @@ export const ReceiptScannerDemo = () => {
   const receipts = [
     {
       id: "indomaret",
-      title: "Struk Minimarket",
+      title: "Indomaret (Kebutuhan)",
       merchant: "INDOMARET CIPETE",
       date: "12 Mei 2026",
       total: "Rp 68.500",
       rawTotal: 68500,
-      categoryGroup: "Needs",
-      categoryDetail: "Kebutuhan Pokok",
+      categoryGroup: "Pos Kebutuhan (50%)",
+      categoryDetail: "Kebutuhan Pokok & Sembako",
       badgeColor:
         "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 border border-blue-200 dark:border-blue-900",
       items: [
@@ -32,13 +32,13 @@ export const ReceiptScannerDemo = () => {
     },
     {
       id: "kopi",
-      title: "Struk Kafe Kopi",
+      title: "Kafe Kopi (Gaya Hidup)",
       merchant: "KOPI KENANGAN GRAND INDO",
       date: "11 Mei 2026",
       total: "Rp 38.000",
       rawTotal: 38000,
-      categoryGroup: "Wants",
-      categoryDetail: "Gaya Hidup / Kuliner",
+      categoryGroup: "Pos Keinginan (30%)",
+      categoryDetail: "Gaya Hidup & Rekreasi",
       badgeColor:
         "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900",
       items: [
@@ -48,13 +48,13 @@ export const ReceiptScannerDemo = () => {
     },
     {
       id: "spbu",
-      title: "Struk SPBU Bensin",
+      title: "SPBU (Transportasi)",
       merchant: "SPBU PERTAMINA 31.124.02",
       date: "10 Mei 2026",
       total: "Rp 150.000",
       rawTotal: 150000,
-      categoryGroup: "Needs",
-      categoryDetail: "Transportasi",
+      categoryGroup: "Pos Kebutuhan (50%)",
+      categoryDetail: "Bahan Bakar & Transportasi",
       badgeColor:
         "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 border border-blue-200 dark:border-blue-900",
       items: [{ name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" }],
@@ -86,8 +86,7 @@ export const ReceiptScannerDemo = () => {
               Simulasi Ekstraksi Struk Belanja
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Pilih contoh struk fisik di bawah ini untuk melihat cara kerja OCR
-              SADAR.
+              Pilih contoh struk kasir di bawah ini untuk melihat akurasi sistem AI OCR SADAR.
             </p>
           </div>
         </div>
@@ -168,7 +167,7 @@ export const ReceiptScannerDemo = () => {
               ))}
             </div>
             <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex justify-between font-bold text-slate-900 dark:text-white text-xs">
-              <span>TOTAL</span>
+              <span>TOTAL STRUK</span>
               <span className="text-[#1E3A8A] dark:text-sky-400">
                 {activeReceipt.total}
               </span>
@@ -186,10 +185,10 @@ export const ReceiptScannerDemo = () => {
           <div className="flex items-center justify-between mb-3">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1E3A8A] dark:text-sky-300">
               <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-              Ekstraksi Cerdas Terdeteksi
+              Hasil Ekstraksi AI OCR
             </div>
             <span
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}
+              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${activeReceipt.badgeColor}`}
             >
               {activeReceipt.categoryGroup}
             </span>
@@ -215,7 +214,7 @@ export const ReceiptScannerDemo = () => {
 
               <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal Transaksi
                 </span>
                 <span className="font-semibold text-slate-900 dark:text-white">
                   {activeReceipt.date}
@@ -224,7 +223,7 @@ export const ReceiptScannerDemo = () => {
 
               <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-slate-400" /> Pos & Detail
+                  <Tag className="w-3.5 h-3.5 text-slate-400" /> Pos Anggaran
                 </span>
                 <span className="font-semibold text-slate-900 dark:text-white">
                   {activeReceipt.categoryDetail}
@@ -233,8 +232,7 @@ export const ReceiptScannerDemo = () => {
 
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#1E3A8A] text-white shadow-sm font-medium">
                 <span className="text-white/90 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-white" /> Nominal
-                  Terbaca
+                  <CheckCircle className="w-3.5 h-3.5 text-white" /> Total Terverifikasi
                 </span>
                 <span className="text-base font-extrabold">
                   {activeReceipt.total}
@@ -247,4 +245,5 @@ export const ReceiptScannerDemo = () => {
     </div>
   );
 };
+
 

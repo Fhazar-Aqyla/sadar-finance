@@ -43,8 +43,7 @@ export const InteractiveBudgetSlider = () => {
             Hitung Alokasi Gaji Idealmu
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Geser slider atau pilih estimasi pemasukan bulananmu untuk melihat
-            alokasi sehat.
+            Pilih preset atau geser slider sesuai estimasi pendapatan bulananmu untuk melihat alokasi sehat.
           </p>
         </div>
 
@@ -125,7 +124,7 @@ export const InteractiveBudgetSlider = () => {
                 <Wallet className="w-4 h-4" />
               </div>
               <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
-                Kebutuhan Pokok
+                Kebutuhan Esensial
               </span>
             </div>
             <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-200/60">
@@ -136,8 +135,7 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(needs)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi,
-            transportasi kerja.
+            Makan pokok, sewa tempat tinggal, tagihan utilitas, cicilan pokok, dan transportasi rutin.
           </p>
           <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
@@ -160,7 +158,7 @@ export const InteractiveBudgetSlider = () => {
                 <Coffee className="w-4 h-4" />
               </div>
               <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
-                Gaya Hidup & Santai
+                Gaya Hidup & Keinginan
               </span>
             </div>
             <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/60">
@@ -171,8 +169,7 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(wants)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi
-            akhir pekan.
+            Kulineran, jajan kopi, nongkrong, streaming, bioskop, hobi, dan liburan akhir pekan.
           </p>
           <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
@@ -195,7 +192,7 @@ export const InteractiveBudgetSlider = () => {
                 <PiggyBank className="w-4 h-4" />
               </div>
               <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
-                Tabungan & Investasi
+                Tabungan & Masa Depan
               </span>
             </div>
             <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60">
@@ -206,8 +203,7 @@ export const InteractiveBudgetSlider = () => {
             {formatRupiah(savings)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Dana darurat, tabungan impian, reksadana, emas, atau investasi masa
-            depan.
+            Akumulasi dana darurat, tabungan tujuan masa depan, reksadana, emas, atau investasi.
           </p>
           <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
@@ -225,19 +221,19 @@ export const InteractiveBudgetSlider = () => {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>
-            SADAR Finance otomatis memantau kepatuhan batas ini di setiap
-            transaksi.
+            SADAR Finance otomatis memantau kepatuhan batas ini di setiap transaksi harianmu.
           </span>
         </div>
         <Link
           to="/register"
           className="inline-flex items-center gap-1 font-semibold text-[#1E3A8A] hover:text-[#1A3175] dark:text-sky-400 hover:underline shrink-0 group"
         >
-          Kunci Budgetmu Sekarang{" "}
+          Terapkan Alokasi Ini di Akunmu{" "}
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </div>
   );
 };
+
 

@@ -42,10 +42,10 @@ export const BentoFeatures = () => {
         stroke: "#e11d48",
         glow: "border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900",
         recommendation:
-          "Pangkas kuota Wants & lunasi utang bunga tinggi segera.",
+          "Pangkas kuota keinginan dan prioritaskan pelunasan utang berbunga tinggi.",
         factors: [
           { name: "Rasio Tabungan", val: "10%", status: "Rendah", ok: false },
-          { name: "Disiplin Budget", val: "45%", status: "Bocor", ok: false },
+          { name: "Disiplin Anggaran", val: "45%", status: "Bocor", ok: false },
           { name: "Kontrol Belanja", val: "50%", status: "Waspada", ok: false },
           { name: "Dana Darurat", val: "0.5 Bln", status: "Kurang", ok: false },
         ],
@@ -58,11 +58,11 @@ export const BentoFeatures = () => {
         color: "text-amber-600",
         stroke: "#d97706",
         glow: "border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900",
-        recommendation: "Tingkatkan alokasi tabungan rutin ke 20% penghasilan.",
+        recommendation: "Tingkatkan alokasi tabungan rutin ke 20% dari total pendapatan.",
         factors: [
           { name: "Rasio Tabungan", val: "20%", status: "Cukup", ok: true },
           {
-            name: "Disiplin Budget",
+            name: "Disiplin Anggaran",
             val: "70%",
             status: "Terkendali",
             ok: true,
@@ -73,15 +73,15 @@ export const BentoFeatures = () => {
       };
     }
     return {
-      label: "Kondisi Sehat",
+      label: "Kondisi Prima",
       tag: "Prima",
       color: "text-emerald-600",
       stroke: "#059669",
       glow: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-900",
-      recommendation: "Alokasi 50/30/20 optimal & cadangan darurat terpenuhi.",
+      recommendation: "Alokasi 50/30/20 berada di tingkat optimal & cadangan dana darurat aman.",
       factors: [
         { name: "Rasio Tabungan", val: "35%", status: "Optimal", ok: true },
-        { name: "Disiplin Budget", val: "92%", status: "Disiplin", ok: true },
+        { name: "Disiplin Anggaran", val: "92%", status: "Disiplin", ok: true },
         { name: "Kontrol Belanja", val: "88%", status: "Terkendali", ok: true },
         { name: "Dana Darurat", val: "6 Bln", status: "Aman", ok: true },
       ],
@@ -114,17 +114,17 @@ export const BentoFeatures = () => {
       <div className="text-center max-w-3xl mx-auto mb-16">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
           <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-          Fitur Unggulan
+          Teknologi & Fitur Utama
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          Teknologi Cerdas yang Bekerja{" "}
+          Solusi Cerdas untuk Mengelola Keuangan{" "}
           <span className="text-[#1E3A8A] dark:text-sky-400">
-            Tanpa Beban Pikiran.
+            Tanpa Rasa Khawatir.
           </span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-          Dirancang khusus untuk gaya hidup modern. Bekerja otomatis di latar
-          belakang tanpa perlu chatbot rumit.
+          Otomatisasi pencatatan belanja, analisis laju pengeluaran, dan wawasan
+          finansial terarah dalam satu dashboard modern.
         </p>
       </div>
 
@@ -136,15 +136,15 @@ export const BentoFeatures = () => {
             <div className="max-w-2xl mb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 mb-2.5 border border-blue-100 dark:border-blue-900/30">
                 <Scan className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-                OCR & NLP Scanner
+                AI OCR Scanner
               </div>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Foto Struk Kasir, Biarkan AI Menginput
+                Cukup Foto Struk Belanja, AI yang Menginput Datanya
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed font-normal">
-                Tidak perlu lagi mengetik satu per satu barang belanjaan. Ambil
-                foto struk dari Indomaret, kafe, atau SPBU, dan nominal serta
-                pos kebutuhan 50/30/20 otomatis terdeteksi.
+                Tak perlu lagi mencatat struk belanja satu per satu. Sistem cerdas
+                SADAR mengekstrak merchant, tanggal, total nominal, dan membaginya
+                ke pos 50/30/20 secara otomatis.
               </p>
             </div>
             <ReceiptScannerDemo />
@@ -172,11 +172,11 @@ export const BentoFeatures = () => {
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                Skor Kesehatan Finansial 0–100
+                Evaluasi Kesehatan Finansial Realtime
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal leading-relaxed">
-                Kalkulasi objektif dari rasio tabungan, disiplin budget, kontrol
-                pengeluaran, dan cadangan darurat.
+                SADAR mengevaluasi rasio tabungan, kepatuhan anggaran, dan ketahanan
+                dana daruratmu untuk menghasilkan skor kesehatan finansial yang objektif.
               </p>
 
               {/* Modern Radial Gauge & Score Visualization Card */}
@@ -245,7 +245,7 @@ export const BentoFeatures = () => {
                 {/* Interactive Slider Controller with Presets */}
                 <div className="mt-5 pt-4 border-t border-slate-200/80 dark:border-slate-800">
                   <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">
-                    <span>Geser untuk simulasi skor:</span>
+                    <span>Simulasikan level skor kesehatan:</span>
                     <span className="font-bold text-[#1E3A8A] dark:text-sky-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-100 dark:border-blue-900/30">
                       {activeScore} Poin
                     </span>
@@ -317,20 +317,19 @@ export const BentoFeatures = () => {
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-bold dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900/30">
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    AI Predictive Engine
+                    Sistem Prediksi Dini
                   </div>
                   <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40">
-                    Sistem Peringatan Dini
+                    Peringatan Proaktif
                   </span>
                 </div>
 
                 <h4 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                  Deteksi Dini Overspending
+                  Deteksi Dini Sebelum Anggaran Bocor
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
-                  SADAR memproyeksikan laju belanja harian hingga akhir bulan
-                  dan memberi peringatan proaktif sebelum kuota anggaran
-                  terlampaui.
+                  SADAR memproyeksikan laju pengeluaran harian hingga akhir bulan
+                  dan mengirim peringatan proaktif sebelum batas anggaran terlampaui.
                 </p>
 
                 {/* Simulated Overspending Progress Card */}
@@ -338,7 +337,7 @@ export const BentoFeatures = () => {
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-amber-500" />
-                      Kopi & Kuliner (Wants)
+                      Kategori Keinginan (Wants)
                     </span>
                     <span className="text-amber-700 dark:text-amber-400 font-bold">
                       82% Terpakai
@@ -356,7 +355,7 @@ export const BentoFeatures = () => {
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                     <span>Rp 410.000 / Rp 500.000</span>
                     <span className="font-semibold text-rose-600 dark:text-rose-400">
-                      Sisa Rp 90.000 (4 Hari)
+                      Sisa Rp 90.000 untuk 4 Hari ke Depan
                     </span>
                   </div>
                 </div>
@@ -367,10 +366,10 @@ export const BentoFeatures = () => {
                 <Sparkles className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
                   <strong className="text-slate-800 dark:text-slate-200">
-                    Saran Cerdas:
+                    Rekomendasi Cerdas:
                   </strong>{" "}
-                  Tahan jajan di luar hingga pekan depan untuk menjaga alokasi
-                  30% tetap sehat.
+                  Batasi pengeluaran kategori kuliner akhir pekan ini agar alokasi
+                  30% tetap aman.
                 </p>
               </div>
             </SpotlightCard>
@@ -382,19 +381,19 @@ export const BentoFeatures = () => {
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30">
                     <Wallet className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-                    Sinkronisasi Multi-Akun
+                    Multi-Akun Terpadu
                   </div>
                   <span className="text-[11px] font-bold text-[#1E3A8A] bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/30">
-                    Semua Terhubung
+                    Semua Terkoneksi
                   </span>
                 </div>
 
                 <h4 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                  Kelola Dompet, Bank & E-Wallet
+                  Semua Rekening & Saldo dalam Satu Tempat
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
-                  Pantau saldo Cash, Rekening BCA/Mandiri, hingga GoPay/OVO
-                  dalam satu ringkasan saldo gabungan yang selalu sinkron.
+                  Gabungkan saldo rekening bank, dompet tunai, hingga e-wallet
+                  favoritmu ke dalam satu ringkasan kekayaan bersih (Net Worth) yang selalu sinkron.
                 </p>
 
                 {/* Account Balances Visual Row Cards */}
@@ -454,7 +453,7 @@ export const BentoFeatures = () => {
               {/* Total Consolidated Balance Bar */}
               <div className="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs">
                 <span className="text-slate-500 dark:text-slate-400 font-medium">
-                  Total Saldo Bersih:
+                  Total Kekayaan Bersih (Net Worth):
                 </span>
                 <span className="font-extrabold text-sm text-[#1E3A8A] dark:text-sky-400">
                   Rp 15.470.000
@@ -467,4 +466,5 @@ export const BentoFeatures = () => {
     </section>
   );
 };
+
 

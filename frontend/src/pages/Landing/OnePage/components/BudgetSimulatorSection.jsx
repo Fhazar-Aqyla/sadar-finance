@@ -29,16 +29,16 @@ export const BudgetSimulatorSection = () => {
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
             <Calculator className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-            Kalkulator Alokasi Finansial
+            Simulasi Anggaran 50 / 30 / 20
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-            Coba Simulasi Anggaran{" "}
+            Hitung Pembagian Gaji Idealmu{" "}
             <span className="text-[#1E3A8A] dark:text-sky-400">
-              Sebelum Mendaftar.
+              Secara Akurat.
             </span>
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-            Metode alokasi 50/30/20 terbukti secara global membantu jutaan orang terbebas dari stres finansial tanggal tua.
+            Terapkan rumus alokasi 50/30/20 yang teruji secara global untuk menjaga keseimbangan antara kebutuhan esensial, gaya hidup, dan masa depan.
           </p>
         </div>
 
@@ -50,4 +50,5 @@ export const BudgetSimulatorSection = () => {
     </section>
   );
 };
+
 
