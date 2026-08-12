@@ -29,6 +29,14 @@ const navItems = [
   { label: "FAQ", href: "#faq" },
 ];
 
+const hasAuthToken = () => {
+  try {
+    return Boolean(JSON.parse(sessionStorage.getItem("authUser") || "null")?.token);
+  } catch {
+    return false;
+  }
+};
+
 const faqs = [
   {
     question: "Apa itu SADAR Finance?",
@@ -436,6 +444,7 @@ const StepInsightPreview = () => (
 const OnePage = () => {
   const [openFaq, setOpenFaq] = useState(-1);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isAuthenticated = hasAuthToken();
 
   useEffect(() => {
     document.title = "SADAR Finance | Manajemen Keuangan Cerdas";
@@ -473,16 +482,16 @@ const OnePage = () => {
 
           <div className="flex shrink-0 items-center justify-end gap-3">
             <Link
-              to="/login"
+              to={isAuthenticated ? "/dashboard" : "/login"}
               className="text-[12px] font-semibold !text-[#475569] no-underline hover:!text-[#1E3A8A]"
             >
-              Masuk
+              {isAuthenticated ? "Dashboard" : "Masuk"}
             </Link>
             <Link
-              to="/register"
+              to={isAuthenticated ? "/dashboard" : "/register"}
               className={`${primaryButtonClass} min-w-[118px] max-sm:hidden`}
             >
-              Mulai Sekarang
+              {isAuthenticated ? "Buka Aplikasi" : "Mulai Sekarang"}
             </Link>
             <button
               type="button"
@@ -515,11 +524,11 @@ const OnePage = () => {
               </a>
             ))}
             <Link
-              to="/register"
+              to={isAuthenticated ? "/dashboard" : "/register"}
               onClick={() => setIsMobileMenuOpen(false)}
               className={`${primaryButtonClass} mt-2 w-full sm:hidden`}
             >
-              Mulai Sekarang
+              {isAuthenticated ? "Buka Aplikasi" : "Mulai Sekarang"}
             </Link>
           </nav>
         )}

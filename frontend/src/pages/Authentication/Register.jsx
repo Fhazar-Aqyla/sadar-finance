@@ -55,7 +55,7 @@ const Register = () => {
                 .required("Konfirmasi password wajib diisi"),
         }),
         onSubmit: (values) => {
-            dispatch(registerUser(values));
+            dispatch(registerUser(values, history));
         }
     });
 
@@ -78,10 +78,6 @@ const Register = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (success) {
-            setTimeout(() => history("/login"), 3000);
-        }
-
         setTimeout(() => {
             dispatch(resetRegisterFlag());
         }, 3000);
