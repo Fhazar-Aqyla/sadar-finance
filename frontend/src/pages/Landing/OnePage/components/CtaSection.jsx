@@ -1,27 +1,58 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, CheckCircle2, Shield } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 export const CtaSection = () => {
+  const containerRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  // Parallax transforms for CTA Card and Ambient Spheres
+  const scale = useTransform(smoothProgress, [0, 0.5, 1], [0.91, 1, 0.96]);
+  const yCard = useTransform(smoothProgress, [0, 1], [60, -35]);
+
+  const ySphere1 = useTransform(smoothProgress, [0, 1], [-110, 130]);
+  const xSphere1 = useTransform(smoothProgress, [0, 1], [-50, 60]);
+
+  const ySphere2 = useTransform(smoothProgress, [0, 1], [90, -100]);
+  const xSphere2 = useTransform(smoothProgress, [0, 1], [45, -50]);
+
   return (
-    <section className="py-16 lg:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] border border-white/20 p-8 sm:p-12 lg:p-16 text-center text-white shadow-2xl shadow-sky-500/25">
-        {/* Ambient Breathing Glow Spheres */}
+    <section
+      ref={containerRef}
+      className="py-16 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden"
+    >
+      <motion.div
+        style={{ scale, y: yCard }}
+        className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] border border-white/25 p-8 sm:p-12 lg:p-16 text-center text-white shadow-2xl shadow-sky-500/30"
+      >
+        {/* Ambient Breathing & Parallax Glow Spheres */}
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          style={{ y: ySphere1, x: xSphere1 }}
+          animate={{ scale: [1, 1.25, 1], opacity: [0.35, 0.6, 0.35] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 bg-white/20 blur-3xl rounded-full"
+          className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 bg-white/25 blur-3xl rounded-full"
         />
         <motion.div
-          animate={{ scale: [1, 1.25, 1], opacity: [0.2, 0.4, 0.2] }}
+          style={{ y: ySphere2, x: xSphere2 }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.25, 0.5, 0.25] }}
           transition={{
             duration: 7,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 1,
           }}
-          className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-200/25 blur-3xl rounded-full"
+          className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-200/35 blur-3xl rounded-full"
         />
 
         <div className="relative z-10 max-w-3xl mx-auto">
@@ -70,7 +101,7 @@ export const CtaSection = () => {
             </motion.div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-white/20 flex flex-wrap items-center justify-center gap-6 text-xs text-white/80 font-medium">
+          <div className="mt-8 pt-6 border-t border-white/20 flex flex-wrap items-center justify-center gap-6 text-xs text-white/85 font-medium">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-white" />
               <span>Gratis Digunakan</span>
@@ -81,7 +112,7 @@ export const CtaSection = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

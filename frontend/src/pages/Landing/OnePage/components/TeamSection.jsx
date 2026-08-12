@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { Users } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import diahAvatar from "@/assets/images/users/diah.png";
 import marselaAvatar from "@/assets/images/users/marsela.png";
 import dzakyAvatar from "@/assets/images/users/dzaky.png";
@@ -33,6 +33,23 @@ const InstagramIcon = ({ className = "w-4 h-4" }) => (
 );
 
 export const TeamSection = () => {
+  const containerRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  const yCol1 = useTransform(smoothProgress, [0, 1], [30, -30]);
+  const yCol2 = useTransform(smoothProgress, [0, 1], [-20, 20]);
+  const yCol3 = useTransform(smoothProgress, [0, 1], [40, -40]);
+
   const team = [
     {
       name: "Fhazar Raffiful Aqyla",
@@ -40,6 +57,7 @@ export const TeamSection = () => {
       avatar: fhazarAvatar,
       objectPosition: "center 30%",
       badge: "Lead Architecture",
+      yOffset: yCol1,
       socials: {
         github: "https://github.com/Fhazar-Aqyla",
         linkedin: "https://www.linkedin.com/in/fhazaraqyla/",
@@ -51,6 +69,7 @@ export const TeamSection = () => {
       role: "Full Stack Developer",
       avatar: habibAvatar,
       badge: "Frontend & UI/UX",
+      yOffset: yCol2,
       socials: {
         github: "https://github.com/mhmdhabibrafi",
         linkedin: "https://www.linkedin.com/in/mhmdhabibrafi",
@@ -63,6 +82,7 @@ export const TeamSection = () => {
       role: "AI Engineer",
       avatar: dzakyAvatar,
       badge: "OCR & NLP Pipeline",
+      yOffset: yCol3,
       socials: {
         github: "https://github.com/iMiNerVaa",
         linkedin: "https://www.linkedin.com/in/dj-al/",
@@ -74,6 +94,7 @@ export const TeamSection = () => {
       role: "AI Engineer",
       avatar: farrelAvatar,
       badge: "ML Modeling & Analytics",
+      yOffset: yCol1,
       socials: {
         github: "https://github.com/farrelalfaqih",
         linkedin:
@@ -87,6 +108,7 @@ export const TeamSection = () => {
       role: "Data Scientist",
       avatar: diahAvatar,
       badge: "Behavior & Forecasting",
+      yOffset: yCol2,
       socials: {
         github: "https://github.com/Diahayuups",
         linkedin: "https://www.linkedin.com/in/diahaps/",
@@ -98,6 +120,7 @@ export const TeamSection = () => {
       role: "Data Scientist",
       avatar: marselaAvatar,
       badge: "Data Modeling & Insights",
+      yOffset: yCol3,
       socials: {
         github: "https://github.com/Marsela0603",
         linkedin: "https://www.linkedin.com/in/marsela-marsela-30a763248",
@@ -109,10 +132,11 @@ export const TeamSection = () => {
   return (
     <section
       id="team"
-      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      ref={containerRef}
+      className="py-16 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
     >
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3">
+      <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm">
           <Users className="w-3.5 h-3.5 text-[#25a0e2]" />
           Tim Pengembang
         </div>
@@ -128,20 +152,21 @@ export const TeamSection = () => {
         </p>
       </div>
 
-      {/* Team Cards Grid */}
+      {/* Team Cards Grid with Column Parallax */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {team.map((member, idx) => (
           <motion.div
             key={idx}
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            style={{ y: member.yOffset }}
+            whileHover={{ y: -8, transition: { duration: 0.2 } }}
             className="h-full"
           >
-            <SpotlightCard className="h-full p-6 text-center flex flex-col items-center justify-between shadow-sm border-slate-200/80 dark:border-slate-800">
+            <SpotlightCard className="h-full p-6 text-center flex flex-col items-center justify-between shadow-sm border-slate-200/80 dark:border-slate-800 transition-all duration-300 hover:shadow-2xl hover:shadow-sky-500/15">
               <div className="flex flex-col items-center">
                 {/* Avatar Photo */}
                 <motion.div
-                  whileHover={{ scale: 1.06 }}
-                  className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-sky-400/40 p-1 bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] shadow-lg shadow-sky-500/15 mb-4 cursor-pointer"
+                  whileHover={{ scale: 1.08 }}
+                  className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-sky-400/40 p-1 bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] shadow-lg shadow-sky-500/20 mb-4 cursor-pointer"
                 >
                   <img
                     src={member.avatar}
@@ -171,7 +196,7 @@ export const TeamSection = () => {
               <div className="flex items-center gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
                 {member.socials.github && (
                   <motion.a
-                    whileHover={{ scale: 1.15 }}
+                    whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
                     href={member.socials.github}
                     target="_blank"
@@ -184,7 +209,7 @@ export const TeamSection = () => {
                 )}
                 {member.socials.linkedin && (
                   <motion.a
-                    whileHover={{ scale: 1.15 }}
+                    whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
                     href={member.socials.linkedin}
                     target="_blank"
@@ -197,7 +222,7 @@ export const TeamSection = () => {
                 )}
                 {member.socials.instagram && (
                   <motion.a
-                    whileHover={{ scale: 1.15 }}
+                    whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
                     href={member.socials.instagram}
                     target="_blank"

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,14 +39,20 @@ export const Navbar = () => {
           : "bg-transparent py-5"
       }`}
     >
+      {/* Top Scroll Progress Line */}
+      <motion.div
+        style={{ scaleX }}
+        className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] origin-left z-50"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
               whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] p-0.5 shadow-md shadow-sky-500/20 flex items-center justify-center"
+              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] p-0.5 shadow-md shadow-sky-500/20 flex items-center justify-center transition-transform"
             >
               <img
                 src={sadarLogo}
@@ -67,14 +79,15 @@ export const Navbar = () => {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-slate-600 hover:text-[#25a0e2] dark:text-slate-300 dark:hover:text-[#32ccff] transition-colors"
+                className="text-sm font-medium text-slate-600 hover:text-[#25a0e2] dark:text-slate-300 dark:hover:text-[#32ccff] transition-colors relative py-1 group"
               >
                 {link.label}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#25a0e2] transition-all duration-300 group-hover:w-full rounded-full" />
               </a>
             ))}
           </nav>
 
-          {/* CTA Buttons (Desktop) - Auth-consistent buttons */}
+          {/* CTA Buttons (Desktop) - Auth style */}
           <div className="hidden sm:flex items-center gap-3">
             <Link
               to="/login"
@@ -82,10 +95,10 @@ export const Navbar = () => {
             >
               Masuk
             </Link>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white text-sm font-semibold shadow-md shadow-sky-500/25 hover:shadow-lg hover:shadow-sky-500/35 transition-all"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white text-sm font-semibold shadow-md shadow-sky-500/25 hover:shadow-lg hover:shadow-sky-500/40 transition-all"
               >
                 Mulai Sekarang <ArrowRight className="w-4 h-4" />
               </Link>
@@ -106,7 +119,7 @@ export const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Dropdown Menu with Framer Motion AnimatePresence */}
+        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div

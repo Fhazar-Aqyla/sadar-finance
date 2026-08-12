@@ -1,10 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
 @import "tailwindcss";
 
 @variant dark (&:where([data-bs-theme="dark"], [data-bs-theme="dark"] *));
 
-html {
-  scroll-behavior: smooth;
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 @keyframes moveAurora1 {
@@ -39,7 +55,7 @@ html {
   width: 60%;
   height: 60%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.35) 0%, rgba(20, 184, 166, 0) 70%);
+  background: radial-gradient(circle, rgba(11, 185, 168, 0.35) 0%, rgba(11, 185, 168, 0) 70%);
   animation: moveAurora1 20s infinite alternate ease-in-out;
 }
 
@@ -50,7 +66,7 @@ html {
   width: 60%;
   height: 60%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(30, 58, 138, 0.35) 0%, rgba(30, 58, 138, 0) 70%);
+  background: radial-gradient(circle, rgba(37, 160, 226, 0.35) 0%, rgba(37, 160, 226, 0) 70%);
   animation: moveAurora2 20s infinite alternate ease-in-out;
 }
 
@@ -88,4 +104,3 @@ html {
 .animate-blob {
   animation: blob 7s infinite ease-in-out;
 }
-

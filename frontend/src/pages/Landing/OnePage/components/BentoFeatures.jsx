@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { ReceiptScannerDemo } from "@/Components/ui/receipt-scanner-demo";
 import {
@@ -6,16 +6,31 @@ import {
   Activity,
   AlertTriangle,
   Wallet,
-  TrendingUp,
   Sparkles,
-  ArrowRight,
-  ShieldCheck,
   CheckCircle2,
-  PieChart,
 } from "lucide-react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 export const BentoFeatures = () => {
+  const containerRef = useRef(null);
   const [activeScore, setActiveScore] = useState(84);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 95,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  // Parallax offsets for cards & background
+  const yBg = useTransform(smoothProgress, [0, 1], [-120, 120]);
+  const yCard1 = useTransform(smoothProgress, [0, 1], [30, -30]);
+  const yCard2 = useTransform(smoothProgress, [0, 1], [45, -45]);
+  const yCard3 = useTransform(smoothProgress, [0, 1], [60, -60]);
 
   const getScoreStatus = (val) => {
     if (val <= 40)
@@ -42,11 +57,22 @@ export const BentoFeatures = () => {
   return (
     <section
       id="features"
-      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      ref={containerRef}
+      className="py-16 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
+      {/* Background Parallax Light Mesh */}
+      <motion.div
+        style={{ y: yBg }}
+        className="pointer-events-none absolute top-1/3 -left-48 w-96 h-96 bg-gradient-to-tr from-cyan-400/20 to-sky-300/10 blur-3xl rounded-full -z-10"
+      />
+      <motion.div
+        style={{ y: yBg }}
+        className="pointer-events-none absolute bottom-10 -right-48 w-96 h-96 bg-gradient-to-tr from-teal-400/20 to-sky-300/10 blur-3xl rounded-full -z-10"
+      />
+
       {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3">
+      <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-[#25a0e2]" />
           Fitur Unggulan
         </div>
@@ -62,10 +88,10 @@ export const BentoFeatures = () => {
         </p>
       </div>
 
-      {/* Bento Grid 4-Cards Layout */}
+      {/* Bento Grid 4-Cards Layout with Parallax Transforms */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Card 1: Interactive OCR Scanner (Full-Width Large Card - 12 Cols) */}
-        <div className="lg:col-span-12">
+        <motion.div style={{ y: yCard1 }} className="lg:col-span-12">
           <SpotlightCard className="p-6 sm:p-8 border-sky-200/60 dark:border-sky-900/30 shadow-md shadow-sky-500/5">
             <div className="max-w-2xl mb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-50 text-[#1a85be] text-xs font-bold dark:bg-sky-950/60 dark:text-sky-300 mb-2">
@@ -75,7 +101,7 @@ export const BentoFeatures = () => {
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
                 Foto Struk Kasir, Biarkan AI Menginput
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed font-normal">
                 Tidak perlu lagi mengetik satu per satu barang belanjaan. Ambil
                 foto struk dari Indomaret, kafe, atau SPBU, dan nominal serta
                 pos kebutuhan otomatis terdeteksi.
@@ -83,10 +109,10 @@ export const BentoFeatures = () => {
             </div>
             <ReceiptScannerDemo />
           </SpotlightCard>
-        </div>
+        </motion.div>
 
         {/* Card 2: Interactive Financial Health Score (6 Cols) */}
-        <div className="lg:col-span-6">
+        <motion.div style={{ y: yCard2 }} className="lg:col-span-6">
           <SpotlightCard className="h-full flex flex-col justify-between p-6 sm:p-8 border-slate-200/80 dark:border-slate-800">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-50 text-[#1a85be] text-xs font-bold dark:bg-sky-950/60 dark:text-sky-300 mb-3">
@@ -96,7 +122,7 @@ export const BentoFeatures = () => {
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
                 Skor Kesehatan Finansial 0–100
               </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal">
                 Kalkulasi objektif dari rasio tabungan, disiplin budget, dan
                 kontrol pengeluaran.
               </p>
@@ -121,9 +147,9 @@ export const BentoFeatures = () => {
 
                 {/* Score Tester Slider */}
                 <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800">
-                  <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+                  <div className="flex justify-between text-xs text-slate-500 mb-1.5 font-medium">
                     <span>Uji Nilai Skor:</span>
-                    <span className="font-semibold">{activeScore} poin</span>
+                    <span className="font-bold text-[#25a0e2]">{activeScore} poin</span>
                   </div>
                   <input
                     type="range"
@@ -137,7 +163,7 @@ export const BentoFeatures = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-xs text-slate-600 dark:text-slate-400 pt-2">
+            <div className="grid grid-cols-2 gap-3 text-xs text-slate-600 dark:text-slate-400 pt-2 font-medium">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#25a0e2]" />
                 <span>Rasio Tabungan (35%)</span>
@@ -148,26 +174,26 @@ export const BentoFeatures = () => {
               </div>
             </div>
           </SpotlightCard>
-        </div>
+        </motion.div>
 
         {/* Card 3: Smart Overspending Alerts & Multi-Account (6 Cols) */}
-        <div className="lg:col-span-6 flex flex-col gap-6">
+        <motion.div style={{ y: yCard3 }} className="lg:col-span-6 flex flex-col gap-6">
           {/* Subcard A: Predictive Spending Alert */}
           <SpotlightCard className="p-6 border-slate-200/80 dark:border-slate-800">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 shrink-0">
+              <div className="p-3 rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 shrink-0 shadow-sm">
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white">
                   Deteksi Dini Overspending
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
                   SADAR memproyeksikan laju belanja hingga akhir bulan. Jika
                   tren pengeluaran diprediksi melebihi budget, kamu langsung
                   mendapat peringatan.
                 </p>
-                <div className="mt-3 p-3 rounded-xl bg-amber-50/70 border border-amber-200/60 dark:bg-amber-950/30 dark:border-amber-800/50 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300">
+                <div className="mt-3 p-3 rounded-xl bg-amber-50/70 border border-amber-200/60 dark:bg-amber-950/30 dark:border-amber-800/50 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300 font-medium">
                   <span className="font-bold">⚠️ Alert Simulasi:</span>
                   <span>
                     Pengeluaran Kopi & Jajan pekan ini telah menyerap 82% kuota
@@ -181,14 +207,14 @@ export const BentoFeatures = () => {
           {/* Subcard B: Multi-Account Management */}
           <SpotlightCard className="p-6 border-slate-200/80 dark:border-slate-800">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-2xl bg-sky-50 text-[#25a0e2] dark:bg-sky-950/60 dark:text-sky-400 shrink-0">
+              <div className="p-3 rounded-2xl bg-sky-50 text-[#25a0e2] dark:bg-sky-950/60 dark:text-sky-400 shrink-0 shadow-sm">
                 <Wallet className="w-6 h-6" />
               </div>
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white">
                   Kelola Dompet, Bank & E-Wallet
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
                   Pantau saldo Cash, Rekening BCA/Mandiri, hingga GoPay/OVO
                   dalam satu ringkasan saldo gabungan yang selalu sinkron.
                 </p>
@@ -206,7 +232,7 @@ export const BentoFeatures = () => {
               </div>
             </div>
           </SpotlightCard>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
