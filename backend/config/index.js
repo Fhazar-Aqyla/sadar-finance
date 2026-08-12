@@ -60,8 +60,9 @@ const config = {
   },
 
   ai: {
-    serviceUrl: process.env.AI_SERVICE_URL || 'http://localhost:5000',
-    timeoutMs: parseInt(process.env.AI_SERVICE_TIMEOUT_MS, 10) || 10000,
+    serviceUrl: process.env.AI_SERVICE_URL || 'https://sadar-finance-sadar-finance-ai.hf.space',
+    apiKey: process.env.AI_API_KEY || process.env.HF_TOKEN || '',
+    timeoutMs: parseInt(process.env.AI_SERVICE_TIMEOUT_MS, 10) || 15000,
     mockMode: process.env.AI_MOCK_MODE === 'true',
   },
 

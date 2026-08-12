@@ -1,0 +1,1717 @@
+//
+// _authentication.scss
+//
+
+
+.auth-page-wrapper{
+    .auth-page-content{
+        padding-bottom: $footer-height;
+        position: relative;
+        z-index: 2;
+        width: 100%;
+    }
+    .footer{
+        left: 0;
+        background-color: transparent;
+        color: var(--#{$prefix}body-color);
+    }
+}
+
+.auth-one-bg-position{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 380px;
+    
+    @media (max-width: 575.98px) {
+        height: 280px;
+    }
+}
+
+.auth-one-bg{
+    background-image: url("../../images/auth-one-bg.jpg");
+    background-position: center;
+    background-size: cover;
+
+    .bg-overlay{
+        background: linear-gradient(to right, darken($primary, 6%), $primary);
+        opacity: 0.9;
+    }
+}
+
+.sadar-auth-wrapper {
+    background:
+        radial-gradient(circle at top left, rgba(30, 58, 138, 0.12), transparent 34rem),
+        linear-gradient(180deg, rgba(30, 58, 138, 0.06) 0%, #ffffff 52%, #ffffff 100%);
+
+    .auth-one-bg {
+        background-image: url("../../images/bg-auth.jpg");
+
+        .bg-overlay {
+            background:
+                linear-gradient(120deg, rgba(30, 58, 138, 0.96), rgba(30, 58, 138, 0.9));
+            opacity: 1;
+        }
+    }
+
+    .auth-logo {
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.96);
+        padding: 10px 18px;
+        box-shadow: 0 10px 26px rgba(30, 58, 138, 0.18);
+
+        img {
+            height: 30px;
+        }
+    }
+
+    .card {
+        border: 0;
+        border-radius: 8px;
+        box-shadow: 0 18px 50px rgba(30, 58, 138, 0.14);
+    }
+
+    .btn-success {
+        --#{$prefix}btn-bg: #1e3a8a;
+        --#{$prefix}btn-border-color: #1e3a8a;
+        --#{$prefix}btn-hover-bg: #1e3a8a;
+        --#{$prefix}btn-hover-border-color: #1e3a8a;
+        --#{$prefix}btn-active-bg: #1e3a8a;
+        --#{$prefix}btn-active-border-color: #1e3a8a;
+        --#{$prefix}btn-disabled-bg: #1e3a8a;
+        --#{$prefix}btn-disabled-border-color: #1e3a8a;
+    }
+
+    .text-primary,
+    a.text-primary {
+        color: #1e3a8a !important;
+    }
+
+    .auth-brand-subtitle {
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .auth-mini-panel {
+        border: 1px solid rgba(30, 58, 138, 0.08);
+        border-radius: 8px;
+        background: rgba(30, 58, 138, 0.04);
+    }
+}
+
+.sadar-auth-cover {
+    background: #1e3a8a;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 !important;
+
+    > .bg-overlay {
+        background-image:
+            radial-gradient(circle at 10% 24%, rgba(255, 255, 255, 0.12) 0 2px, transparent 3px),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0 1px, transparent 1px),
+            url("../../images/cover-pattern.png");
+        background-size: 32px 32px, 520px 520px, cover;
+        background-position: left top, center, center;
+        opacity: 0.65;
+    }
+
+    .auth-page-content {
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 0 !important;
+    }
+
+    .container {
+        max-width: 100%;
+        height: 100%;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .container > .row,
+    .container > .row > [class*="col-"] {
+        height: 100%;
+    }
+
+    .card {
+        border-radius: 0;
+        box-shadow: 0 22px 60px rgba(30, 58, 138, 0.18);
+    }
+
+    .sadar-auth-card {
+        min-height: 100vh;
+        min-height: 100dvh;
+
+        > .row {
+            height: 100%;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .sadar-auth-card {
+            > .row {
+                flex-direction: row-reverse;
+            }
+        }
+
+        .sadar-auth-form-panel {
+            flex: 0 0 40%;
+            max-width: 40%;
+        }
+
+        .sadar-auth-visual-panel {
+            flex: 0 0 60%;
+            max-width: 60%;
+        }
+    }
+
+    .sadar-auth-form-panel {
+        --sadar-auth-content-width: min(calc(100% - 96px), 580px);
+        --sadar-auth-content-padding: 3rem;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        min-height: 0;
+        max-height: 100vh;
+        max-height: 100dvh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+
+        > div {
+            width: var(--sadar-auth-content-width);
+            max-width: var(--sadar-auth-content-width);
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .form-label {
+            margin-bottom: 0.35rem;
+        }
+
+        .form-control.is-invalid,
+        .was-validated .form-control:invalid {
+            background-image: none;
+            padding-right: 0.9rem;
+        }
+
+        .p-lg-5 {
+            padding-top: 0 !important;
+            padding-bottom: 2rem !important;
+        }
+
+        .p-2 {
+            padding: 0 !important;
+        }
+
+        .mt-4 {
+            margin-top: 1rem !important;
+        }
+
+        .mt-5 {
+            margin-top: 1.5rem !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.85rem !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem !important;
+        }
+    }
+
+    .sadar-auth-panel-logo {
+        display: flex;
+        width: var(--sadar-auth-content-width);
+        max-width: var(--sadar-auth-content-width);
+        margin: 0 auto 1.5rem;
+        padding: 0 var(--sadar-auth-content-padding);
+
+        img {
+            height: 34px;
+            width: auto;
+            flex: 0 0 auto;
+        }
+    }
+
+    .sadar-auth-wordmark {
+        color: #1e3a8a;
+        font-size: 1.55rem;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        line-height: 1;
+    }
+
+    .sadar-auth-visual-panel {
+        min-width: 0;
+        padding: 0;
+    }
+
+    .sadar-auth-visual {
+        min-height: 720px;
+        isolation: isolate;
+        background: #1e3a8a !important;
+    }
+
+    .sadar-auth-visual-depth {
+        background:
+            radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.16), transparent 22rem),
+            radial-gradient(circle at 84% 26%, rgba(255, 255, 255, 0.1), transparent 20rem),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(30, 58, 138, 0.18));
+    }
+
+    .sadar-auth-visual::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 38%, rgba(255, 255, 255, 0.03));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        pointer-events: none;
+    }
+
+    .sadar-auth-aurora {
+        position: absolute;
+        inset: -20%;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+
+        span {
+            position: absolute;
+            display: block;
+            border-radius: 50%;
+            filter: blur(34px);
+            mix-blend-mode: screen;
+            opacity: 0.34;
+            will-change: transform;
+        }
+
+        span:nth-child(1) {
+            top: 2%;
+            left: 3%;
+            width: 52%;
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.46);
+            animation: sadar-auth-orbit-one 13s ease-in-out infinite alternate;
+        }
+
+        span:nth-child(2) {
+            top: 18%;
+            right: 0;
+            width: 48%;
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.34);
+            animation: sadar-auth-orbit-two 16s ease-in-out infinite alternate;
+        }
+
+        span:nth-child(3) {
+            bottom: -5%;
+            left: 26%;
+            width: 58%;
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.28);
+            opacity: 0.22;
+            animation: sadar-auth-orbit-three 18s ease-in-out infinite alternate;
+        }
+    }
+
+    .sadar-auth-wave {
+        animation: sadar-auth-wave-drift 12s ease-in-out infinite alternate;
+        will-change: transform;
+    }
+
+    .sadar-auth-quote-glass {
+        position: relative;
+        width: 100%;
+        padding: 1.4rem;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 26px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+        box-shadow: 0 22px 54px rgba(30, 58, 138, 0.28), inset 0 1.5px 0 rgba(255, 255, 255, 0.32), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(26px) saturate(160%);
+        -webkit-backdrop-filter: blur(26px) saturate(160%);
+        isolation: isolate;
+    }
+
+    .sadar-auth-quote-shine {
+        position: absolute;
+        top: -120%;
+        left: -35%;
+        z-index: -1;
+        width: 54%;
+        height: 340%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+        transform: rotate(20deg);
+        animation: sadar-auth-glass-shine 7s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    .sadar-auth-quote-kicker {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin-bottom: 0.9rem;
+        color: rgba(255, 255, 255, 0.74);
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+    }
+
+    .sadar-auth-quote-symbol {
+        display: inline-flex;
+        width: 29px;
+        height: 29px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 10px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.13);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        font-size: 0.95rem;
+    }
+
+    .sadar-auth-quote-content {
+        min-height: 146px;
+        opacity: 1;
+        transform: translate3d(0, 14px, 0) scale(0.985);
+        filter: blur(5px);
+
+        &.is-visible {
+            animation: sadar-auth-quote-in 0.72s cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+        }
+
+    }
+
+    .sadar-auth-quote-progress {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 1rem;
+
+        span {
+            display: block;
+            width: 7px;
+            height: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.26);
+            transition: width 0.48s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease;
+        }
+
+        span.is-active {
+            position: relative;
+            width: 42px;
+            background: rgba(255, 255, 255, 0.26);
+        }
+
+        span.is-active::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: #ffffff;
+            transform-origin: left;
+            animation: sadar-auth-quote-timer 5.2s linear forwards;
+        }
+    }
+
+    .text-primary,
+    a.text-primary {
+        color: #1e3a8a !important;
+    }
+
+    .btn-success {
+        --#{$prefix}btn-bg: #1e3a8a;
+        --#{$prefix}btn-border-color: #1e3a8a;
+        --#{$prefix}btn-hover-bg: #1e3a8a;
+        --#{$prefix}btn-hover-border-color: #1e3a8a;
+        --#{$prefix}btn-active-bg: #1e3a8a;
+        --#{$prefix}btn-active-border-color: #1e3a8a;
+        --#{$prefix}btn-disabled-bg: #1e3a8a;
+        --#{$prefix}btn-disabled-border-color: #1e3a8a;
+    }
+
+    .sadar-auth-slider {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background-image: url("../../images/bg-auth.jpg");
+        background-position: center;
+        background-size: cover;
+
+        .bg-overlay {
+            background: rgba(30, 58, 138, 0.9);
+            opacity: 1;
+        }
+
+        .auth-logo {
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 10px 18px;
+            box-shadow: 0 10px 26px rgba(30, 58, 138, 0.18);
+
+            img {
+                height: 30px;
+            }
+        }
+    }
+
+    .signin-other-title .title {
+        background-color: var(--#{$prefix}secondary-bg);
+    }
+
+    @media (max-width: 991.98px) {
+        display: block !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background: #ffffff;
+
+        .auth-page-content,
+        .container,
+        .container > .row,
+        .container > .row > [class*="col-"] {
+            height: auto;
+            min-height: 100vh;
+        }
+
+        .sadar-auth-card {
+            height: auto;
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: visible !important;
+            padding-bottom: 1.1rem;
+            background:
+                radial-gradient(circle at 12% 62%, rgba(30, 58, 138, 0.1), transparent 17rem),
+                radial-gradient(circle at 90% 82%, rgba(30, 58, 138, 0.06), transparent 18rem),
+                linear-gradient(180deg, rgba(30, 58, 138, 0.08) 0%, #ffffff 66%, #ffffff 100%);
+
+            > .row {
+                display: flex;
+                min-height: 100vh;
+                min-height: 100dvh;
+                flex-direction: column;
+            }
+        }
+
+        .sadar-auth-visual-panel {
+            display: block !important;
+            width: 100%;
+            max-width: none;
+            flex: 0 0 auto;
+        }
+
+        .sadar-auth-visual {
+            height: 304px !important;
+            min-height: 304px;
+            padding: 1.05rem 1rem 2.65rem !important;
+            border-radius: 0 0 36px 36px;
+            box-shadow: 0 24px 58px rgba(30, 58, 138, 0.3);
+        }
+
+        .sadar-auth-visual::after {
+            border-radius: 0 0 36px 36px;
+            border-top: 0;
+        }
+
+        .sadar-auth-quote {
+            width: min(100%, 560px);
+            max-width: 560px !important;
+            margin: 0 auto;
+            padding-top: 0 !important;
+
+            p {
+                font-size: clamp(0.98rem, 4.2vw, 1.18rem) !important;
+                line-height: 1.4 !important;
+            }
+
+            footer {
+                margin-top: 0.8rem !important;
+                color: rgba(255, 255, 255, 0.78) !important;
+                font-size: 0.7rem !important;
+            }
+        }
+
+        .sadar-auth-quote-glass {
+            min-height: 248px;
+            padding: 1rem 1.05rem 0.85rem;
+            border-radius: 27px;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.2), transparent 42%),
+                linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+            box-shadow: 0 20px 48px rgba(3, 17, 54, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 0.36), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .sadar-auth-quote-content {
+            min-height: 113px;
+        }
+
+        .sadar-auth-quote-progress {
+            margin-top: 0.65rem;
+        }
+
+        .sadar-auth-form-panel {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 3;
+            width: calc(100% - 24px);
+            max-width: 540px;
+            min-height: auto;
+            flex: 0 0 auto;
+            align-self: center;
+            margin-top: -24px;
+            padding: 1.25rem 0.25rem 1.45rem;
+            max-height: none;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.88);
+            border-radius: 30px;
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(239, 246, 255, 0.68)),
+                rgba(255, 255, 255, 0.68);
+            box-shadow: 0 26px 62px rgba(30, 58, 138, 0.18), inset 0 1.5px 0 rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(30px) saturate(170%);
+            -webkit-backdrop-filter: blur(30px) saturate(170%);
+            --sadar-auth-content-width: #{min(calc(100% - 32px), 460px)};
+            --sadar-auth-content-padding: 0;
+
+            &::before {
+                content: "";
+                position: absolute;
+                top: -35%;
+                right: -16%;
+                width: 58%;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                background: rgba(30, 58, 138, 0.08);
+                filter: blur(30px);
+                pointer-events: none;
+            }
+
+            > * {
+                position: relative;
+                z-index: 1;
+            }
+
+            > div {
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+            }
+
+            .form-control {
+                min-height: 48px;
+                border-radius: 14px;
+                border-color: rgba(148, 163, 184, 0.35);
+                background: rgba(255, 255, 255, 0.72);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 14px rgba(15, 23, 42, 0.04);
+                font-size: 16px;
+                transition: border-color 0.24s ease, box-shadow 0.24s ease, background 0.24s ease, transform 0.24s ease;
+
+                &:focus {
+                    border-color: #1e3a8a;
+                    background: rgba(255, 255, 255, 0.92);
+                    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.11), inset 0 1px 0 rgba(255, 255, 255, 1), 0 10px 24px rgba(30, 58, 138, 0.08);
+                    transform: translateY(-1px);
+                }
+            }
+
+            .btn-success {
+                min-height: 48px;
+                border-radius: 14px;
+                box-shadow: 0 10px 24px rgba(30, 58, 138, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, filter 0.24s ease;
+
+                &:hover,
+                &:focus {
+                    transform: translateY(-2px);
+                    box-shadow: 0 15px 32px rgba(30, 58, 138, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+                    filter: saturate(1.08);
+                }
+
+                &:active {
+                    transform: scale(0.985);
+                }
+            }
+
+            .auth-pass-inputgroup .password-toggle-btn {
+                top: 4px;
+                right: 4px;
+                width: 40px;
+                height: 40px;
+                border-radius: 12px;
+            }
+        }
+
+        .sadar-auth-panel-logo {
+            margin-top: 0;
+            margin-bottom: 1rem;
+
+            img {
+                height: 30px;
+                animation: sadar-auth-logo-in 0.72s 0.12s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+            }
+        }
+
+        .sadar-auth-slider {
+            height: auto;
+            min-height: 300px;
+        }
+
+        > .footer {
+            position: static;
+            height: auto;
+            padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom));
+            background: transparent;
+            font-size: 0.72rem;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .sadar-auth-visual {
+            height: 292px !important;
+            min-height: 292px;
+            border-radius: 0 0 32px 32px;
+        }
+
+        .sadar-auth-visual::after {
+            border-radius: 0 0 32px 32px;
+        }
+
+        .sadar-auth-form-panel {
+            padding-top: 1rem;
+
+            .d-flex.align-items-center.justify-content-between {
+                align-items: flex-start !important;
+                flex-direction: column;
+                gap: 0.65rem !important;
+            }
+        }
+    }
+
+    @media (max-width: 991.98px) and (max-height: 640px) and (orientation: landscape) {
+        .sadar-auth-visual {
+            height: 228px !important;
+            min-height: 228px;
+        }
+
+        .sadar-auth-quote {
+            p {
+                font-size: 1rem !important;
+            }
+
+            footer {
+                margin-top: 0.65rem !important;
+            }
+        }
+
+        .sadar-auth-quote-glass {
+            min-height: 184px;
+            padding: 0.75rem 0.9rem;
+        }
+
+        .sadar-auth-quote-content {
+            min-height: 72px;
+        }
+    }
+
+    @media (min-width: 992px) and (max-height: 760px) {
+        .sadar-auth-form-panel {
+            justify-content: flex-start;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+
+            .p-lg-5 {
+                padding-bottom: 1rem !important;
+            }
+
+            .mt-4,
+            .mt-5 {
+                margin-top: 0.75rem !important;
+            }
+
+            .mb-3 {
+                margin-bottom: 0.65rem !important;
+            }
+
+            .mb-4 {
+                margin-bottom: 0.75rem !important;
+            }
+        }
+
+        .sadar-auth-panel-logo {
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+@keyframes sadar-auth-orbit-one {
+    0% { transform: translate3d(-5%, -4%, 0) scale(0.9); }
+    52% { transform: translate3d(30%, 18%, 0) scale(1.12); }
+    100% { transform: translate3d(12%, 42%, 0) scale(0.96); }
+}
+
+@keyframes sadar-auth-orbit-two {
+    0% { transform: translate3d(8%, 8%, 0) scale(0.94); }
+    55% { transform: translate3d(-34%, 22%, 0) scale(1.1); }
+    100% { transform: translate3d(-12%, -12%, 0) scale(1); }
+}
+
+@keyframes sadar-auth-orbit-three {
+    0% { transform: translate3d(-18%, 8%, 0) scale(1); }
+    50% { transform: translate3d(18%, -22%, 0) scale(1.14); }
+    100% { transform: translate3d(38%, -4%, 0) scale(0.92); }
+}
+
+@keyframes sadar-auth-wave-drift {
+    from { transform: translate3d(-1.5%, 1%, 0) scale(1.03); }
+    to { transform: translate3d(1.5%, -1%, 0) scale(1.08); }
+}
+
+@keyframes sadar-auth-glass-shine {
+    0%, 18% { transform: translateX(-80%) rotate(20deg); opacity: 0; }
+    30% { opacity: 1; }
+    55%, 100% { transform: translateX(310%) rotate(20deg); opacity: 0; }
+}
+
+@keyframes sadar-auth-quote-in {
+    from { opacity: 0.84; transform: translate3d(0, 12px, 0) scale(0.988); filter: none; }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+}
+
+@keyframes sadar-auth-quote-out {
+    from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+    to { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.99); filter: blur(4px); }
+}
+
+@keyframes sadar-auth-quote-timer {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+@keyframes sadar-auth-logo-in {
+    from { opacity: 0.72; transform: translateY(8px) scale(0.96); filter: none; }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sadar-auth-cover {
+        .sadar-auth-aurora span,
+        .sadar-auth-wave,
+        .sadar-auth-quote-shine,
+        .sadar-auth-quote-content,
+        .sadar-auth-quote-progress span.is-active::after,
+        .sadar-auth-panel-logo img {
+            animation: none !important;
+        }
+
+        .sadar-auth-quote-content {
+            opacity: 1;
+            transform: none;
+            filter: none;
+        }
+    }
+}
+
+.shape{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+    >svg {
+        width: 100%;
+        height: auto;
+        fill: var(--#{$prefix}body-bg);
+    }
+}
+
+// auth-pass-inputgroup
+
+.auth-pass-inputgroup{
+    .form-control,
+    .form-control.is-invalid {
+        background-image: none;
+        padding-right: 3rem;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        z-index: 5;
+        width: 42px;
+        height: 40px;
+        padding: 0;
+        border: 0;
+        color: var(--#{$prefix}secondary-color);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover,
+        &:focus {
+            color: var(--#{$prefix}primary);
+            box-shadow: none;
+        }
+    }
+
+    input[type="text"] + .btn .ri-eye-fill{
+        &:before{
+            content: "\ecb6";
+        }
+    }
+}
+
+.particles-js-canvas-el{
+    position: relative;
+}
+
+// signin card title
+
+.signin-other-title{
+    position: relative;
+    &:after{
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed var(--#{$prefix}border-color);
+        top: 10px;
+    }
+
+    .title{
+        display: inline-block;
+        position: relative;
+        z-index: 9;
+        background-color: var(--#{$prefix}secondary-bg);
+        padding: 2px 16px;
+    }
+}
+
+// Auth cover
+
+.auth-bg-cover{
+    background: $auth-bg-cover;
+
+    > .bg-overlay{
+        background-image: url("../../images/cover-pattern.png");
+        background-position: center;
+        background-size: cover;
+        opacity: 1;
+        background-color: transparent;
+    }
+
+    .footer{
+        color: rgba($white, .5);
+    }
+}
+
+//passowrd validations 
+#password-contain {
+    display: none;
+
+    p {
+        padding-left: 13px;
+
+        &.valid {
+            color: $success;
+
+            &::before {
+                position: relative;
+                left: -8px;
+                content: "✔";
+            }
+        }
+
+        &.invalid {
+            color: $danger;
+
+            &::before {
+                position: relative;
+                left: -8px;
+                content: "✖";
+            }
+        }
+    }
+}
+
+// SADAR mobile authentication shell. The page itself stays locked to the
+// dynamic viewport; only the form surface scrolls when validation text or a
+// very short browser viewport needs additional room.
+.sadar-auth-cover {
+    --sadar-auth-brand: #1e3a8a;
+    --#{$prefix}primary: var(--sadar-auth-brand);
+    --#{$prefix}primary-rgb: 30, 58, 138;
+
+    .text-primary,
+    a,
+    a.text-primary,
+    .form-check-label .text-primary,
+    .password-toggle-btn:hover,
+    .password-toggle-btn:focus {
+        color: var(--sadar-auth-brand) !important;
+    }
+
+    .form-control:focus,
+    .form-check-input:focus {
+        border-color: var(--sadar-auth-brand);
+        box-shadow: 0 0 0 0.22rem rgba(30, 58, 138, 0.12);
+    }
+
+    .form-check-input:checked {
+        border-color: var(--sadar-auth-brand);
+        background-color: var(--sadar-auth-brand);
+    }
+
+    .btn-success {
+        border-color: var(--sadar-auth-brand);
+        background: var(--sadar-auth-brand);
+
+        &:hover,
+        &:focus,
+        &:active {
+            border-color: var(--sadar-auth-brand) !important;
+            background: var(--sadar-auth-brand) !important;
+            filter: brightness(0.92);
+        }
+
+        &:disabled {
+            border-color: var(--sadar-auth-brand);
+            background: var(--sadar-auth-brand);
+            opacity: 0.55;
+        }
+    }
+}
+
+.sadar-auth-terms-modal {
+    --#{$prefix}primary: #1e3a8a;
+    --#{$prefix}primary-rgb: 30, 58, 138;
+
+    .text-primary {
+        color: #1e3a8a !important;
+    }
+}
+
+// Terms use the same readable liquid-glass surface as mobile notifications.
+.sadar-auth-terms-modal .modal-content {
+    border: 1px solid rgba(255, 255, 255, 0.96) !important;
+    outline: 1px solid rgba(30, 58, 138, 0.12);
+    outline-offset: -1px;
+    overflow: hidden;
+    border-radius: 24px;
+    color: #172033;
+    background:
+        radial-gradient(circle at 90% -18%, rgba(30, 58, 138, 0.07), transparent 42%),
+        rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 28px 72px rgba(15, 23, 42, 0.24), inset 0 1px 0 #ffffff !important;
+    backdrop-filter: blur(16px) saturate(125%);
+    -webkit-backdrop-filter: blur(16px) saturate(125%);
+}
+
+.sadar-auth-terms-modal :where(.modal-header, .modal-body) {
+    border-color: rgba(30, 58, 138, 0.1) !important;
+    color: #172033 !important;
+    background: transparent !important;
+}
+
+.sadar-auth-terms-modal .modal-title,
+.sadar-auth-terms-modal .modal-body :where(h1, h2, h3, h4, h5, h6, strong) {
+    color: #172033 !important;
+}
+
+.sadar-auth-terms-modal .modal-body :where(p, .text-muted) {
+    color: #5f6f83 !important;
+}
+
+.sadar-auth-terms-modal .modal-body h5 {
+    color: #1e3a8a !important;
+}
+
+.sadar-auth-terms-backdrop.show {
+    background: #172033;
+    opacity: 0.4;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+html[data-bs-theme="dark"] .sadar-auth-terms-modal .modal-content {
+    border-color: rgba(165, 180, 202, 0.18) !important;
+    outline-color: rgba(2, 6, 23, 0.46);
+    color: #f4f7fb;
+    background:
+        radial-gradient(circle at 90% -18%, rgba(30, 58, 138, 0.28), transparent 42%),
+        rgba(10, 24, 42, 0.98) !important;
+    box-shadow: 0 30px 76px rgba(0, 4, 15, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+
+html[data-bs-theme="dark"] .sadar-auth-terms-modal :where(.modal-header, .modal-body) {
+    border-color: rgba(165, 180, 202, 0.14) !important;
+    color: #f4f7fb !important;
+}
+
+html[data-bs-theme="dark"] .sadar-auth-terms-modal .modal-title,
+html[data-bs-theme="dark"] .sadar-auth-terms-modal .modal-body :where(h1, h2, h3, h4, h5, h6, strong) {
+    color: #f4f7fb !important;
+}
+
+html[data-bs-theme="dark"] .sadar-auth-terms-modal .modal-body :where(p, .text-muted) {
+    color: #a9b8ca !important;
+}
+
+html[data-bs-theme="dark"] .sadar-auth-terms-modal .modal-body h5 {
+    color: #c8d5f5 !important;
+}
+
+@media (max-width: 575.98px) {
+    .sadar-auth-terms-modal .modal-dialog {
+        display: flex;
+        min-height: 100dvh;
+        align-items: flex-end;
+        margin: 0 !important;
+    }
+
+    .sadar-auth-terms-modal .modal-content {
+        max-height: 84dvh;
+        border-radius: 24px 24px 0 0 !important;
+    }
+
+    .sadar-auth-terms-modal .modal-header {
+        padding: 1rem 1.1rem 0.8rem;
+    }
+
+    .sadar-auth-terms-modal .modal-body {
+        max-height: none !important;
+        padding: 1rem 1.1rem calc(1rem + env(safe-area-inset-bottom)) !important;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sadar-auth-cover {
+        position: fixed;
+        inset: 0;
+        display: block !important;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #ffffff;
+
+        > .bg-overlay {
+            display: none;
+        }
+
+        .sadar-auth-content,
+        .container,
+        .container > .row,
+        .container > .row > [class*="col-"] {
+            width: 100%;
+            height: 100%;
+            min-height: 0 !important;
+            padding: 0;
+            margin: 0;
+            overflow: hidden !important;
+        }
+
+        .sadar-auth-card {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            padding: 0;
+            overflow: hidden !important;
+            border-radius: 0;
+            background: #ffffff;
+            box-shadow: none;
+
+            > .row {
+                display: grid;
+                grid-template-rows: 152px minmax(0, 1fr);
+                width: 100%;
+                height: 100%;
+                min-height: 0;
+                margin: 0;
+            }
+        }
+
+        .sadar-auth-visual-panel {
+            display: block !important;
+            width: 100%;
+            height: 152px;
+            min-height: 0;
+            padding: 0;
+            overflow: visible;
+        }
+
+        .sadar-auth-visual {
+            width: 100%;
+            height: 176px !important;
+            min-height: 176px;
+            padding: 0.6rem 0.7rem 1.7rem !important;
+            overflow: hidden;
+            border-radius: 0 0 30px 30px;
+            background: var(--sadar-auth-brand) !important;
+            box-shadow: 0 18px 42px rgba(30, 58, 138, 0.24);
+        }
+
+        .sadar-auth-visual::after {
+            border-radius: 0 0 30px 30px;
+        }
+
+        .sadar-auth-quote {
+            width: min(100%, 520px);
+            margin: 0 auto;
+            padding: 0 !important;
+
+            p {
+                display: -webkit-box;
+                overflow: hidden;
+                font-size: clamp(0.86rem, 3.65vw, 1rem) !important;
+                line-height: 1.32 !important;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 3;
+            }
+
+            footer {
+                margin-top: 0.5rem !important;
+                font-size: 0.65rem !important;
+            }
+        }
+
+        .sadar-auth-quote-glass {
+            min-height: 131px;
+            padding: 0.58rem 0.75rem 0.52rem;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.13);
+            box-shadow: 0 12px 30px rgba(30, 58, 138, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+            backdrop-filter: blur(20px) saturate(125%);
+            -webkit-backdrop-filter: blur(20px) saturate(125%);
+        }
+
+        .sadar-auth-quote-kicker {
+            margin-bottom: 0.45rem;
+            font-size: 0.58rem;
+        }
+
+        .sadar-auth-quote-symbol {
+            width: 25px;
+            height: 25px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+        }
+
+        .sadar-auth-quote-content {
+            min-height: 54px;
+        }
+
+        .sadar-auth-quote-progress {
+            margin-top: 0.42rem;
+        }
+
+        .sadar-auth-form-panel {
+            position: relative;
+            top: -16px;
+            z-index: 3;
+            display: block;
+            align-self: stretch;
+            width: calc(100% - 16px);
+            max-width: 560px;
+            height: calc(100% + 16px);
+            min-height: 0;
+            max-height: none;
+            margin: 0 auto;
+            padding: 0.9rem 0.25rem calc(0.8rem + env(safe-area-inset-bottom));
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            overscroll-behavior-y: contain;
+            scrollbar-width: none;
+            border: 1px solid rgba(30, 58, 138, 0.1);
+            border-bottom: 0;
+            border-radius: 26px 26px 0 0;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: 0 -10px 34px rgba(30, 58, 138, 0.12), inset 0 1px 0 #ffffff;
+            backdrop-filter: blur(24px) saturate(115%);
+            -webkit-backdrop-filter: blur(24px) saturate(115%);
+            --sadar-auth-content-width: #{min(calc(100% - 32px), 440px)};
+            --sadar-auth-content-padding: 0;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            &::before {
+                display: none;
+            }
+
+            .form-control {
+                min-height: 44px;
+                border-color: rgba(30, 58, 138, 0.2);
+                border-radius: 12px;
+                background: #ffffff;
+                box-shadow: 0 4px 14px rgba(30, 58, 138, 0.04);
+
+                &:focus {
+                    border-color: var(--sadar-auth-brand);
+                    background: #ffffff;
+                    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+                    transform: none;
+                }
+            }
+
+            .btn-success {
+                min-height: 44px;
+                border-radius: 12px;
+                box-shadow: 0 9px 22px rgba(30, 58, 138, 0.2);
+            }
+
+            .auth-pass-inputgroup .password-toggle-btn {
+                top: 2px;
+                right: 2px;
+                width: 40px;
+                height: 40px;
+                color: var(--sadar-auth-brand);
+            }
+
+            .mb-3 {
+                margin-bottom: 0.65rem !important;
+            }
+
+            .mb-4 {
+                margin-bottom: 0.8rem !important;
+            }
+
+            .mt-4,
+            .mt-5 {
+                margin-top: 0.8rem !important;
+            }
+        }
+
+        .sadar-auth-panel-logo {
+            align-items: center;
+            margin: 0 auto 0.65rem;
+
+            img {
+                display: block;
+                width: auto;
+                height: 27px;
+                object-fit: contain;
+            }
+        }
+
+        .sadar-auth-wordmark {
+            color: var(--sadar-auth-brand);
+            font-size: 1.35rem;
+        }
+
+        &.sadar-auth-login .sadar-auth-form-panel {
+            justify-content: flex-start;
+        }
+
+        &.sadar-auth-login .sadar-auth-form-body .d-flex.align-items-center.justify-content-between {
+            flex-direction: row;
+            align-items: center !important;
+        }
+
+        .sadar-auth-form-content {
+            padding: 0 !important;
+        }
+
+        .sadar-auth-form-heading {
+            h5 {
+                margin-bottom: 0.2rem;
+                color: var(--sadar-auth-brand) !important;
+                font-size: 1.05rem;
+            }
+
+            p {
+                margin-bottom: 0;
+                font-size: 0.78rem;
+                line-height: 1.35;
+            }
+        }
+
+        .sadar-auth-form-body {
+            margin-top: 0.7rem !important;
+        }
+
+        .sadar-auth-switch {
+            margin-top: 0.85rem !important;
+            font-size: 0.78rem;
+        }
+
+        .form-label,
+        .form-check-label {
+            font-size: 0.78rem;
+        }
+
+        .sadar-auth-terms-check {
+            display: grid !important;
+            grid-template-columns: 18px minmax(0, 1fr);
+            align-items: start;
+            gap: 0.45rem;
+            padding-left: 0;
+
+            .form-check-input {
+                float: none;
+                width: 17px;
+                height: 17px;
+                margin: 0.12rem 0 0;
+            }
+        }
+
+        .sadar-auth-terms-copy {
+            min-width: 0;
+            color: #64748b;
+            font-size: clamp(0.67rem, 2.9vw, 0.73rem);
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .sadar-auth-terms-link {
+            display: inline;
+            padding: 0;
+            border: 0;
+            color: var(--sadar-auth-brand);
+            background: transparent;
+            font: inherit;
+            font-weight: 650;
+            text-align: left;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .sadar-auth-terms-link:focus-visible {
+            border-radius: 3px;
+            outline: 3px solid rgba(30, 58, 138, 0.16);
+            outline-offset: 2px;
+        }
+
+        .sadar-auth-terms-error {
+            margin-top: -0.45rem;
+            color: #dc2626;
+            font-size: 0.7rem;
+            line-height: 1.35;
+        }
+
+        > .footer {
+            display: none !important;
+        }
+    }
+}
+
+@media (max-width: 991.98px) and (max-height: 700px) {
+    .sadar-auth-cover {
+        .sadar-auth-card > .row {
+            grid-template-rows: 104px minmax(0, 1fr);
+        }
+
+        .sadar-auth-visual-panel {
+            height: 104px;
+        }
+
+        .sadar-auth-visual {
+            height: 124px !important;
+            min-height: 124px;
+            padding: 0.35rem 0.55rem 1.2rem !important;
+        }
+
+        .sadar-auth-quote-glass {
+            min-height: 90px;
+            padding: 0.42rem 0.58rem 0.36rem;
+            border-radius: 16px;
+        }
+
+        .sadar-auth-quote-kicker {
+            margin-bottom: 0.28rem;
+        }
+
+        .sadar-auth-quote-symbol {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sadar-auth-quote-content {
+            min-height: 34px;
+        }
+
+        .sadar-auth-quote p {
+            font-size: 0.72rem !important;
+            line-height: 1.2 !important;
+            -webkit-line-clamp: 2;
+        }
+
+        .sadar-auth-quote footer {
+            margin-top: 0.16rem !important;
+            font-size: 0.54rem !important;
+        }
+
+        .sadar-auth-quote-progress {
+            margin-top: 0.12rem;
+        }
+
+        .sadar-auth-form-panel {
+            padding-top: 0.68rem;
+            padding-bottom: calc(0.55rem + env(safe-area-inset-bottom));
+
+            .form-control {
+                min-height: 42px;
+            }
+
+            .mb-3 {
+                margin-bottom: 0.5rem !important;
+            }
+
+            .mb-4,
+            .mt-4,
+            .mt-5 {
+                margin-top: 0.6rem !important;
+                margin-bottom: 0.6rem !important;
+            }
+        }
+
+        .sadar-auth-panel-logo {
+            margin-bottom: 0.5rem;
+
+            img {
+                height: 24px;
+            }
+        }
+
+        .sadar-auth-wordmark {
+            font-size: 1.22rem;
+        }
+
+        .sadar-auth-form-body,
+        .sadar-auth-switch {
+            margin-top: 0.55rem !important;
+        }
+    }
+}
+
+// Final mobile composition: readable rotating quote, fixed viewport shell and
+// a compact form surface that remains usable on short browser viewports.
+@media (max-width: 991.98px) {
+    .sadar-auth-cover {
+        .sadar-auth-card > .row {
+            grid-template-rows: 232px minmax(0, 1fr);
+        }
+
+        &.sadar-auth-login .sadar-auth-card > .row {
+            grid-template-rows: 248px minmax(0, 1fr);
+        }
+
+        .sadar-auth-visual-panel {
+            height: 220px;
+        }
+
+        &.sadar-auth-login .sadar-auth-visual-panel {
+            height: 236px;
+        }
+
+        .sadar-auth-visual {
+            height: 220px !important;
+            min-height: 220px;
+            padding: 0.8rem 0.85rem !important;
+            border-radius: 0 0 30px 30px;
+        }
+
+        &.sadar-auth-login .sadar-auth-visual {
+            height: 236px !important;
+            min-height: 236px;
+        }
+
+        .sadar-auth-quote-glass {
+            min-height: 190px;
+            padding: 0.9rem 0.95rem 0.78rem;
+            border-radius: 22px;
+        }
+
+        &.sadar-auth-login .sadar-auth-quote-glass {
+            min-height: 206px;
+        }
+
+        .sadar-auth-quote-kicker {
+            margin-bottom: 0.62rem;
+            font-size: 0.63rem;
+        }
+
+        .sadar-auth-quote-symbol {
+            width: 28px;
+            height: 28px;
+            font-size: 0.88rem;
+        }
+
+        .sadar-auth-quote-content {
+            min-height: 94px;
+        }
+
+        .sadar-auth-quote p {
+            display: block;
+            overflow: visible;
+            font-size: clamp(1.08rem, 4.8vw, 1.28rem) !important;
+            font-weight: 700;
+            line-height: 1.32 !important;
+            -webkit-line-clamp: initial;
+        }
+
+        .sadar-auth-quote footer {
+            margin-top: 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+
+        .sadar-auth-quote-progress {
+            margin-top: 0.48rem;
+        }
+
+        .sadar-auth-form-panel {
+            top: 0;
+            justify-content: flex-start;
+            width: calc(100% - 18px);
+            height: 100%;
+            padding: 1rem 0.3rem calc(0.85rem + env(safe-area-inset-bottom));
+            border-radius: 28px 28px 0 0;
+            --sadar-auth-content-width: #{min(calc(100% - 30px), 440px)};
+        }
+
+        &.sadar-auth-login .sadar-auth-form-panel {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .sadar-auth-panel-logo {
+            flex: 0 0 auto;
+            margin-bottom: 0.7rem;
+
+            img {
+                height: 30px;
+            }
+        }
+
+        .sadar-auth-form-heading {
+            h5 {
+                font-size: 1.15rem;
+            }
+
+            p {
+                font-size: 0.8rem;
+            }
+        }
+
+        .sadar-auth-form-panel .form-control {
+            min-height: 46px;
+            font-size: 0.9rem;
+        }
+
+        .sadar-auth-form-panel .btn-success {
+            min-height: 46px;
+        }
+
+        .sadar-auth-switch {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+@media (max-width: 991.98px) and (max-height: 700px) {
+    .sadar-auth-cover {
+        .sadar-auth-card > .row,
+        &.sadar-auth-login .sadar-auth-card > .row {
+            grid-template-rows: 176px minmax(0, 1fr);
+        }
+
+        .sadar-auth-visual-panel,
+        &.sadar-auth-login .sadar-auth-visual-panel {
+            height: 164px;
+        }
+
+        .sadar-auth-visual,
+        &.sadar-auth-login .sadar-auth-visual {
+            height: 164px !important;
+            min-height: 164px;
+            padding: 0.55rem 0.65rem !important;
+        }
+
+        .sadar-auth-quote-glass,
+        &.sadar-auth-login .sadar-auth-quote-glass {
+            min-height: 140px;
+            padding: 0.62rem 0.72rem 0.52rem;
+            border-radius: 18px;
+        }
+
+        .sadar-auth-quote-kicker {
+            margin-bottom: 0.38rem;
+            font-size: 0.56rem;
+        }
+
+        .sadar-auth-quote-symbol {
+            width: 23px;
+            height: 23px;
+        }
+
+        .sadar-auth-quote-content {
+            min-height: 68px;
+        }
+
+        .sadar-auth-quote p {
+            display: -webkit-box;
+            overflow: hidden;
+            font-size: clamp(1rem, 4.1vw, 1.05rem) !important;
+            line-height: 1.25 !important;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+
+        .sadar-auth-quote footer {
+            margin-top: 0.25rem !important;
+            font-size: 0.62rem !important;
+        }
+
+        .sadar-auth-quote-progress {
+            margin-top: 0.22rem;
+        }
+
+        .sadar-auth-form-panel {
+            top: 0;
+            height: 100%;
+            padding-top: 0.72rem;
+            padding-bottom: calc(0.62rem + env(safe-area-inset-bottom));
+        }
+
+        &.sadar-auth-login .sadar-auth-form-panel {
+            justify-content: flex-start;
+        }
+
+        .sadar-auth-panel-logo {
+            margin-bottom: 0.5rem;
+
+            img {
+                height: 25px;
+            }
+        }
+
+        .sadar-auth-form-heading h5 {
+            font-size: 1.04rem;
+        }
+
+        .sadar-auth-form-panel .form-control,
+        .sadar-auth-form-panel .btn-success {
+            min-height: 42px;
+        }
+    }
+}

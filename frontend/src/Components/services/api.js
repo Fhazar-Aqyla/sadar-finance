@@ -232,23 +232,11 @@ export const authApi = {
   register: (payload) =>
     isSadarMockDataScenario
       ? mockApi.auth.register(payload)
-      : apiClient
-          .post("/auth/register", payload)
-          .then(unwrapData)
-          .catch(() => mockApi.auth.register(payload)),
+      : apiClient.post("/auth/register", payload).then(unwrapData),
   login: (payload) =>
     isSadarMockDataScenario
       ? mockApi.auth.login(payload)
-      : apiClient
-          .post("/auth/login", payload)
-          .then(unwrapData)
-          .catch((err) => {
-            console.warn(
-              "Backend login unavailable, fallback to mock auth:",
-              err.message
-            );
-            return mockApi.auth.login(payload);
-          }),
+      : apiClient.post("/auth/login", payload).then(unwrapData),
   forgotPassword: (payload) =>
     isSadarMockDataScenario
       ? mockApi.auth.forgotPassword(payload)

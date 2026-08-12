@@ -1,0 +1,43 @@
+// 
+// type.scss
+//
+
+// Blockquote
+.custom-blockquote {
+    &.blockquote {
+        padding: 16px;
+        border-left: 3px solid;
+        
+        &.blockquote-outline{
+            background-color: var(--#{$prefix}secondary-bg) !important;
+            border: 1px solid;
+            border-left: 3px solid;
+        }
+    }
+}
+
+@each $color,
+$value in $theme-colors {
+    .custom-blockquote {
+        &.blockquote {
+            &.blockquote-#{$color} {
+                border-color: var(--#{$prefix}#{$color});
+                background-color: var(--#{$prefix}#{$color}-bg-subtle);
+
+                .blockquote-footer {
+                    color: var(--#{$prefix}#{$color}-text-emphasis);
+                }
+            }
+
+            &.blockquote-outline{
+                &.blockquote-#{$color} {
+                    border-color: var(--#{$prefix}#{$color});
+
+                    .blockquote-footer {
+                        color: var(--#{$prefix}#{$color}-text-emphasis);
+                    }
+                }
+            }
+        }
+    }
+}

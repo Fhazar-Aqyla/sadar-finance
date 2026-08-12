@@ -1,0 +1,201 @@
+// Dark color mode variables
+//
+// Custom variables for the `[data-bs-theme="dark"]` theme. Use this as a starting point for your own custom color modes by creating a new theme-specific file like `_variables-dark.scss` and adding the variables you need.
+
+//
+// Global colors
+//
+
+$body-bg-dark:                                                      #1a1d21;
+
+// scss-docs-start sass-dark-mode-vars
+// scss-docs-start theme-text-body-variables
+$primary-text-emphasis-dark:                                        tint-color($primary, 20%);
+$secondary-text-emphasis-dark:                                      tint-color($secondary, 20%);
+$success-text-emphasis-dark:                                        tint-color($success, 20%);
+$info-text-emphasis-dark:                                           tint-color($info, 20%);
+$warning-text-emphasis-dark:                                        tint-color($warning, 20%);
+$danger-text-emphasis-dark:                                         tint-color($danger, 20%);
+$light-text-emphasis-dark:                                          tint-color($body-bg-dark, 25%);
+$dark-text-emphasis-dark:                                           tint-color($body-bg-dark, 30%);
+// scss-docs-end theme-text-body-variables
+
+// scss-docs-start theme-bg-subtle-dark-variables
+$primary-bg-subtle-dark:                                            rgba($primary, 0.15);
+$secondary-bg-subtle-dark:                                          rgba($secondary, 0.15);
+$success-bg-subtle-dark:                                            rgba($success, 0.15);
+$info-bg-subtle-dark:                                               rgba($info, 0.15);
+$warning-bg-subtle-dark:                                            rgba($warning, 0.15);
+$danger-bg-subtle-dark:                                             rgba($danger, 0.15);
+$light-bg-subtle-dark:                                              tint-color($body-bg-dark, 5%);
+$dark-bg-subtle-dark:                                               tint-color($body-bg-dark, 10%);
+// scss-docs-end theme-bg-subtle-dark-variables
+
+// scss-docs-start theme-border-subtle-dark-variables
+$primary-border-subtle-dark:                                        shade-color($primary, 35%);
+$secondary-border-subtle-dark:                                      shade-color($secondary, 50%);
+$success-border-subtle-dark:                                        shade-color($success, 50%);
+$info-border-subtle-dark:                                           shade-color($info, 50%);
+$warning-border-subtle-dark:                                        shade-color($warning, 50%);
+$danger-border-subtle-dark:                                         shade-color($danger, 50%);
+$light-border-subtle-dark:                                          tint-color($body-bg-dark, 12%);
+$dark-border-subtle-dark:                                           tint-color($body-bg-dark, 15%);
+// scss-docs-end theme-border-subtle-dark-variables
+
+$body-color-dark:                                                   #ced4da;
+$body-secondary-color-dark:                                         #878a99;
+$body-secondary-bg-dark:                                            #212529;
+$body-tertiary-color-dark:                                          rgba($body-color-dark, .75);
+$body-tertiary-bg-dark:                                             tint-color($body-bg-dark, 7%);
+$body-emphasis-color-dark:                                          $white;
+$border-color-dark:                                                 #32383e;
+$border-color-translucent-dark:                                     #32383e;
+$headings-color-dark:                                               #ced4da;
+$link-color-dark:                                                   tint-color($primary, 80%);
+$link-hover-color-dark:                                             shift-color($link-color-dark, -$link-shade-percentage);
+$code-color-dark:                                                   $code-color;
+
+//custom only default themes colors
+$light-dark:                                                        tint-color($body-bg-dark, 6%);
+$dark-color:                                                        tint-color($body-bg-dark, 10%);
+
+$dropdown-bg-dark:                                                  #292e33;
+$dropdown-link-color-dark:                                          #adb5bd;
+$dropdown-link-hover-color-dark:                                    #b9bfc4;
+$dropdown-link-hover-bg-dark:                                       #2f343a;
+$dropdown-link-hover-bg-dark:                                       #2f343a;
+$dropdown-border-width-dark:                                        1px;
+$dropdown-link-active-color-dark:                                   #adb5bd;
+$dropdown-link-active-bg-dark:                                      #2f343a;
+
+$input-bg-custom-dark:                                              #262a2f;
+$input-border-custom-dark:                                          #2a2f34;
+
+//
+// Forms
+//
+
+$form-select-indicator-color-dark:                                  $body-color-dark;
+$form-select-indicator-dark:                                        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>");
+
+$form-switch-color-dark:                                            rgba($white, .25);
+$form-switch-bg-image-dark:                                         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color-dark}'/></svg>");
+
+// scss-docs-start form-validation-colors-dark
+$form-valid-color-dark:                                             $green-400;
+$form-valid-border-color-dark:                                      $green-400;
+$form-invalid-color-dark:                                           $red-400;
+$form-invalid-border-color-dark:                                    $red-400;
+// scss-docs-end form-validation-colors-dark
+
+
+//
+// Accordion
+//
+
+$accordion-icon-color-dark:                                         $primary-text-emphasis-dark;
+$accordion-icon-active-color-dark:                                  $primary-text-emphasis-dark;
+
+$accordion-button-icon-dark:                                        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");
+$accordion-button-active-icon-dark:                                 url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");
+// scss-docs-end sass-dark-mode-vars
+
+
+/*********************variables-custom dark Mode***************************/
+
+// Horizontal Menu
+$topnav-bg-dark:                                                    #272b30;
+$topnav-item-color-dark:                                            #878a99;
+$topnav-item-active-color-dark:                                     $white;
+
+// Topbar
+$header-bg-dark:                                                    #292e32;
+$header-border-dark:                                                #292e32;
+$header-item-color-dark:                                            #e9ecef;
+$header-item-bg-dark:                                               #31363c;
+$header-item-sub-color-dark:                                        #878a99;
+$topbar-user-bg-dark:                                               #31373c;
+$topbar-search-bg-dark:                                             #202328;
+$topbar-search-color-dark:                                          $white;
+
+//page-title
+$page-title-border-dark:                                            #32383e;
+$page-title-box-shadow-dark:                                        0 1px 2px rgba(56,65,74,0.15);
+
+// Topbar - dark
+$dark-header-bg-dark:                                               #2a2f34;
+$dark-header-border-dark:                                           #2a2f34;
+$dark-header-item-color-dark:                                       rgba($white, .85);
+$dark-header-item-bg-dark:                                          #363b42;
+$dark-header-item-sub-color-dark:                                   #b0c4d9; 
+$dark-topbar-user-bg-dark:                                          #31373c;
+$dark-topbar-search-bg-dark:                                        rgba($white, .05);
+$dark-topbar-search-color-dark:                                     $white;
+
+//two column
+$twocolumn-menu-box-shadow-dark:                                    0 2px 4px rgba(15,34,58,0.12);
+
+// boxed 
+$boxed-body-bg-dark:                                                darken($body-bg-dark, 4%);
+
+// Footer
+$footer-bg-dark:                                                    #212529;
+$footer-color-dark:                                                 #878a99;
+
+//sidebar light 
+$vertical-menu-bg-dark:                                             $white;
+$vertical-menu-border-dark:                                         $white;
+$vertical-menu-item-color-dark:                                     darken($gray-600, 10%);
+$vertical-menu-item-bg-dark:                                        rgba($primary, .15);
+$vertical-menu-item-hover-color-dark:                               $primary;
+$vertical-menu-item-active-color-dark:                              $primary;
+$vertical-menu-item-active-bg-dark:                                 rgba($primary, .15);
+$vertical-menu-sub-item-color-dark:                                 darken($gray-600, 4%);
+$vertical-menu-sub-item-hover-color-dark:                           $primary;
+$vertical-menu-sub-item-active-color-dark:                          $primary;
+$vertical-menu-title-color-dark:                                    #919da9;
+
+//sidebar dark 
+$dark-vertical-menu-bg-dark:                                        #212428;
+$dark-vertical-menu-border-dark:                                    #212428;
+$dark-vertical-menu-item-color-dark:                                #9aaab3;
+$dark-vertical-menu-item-bg-dark:                                   rgba($white, .15);
+$dark-vertical-menu-item-hover-color-dark:                          $white;
+$dark-vertical-menu-item-active-color-dark:                         $white;
+$dark-vertical-menu-item-active-bg-dark:                            rgba($white, .15);
+$dark-vertical-menu-sub-item-color-dark:                            #9aaab3;
+$dark-vertical-menu-sub-item-hover-color-dark:                      $white;
+$dark-vertical-menu-sub-item-active-color-dark:                     $white;
+$dark-vertical-menu-title-color-dark:                               #aeafaf;
+$dark-twocolumn-menu-iconview-bg-dark:                              #1d2024;
+
+//sidebar gradient
+$vertical-menu-item-color-gradient-dark:                            rgba($white, .5);
+$vertical-menu-item-bg-gradient-dark:                               rgba($white, .15);
+$vertical-menu-item-hover-color-gradient-dark:                      $white;
+$vertical-menu-item-active-color-gradient-dark:                     $white;
+$vertical-menu-item-active-bg-gradient-dark:                        rgba($white, .15);
+$vertical-menu-sub-item-color-gradient-dark:                        rgba($white, .5);
+$vertical-menu-sub-item-hover-color-gradient-dark:                  $white;
+$vertical-menu-sub-item-active-color-gradient-dark:                 $white;
+$vertical-menu-title-color-gradient-dark:                           rgba($white, .5);
+
+//gradient one
+$vertical-menu-bg-gradient-dark:                                    linear-gradient(to right, var(--#{$prefix}primary), var(--#{$prefix}success));
+$vertical-menu-border-gradient-dark:                                var(--#{$prefix}success);
+$twocolumn-menu-iconview-bg-gradient-dark:                          var(--#{$prefix}primary);
+
+//gradient-2
+$vertical-menu-bg-gradient-2-dark:                                  linear-gradient(to right, var(--#{$prefix}info), var(--#{$prefix}secondary));
+$vertical-menu-border-gradient-2-dark:                              var(--#{$prefix}secondary);
+$twocolumn-menu-iconview-bg-gradient-2-dark:                        var(--#{$prefix}info);
+
+//gradient-3
+$vertical-menu-bg-gradient-3-dark:                                  linear-gradient(to right, var(--#{$prefix}info), var(--#{$prefix}success));
+$vertical-menu-border-gradient-3-dark:                              var(--#{$prefix}success);
+$twocolumn-menu-iconview-bg-gradient-3-dark:                        var(--#{$prefix}info);
+
+//gradient-4
+$vertical-menu-bg-gradient-4-dark:                                  linear-gradient(to right, #1a1d21, var(--#{$prefix}primary));
+$vertical-menu-border-gradient-4-dark:                              var(--#{$prefix}primary);
+$twocolumn-menu-iconview-bg-gradient-4-dark:                        #1a1d21;

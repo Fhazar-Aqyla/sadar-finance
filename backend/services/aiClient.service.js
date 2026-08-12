@@ -78,15 +78,24 @@ class AiClientService {
     });
   }
 
-  async _request(endpoint, options) {
+  async _request(endpoint, options = {}) {
     this._assertFetchSupport();
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), config.ai.timeoutMs);
 
+    const headers = {
+      ...(options.headers || {}),
+    };
+    if (config.ai.apiKey) {
+      headers['Authorization'] = `Bearer ${config.ai.apiKey}`;
+      headers['x-api-key'] = config.ai.apiKey;
+    }
+
     try {
       const response = await fetch(this._buildUrl(endpoint), {
         ...options,
+        headers,
         signal: controller.signal,
       });
 
