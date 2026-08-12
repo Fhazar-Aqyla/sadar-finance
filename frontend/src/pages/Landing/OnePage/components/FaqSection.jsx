@@ -49,8 +49,8 @@ export const FaqSection = () => {
       className="py-16 lg:py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
     >
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3">
-          <HelpCircle className="w-3.5 h-3.5 text-[#25a0e2]" />
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
+          <HelpCircle className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Pertanyaan Umum
         </div>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -71,8 +71,8 @@ export const FaqSection = () => {
         >
           {faqs.map((faq) => (
             <AccordionItem key={faq.id} value={faq.id}>
-              <AccordionTrigger>{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
+              <AccordionTrigger className="text-left hover:text-[#1E3A8A] dark:hover:text-sky-400 font-semibold">{faq.question}</AccordionTrigger>
+              <AccordionContent className="text-slate-600 dark:text-slate-400 leading-relaxed">{faq.answer}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
@@ -80,3 +80,4 @@ export const FaqSection = () => {
     </section>
   );
 };
+

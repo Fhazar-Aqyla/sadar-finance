@@ -29,19 +29,18 @@ export const BentoFeatures = () => {
     restDelta: 0.001,
   });
 
-  // Parallax offsets for cards & background - synchronized symmetrically to prevent misaligned staggering
-  const yBg = useTransform(smoothProgress, [0, 1], [-100, 100]);
-  const yCard1 = useTransform(smoothProgress, [0, 1], [25, -25]);
-  const yBottomGrid = useTransform(smoothProgress, [0, 1], [35, -35]);
+  // Subtle Parallax offsets for cards
+  const yCard1 = useTransform(smoothProgress, [0, 1], [20, -20]);
+  const yBottomGrid = useTransform(smoothProgress, [0, 1], [30, -30]);
 
   const getScoreData = (val) => {
     if (val <= 45) {
       return {
         label: "Perlu Perhatian",
         tag: "Kritis",
-        color: "text-rose-500",
-        stroke: "#f43f5e",
-        glow: "shadow-rose-500/20 border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900",
+        color: "text-rose-600",
+        stroke: "#e11d48",
+        glow: "border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900",
         recommendation:
           "Pangkas kuota Wants & lunasi utang bunga tinggi segera.",
         factors: [
@@ -56,9 +55,9 @@ export const BentoFeatures = () => {
       return {
         label: "Cukup Sehat",
         tag: "Waspada",
-        color: "text-amber-500",
-        stroke: "#f59e0b",
-        glow: "shadow-amber-500/20 border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900",
+        color: "text-amber-600",
+        stroke: "#d97706",
+        glow: "border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900",
         recommendation: "Tingkatkan alokasi tabungan rutin ke 20% penghasilan.",
         factors: [
           { name: "Rasio Tabungan", val: "20%", status: "Cukup", ok: true },
@@ -76,9 +75,9 @@ export const BentoFeatures = () => {
     return {
       label: "Kondisi Sehat",
       tag: "Prima",
-      color: "text-emerald-500",
-      stroke: "#10b981",
-      glow: "shadow-emerald-500/20 border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-900",
+      color: "text-emerald-600",
+      stroke: "#059669",
+      glow: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-900",
       recommendation: "Alokasi 50/30/20 optimal & cadangan darurat terpenuhi.",
       factors: [
         { name: "Rasio Tabungan", val: "35%", status: "Optimal", ok: true },
@@ -95,7 +94,6 @@ export const BentoFeatures = () => {
   const radius = 70;
   const strokeWidth = 10;
   const circumference = 2 * Math.PI * radius;
-  // Use a 220 degree arc (220/360 fraction of circle)
   const arcLength = circumference * (220 / 360);
   const strokeDashoffset = arcLength - arcLength * ((activeScore - 20) / 80);
 
@@ -110,27 +108,17 @@ export const BentoFeatures = () => {
     <section
       id="features"
       ref={containerRef}
-      className="py-16 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
-      {/* Background Parallax Light Mesh */}
-      <motion.div
-        style={{ y: yBg }}
-        className="pointer-events-none absolute top-1/3 -left-48 w-96 h-96 bg-gradient-to-tr from-cyan-400/20 to-sky-300/10 blur-3xl rounded-full -z-10"
-      />
-      <motion.div
-        style={{ y: yBg }}
-        className="pointer-events-none absolute bottom-10 -right-48 w-96 h-96 bg-gradient-to-tr from-teal-400/20 to-sky-300/10 blur-3xl rounded-full -z-10"
-      />
-
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-sky-100 dark:border-sky-900/40">
-          <Sparkles className="w-3.5 h-3.5 text-[#25a0e2]" />
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
+          <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Fitur Unggulan
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
           Teknologi Cerdas yang Bekerja{" "}
-          <span className="bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] bg-clip-text text-transparent">
+          <span className="text-[#1E3A8A] dark:text-sky-400">
             Tanpa Beban Pikiran.
           </span>
         </h2>
@@ -144,10 +132,10 @@ export const BentoFeatures = () => {
       <div className="space-y-6 lg:space-y-8">
         {/* Card 1: Interactive OCR Scanner (Full-Width Large Card) */}
         <motion.div style={{ y: yCard1 }}>
-          <SpotlightCard className="p-6 sm:p-8 lg:p-10 border-slate-200/80 dark:border-slate-800 shadow-md shadow-sky-500/5">
+          <SpotlightCard className="p-6 sm:p-8 lg:p-10 border-slate-200/90 dark:border-slate-800 shadow-sm">
             <div className="max-w-2xl mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-50 text-[#1a85be] text-xs font-bold dark:bg-sky-950/60 dark:text-sky-300 mb-2.5 border border-sky-100 dark:border-sky-900/30">
-                <Scan className="w-3.5 h-3.5 text-[#25a0e2]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 mb-2.5 border border-blue-100 dark:border-blue-900/30">
+                <Scan className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                 OCR & NLP Scanner
               </div>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -169,16 +157,16 @@ export const BentoFeatures = () => {
           className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch"
         >
           {/* Card 2: Interactive Financial Health Score */}
-          <SpotlightCard className="h-full flex flex-col justify-between p-6 sm:p-8 border-slate-200/80 dark:border-slate-800 shadow-md shadow-sky-500/5">
+          <SpotlightCard className="h-full flex flex-col justify-between p-6 sm:p-8 border-slate-200/90 dark:border-slate-800 shadow-sm">
             <div>
               {/* Header Badge & Title */}
               <div className="flex items-center justify-between gap-2 mb-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-50 text-[#1a85be] text-xs font-bold dark:bg-sky-950/60 dark:text-sky-300 border border-sky-100 dark:border-sky-900/30">
-                  <Activity className="w-3.5 h-3.5 text-[#25a0e2]" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30">
+                  <Activity className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                   Financial Health Score
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-900/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-900/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                   Live AI Evaluator
                 </div>
               </div>
@@ -192,15 +180,7 @@ export const BentoFeatures = () => {
               </p>
 
               {/* Modern Radial Gauge & Score Visualization Card */}
-              <div className="my-5 p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-slate-50/90 to-white dark:from-slate-900 dark:to-slate-950 border border-slate-200/90 dark:border-slate-800 shadow-sm relative overflow-hidden">
-                {/* Background soft radial glow based on score */}
-                <div
-                  className="absolute inset-0 opacity-15 pointer-events-none transition-colors duration-500"
-                  style={{
-                    background: `radial-gradient(circle at center 40%, ${scoreData.stroke} 0%, transparent 70%)`,
-                  }}
-                />
-
+              <div className="my-5 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 relative overflow-hidden">
                 {/* SVG Radial Arc Visualizer */}
                 <div className="relative flex flex-col items-center justify-center pt-2">
                   <div className="relative w-44 h-36 flex items-center justify-center">
@@ -266,7 +246,7 @@ export const BentoFeatures = () => {
                 <div className="mt-5 pt-4 border-t border-slate-200/80 dark:border-slate-800">
                   <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">
                     <span>Geser untuk simulasi skor:</span>
-                    <span className="font-bold text-[#25a0e2] bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-md border border-sky-100 dark:border-sky-900/30">
+                    <span className="font-bold text-[#1E3A8A] dark:text-sky-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-100 dark:border-blue-900/30">
                       {activeScore} Poin
                     </span>
                   </div>
@@ -279,12 +259,7 @@ export const BentoFeatures = () => {
                     value={activeScore}
                     onChange={(e) => setActiveScore(Number(e.target.value))}
                     aria-label="Simulasi Skor Finansial"
-                    className="w-full h-2.5 rounded-lg appearance-none cursor-pointer accent-[#25a0e2] dark:accent-[#32ccff] transition-all"
-                    style={{
-                      background: `linear-gradient(to right, ${scoreData.stroke} 0%, ${scoreData.stroke} ${
-                        ((activeScore - 20) / (98 - 20)) * 100
-                      }%, #e2e8f0 ${((activeScore - 20) / (98 - 20)) * 100}%, #e2e8f0 100%)`,
-                    }}
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#1E3A8A] dark:accent-sky-400 transition-all bg-slate-200 dark:bg-slate-800"
                   />
 
                   {/* Quick Preset Buttons */}
@@ -296,8 +271,8 @@ export const BentoFeatures = () => {
                         onClick={() => setActiveScore(preset.score)}
                         className={`flex-1 py-1 px-1.5 text-[11px] font-semibold rounded-lg border transition-all text-center ${
                           activeScore === preset.score
-                            ? "bg-[#25a0e2] text-white border-[#25a0e2] shadow-sm shadow-sky-500/30"
-                            : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-sky-300"
+                            ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm"
+                            : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300"
                         }`}
                       >
                         {preset.label} ({preset.score})
@@ -313,12 +288,12 @@ export const BentoFeatures = () => {
               {scoreData.factors.map((f, i) => (
                 <div
                   key={i}
-                  className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between"
+                  className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-1.5 truncate">
                     <CheckCircle2
                       className={`w-3.5 h-3.5 shrink-0 ${
-                        f.ok ? "text-emerald-500" : "text-rose-500"
+                        f.ok ? "text-emerald-600" : "text-rose-500"
                       }`}
                     />
                     <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
@@ -333,18 +308,18 @@ export const BentoFeatures = () => {
             </div>
           </SpotlightCard>
 
-          {/* Card 3: Stacked AI Alerts & Multi-Wallet Manager (Balanced & Equal Height) */}
+          {/* Card 3: Stacked AI Alerts & Multi-Wallet Manager */}
           <div className="flex flex-col gap-6 lg:gap-8 h-full">
             {/* Subcard A: Predictive Overspending Alert */}
-            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/80 dark:border-slate-800 shadow-md shadow-sky-500/5">
+            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-sm">
               <div>
                 {/* Header Badge */}
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/30">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-bold dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900/30">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                     AI Predictive Engine
                   </div>
-                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
+                  <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40">
                     Sistem Peringatan Dini
                   </span>
                 </div>
@@ -358,22 +333,22 @@ export const BentoFeatures = () => {
                   terlampaui.
                 </p>
 
-                {/* Interactive Simulated Overspending Progress Card */}
-                <div className="mt-4 p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40">
+                {/* Simulated Overspending Progress Card */}
+                <div className="mt-4 p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                     <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
                       Kopi & Kuliner (Wants)
                     </span>
-                    <span className="text-amber-600 dark:text-amber-400 font-bold">
+                    <span className="text-amber-700 dark:text-amber-400 font-bold">
                       82% Terpakai
                     </span>
                   </div>
 
                   {/* Progress bar */}
-                  <div className="w-full h-2.5 bg-amber-100 dark:bg-amber-950/60 rounded-full overflow-hidden mb-2">
+                  <div className="w-full h-2 bg-amber-200/70 dark:bg-amber-950/60 rounded-full overflow-hidden mb-2">
                     <div
-                      className="h-full bg-gradient-to-r from-amber-400 to-rose-500 rounded-full transition-all duration-500"
+                      className="h-full bg-amber-500 rounded-full transition-all duration-500"
                       style={{ width: "82%" }}
                     />
                   </div>
@@ -388,8 +363,8 @@ export const BentoFeatures = () => {
               </div>
 
               {/* AI Proactive Advice Banner */}
-              <div className="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400">
-                <Sparkles className="w-4 h-4 text-[#25a0e2] shrink-0 mt-0.5" />
+              <div className="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400">
+                <Sparkles className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
                   <strong className="text-slate-800 dark:text-slate-200">
                     Saran Cerdas:
@@ -401,15 +376,15 @@ export const BentoFeatures = () => {
             </SpotlightCard>
 
             {/* Subcard B: Multi-Account Management */}
-            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/80 dark:border-slate-800 shadow-md shadow-sky-500/5">
+            <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-sm">
               <div>
                 {/* Header Badge */}
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-50 text-[#1a85be] text-xs font-bold dark:bg-sky-950/60 dark:text-sky-300 border border-sky-100 dark:border-sky-900/30">
-                    <Wallet className="w-3.5 h-3.5 text-[#25a0e2]" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30">
+                    <Wallet className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                     Sinkronisasi Multi-Akun
                   </div>
-                  <span className="text-[11px] font-bold text-[#25a0e2] bg-sky-50 dark:bg-sky-950/50 px-2 py-0.5 rounded-full border border-sky-100 dark:border-sky-900/30">
+                  <span className="text-[11px] font-bold text-[#1E3A8A] bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/30">
                     Semua Terhubung
                   </span>
                 </div>
@@ -424,9 +399,9 @@ export const BentoFeatures = () => {
 
                 {/* Account Balances Visual Row Cards */}
                 <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 hover:border-sky-200 transition-colors">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-sky-400 flex items-center justify-center shrink-0">
                         <Landmark className="w-4 h-4" />
                       </div>
                       <div>
@@ -449,9 +424,9 @@ export const BentoFeatures = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 hover:border-sky-200 transition-colors">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-[#25a0e2] flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-sky-400 flex items-center justify-center shrink-0">
                         <Smartphone className="w-4 h-4" />
                       </div>
                       <div>
@@ -481,7 +456,7 @@ export const BentoFeatures = () => {
                 <span className="text-slate-500 dark:text-slate-400 font-medium">
                   Total Saldo Bersih:
                 </span>
-                <span className="font-extrabold text-sm text-[#1a85be] dark:text-[#32ccff]">
+                <span className="font-extrabold text-sm text-[#1E3A8A] dark:text-sky-400">
                   Rp 15.470.000
                 </span>
               </div>
@@ -492,3 +467,4 @@ export const BentoFeatures = () => {
     </section>
   );
 };
+

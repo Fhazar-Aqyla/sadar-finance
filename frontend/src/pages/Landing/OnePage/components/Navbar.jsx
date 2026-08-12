@@ -35,39 +35,25 @@ export const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm py-3"
+          ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm py-3"
           : "bg-transparent py-5"
       }`}
     >
       {/* Top Scroll Progress Line */}
       <motion.div
         style={{ scaleX }}
-        className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] origin-left z-50"
+        className="absolute top-0 left-0 right-0 h-[2.5px] bg-[#1E3A8A] origin-left z-50"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: 2 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] p-0.5 shadow-md shadow-sky-500/20 flex items-center justify-center transition-transform"
-            >
-              <img
-                src={sadarLogo}
-                alt="SADAR Finance"
-                className="w-full h-full object-contain rounded-lg bg-white"
-              />
-            </motion.div>
-            <div className="flex flex-col">
-              <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-                SADAR <span className="text-[#25a0e2] font-bold">FINANCE</span>
-              </span>
-              <span className="text-[10px] font-semibold text-slate-400 -mt-1 tracking-wider uppercase">
-                Mindful Spending
-              </span>
-            </div>
+          <Link to="/" className="flex items-center group py-1" aria-label="SADAR Finance">
+            <img
+              src={sadarLogo}
+              alt="SADAR Finance"
+              className="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -76,26 +62,26 @@ export const Navbar = () => {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-slate-600 hover:text-[#25a0e2] dark:text-slate-300 dark:hover:text-[#32ccff] transition-colors relative py-1 group"
+                className="text-sm font-medium text-slate-600 hover:text-[#1E3A8A] dark:text-slate-300 dark:hover:text-sky-400 transition-colors relative py-1 group"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#25a0e2] transition-all duration-300 group-hover:w-full rounded-full" />
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#1E3A8A] dark:bg-sky-400 transition-all duration-200 group-hover:w-full rounded-full" />
               </a>
             ))}
           </nav>
 
-          {/* CTA Buttons (Desktop) - Auth style */}
+          {/* CTA Buttons (Desktop) - Matching Auth style (#1E3A8A) */}
           <div className="hidden sm:flex items-center gap-3">
             <Link
               to="/login"
-              className="text-sm font-semibold text-slate-700 hover:text-[#25a0e2] dark:text-slate-200 dark:hover:text-[#32ccff] px-4 py-2 rounded-xl transition-colors"
+              className="text-sm font-semibold text-slate-700 hover:text-[#1E3A8A] dark:text-slate-200 dark:hover:text-sky-400 px-4 py-2 rounded-xl transition-colors"
             >
               Masuk
             </Link>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white text-sm font-semibold shadow-md shadow-sky-500/25 hover:shadow-lg hover:shadow-sky-500/40 transition-all"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white text-sm font-semibold shadow-sm transition-all"
               >
                 Mulai Sekarang <ArrowRight className="w-4 h-4" />
               </Link>
@@ -124,14 +110,14 @@ export const Navbar = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden mt-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-3"
+              className="lg:hidden mt-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-3"
             >
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-sky-50 hover:text-[#25a0e2] dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-[#1E3A8A] dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   {link.label}
                 </a>
@@ -147,7 +133,7 @@ export const Navbar = () => {
                 <Link
                   to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white font-semibold text-sm shadow-md shadow-sky-500/25"
+                  className="w-full text-center py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-semibold text-sm shadow-sm"
                 >
                   Daftar
                 </Link>

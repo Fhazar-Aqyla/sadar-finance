@@ -46,9 +46,9 @@ export const TeamSection = () => {
     restDelta: 0.001,
   });
 
-  const yCol1 = useTransform(smoothProgress, [0, 1], [30, -30]);
-  const yCol2 = useTransform(smoothProgress, [0, 1], [-20, 20]);
-  const yCol3 = useTransform(smoothProgress, [0, 1], [40, -40]);
+  const yCol1 = useTransform(smoothProgress, [0, 1], [25, -25]);
+  const yCol2 = useTransform(smoothProgress, [0, 1], [-15, 15]);
+  const yCol3 = useTransform(smoothProgress, [0, 1], [30, -30]);
 
   const team = [
     {
@@ -133,16 +133,16 @@ export const TeamSection = () => {
     <section
       id="team"
       ref={containerRef}
-      className="py-16 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
     >
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 text-[#1a85be] dark:bg-sky-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm">
-          <Users className="w-3.5 h-3.5 text-[#25a0e2]" />
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
+          <Users className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Tim Pengembang
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
           Dibuat dengan Dedikasi untuk{" "}
-          <span className="bg-gradient-to-r from-[#0bb9a8] via-[#25a0e2] to-[#2c9be0] bg-clip-text text-transparent">
+          <span className="text-[#1E3A8A] dark:text-sky-400">
             Masyarakat Indonesia.
           </span>
         </h2>
@@ -158,15 +158,15 @@ export const TeamSection = () => {
           <motion.div
             key={idx}
             style={{ y: member.yOffset }}
-            whileHover={{ y: -8, transition: { duration: 0.2 } }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
             className="h-full"
           >
-            <SpotlightCard className="h-full p-6 text-center flex flex-col items-center justify-between shadow-sm border-slate-200/80 dark:border-slate-800 transition-all duration-300 hover:shadow-2xl hover:shadow-sky-500/15">
+            <SpotlightCard className="h-full p-6 text-center flex flex-col items-center justify-between shadow-sm border-slate-200/90 dark:border-slate-800 transition-all duration-300 hover:shadow-md">
               <div className="flex flex-col items-center">
-                {/* Avatar Photo */}
+                {/* Clean Avatar Photo */}
                 <motion.div
-                  whileHover={{ scale: 1.08 }}
-                  className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-sky-400/40 p-1 bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] shadow-lg shadow-sky-500/20 mb-4 cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  className="relative w-24 h-24 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-50 dark:bg-slate-800 shadow-sm mb-4 cursor-pointer"
                 >
                   <img
                     src={member.avatar}
@@ -184,10 +184,10 @@ export const TeamSection = () => {
                 <h3 className="font-bold text-lg text-slate-900 dark:text-white">
                   {member.name}
                 </h3>
-                <p className="text-sm font-semibold text-[#25a0e2] dark:text-[#32ccff] mt-0.5">
+                <p className="text-sm font-semibold text-[#1E3A8A] dark:text-sky-400 mt-0.5">
                   {member.role}
                 </p>
-                <span className="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium dark:bg-slate-800 dark:text-slate-400">
+                <span className="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-medium dark:bg-slate-800 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
                   {member.badge}
                 </span>
               </div>
@@ -196,7 +196,7 @@ export const TeamSection = () => {
               <div className="flex items-center gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
                 {member.socials.github && (
                   <motion.a
-                    whileHover={{ scale: 1.2 }}
+                    whileHover={{ scale: 1.15 }}
                     whileTap={{ scale: 0.9 }}
                     href={member.socials.github}
                     target="_blank"
@@ -209,12 +209,12 @@ export const TeamSection = () => {
                 )}
                 {member.socials.linkedin && (
                   <motion.a
-                    whileHover={{ scale: 1.2 }}
+                    whileHover={{ scale: 1.15 }}
                     whileTap={{ scale: 0.9 }}
                     href={member.socials.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-xl text-slate-400 hover:text-[#25a0e2] hover:bg-sky-50 dark:hover:text-sky-400 dark:hover:bg-sky-950/40 transition-colors"
+                    className="p-2 rounded-xl text-slate-400 hover:text-[#1E3A8A] hover:bg-blue-50 dark:hover:text-sky-400 dark:hover:bg-blue-950/40 transition-colors"
                     aria-label="LinkedIn"
                   >
                     <LinkedinIcon className="w-4 h-4" />
@@ -222,7 +222,7 @@ export const TeamSection = () => {
                 )}
                 {member.socials.instagram && (
                   <motion.a
-                    whileHover={{ scale: 1.2 }}
+                    whileHover={{ scale: 1.15 }}
                     whileTap={{ scale: 0.9 }}
                     href={member.socials.instagram}
                     target="_blank"
@@ -241,3 +241,4 @@ export const TeamSection = () => {
     </section>
   );
 };
+

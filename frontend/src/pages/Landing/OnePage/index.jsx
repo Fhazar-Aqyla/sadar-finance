@@ -45,7 +45,7 @@ const LandingOnePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#25A0E2] selection:text-white overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#1E3A8A] selection:text-white overflow-x-hidden font-sans">
       {/* Top Glassmorphic Navigation */}
       <Navbar />
 

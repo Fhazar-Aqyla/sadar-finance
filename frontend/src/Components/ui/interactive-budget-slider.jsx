@@ -32,11 +32,11 @@ export const InteractiveBudgetSlider = () => {
     }).format(val);
 
   return (
-    <div className="w-full rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white via-slate-50/50 to-white p-6 sm:p-8 shadow-xl shadow-sky-500/5 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-950 dark:shadow-none">
+    <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 text-[#1a85be] text-xs font-semibold dark:bg-sky-950/60 dark:text-sky-300 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#25a0e2] animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-semibold dark:bg-blue-950/60 dark:text-sky-300 mb-2 border border-blue-100 dark:border-blue-900/30">
+            <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
             Simulasi Rumus 50 / 30 / 20
           </div>
           <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
@@ -49,7 +49,7 @@ export const InteractiveBudgetSlider = () => {
         </div>
 
         {/* Quick Presets with Framer Motion layoutId */}
-        <div className="flex flex-wrap items-center gap-2 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl">
+        <div className="flex flex-wrap items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
           {presets.map((preset) => {
             const isSelected = income === preset.value;
             return (
@@ -62,7 +62,7 @@ export const InteractiveBudgetSlider = () => {
                   <motion.div
                     layoutId="activePresetPill"
                     transition={{ type: "spring", stiffness: 450, damping: 32 }}
-                    className="absolute inset-0 bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] rounded-lg shadow-md shadow-sky-500/25 -z-10"
+                    className="absolute inset-0 bg-[#1E3A8A] rounded-lg shadow-sm -z-10"
                   />
                 )}
                 <span
@@ -88,10 +88,10 @@ export const InteractiveBudgetSlider = () => {
           </span>
           <motion.span
             key={income}
-            initial={{ scale: 1.08 }}
+            initial={{ scale: 1.05 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.2 }}
-            className="text-2xl sm:text-3xl font-extrabold text-[#25a0e2] dark:text-[#32ccff] tracking-tight"
+            className="text-2xl sm:text-3xl font-extrabold text-[#1E3A8A] dark:text-sky-400 tracking-tight"
           >
             {formatRupiah(income)}
           </motion.span>
@@ -103,7 +103,7 @@ export const InteractiveBudgetSlider = () => {
           step="500000"
           value={income}
           onChange={(e) => setIncome(Number(e.target.value))}
-          className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#25a0e2] dark:bg-slate-800 transition-all"
+          className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1E3A8A] dark:bg-slate-800 transition-all"
         />
         <div className="flex justify-between text-xs text-slate-400 dark:text-slate-500 mt-1.5 font-medium">
           <span>Rp 1,5 Jt</span>
@@ -116,19 +116,19 @@ export const InteractiveBudgetSlider = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Needs Card */}
         <motion.div
-          whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="rounded-xl border border-sky-100 bg-sky-50/50 p-4.5 dark:border-sky-900/30 dark:bg-sky-950/20 shadow-sm"
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="rounded-xl border border-slate-200/90 bg-slate-50/70 p-4.5 dark:border-slate-800 dark:bg-slate-800/40 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-[#25a0e2] text-white shadow-sm">
+              <div className="p-2 rounded-lg bg-[#1E3A8A] text-white shadow-sm">
                 <Wallet className="w-4 h-4" />
               </div>
               <span className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">
                 Kebutuhan Pokok
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-sky-100 text-[#1a85be] text-xs font-bold dark:bg-sky-900/50 dark:text-sky-300">
+            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-200/60">
               50%
             </span>
           </div>
@@ -139,20 +139,20 @@ export const InteractiveBudgetSlider = () => {
             Makan pokok, sewa kost/rumah, tagihan listrik, pulsa/wifi,
             transportasi kerja.
           </p>
-          <div className="w-full bg-sky-200/60 dark:bg-sky-950 h-1.5 rounded-full mt-3 overflow-hidden">
+          <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
               initial={{ width: "0%" }}
               animate={{ width: "50%" }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="bg-[#25a0e2] h-full rounded-full"
+              className="bg-[#1E3A8A] h-full rounded-full"
             />
           </div>
         </motion.div>
 
         {/* Wants Card */}
         <motion.div
-          whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="rounded-xl border border-amber-100 bg-amber-50/50 p-4.5 dark:border-amber-900/30 dark:bg-amber-950/20 shadow-sm"
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="rounded-xl border border-slate-200/90 bg-slate-50/70 p-4.5 dark:border-slate-800 dark:bg-slate-800/40 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export const InteractiveBudgetSlider = () => {
                 Gaya Hidup & Santai
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold dark:bg-amber-900/50 dark:text-amber-300">
+            <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-bold dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/60">
               30%
             </span>
           </div>
@@ -174,7 +174,7 @@ export const InteractiveBudgetSlider = () => {
             Jajan kopi, nongkrong, belanja sekunder, streaming, bioskop & hobi
             akhir pekan.
           </p>
-          <div className="w-full bg-amber-200/60 dark:bg-amber-950 h-1.5 rounded-full mt-3 overflow-hidden">
+          <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
               initial={{ width: "0%" }}
               animate={{ width: "30%" }}
@@ -186,8 +186,8 @@ export const InteractiveBudgetSlider = () => {
 
         {/* Savings Card */}
         <motion.div
-          whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4.5 dark:border-emerald-900/30 dark:bg-emerald-950/20 shadow-sm"
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="rounded-xl border border-slate-200/90 bg-slate-50/70 p-4.5 dark:border-slate-800 dark:bg-slate-800/40 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -198,23 +198,23 @@ export const InteractiveBudgetSlider = () => {
                 Tabungan & Investasi
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold dark:bg-emerald-900/50 dark:text-emerald-300">
+            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60">
               20%
             </span>
           </div>
-          <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 mb-2">
+          <div className="text-xl font-bold text-emerald-700 dark:text-emerald-400 mt-1 mb-2">
             {formatRupiah(savings)}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             Dana darurat, tabungan impian, reksadana, emas, atau investasi masa
             depan.
           </p>
-          <div className="w-full bg-emerald-200/60 dark:bg-emerald-950 h-1.5 rounded-full mt-3 overflow-hidden">
+          <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
             <motion.div
               initial={{ width: "0%" }}
               animate={{ width: "20%" }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="bg-emerald-500 h-full rounded-full"
+              className="bg-emerald-600 h-full rounded-full"
             />
           </div>
         </motion.div>
@@ -223,7 +223,7 @@ export const InteractiveBudgetSlider = () => {
       {/* Footer Call to Action */}
       <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
         <div className="flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-[#25a0e2] shrink-0" />
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>
             SADAR Finance otomatis memantau kepatuhan batas ini di setiap
             transaksi.
@@ -231,7 +231,7 @@ export const InteractiveBudgetSlider = () => {
         </div>
         <Link
           to="/register"
-          className="inline-flex items-center gap-1 font-semibold text-[#25a0e2] hover:text-[#1a85be] dark:text-[#32ccff] hover:underline shrink-0 group"
+          className="inline-flex items-center gap-1 font-semibold text-[#1E3A8A] hover:text-[#1A3175] dark:text-sky-400 hover:underline shrink-0 group"
         >
           Kunci Budgetmu Sekarang{" "}
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -240,3 +240,4 @@ export const InteractiveBudgetSlider = () => {
     </div>
   );
 };
+

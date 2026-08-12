@@ -23,7 +23,7 @@ export const ReceiptScannerDemo = () => {
       categoryGroup: "Needs",
       categoryDetail: "Kebutuhan Pokok",
       badgeColor:
-        "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
+        "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 border border-blue-200 dark:border-blue-900",
       items: [
         { name: "Susu UHT Full Cream 1L", price: "Rp 21.000" },
         { name: "Roti Tawar Gandum", price: "Rp 17.500" },
@@ -40,7 +40,7 @@ export const ReceiptScannerDemo = () => {
       categoryGroup: "Wants",
       categoryDetail: "Gaya Hidup / Kuliner",
       badgeColor:
-        "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
+        "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900",
       items: [
         { name: "Kopi Kenangan Mantan Large", price: "Rp 24.000" },
         { name: "Cinnamon Roll Toast", price: "Rp 14.000" },
@@ -56,7 +56,7 @@ export const ReceiptScannerDemo = () => {
       categoryGroup: "Needs",
       categoryDetail: "Transportasi",
       badgeColor:
-        "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
+        "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 border border-blue-200 dark:border-blue-900",
       items: [{ name: "Pertamax 92 (11.54 Liter)", price: "Rp 150.000" }],
     },
   ];
@@ -74,11 +74,11 @@ export const ReceiptScannerDemo = () => {
   };
 
   return (
-    <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-xl shadow-sky-500/5 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+    <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       {/* Header Tabs with Framer Motion layoutId */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-sky-50 text-[#25a0e2] dark:bg-sky-950/60 dark:text-[#32ccff]">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400">
             <Scan className="w-4 h-4" />
           </div>
           <div>
@@ -92,8 +92,8 @@ export const ReceiptScannerDemo = () => {
           </div>
         </div>
 
-        {/* Receipt Switcher Pills with springy layoutId */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto">
+        {/* Receipt Switcher Pills */}
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
           {receipts.map((r) => {
             const isSelected = activeReceipt.id === r.id;
             return (
@@ -112,7 +112,7 @@ export const ReceiptScannerDemo = () => {
                 <span
                   className={
                     isSelected
-                      ? "text-[#25a0e2] dark:text-[#32ccff] font-bold"
+                      ? "text-[#1E3A8A] dark:text-sky-400 font-bold"
                       : "text-slate-600 dark:text-slate-400"
                   }
                 >
@@ -127,7 +127,7 @@ export const ReceiptScannerDemo = () => {
       {/* Interactive Scan Stage */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
         {/* Visual Simulated Receipt (Left) */}
-        <div className="lg:col-span-5 relative rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-950/50 font-mono text-xs overflow-hidden">
+        <div className="lg:col-span-5 relative rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950/60 font-mono text-xs overflow-hidden">
           {/* Laser Scanning Line with Framer Motion */}
           <AnimatePresence>
             {isScanning && (
@@ -136,7 +136,7 @@ export const ReceiptScannerDemo = () => {
                 animate={{ top: ["0%", "100%", "0%"] }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.75, ease: "easeInOut" }}
-                className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#25a0e2] to-transparent shadow-[0_0_15px_rgba(37,160,226,0.9)] z-20"
+                className="absolute left-0 right-0 h-0.5 bg-[#1E3A8A] dark:bg-sky-400 shadow-sm z-20"
               />
             )}
           </AnimatePresence>
@@ -169,7 +169,7 @@ export const ReceiptScannerDemo = () => {
             </div>
             <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex justify-between font-bold text-slate-900 dark:text-white text-xs">
               <span>TOTAL</span>
-              <span className="text-[#25a0e2] dark:text-[#32ccff]">
+              <span className="text-[#1E3A8A] dark:text-sky-400">
                 {activeReceipt.total}
               </span>
             </div>
@@ -178,14 +178,14 @@ export const ReceiptScannerDemo = () => {
 
         {/* Arrow Transition */}
         <div className="hidden lg:flex lg:col-span-1 justify-center text-slate-300 dark:text-slate-600">
-          <ArrowRight className="w-5 h-5 animate-pulse text-[#25a0e2]" />
+          <ArrowRight className="w-5 h-5 text-[#1E3A8A] dark:text-sky-400" />
         </div>
 
         {/* Extracted Clean Result (Right) */}
-        <div className="lg:col-span-6 bg-gradient-to-br from-slate-50 to-sky-50/40 rounded-xl p-4.5 border border-sky-100 dark:from-slate-900 dark:to-slate-900/50 dark:border-slate-800">
+        <div className="lg:col-span-6 bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4.5 border border-slate-200/90 dark:border-slate-750">
           <div className="flex items-center justify-between mb-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1a85be] dark:text-sky-300">
-              <Sparkles className="w-3.5 h-3.5 text-[#25a0e2]" />
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1E3A8A] dark:text-sky-300">
+              <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
               Ekstraksi Cerdas Terdeteksi
             </div>
             <span
@@ -204,7 +204,7 @@ export const ReceiptScannerDemo = () => {
               transition={{ duration: 0.2 }}
               className="space-y-2.5 text-xs"
             >
-              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Store className="w-3.5 h-3.5 text-slate-400" /> Merchant
                 </span>
@@ -213,7 +213,7 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal
                 </span>
@@ -222,7 +222,7 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Tag className="w-3.5 h-3.5 text-slate-400" /> Pos & Detail
                 </span>
@@ -231,7 +231,7 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-[#0bb9a8] to-[#2c9be0] text-white shadow-sm font-medium">
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#1E3A8A] text-white shadow-sm font-medium">
                 <span className="text-white/90 flex items-center gap-1.5">
                   <CheckCircle className="w-3.5 h-3.5 text-white" /> Nominal
                   Terbaca
@@ -247,3 +247,4 @@ export const ReceiptScannerDemo = () => {
     </div>
   );
 };
+

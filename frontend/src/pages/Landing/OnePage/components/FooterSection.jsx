@@ -1,67 +1,63 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
-import { Heart, ShieldCheck } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export const FooterSection = () => {
   return (
-    <footer className="border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 py-12">
+    <footer className="border-t border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-950 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-100 dark:border-slate-800/80">
           {/* Brand Logo & Tagline */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0bb9a8] to-[#2c9be0] p-0.5 shadow-sm flex items-center justify-center">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <Link to="/" className="flex items-center group" aria-label="SADAR Finance">
               <img
                 src={sadarLogo}
                 alt="SADAR Finance"
-                className="w-full h-full object-contain rounded-lg bg-white"
+                className="h-7 w-auto object-contain transition-transform group-hover:scale-105"
               />
-            </div>
-            <div>
-              <span className="font-extrabold text-slate-900 dark:text-white tracking-tight text-base">
-                SADAR <span className="text-[#25a0e2]">FINANCE</span>
-              </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Smart AI-Driven Automated Receipt & Personal Finance Management
-              </p>
-            </div>
+            </Link>
+            <span className="hidden sm:inline-block text-slate-300 dark:text-slate-700">|</span>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Smart AI-Driven Automated Receipt & Personal Finance Management
+            </p>
           </div>
 
           {/* Quick Nav Links */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-600 dark:text-slate-400 font-medium">
             <a
               href="#home"
-              className="hover:text-[#25a0e2] dark:hover:text-[#32ccff] transition-colors"
+              className="hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors"
             >
               Beranda
             </a>
             <a
               href="#features"
-              className="hover:text-[#25a0e2] dark:hover:text-[#32ccff] transition-colors"
+              className="hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors"
             >
               Fitur
             </a>
             <a
               href="#simulator"
-              className="hover:text-[#25a0e2] dark:hover:text-[#32ccff] transition-colors"
+              className="hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors"
             >
               Simulasi
             </a>
             <a
               href="#how-it-works"
-              className="hover:text-[#25a0e2] dark:hover:text-[#32ccff] transition-colors"
+              className="hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors"
             >
               Cara Kerja
             </a>
             <a
               href="#team"
-              className="hover:text-[#25a0e2] dark:hover:text-[#32ccff] transition-colors"
+              className="hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors"
             >
               Tim
             </a>
             <a
               href="#faq"
-              className="hover:text-[#25a0e2] dark:hover:text-[#32ccff] transition-colors"
+              className="hover:text-[#1E3A8A] dark:hover:text-sky-400 transition-colors"
             >
               FAQ
             </a>
@@ -83,3 +79,4 @@ export const FooterSection = () => {
     </footer>
   );
 };
+
