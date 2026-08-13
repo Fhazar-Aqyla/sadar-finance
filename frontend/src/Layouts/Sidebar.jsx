@@ -3,14 +3,19 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Activity,
   BarChart3,
+  ChevronDown,
   Edit3,
   Home,
+  LogOut,
   ReceiptText,
+  User,
   X,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import sadarLogo from "../assets/images/landing/sadar-logo.png";
 import sadarLogoLight from "../assets/images/landing/logo-sadar-light.png";
+import dummyAvatar from "../assets/images/users/user-dummy-img.jpg";
 
 const navigationItems = [
   { id: "dashboard", name: "Dashboard", icon: Home, href: "/dashboard" },
@@ -59,10 +64,18 @@ const normalizeAccountEmail = (value) => {
   return email;
 };
 
-const Sidebar = ({ className = "" }) => {
+const resolveAvatarUrl = (url) => {
+  if (!url) return dummyAvatar;
+  if (/^(https?:|data:)/i.test(url)) return url;
+  const serverUrl = "https://sadar-finance.up.railway.app";
+  return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+};
+
+const Sidebar = ({ className = "", onLogoutClick }) => {
   const location = useLocation();
   const profileUser = useSelector((state) => state.Profile?.user ?? {});
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(
     document.documentElement.getAttribute("data-sidebar-size") === "sm",
   );
@@ -98,6 +111,20 @@ const Sidebar = ({ className = "" }) => {
   }, [profileUser]);
 
   const userInitials = getInitials(userName) || "AF";
+
+  const userAvatar = useMemo(() => {
+    const rawAvatar =
+      profileUser?.profile_picture ||
+      profileUser?.profilePicture ||
+      profileUser?.avatar;
+    if (rawAvatar) return resolveAvatarUrl(rawAvatar);
+
+    const storedUser = getStoredUser();
+    const u =
+      storedUser?.user || storedUser?.data?.user || storedUser?.data || storedUser;
+    const av = u?.profile_picture || u?.profilePicture || u?.avatar;
+    return av ? resolveAvatarUrl(av) : dummyAvatar;
+  }, [profileUser]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -249,6 +276,95 @@ const Sidebar = ({ className = "" }) => {
             })}
           </ul>
         </nav>
+
+        <div className="sadar-sidebar-profile shrink-0 border-t border-slate-200 px-3 py-3 dark:border-slate-800">
+          <Dropdown
+            isOpen={isProfileOpen}
+            toggle={() => setIsProfileOpen((prev) => !prev)}
+            className="sadar-profile"
+          >
+            {!isCollapsed && (
+              <DropdownToggle
+                tag="button"
+                type="button"
+                className="btn w-full d-flex align-items-center gap-3 rounded-lg border-0 bg-slate-50/80 p-3 text-start no-underline hover:bg-slate-100 dark:bg-slate-800/40"
+              >
+                <img
+                  src={userAvatar}
+                  alt={userName}
+                  className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = dummyAvatar;
+                  }}
+                />
+                <span className="flex-grow-1 min-w-0">
+                  <span className="block truncate text-sm font-semibold !text-slate-800 dark:!text-slate-100">
+                    {userName}
+                  </span>
+                  <span className="block truncate text-xs text-slate-500 dark:text-slate-400">
+                    {userEmail}
+                  </span>
+                </span>
+                <ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-500" />
+              </DropdownToggle>
+            )}
+
+            {isCollapsed && (
+              <DropdownToggle
+                tag="button"
+                type="button"
+                className="btn w-full d-flex justify-content-center rounded-lg border-0 bg-transparent p-2 no-underline"
+                aria-label="Menu profil"
+              >
+                <img
+                  src={userAvatar}
+                  alt={userName}
+                  className="h-9 w-9 rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = dummyAvatar;
+                  }}
+                />
+              </DropdownToggle>
+            )}
+
+            <DropdownMenu
+              className={`sadar-profile-menu ${isCollapsed ? "" : "w-100"}`}
+              style={{ minWidth: isCollapsed ? "200px" : "100%" }}
+            >
+              <div className="d-flex align-items-center gap-2 px-3 py-2 border-bottom">
+                <img
+                  className="rounded-circle header-profile-user"
+                  src={userAvatar}
+                  alt="Avatar"
+                />
+                <div className="flex-grow-1 min-width-0">
+                  <h6 className="m-0 text-truncate fs-14">{userName}</h6>
+                  <p className="m-0 text-truncate fs-12 text-muted">{userEmail}</p>
+                </div>
+              </div>
+              <Link
+                to="/profile-account"
+                className="dropdown-item d-flex align-items-center gap-2"
+                onClick={() => setIsProfileOpen(false)}
+              >
+                <User className="fs-15" size={16} />
+                <span>Profil & Akun</span>
+              </Link>
+              <div className="dropdown-divider"></div>
+              <button
+                type="button"
+                className="dropdown-item d-flex align-items-center gap-2 text-danger"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  if (onLogoutClick) onLogoutClick();
+                }}
+              >
+                <LogOut className="fs-15" size={16} />
+                <span>Keluar</span>
+              </button>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
       </div>
     </React.Fragment>
   );

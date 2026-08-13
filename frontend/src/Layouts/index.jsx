@@ -153,6 +153,7 @@ const Layout = (props) => {
                 />
                 <Sidebar
                     layoutType={layoutType}
+                    onLogoutClick={() => setShowLogoutModal(true)}
                 />
                 <div className="main-content">{props.children}
                     <Footer />

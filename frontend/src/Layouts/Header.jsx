@@ -7,14 +7,13 @@ import SearchOption from '../Components/Common/SearchOption';
 import FullScreenDropdown from '../Components/Common/FullScreenDropdown';
 import LightDark from '../Components/Common/LightDark';
 import NotificationDropdown from '../Components/Common/NotificationDropdown';
-import ProfileDropdown from '../Components/Common/ProfileDropdown';
 import sadarLogo from '../assets/images/landing/sadar-logo.png';
 
 import { changeSidebarVisibility } from '../slices/thunks';
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from 'reselect';
 
-const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick }) => {
+const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
     const dispatch = useDispatch();
 
     const selectDashboardData = createSelector(
@@ -130,7 +129,6 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick
                             </div>
                             <LightDark layoutMode={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
                             <NotificationDropdown />
-                            <ProfileDropdown onLogoutClick={onLogoutClick} />
                         </div>
                     </div>
                 </div>
