@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
@@ -41,7 +41,7 @@ const ProfileDropdown = ({ onLogoutClick }) => {
     const fallbackName = normalizeAccountName(
       user?.first_name || user?.username || "Aqyla",
     );
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
 
     if (!storedUser) {
       return fallbackName;
@@ -69,7 +69,7 @@ const ProfileDropdown = ({ onLogoutClick }) => {
 
   const userEmail = useMemo(() => {
     const fallbackEmail = normalizeAccountEmail(user?.email);
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
 
     if (!storedUser) {
       return fallbackEmail;
@@ -98,7 +98,7 @@ const ProfileDropdown = ({ onLogoutClick }) => {
       user?.profile_picture || user?.profilePicture || user?.avatar;
     if (rawAvatar) return resolveAvatarUrl(rawAvatar);
 
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
     if (storedUser) {
       try {
         const authUser = JSON.parse(storedUser);

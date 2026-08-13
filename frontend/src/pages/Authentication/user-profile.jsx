@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { isEmpty } from "lodash";
 
 import {
@@ -50,7 +50,7 @@ const UserProfile = () => {
   } = useSelector(userprofileData);
 
   const getStoredAuthUser = () => {
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
 
     if (!storedUser) {
       return null;
@@ -73,7 +73,7 @@ const UserProfile = () => {
           ? { ...authUser, data: { ...authUser.data, first_name: user.first_name } }
           : { ...authUser, first_name: user.first_name };
 
-        sessionStorage.setItem("authUser", JSON.stringify(updatedAuthUser));
+        localStorage.setItem("authUser", JSON.stringify(updatedAuthUser));
       }
 
       setUserName(user?.first_name || storedProfile.first_name || storedProfile.username || "Admin");

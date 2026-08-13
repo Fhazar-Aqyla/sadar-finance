@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Hero } from "@/Components/ui/animated-hero";
 import { ContainerScroll } from "@/Components/ui/container-scroll-animation";
@@ -31,7 +31,7 @@ const navItems = [
 
 const hasAuthToken = () => {
   try {
-    return Boolean(JSON.parse(sessionStorage.getItem("authUser") || "null")?.token);
+    return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
   } catch {
     return false;
   }

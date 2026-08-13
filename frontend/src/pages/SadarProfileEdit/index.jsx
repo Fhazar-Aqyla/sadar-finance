@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Alert,
@@ -29,7 +29,7 @@ import "../SadarShared/sadar-pages.css";
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = sessionStorage.getItem("authUser");
+    const rawAuth = localStorage.getItem("authUser");
     if (!rawAuth) return;
     const authData = JSON.parse(rawAuth);
 
@@ -43,9 +43,9 @@ const updateSessionUser = (updatedUser) => {
       Object.assign(authData, updatedUser);
     }
 
-    sessionStorage.setItem("authUser", JSON.stringify(authData));
+    localStorage.setItem("authUser", JSON.stringify(authData));
   } catch (e) {
-    console.error("Failed to update sessionStorage user", e);
+    console.error("Failed to update localStorage user", e);
   }
 };
 
@@ -260,7 +260,7 @@ const ProfileEdit = () => {
       });
       setAvatarFile(null);
 
-      // Update sessionStorage and Redux state to sync header avatar instantly
+      // Update localStorage and Redux state to sync header avatar instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
@@ -289,7 +289,7 @@ const ProfileEdit = () => {
       });
       setAvatarFile(null);
 
-      // Update sessionStorage and Redux state to sync header avatar instantly
+      // Update localStorage and Redux state to sync header avatar instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
@@ -456,7 +456,7 @@ const ProfileEdit = () => {
         message: "Identitas pribadi berhasil disimpan.",
       });
 
-      // Update sessionStorage and Redux state to sync header user details instantly
+      // Update localStorage and Redux state to sync header user details instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {

@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 import { api } from "../../config";
 import {
   accounts as mockAccounts,
@@ -17,7 +17,7 @@ const apiClient = axios.create({
 
 const getAuthUser = () => {
   try {
-    return JSON.parse(sessionStorage.getItem("authUser") || "null");
+    return JSON.parse(localStorage.getItem("authUser") || "null");
   } catch (_error) {
     return null;
   }
