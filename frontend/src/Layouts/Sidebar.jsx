@@ -5,10 +5,7 @@ import {
   BarChart3,
   Edit3,
   Home,
-  LogOut,
-  Menu,
   ReceiptText,
-  User,
   X,
 } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -21,7 +18,6 @@ const navigationItems = [
   { id: "behavior-insight", name: "Insight Perilaku", icon: Activity, href: "/behavior-insight" },
   { id: "financial-score", name: "Skor Finansial", icon: BarChart3, href: "/financial-score" },
   { id: "financial-history", name: "Riwayat Keuangan", icon: ReceiptText, href: "/financial-history" },
-  { id: "profile-account", name: "Profil", icon: User, href: "/profile-account" },
 ];
 
 const sidebarWidths = {
@@ -63,7 +59,7 @@ const normalizeAccountEmail = (value) => {
   return email;
 };
 
-const Sidebar = ({ className = "", onLogoutClick }) => {
+const Sidebar = ({ className = "" }) => {
   const location = useLocation();
   const profileUser = useSelector((state) => state.Profile?.user ?? {});
   const [isOpen, setIsOpen] = useState(false);
@@ -253,37 +249,6 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
             })}
           </ul>
         </nav>
-
-        <div className="sadar-sidebar-footer mt-auto shrink-0 border-t border-slate-200 bg-white">
-          <div className={isCollapsed ? "flex h-[66px] items-center justify-center p-3" : "flex h-[66px] items-center p-3"}>
-            <Link
-              to="#"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onLogoutClick) {
-                  onLogoutClick();
-                }
-              }}
-              className={`sadar-sidebar-logout group relative flex w-full items-center rounded-md text-left no-underline transition-all duration-200 !text-red-600 hover:bg-red-50 hover:!text-red-700 dark:!text-red-400 dark:hover:bg-red-950/30 dark:hover:!text-red-300 ${
-                isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2.5"
-              }`}
-              title={isCollapsed ? "Keluar" : undefined}
-            >
-              <div className="flex min-w-[22px] items-center justify-center">
-                <LogOut className="h-4 w-4 flex-shrink-0 text-red-500 group-hover:text-red-600 dark:text-red-400 dark:group-hover:text-red-300" />
-              </div>
-
-              {!isCollapsed && <span className="text-sm text-red-600 group-hover:text-red-700 dark:text-red-400 dark:group-hover:text-red-300">Keluar</span>}
-
-              {isCollapsed && (
-                <div className="invisible absolute left-full z-50 ml-2 whitespace-nowrap rounded bg-slate-800 px-2 py-1 text-xs text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
-                  Keluar
-                  <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-x-1 -translate-y-1/2 rotate-45 bg-slate-800" />
-                </div>
-              )}
-            </Link>
-          </div>
-        </div>
       </div>
     </React.Fragment>
   );

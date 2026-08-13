@@ -22,21 +22,25 @@ import "./transaction-input.css";
 import { TransactionInputSkeleton } from "../../Components/Skeleton";
 
 const categories = [
-  { value: "food_and_beverage", label: "Makanan & Minuman" },
-  { value: "groceries", label: "Belanja Bulanan" },
-  { value: "transportation", label: "Transportasi" },
-  { value: "utilities", label: "Tagihan & Utilitas" },
-  { value: "shopping", label: "Belanja" },
-  { value: "education", label: "Pendidikan" },
-  { value: "health", label: "Kesehatan" },
-  { value: "other", label: "Lainnya" },
+  { value: "needs", label: "Kebutuhan" },
+  { value: "wants", label: "Keinginan" },
+  { value: "savings", label: "Tabungan" },
 ];
+
+const normalizeCategoryGroup = (value) => {
+  const text = String(value || "").trim().toLowerCase();
+  if (/keinginan|wants|want|hiburan|entertainment|belanja|shopping|game|nonton|bioskop|liburan|travel/.test(text)) return "wants";
+  if (/tabungan|savings|saving|invest|dana darurat/.test(text)) return "savings";
+  if (/kebutuhan|needs|need/.test(text)) return "needs";
+  if (/makan|food|beverage|minum|groceries|sembako|transport|tagihan|utilit|kesehatan|health|pendidikan|education|bills/.test(text)) return "needs";
+  return "needs";
+};
 
 const initialForm = {
   accountId: "",
   merchant: "",
   transactionDate: new Date().toISOString().slice(0, 10),
-  categoryGroup: "other",
+  categoryGroup: "needs",
   amount: "",
   description: "",
   source: "manual",
@@ -308,7 +312,7 @@ const TransactionInput = () => {
       accountId: form.accountId,
       merchant,
       transactionDate: getParsedDate(parsed?.date || parsed?.transactionDate || parsed?.transaction_date),
-      categoryGroup: parsed?.categoryGroup || parsed?.category_group || parsed?.category || "other",
+      categoryGroup: normalizeCategoryGroup(parsed?.categoryGroup || parsed?.category_group || parsed?.category || "needs"),
       amount: amount ? String(amount) : "",
       description,
       source: "ocr",

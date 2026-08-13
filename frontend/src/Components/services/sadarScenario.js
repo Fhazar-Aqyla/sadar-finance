@@ -7,11 +7,11 @@ export const SADAR_DATA_SCENARIOS = {
 const normalizeScenario = (value) => {
   const scenario = String(value || "").trim().toLowerCase();
 
-  if (["mock", "mock-data", "demo", "demo-auth"].includes(scenario)) {
+  if (["mock", "mock-data", "demo", "demo-auth", SADAR_DATA_SCENARIOS.MOCK_WITH_BACKEND_AUTH].includes(scenario)) {
     return SADAR_DATA_SCENARIOS.MOCK_WITH_BACKEND_AUTH;
   }
 
-  if (["backend", "backend-auth", "api"].includes(scenario)) {
+  if (["backend", "backend-auth", "api", SADAR_DATA_SCENARIOS.BACKEND_WITH_BACKEND_AUTH].includes(scenario)) {
     return SADAR_DATA_SCENARIOS.BACKEND_WITH_BACKEND_AUTH;
   }
 

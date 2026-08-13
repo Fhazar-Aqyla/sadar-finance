@@ -130,7 +130,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick
                             </div>
                             <LightDark layoutMode={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
                             <NotificationDropdown />
-                            <ProfileDropdown />
+                            <ProfileDropdown onLogoutClick={onLogoutClick} />
                         </div>
                     </div>
                 </div>
@@ -147,24 +147,12 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick
                             { name: "Insight Perilaku", href: "/behavior-insight" },
                             { name: "Skor Finansial", href: "/financial-score" },
                             { name: "Riwayat Keuangan", href: "/financial-history" },
-                            { name: "Profil", href: "/profile-account" },
-                            { name: "Keluar", href: "/logout", className: "text-danger" },
                         ].map((item) => (
                             <Link
                                 key={item.href}
-                                to={item.href === "/logout" ? "#" : item.href}
-                                onClick={(e) => {
-                                    setIsMobileMenuOpen(false);
-                                    if (item.href === "/logout") {
-                                        e.preventDefault();
-                                        if (onLogoutClick) {
-                                            onLogoutClick();
-                                        }
-                                    }
-                                }}
-                                className={`px-3 py-2.5 rounded-lg text-[13px] font-semibold no-underline transition-all duration-200 flex items-center justify-between ${
-                                    item.className ? "text-red-500 hover:bg-red-50" : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"
-                                }`}
+                                to={item.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="px-3 py-2.5 rounded-lg text-[13px] font-semibold no-underline transition-all duration-200 flex items-center justify-between text-slate-700 hover:bg-slate-100 hover:text-blue-600"
                             >
                                 <span>{item.name}</span>
                                 <i className="ri-arrow-right-s-line text-slate-400"></i>
