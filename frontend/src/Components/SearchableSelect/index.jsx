@@ -123,6 +123,9 @@ const SearchableSelect = ({
         <span className="sadar-select-value">
           {selectedInstitution ? (
             <span className="d-flex align-items-center gap-2">
+              {selectedInstitution.featured && (
+                <i className="ri-star-fill text-warning"></i>
+              )}
               <span className="sadar-institution-name fw-medium">
                 {selectedInstitution.name}
               </span>
@@ -199,6 +202,9 @@ const SearchableSelect = ({
                         aria-selected={isSelected}
                       >
                         <span className="option-name">{item.name}</span>
+                        {item.featured && (
+                          <i className="ri-star-fill text-warning"></i>
+                        )}
                         {isSelected && (
                           <i className="ri-check-line option-check ms-auto"></i>
                         )}

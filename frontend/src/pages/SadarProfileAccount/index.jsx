@@ -1034,7 +1034,7 @@ const ProfileAccountWithData = () => {
                             </div>
                             <p className="text-muted fs-12 mb-0 mt-1">
                               {account.accountNumber
-                                ? `${account.type === "Bank" ? "No. Rekening" : "No. Akun"}: ${formatAccountNumberInput(account.accountNumber, account.type)}`
+                                ? `${account.type === "Bank" ? "No. Rekening" : "No. Akun"}: ${formatAccountNumberInput(account.accountNumber, account.type, account.name)}`
                                 : "Tanpa nomor akun"}
                             </p>
                           </div>
