@@ -235,15 +235,24 @@ export const HeroSection = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-gradient-to-b from-slate-50/90 via-white to-slate-50/60 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-32 pb-24 lg:pt-40 lg:pb-36 overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-slate-50/60 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
-      {/* Dynamic Animated Ambient Light Orbs */}
-      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-blue-500/10 via-sky-400/10 to-indigo-500/10 blur-[90px] rounded-full -z-10 animate-pulse" />
-      <div className="pointer-events-none absolute top-12 left-10 w-72 h-72 bg-blue-600/5 blur-[80px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute top-20 right-10 w-72 h-72 bg-emerald-500/5 blur-[80px] rounded-full -z-10" />
+      {/* Primary large animated ambient mesh */}
+      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[420px] bg-gradient-to-tr from-blue-500/15 via-sky-300/10 to-indigo-400/12 blur-[100px] rounded-full -z-10 animate-pulse" />
+      {/* Secondary accent orbs */}
+      <div className="pointer-events-none absolute top-8 left-0 w-80 h-80 bg-blue-600/8 blur-[90px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-16 right-0 w-80 h-80 bg-emerald-500/8 blur-[90px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute bottom-20 left-1/4 w-64 h-64 bg-sky-400/6 blur-[80px] rounded-full -z-10" />
 
-      {/* Subtle clean background dot grid */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:28px_28px] opacity-[0.4] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] dark:opacity-[0.25] -z-10" />
+      {/* Fine dot-grid texture overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#93c5fd_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.25] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] dark:opacity-[0.2] -z-10" />
+
+      {/* Decorative animated geometric particles */}
+      <div className="pointer-events-none absolute top-32 left-[8%] w-2.5 h-2.5 rounded-full bg-blue-400/40 dark:bg-sky-400/30 animate-bounce" style={{animationDuration:'3.1s'}} />
+      <div className="pointer-events-none absolute top-48 right-[12%] w-2 h-2 rounded-full bg-emerald-400/50 dark:bg-emerald-400/30 animate-bounce" style={{animationDuration:'4.3s', animationDelay:'0.8s'}} />
+      <div className="pointer-events-none absolute top-72 left-[18%] w-1.5 h-1.5 rounded-full bg-indigo-400/40 dark:bg-indigo-400/25 animate-bounce" style={{animationDuration:'3.7s', animationDelay:'1.4s'}} />
+      <div className="pointer-events-none absolute top-40 right-[22%] w-3 h-3 rotate-45 bg-sky-300/30 dark:bg-sky-300/20 animate-pulse" style={{animationDuration:'5s'}} />
+      <div className="pointer-events-none absolute top-20 left-1/3 w-1.5 h-1.5 rounded-full bg-blue-300/50 animate-ping" style={{animationDuration:'3s', animationDelay:'2s'}} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
         {/* Floating Card Left: Live OCR Transaction Scan (3D Mouse Parallax) */}
@@ -302,16 +311,6 @@ export const HeroSection = () => {
 
         {/* Hero Main Content */}
         <div className="hero-content-wrap max-w-3xl xl:max-w-3xl 2xl:max-w-4xl mx-auto text-center relative z-10">
-          {/* Release Pill Badge */}
-          <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-200 bg-white/95 dark:bg-slate-900/95 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold mb-6 shadow-xs cursor-default hover:border-slate-300 transition-colors">
-            <span className="flex h-2 w-2 rounded-full bg-[#1E3A8A] dark:bg-sky-400 animate-pulse" />
-            <span className="font-bold text-[#1E3A8A] dark:text-sky-400">SADAR v1.0</span>
-            <span className="text-slate-300 dark:text-slate-600">•</span>
-            <span className="flex items-center gap-1">
-              Platform Finansial Cerdas Berbasis AI & OCR
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            </span>
-          </div>
 
           {/* Hero Main Headline with Kinetic Word Stagger */}
           <h1
@@ -337,8 +336,27 @@ export const HeroSection = () => {
             secara objektif.
           </p>
 
+          {/* Social Proof Chip */}
+          <div className="hero-subtitle mt-8 flex items-center justify-center gap-3 flex-wrap">
+            {/* Avatar stack */}
+            <div className="flex -space-x-2.5">
+              {['bg-gradient-to-br from-blue-400 to-blue-600','bg-gradient-to-br from-emerald-400 to-emerald-600','bg-gradient-to-br from-violet-400 to-violet-600','bg-gradient-to-br from-amber-400 to-amber-500'].map((grad, i) => (
+                <div key={i} className={`w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 ${grad} shadow-sm flex items-center justify-center text-white text-[9px] font-black`}>
+                  {['F','H','D','Z'][i]}
+                </div>
+              ))}
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Dipercaya <span className="text-[#1E3A8A] dark:text-sky-400">500+ pengguna aktif</span></p>
+              <div className="flex items-center gap-0.5 mt-0.5">
+                {[...Array(5)].map((_, i) => <span key={i} className="text-amber-400 text-[10px]">★</span>)}
+                <span className="text-[10px] text-slate-500 ml-1 font-medium">4.9/5</span>
+              </div>
+            </div>
+          </div>
+
           {/* Call to Actions with Shimmer Effect */}
-          <div className="hero-actions mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <div className="hero-actions mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -395,6 +413,13 @@ export const HeroSection = () => {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Bottom Wave SVG Divider */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none -z-0 overflow-hidden">
+        <svg viewBox="0 0 1440 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
+          <path d="M0,36 C360,72 1080,0 1440,36 L1440,72 L0,72 Z" fill="white" className="dark:fill-slate-900" fillOpacity="1"/>
+        </svg>
       </div>
     </section>
   );

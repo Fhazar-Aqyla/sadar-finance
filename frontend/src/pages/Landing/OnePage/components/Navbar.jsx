@@ -90,7 +90,7 @@ export const Navbar = () => {
                   className={`text-sm font-medium transition-colors relative py-1 group ${
                     isActive
                       ? "text-[#1E3A8A] dark:text-sky-400 font-bold"
-                      : "text-slate-600 hover:text-[#1E3A8A] dark:text-slate-300 dark:hover:text-sky-400"
+                      : "text-[#1E3A8A]/60 hover:text-[#1E3A8A] dark:text-slate-300 dark:hover:text-sky-400"
                   }`}
                 >
                   {link.label}

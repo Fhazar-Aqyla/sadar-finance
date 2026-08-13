@@ -3,17 +3,13 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import {
   XCircle,
   CheckCircle2,
-  AlertOctagon,
   Sparkles,
   ArrowRight,
-  TrendingUp,
   FileSpreadsheet,
-  Receipt,
-  ShieldCheck,
   Zap,
+  ArrowLeftRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { SpotlightCard } from "@/Components/ui/spotlight-card";
 
 export const ComparisonSection = () => {
   const containerRef = useRef(null);
@@ -29,8 +25,8 @@ export const ComparisonSection = () => {
     restDelta: 0.001,
   });
 
-  const yManual = useTransform(smoothProgress, [0, 1], [25, -25]);
-  const ySadar = useTransform(smoothProgress, [0, 1], [-20, 20]);
+  const yManual = useTransform(smoothProgress, [0, 1], [30, -30]);
+  const ySadar = useTransform(smoothProgress, [0, 1], [-25, 25]);
 
   const manualDrawbacks = [
     {
@@ -73,141 +69,200 @@ export const ComparisonSection = () => {
   return (
     <section
       ref={containerRef}
-      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="py-20 lg:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-80 bg-blue-500/5 dark:bg-sky-400/5 blur-[100px] pointer-events-none rounded-full" />
-
-      {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto mb-16 relative z-10">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-blue-100 dark:border-blue-900/40">
-          <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-          Transformasi Finansial
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          Tinggalkan Cara Lama yang{" "}
-          <span className="text-rose-600 dark:text-rose-400">Melelahkan</span>,
-          Beralih ke{" "}
-          <span className="text-[#1E3A8A] dark:text-sky-400">SADAR Finance.</span>
-        </h2>
-        <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-          Bandingkan bagaimana otomatisasi AI dan metode 50/30/20 mengubah cara kamu mengelola uang setiap harinya.
-        </p>
+      {/* Ambient background blobs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-400/8 dark:bg-rose-500/6 blur-[120px] rounded-full" />
+        <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/8 dark:bg-sky-400/6 blur-[120px] rounded-full" />
       </div>
 
+      {/* Section Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="text-center max-w-3xl mx-auto mb-20 relative z-10"
+      >
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm border border-blue-100 dark:border-blue-900/40">
+          <ArrowLeftRight className="w-3.5 h-3.5" />
+          Transformasi Finansial
+        </div>
+        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+          <span className="text-slate-900 dark:text-white">Tinggalkan Cara Lama yang{" "}</span>
+          <span className="text-rose-600 dark:text-rose-400">Melelahkan</span><span className="text-slate-900 dark:text-white">,{" "}</span>
+          <br className="hidden sm:block" />
+          <span className="text-slate-900 dark:text-white">Beralih ke{" "}</span>
+          <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">
+            SADAR Finance.
+          </span>
+        </h2>
+        <p className="mt-4 text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
+          Bandingkan bagaimana otomatisasi AI dan metode 50/30/20 mengubah cara
+          kamu mengelola uang setiap harinya.
+        </p>
+      </motion.div>
+
       {/* Comparison Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch relative z-10">
-        {/* Card 1: Cara Tradisional / Manual */}
-        <motion.div style={{ y: yManual }} className="h-full">
-          <div className="h-full rounded-3xl border border-rose-200/80 bg-gradient-to-b from-rose-50/40 via-white to-rose-50/20 dark:from-rose-950/20 dark:via-slate-900 dark:to-rose-950/10 p-6 sm:p-8 flex flex-col justify-between shadow-xs dark:border-rose-900/40">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-rose-100 dark:border-rose-900/30 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-0 items-stretch relative z-10">
+        {/* ── Left: Manual Card ── */}
+        <motion.div style={{ y: yManual }}>
+          <motion.div
+            initial={{ opacity: 0, x: -32 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="h-full rounded-3xl border border-rose-200 dark:border-rose-900/50 bg-white dark:bg-slate-900 overflow-hidden shadow-lg shadow-rose-500/5"
+          >
+            {/* Card header */}
+            <div className="px-7 py-6 bg-gradient-to-br from-rose-50 to-rose-100/40 dark:from-rose-950/40 dark:to-slate-900 border-b border-rose-100 dark:border-rose-900/40">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-950/70 text-rose-500 flex items-center justify-center shadow-sm">
                     <FileSpreadsheet className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-slate-900 dark:text-white text-lg">
+                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-tight">
                       Cara Manual & Konvensional
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-400 mt-0.5">
                       Metode lama tanpa otomatisasi
                     </p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 text-xs font-bold">
+                <span className="shrink-0 px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase tracking-wide border border-rose-200 dark:border-rose-800">
                   Sering Gagal
                 </span>
               </div>
-
-              <div className="space-y-4">
-                {manualDrawbacks.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    whileHover={{ x: 4 }}
-                    className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-rose-100/80 dark:border-rose-900/30 transition-all"
-                  >
-                    <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed font-normal">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-rose-100 dark:border-rose-900/30 text-center">
-              <span className="text-xs font-bold text-rose-600 dark:text-rose-400">
-                ⚠️ Rentan bocor halus & memakan waktu 30-45 menit/minggu
-              </span>
+            {/* Items */}
+            <div className="px-7 py-6 space-y-3">
+              {manualDrawbacks.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.08, duration: 0.4 }}
+                  whileHover={{ x: 5 }}
+                  className="flex items-start gap-3.5 p-4 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 transition-all cursor-default"
+                >
+                  <div className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-rose-100 dark:bg-rose-900/60 flex items-center justify-center">
+                    <XCircle className="w-4 h-4 text-rose-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          </div>
+
+            {/* Footer */}
+            <div className="mx-7 mb-6 px-4 py-3 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <p className="text-xs font-semibold text-rose-600 dark:text-rose-400">
+                Rentan bocor halus & memakan waktu 30–45 menit/minggu
+              </p>
+            </div>
+          </motion.div>
         </motion.div>
 
-        {/* Card 2: Bersama SADAR Finance */}
-        <motion.div style={{ y: ySadar }} className="h-full">
-          <SpotlightCard className="h-full rounded-3xl border-2 border-[#1E3A8A]/30 dark:border-sky-500/30 bg-gradient-to-b from-blue-50/60 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 p-6 sm:p-8 flex flex-col justify-between shadow-xl shadow-blue-500/5">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-blue-100 dark:border-blue-900/40 mb-6">
+        {/* ── Center Divider ── */}
+        <div className="hidden lg:flex flex-col items-center justify-center px-6 gap-3">
+          <div className="w-px flex-1 bg-gradient-to-b from-transparent via-slate-200 dark:via-slate-700 to-transparent" />
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-rose-400/30 to-blue-500/30 blur-md animate-pulse" />
+            <div className="relative w-12 h-12 rounded-full border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center justify-center shadow-lg">
+              <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 tracking-widest">VS</span>
+            </div>
+          </div>
+          <div className="w-px flex-1 bg-gradient-to-b from-transparent via-slate-200 dark:via-slate-700 to-transparent" />
+        </div>
+
+        {/* ── Right: SADAR Card ── */}
+        <motion.div style={{ y: ySadar }}>
+          <motion.div
+            initial={{ opacity: 0, x: 32 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="h-full rounded-3xl border-2 border-[#1E3A8A]/25 dark:border-sky-500/30 bg-white dark:bg-slate-900 overflow-hidden shadow-2xl shadow-blue-500/10 relative"
+          >
+            {/* Subtle inner glow top */}
+            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-blue-50/80 to-transparent dark:from-blue-950/30 dark:to-transparent pointer-events-none" />
+
+            {/* Card header */}
+            <div className="relative px-7 py-6 bg-gradient-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/40 dark:to-slate-900 border-b border-blue-100 dark:border-blue-900/40">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1E3A8A] text-white flex items-center justify-center shadow-sm">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#1E3A8A] to-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-slate-900 dark:text-white text-lg flex items-center gap-2">
+                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-tight flex items-center gap-2">
                       Bersama SADAR Finance
                       <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     </h3>
-                    <p className="text-xs text-[#1E3A8A] dark:text-sky-400 font-semibold">
+                    <p className="text-xs text-[#1E3A8A] dark:text-sky-400 font-semibold mt-0.5">
                       AI Powered & Realtime Ecosystem
                     </p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 text-xs font-black border border-emerald-200 dark:border-emerald-800">
-                  Direkomendasikan
+                <span className="shrink-0 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 text-[10px] font-black uppercase tracking-wide border border-emerald-200 dark:border-emerald-800">
+                  ✦ Direkomendasikan
                 </span>
-              </div>
-
-              <div className="space-y-4">
-                {sadarAdvantages.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    whileHover={{ x: 4 }}
-                    className="flex items-start gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-900/50 shadow-xs hover:border-[#1E3A8A]/40 dark:hover:border-sky-400/40 transition-all"
-                  >
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed font-normal">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
               </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-blue-100 dark:border-blue-900/40 flex items-center justify-between gap-4">
-              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+            {/* Items */}
+            <div className="px-7 py-6 space-y-3 relative z-10">
+              {sadarAdvantages.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: 16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.08 + 0.1, duration: 0.4 }}
+                  whileHover={{ x: -5 }}
+                  className="flex items-start gap-3.5 p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 hover:border-[#1E3A8A]/30 dark:hover:border-sky-500/40 transition-all cursor-default"
+                >
+                  <div className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div className="mx-7 mb-6 px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-50 to-emerald-50/60 dark:from-blue-950/30 dark:to-emerald-950/20 border border-blue-100 dark:border-blue-900/40 flex items-center justify-between gap-4">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
                 <Sparkles className="w-3.5 h-3.5" />
                 Hemat waktu hingga 95% & Bebas Stres
               </span>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1E3A8A] hover:text-[#1A3175] dark:text-sky-400 hover:underline group"
+                className="inline-flex items-center gap-1.5 text-xs font-black text-[#1E3A8A] dark:text-sky-400 hover:underline group whitespace-nowrap"
               >
-                Coba Sekarang{" "}
+                Coba Sekarang
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-          </SpotlightCard>
+          </motion.div>
         </motion.div>
       </div>
     </section>

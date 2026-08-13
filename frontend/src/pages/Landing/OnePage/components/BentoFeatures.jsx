@@ -49,7 +49,7 @@ export const BentoFeatures = () => {
     const kontrolBelanja = Math.min(92, Math.max(30, Math.round(val * 0.91)));
     const danaDarurat = Math.min(
       6.0,
-      Math.max(0.5, Math.round((val / 100) * 60) / 10)
+      Math.max(0.5, Math.round((val / 100) * 60) / 10),
     ).toFixed(1);
 
     if (val < 60) {
@@ -143,9 +143,9 @@ export const BentoFeatures = () => {
           <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Teknologi & Fitur Utama
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          Solusi Cerdas untuk Mengelola Keuangan{" "}
-          <span className="text-[#1E3A8A] dark:text-sky-400">
+        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+          <span className="text-slate-900 dark:text-white">Solusi Cerdas untuk Mengelola Keuangan{" "}</span>
+          <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">
             Tanpa Rasa Khawatir.
           </span>
         </h2>
@@ -169,9 +169,9 @@ export const BentoFeatures = () => {
                 Cukup Foto Struk Belanja, AI yang Menginput Datanya
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed font-normal">
-                Tak perlu lagi mencatat struk belanja satu per satu. Sistem cerdas
-                SADAR mengekstrak merchant, tanggal, total nominal, dan membaginya
-                ke pos 50/30/20 secara otomatis.
+                Tak perlu lagi mencatat struk belanja satu per satu. Sistem
+                cerdas SADAR mengekstrak merchant, tanggal, total nominal, dan
+                membaginya ke pos 50/30/20 secara otomatis.
               </p>
             </div>
             <ReceiptScannerDemo />
@@ -202,8 +202,9 @@ export const BentoFeatures = () => {
                 Evaluasi Kesehatan Finansial Realtime
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal leading-relaxed">
-                SADAR mengevaluasi rasio tabungan, kepatuhan anggaran, dan ketahanan
-                dana daruratmu untuk menghasilkan skor objektif (0–100).
+                SADAR mengevaluasi rasio tabungan, kepatuhan anggaran, dan
+                ketahanan dana daruratmu untuk menghasilkan skor objektif
+                (0–100).
               </p>
 
               {/* Full Circular 360° Ring Display */}
@@ -412,8 +413,9 @@ export const BentoFeatures = () => {
                   Deteksi Dini Sebelum Anggaran Bocor
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
-                  SADAR memproyeksikan laju pengeluaran harian hingga akhir bulan
-                  dan mengirim peringatan proaktif sebelum batas anggaran terlampaui.
+                  SADAR memproyeksikan laju pengeluaran harian hingga akhir
+                  bulan dan mengirim peringatan proaktif sebelum batas anggaran
+                  terlampaui.
                 </p>
 
                 {/* Simulated Overspending Progress Card */}
@@ -454,8 +456,8 @@ export const BentoFeatures = () => {
                   <strong className="text-slate-900 dark:text-slate-200 font-bold">
                     Rekomendasi Cerdas:
                   </strong>{" "}
-                  Batasi pengeluaran kategori kuliner akhir pekan ini agar alokasi
-                  30% tetap aman.
+                  Batasi pengeluaran kategori kuliner akhir pekan ini agar
+                  alokasi 30% tetap aman.
                 </p>
               </div>
             </SpotlightCard>
@@ -479,7 +481,8 @@ export const BentoFeatures = () => {
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
                   Gabungkan saldo rekening bank, dompet tunai, hingga e-wallet
-                  favoritmu ke dalam satu ringkasan kekayaan bersih (Net Worth) yang selalu sinkron.
+                  favoritmu ke dalam satu ringkasan kekayaan bersih (Net Worth)
+                  yang selalu sinkron.
                 </p>
 
                 {/* Account Balances Visual Row Cards */}

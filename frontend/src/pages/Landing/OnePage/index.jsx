@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
-import { EcosystemMarquee } from "./components/EcosystemMarquee";
 import { ScrollShowcase } from "./components/ScrollShowcase";
 import { BentoFeatures } from "./components/BentoFeatures";
 import { ComparisonSection } from "./components/ComparisonSection";
@@ -72,7 +71,7 @@ const LandingOnePage = () => {
   return (
     <div
       onMouseMove={handleMouseMove}
-      className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#1E3A8A] selection:text-white overflow-x-hidden font-sans relative"
+      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white dark:from-slate-950 dark:via-slate-900/80 dark:to-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#1E3A8A] selection:text-white overflow-x-hidden font-sans relative"
     >
       {/* Interactive Global Ambient Cursor Glow Follower */}
       <div
@@ -89,8 +88,6 @@ const LandingOnePage = () => {
         {/* 1. Hero Section with Multi-Layer Parallax & 3D Interactive Cards */}
         <HeroSection />
 
-        {/* 2. Infinite Continuous Ecosystem Marquee (Banks, E-Wallets, Core Tech) */}
-        <EcosystemMarquee />
 
         {/* 3. 3D Perspective Scroll Showcase */}
         <ScrollShowcase />

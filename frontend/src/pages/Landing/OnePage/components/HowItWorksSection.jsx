@@ -71,9 +71,9 @@ export const HowItWorksSection = () => {
           <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Alur Kerja Simpel
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          Tiga Langkah Mudah Menuju{" "}
-          <span className="text-[#1E3A8A] dark:text-sky-400">
+        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+          <span className="text-slate-900 dark:text-white">Tiga Langkah Mudah Menuju{" "}</span>
+          <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">
             Sadar Finansial.
           </span>
         </h2>

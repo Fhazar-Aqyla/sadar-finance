@@ -259,15 +259,17 @@ export const TeamSection = () => {
     >
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-80 bg-blue-500/5 dark:bg-sky-400/5 blur-[100px] pointer-events-none rounded-full" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-violet-300/5 dark:bg-violet-500/4 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-sky-300/6 dark:bg-sky-500/4 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="text-center max-w-3xl mx-auto mb-16 relative z-10">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs border border-blue-100 dark:border-blue-900/40">
           <Users className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Tim di Balik SADAR
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          Didedikasikan untuk Mendorong{" "}
-          <span className="text-[#1E3A8A] dark:text-sky-400">
+        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+          <span className="text-slate-900 dark:text-white">Didedikasikan untuk Mendorong{" "}</span>
+          <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">
             Literasi Finansial Indonesia.
           </span>
         </h2>

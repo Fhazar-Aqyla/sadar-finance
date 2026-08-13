@@ -93,7 +93,8 @@ export const ReceiptScannerDemo = () => {
               Simulasi Ekstraksi Struk Belanja
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Pilih contoh struk kasir di bawah ini untuk melihat akurasi sistem AI OCR SADAR.
+              Pilih contoh struk kasir di bawah ini untuk melihat akurasi sistem
+              AI OCR SADAR.
             </p>
           </div>
         </div>
@@ -141,7 +142,11 @@ export const ReceiptScannerDemo = () => {
                 initial={{ top: "0%" }}
                 animate={{ top: ["0%", "100%", "0%"] }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut", repeat: Infinity }}
+                transition={{
+                  duration: 0.8,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                }}
                 className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#1E3A8A] dark:via-sky-400 to-transparent shadow-[0_0_12px_#38bdf8] z-20"
               />
             ) : (
@@ -241,7 +246,8 @@ export const ReceiptScannerDemo = () => {
 
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal Transaksi
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal
+                  Transaksi
                 </span>
                 <span className="font-semibold text-slate-900 dark:text-white">
                   {activeReceipt.date}
@@ -259,7 +265,8 @@ export const ReceiptScannerDemo = () => {
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-[#1E3A8A] text-white shadow-sm font-medium">
                 <span className="text-white/90 flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" /> Total Terverifikasi
+                  <CheckCircle className="w-4 h-4 text-emerald-400" /> Total
+                  Terverifikasi
                 </span>
                 <span className="text-base font-black">
                   {activeReceipt.total}
