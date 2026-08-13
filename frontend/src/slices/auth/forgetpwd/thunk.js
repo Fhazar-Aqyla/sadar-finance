@@ -42,7 +42,7 @@ export const userForgetPassword = (user) => async (dispatch) => {
       if (data) {
           dispatch(userForgetPasswordSuccess("Link reset password berhasil dikirim."))
       }
-  } catch (forgetError) {
+  } catch {
       dispatch(userForgetPasswordError("Reset password gagal."))
   }
 }

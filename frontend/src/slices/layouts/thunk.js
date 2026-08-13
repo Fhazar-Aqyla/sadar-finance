@@ -1,4 +1,4 @@
-import { changeHTMLAttribute } from './utils';
+﻿import { changeHTMLAttribute } from './utils';
 import {
     changeLayoutAction,
     changeLayoutModeAction,
@@ -29,7 +29,7 @@ export const changeLayout = (layout) => async (dispatch) => {
         }
         changeHTMLAttribute("data-layout", layout);
         dispatch(changeLayoutAction(layout));
-    } catch (error) { }
+    } catch {}
 };
 
 /**
@@ -40,7 +40,7 @@ export const changeLayoutMode = (layoutMode) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-bs-theme", layoutMode);
         dispatch(changeLayoutModeAction(layoutMode));
-    } catch (error) { }
+    } catch {}
 };
 
 /**
@@ -51,9 +51,7 @@ export const changeSidebarTheme = (theme) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-sidebar", theme);
         dispatch(changeSidebarThemeAction(theme));
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -68,9 +66,7 @@ export const changeLayoutWidth = (layoutWidth) => async (dispatch) => {
             changeHTMLAttribute("data-layout-width", "boxed");
         }
         dispatch(changeLayoutWidthAction(layoutWidth));
-    } catch (error) {
-        return error;
-    }
+    } catch {}
 };
 
 /**
@@ -81,9 +77,7 @@ export const changeLayoutPosition = (layoutposition) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-layout-position", layoutposition);
         dispatch(changeLayoutPositionAction(layoutposition));
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -95,9 +89,7 @@ export const changeTopbarTheme = (topbarTheme) => async (dispatch) => {
         changeHTMLAttribute("data-topbar", topbarTheme);
         dispatch(changeTopbarThemeAction(topbarTheme));
 
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -108,9 +100,7 @@ export const changeSidebarImageType = (leftsidebarImagetype) => async (dispatch)
     try {
         changeHTMLAttribute("data-sidebar-image", leftsidebarImagetype);
         dispatch(changeSidebarImageTypeAction(leftsidebarImagetype));
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -121,9 +111,7 @@ export const changePreLoader = (preloaderTypes) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-preloader", preloaderTypes);
         dispatch(changePreLoaderAction(preloaderTypes));
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -150,9 +138,7 @@ export const changeLeftsidebarSizeType = (leftsidebarSizetype) => async (dispatc
         }
         dispatch(changeLeftsidebarSizeTypeAction(leftsidebarSizetype));
 
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -163,9 +149,7 @@ export const changeLeftsidebarViewType = (leftsidebarViewtype) => async (dispatc
     try {
         changeHTMLAttribute("data-layout-style", leftsidebarViewtype);
         dispatch(changeLeftsidebarViewTypeAction(leftsidebarViewtype));
-    } catch (error) {
-        // console.log(error);
-    }
+    } catch {}
 };
 
 /**
@@ -176,5 +160,5 @@ export const changeSidebarVisibility = (sidebarVisibilitytype) => async (dispatc
     try {
         changeHTMLAttribute("data-sidebar-visibility", sidebarVisibilitytype);
         dispatch(changeSidebarVisibilityAction(sidebarVisibilitytype));
-    } catch (error) { }
+    } catch {}
 };

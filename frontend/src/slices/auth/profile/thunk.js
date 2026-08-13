@@ -40,7 +40,7 @@ export const editProfile = (user) => async (dispatch) => {
             dispatch(profileSuccess(data));
         }
 
-    } catch (error) {
+    } catch {
         dispatch(profileError("Profil gagal diperbarui."));
     }
 };

@@ -28,7 +28,7 @@ class FirebaseAuthBackend {
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then(
-          user => {
+          () => {
             resolve(firebase.auth().currentUser);
           },
           error => {
@@ -47,7 +47,7 @@ class FirebaseAuthBackend {
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then(
-          user => {
+          () => {
             resolve(firebase.auth().currentUser);
           },
           error => {
@@ -66,7 +66,7 @@ class FirebaseAuthBackend {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then(
-          user => {
+          () => {
             resolve(firebase.auth().currentUser);
           },
           error => {

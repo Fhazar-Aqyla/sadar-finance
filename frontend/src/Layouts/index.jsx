@@ -72,8 +72,6 @@ const Layout = (props) => {
         topbarThemeType,
         leftsidbarSizeType,
         leftSidebarViewType,
-        leftSidebarImageType,
-        preloader,
         sidebarVisibilitytype
     } = useSelector(selectLayoutProperties);
     const scrollNavigation = () => {

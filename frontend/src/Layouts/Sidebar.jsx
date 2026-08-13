@@ -33,19 +33,9 @@ const sidebarWidths = {
 const getStoredUser = () => {
   try {
     return JSON.parse(localStorage.getItem("authUser") || "null");
-  } catch (error) {
+  } catch {
     return null;
   }
-};
-
-const getInitials = (name) => {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
 };
 
 const normalizeAccountName = (value) => {
@@ -109,8 +99,6 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
       "aqyla@example.com"
     );
   }, [profileUser]);
-
-  const userInitials = getInitials(userName) || "AF";
 
   const userAvatar = useMemo(() => {
     const rawAvatar =

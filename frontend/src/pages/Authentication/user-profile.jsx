@@ -58,7 +58,7 @@ const UserProfile = () => {
 
     try {
       return JSON.parse(storedUser);
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -104,7 +104,10 @@ const UserProfile = () => {
     }
   });
 
-  document.title = "Profil | SADAR Finance";
+  useEffect(() => {
+    document.title = "Profil | SADAR Finance";
+  }, []);
+
   return (
     <React.Fragment>
       <div className="page-content">

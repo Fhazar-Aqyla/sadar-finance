@@ -18,7 +18,7 @@ const apiClient = axios.create({
 const getAuthUser = () => {
   try {
     return JSON.parse(localStorage.getItem("authUser") || "null");
-  } catch (_error) {
+  } catch {
     return null;
   }
 };
