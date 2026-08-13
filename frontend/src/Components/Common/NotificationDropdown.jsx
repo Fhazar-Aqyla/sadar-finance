@@ -75,8 +75,17 @@ const NotificationDropdown = () => {
               <Col>
                 <h6 className="m-0 fs-16 fw-semibold text-white">Notifikasi Keuangan</h6>
               </Col>
-              <div className="col-auto">
+              <div className="col-auto d-flex align-items-center gap-2">
                 <span className="badge bg-light-subtle text-body fs-13">{notifications.length} Baru</span>
+                <button
+                  type="button"
+                  className="btn btn-sm p-0 border-0 bg-transparent text-white"
+                  onClick={() => setIsNotificationDropdown(false)}
+                  aria-label="Tutup notifikasi"
+                  title="Tutup"
+                >
+                  <i className="bx bx-x fs-22"></i>
+                </button>
               </div>
             </Row>
           </div>
