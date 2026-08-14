@@ -48,6 +48,8 @@
     "filepond-plugin-image-preview": "^4.6.12",
     "firebase": "^12.13.0",
     "formik": "^2.4.6",
+    "@gsap/react": "^2.1.2",
+    "gsap": "^3.15.0",
     "framer-motion": "^12.38.0",
     "i18next": "^23.16.0",
     "i18next-browser-languagedetector": "^8.0.0",

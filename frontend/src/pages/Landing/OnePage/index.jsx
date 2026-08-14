@@ -1,11 +1,13 @@
 ﻿import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Hero } from "@/Components/ui/animated-hero";
+import GsapHero from "@/Components/ui/gsap-hero";
 import { ContainerScroll } from "@/Components/ui/container-scroll-animation";
 import { GradientBackground } from "@/Components/ui/gradient-background";
 import { Cta4 } from "@/Components/ui/cta-4";
 import { Footer } from "@/Components/ui/footer";
 import ModernTeamShowcase from "@/Components/ui/cybernetic-team-showcase";
+import GsapReveal from "@/Components/ui/gsap-reveal";
+import StatsBar from "@/Components/ui/stats-bar";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import sadarLogo from "../../../assets/images/landing/sadar-logo.png";
@@ -70,40 +72,40 @@ const teamData = [
     name: "Diah Ayu Puspasari",
     title: "Data Scientist",
     avatar: diahAvatar,
-    socials: { 
-      github: "https://github.com/Diahayuups", 
-      linkedin: "https://www.linkedin.com/in/diahaps/", 
-      instagram: "https://www.instagram.com/diahayupsss" 
+    socials: {
+      github: "https://github.com/Diahayuups",
+      linkedin: "https://www.linkedin.com/in/diahaps/",
+      instagram: "https://www.instagram.com/diahayupsss"
     }
   },
   {
     name: "Marsela",
     title: "Data Scientist",
     avatar: marselaAvatar,
-    socials: { 
-      github: "https://github.com/Marsela0603", 
-      linkedin: "https://www.linkedin.com/in/marsela-marsela-30a763248", 
-      instagram: "https://www.linkedin.com/in/marsela-marsela-30a763248" 
+    socials: {
+      github: "https://github.com/Marsela0603",
+      linkedin: "https://www.linkedin.com/in/marsela-marsela-30a763248",
+      instagram: "https://www.linkedin.com/in/marsela-marsela-30a763248"
     }
   },
   {
     name: "Dzaky Jaisy Al-Qorney",
     title: "AI Engineer",
     avatar: dzakyAvatar,
-    socials: { 
-      github: "https://github.com/iMiNerVaa", 
-      linkedin: "https://www.linkedin.com/in/dj-al/", 
-      instagram: "https://www.instagram.com/_zerxx_/" 
+    socials: {
+      github: "https://github.com/iMiNerVaa",
+      linkedin: "https://www.linkedin.com/in/dj-al/",
+      instagram: "https://www.instagram.com/_zerxx_/"
     }
   },
   {
     name: "Farrel Al Faqih Ekatama",
     title: "AI Engineer",
     avatar: farrelAvatar,
-    socials: { 
-      github: "https://github.com/farrelalfaqih", 
-      linkedin: "https://www.linkedin.com/in/farrel-al-faqih-ekatama-339980217/", 
-      instagram: "https://www.instagram.com/farrelalfaqih.fae?igsh=MWEzcDZnMW1nMjE5dQ==" 
+    socials: {
+      github: "https://github.com/farrelalfaqih",
+      linkedin: "https://www.linkedin.com/in/farrel-al-faqih-ekatama-339980217/",
+      instagram: "https://www.instagram.com/farrelalfaqih.fae?igsh=MWEzcDZnMW1nMjE5dQ=="
     }
   },
   {
@@ -111,104 +113,23 @@ const teamData = [
     title: "Full Stack Developer",
     avatar: fhazarAvatar,
     objectPosition: "center 30%",
-    socials: { 
-      github: "https://github.com/Fhazar-Aqyla", 
-      linkedin: "https://www.linkedin.com/in/fhazaraqyla/", 
-      instagram: "https://www.instagram.com/fhazar_aqyla/" 
+    socials: {
+      github: "https://github.com/Fhazar-Aqyla",
+      linkedin: "https://www.linkedin.com/in/fhazaraqyla/",
+      instagram: "https://www.instagram.com/fhazar_aqyla/"
     }
   },
   {
     name: "Muhammad Habib Rafi",
     title: "Full Stack Developer",
     avatar: habibAvatar,
-    socials: { 
-      github: "https://github.com/mhmdhabibrafi", 
-      linkedin: "https://www.linkedin.com/in/mhmdhabibrafi", 
-      instagram: "https://www.instagram.com/mhmdhabibrafi?igsh=MWV6bnR1N2R2Njd2YQ==" 
+    socials: {
+      github: "https://github.com/mhmdhabibrafi",
+      linkedin: "https://www.linkedin.com/in/mhmdhabibrafi",
+      instagram: "https://www.instagram.com/mhmdhabibrafi?igsh=MWV6bnR1N2R2Njd2YQ=="
     }
   }
 ];
-
-const scalePopVariants = {
-  offscreen: { scale: 0.96, opacity: 0 },
-  onscreen: (index = 0) => ({
-    scale: 1,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      bounce: 0.15,
-      duration: 0.8,
-      delay: index * 0.1,
-    }
-  })
-};
-
-const slideFromLeftVariants = {
-  offscreen: { x: -50, opacity: 0 },
-  onscreen: {
-    x: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      bounce: 0.1,
-      duration: 0.8,
-    }
-  }
-};
-
-const slideFromRightVariants = {
-  offscreen: { x: 50, opacity: 0 },
-  onscreen: {
-    x: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      bounce: 0.1,
-      duration: 0.8,
-    }
-  }
-};
-
-const scaleUpVariants = {
-  offscreen: { scale: 0.95, opacity: 0 },
-  onscreen: (index = 0) => ({
-    scale: 1,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      bounce: 0.15,
-      duration: 0.8,
-      delay: index * 0.1,
-    }
-  })
-};
-
-const chronologicalStepVariants = {
-  offscreen: { x: 30, opacity: 0 },
-  onscreen: (index = 0) => ({
-    x: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      bounce: 0.15,
-      duration: 0.8,
-      delay: index * 0.12,
-    }
-  })
-};
-
-const headerFadeInVariants = {
-  offscreen: { y: 20, opacity: 0 },
-  onscreen: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      bounce: 0.1,
-      duration: 0.8,
-    }
-  }
-};
 
 const shellClass =
   "mx-auto w-[min(calc(100%_-_96px),1360px)] max-lg:w-[min(calc(100%_-_48px),1080px)] max-sm:w-[min(calc(100%_-_28px),1080px)]";
@@ -548,7 +469,7 @@ const OnePage = () => {
           className="pointer-events-none absolute inset-x-0 top-[54rem] h-[26rem] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.72)_54%,#FFFFFF_100%)] max-md:top-[48rem] max-md:h-[22rem]"
         />
         <div className="relative z-10">
-          <Hero />
+          <GsapHero />
 
           <ContainerScroll>
             <DashboardPreview />
@@ -556,17 +477,16 @@ const OnePage = () => {
         </div>
       </div>
 
+      <StatsBar />
+
       <section
         id="features"
         className="relative z-10 bg-[#F8FBFF] pb-24 pt-14 max-md:py-16"
       >
         <div className={shellClass}>
-          <motion.div 
-            initial="offscreen" 
-            whileInView="onscreen" 
-            viewport={{ once: true, amount: 0.3 }} 
-            variants={headerFadeInVariants} 
+          <GsapReveal
             className="mx-auto max-w-[680px] text-center"
+            stagger={0.15}
           >
             <span className={sectionBadgeClass}>Fitur SADAR</span>
             <h2 className={sectionHeadingClass}>
@@ -577,17 +497,10 @@ const OnePage = () => {
               Semua dirancang untuk membantumu lebih sadar, lebih terkontrol,
               dan lebih bijak dalam mengelola uangmu secara lebih efektif.
             </p>
-          </motion.div>
+          </GsapReveal>
 
-          <div className="mt-10 grid auto-rows-[minmax(178px,auto)] grid-cols-3 gap-4 max-lg:auto-rows-auto max-lg:grid-cols-2 max-sm:grid-cols-1">
-            <motion.div 
-              variants={scalePopVariants} 
-              custom={0} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={compactCardClass}
-            >
+          <GsapReveal className="mt-10 grid auto-rows-[minmax(178px,auto)] grid-cols-3 gap-4 max-lg:auto-rows-auto max-lg:grid-cols-2 max-sm:grid-cols-1">
+            <div className={compactCardClass}>
               <div>
                 <h3 className={stepTitleClass}>Catat transaksi harian</h3>
                 <p className={stepBodyClass}>
@@ -596,16 +509,9 @@ const OnePage = () => {
                 </p>
                 <StepTransactionPreview />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={scalePopVariants} 
-              custom={1} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={compactCardClass}
-            >
+            <div className={compactCardClass}>
               <div>
                 <h3 className={stepTitleClass}>Kategori langsung kebaca</h3>
                 <p className={stepBodyClass}>
@@ -614,16 +520,9 @@ const OnePage = () => {
                 </p>
                 <StepCategoryPreview />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={scalePopVariants} 
-              custom={2} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={compactCardClass}
-            >
+            <div className={compactCardClass}>
               <div>
                 <h3 className={stepTitleClass}>Budget dipantau real-time</h3>
                 <p className={stepBodyClass}>
@@ -632,16 +531,9 @@ const OnePage = () => {
                 </p>
                 <StepBudgetPreview />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={scalePopVariants} 
-              custom={3} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={`${compactCardClass} col-span-2 max-sm:col-span-1`}
-            >
+            <div className={`${compactCardClass} col-span-2 max-sm:col-span-1`}>
               <div>
                 <h3 className={stepTitleClass}>Dashboard merangkum arus kas</h3>
                 <p className="mt-2 max-w-[460px] text-[12px] leading-5 text-[#7A8795]">
@@ -650,16 +542,9 @@ const OnePage = () => {
                 </p>
                 <StepDashboardPreview />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={scalePopVariants} 
-              custom={4} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={compactCardClass}
-            >
+            <div className={compactCardClass}>
               <div>
                 <h3 className={stepTitleClass}>Insight jadi rekomendasi</h3>
                 <p className={stepBodyClass}>
@@ -668,19 +553,16 @@ const OnePage = () => {
                 </p>
                 <StepInsightPreview />
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </GsapReveal>
         </div>
       </section>
 
       <section id="benefits" className="bg-white pb-24 pt-8 max-md:pb-16">
         <div className={shellClass}>
-          <motion.div 
-            initial="offscreen" 
-            whileInView="onscreen" 
-            viewport={{ once: true, amount: 0.3 }} 
-            variants={headerFadeInVariants} 
+          <GsapReveal
             className="mx-auto max-w-[760px] text-center"
+            stagger={0.15}
           >
             <span className={sectionBadgeClass}>Manfaat</span>
             <h2 className={sectionHeadingClass}>
@@ -691,16 +573,10 @@ const OnePage = () => {
               untuk membantu kamu memahami dan mengontrol keuanganmu dengan
               lebih baik.
             </p>
-          </motion.div>
+          </GsapReveal>
 
-          <div className="mx-auto mt-16 grid max-w-[1140px] grid-cols-[250px_240px_240px_250px] items-end justify-center gap-10 xl:gap-12 max-xl:grid-cols-[235px_225px_225px_235px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-14 max-sm:grid-cols-1">
-            <motion.div 
-              variants={slideFromLeftVariants} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className="pb-9 text-right max-lg:order-3 max-lg:text-center max-sm:order-none max-sm:pb-0"
-            >
+          <GsapReveal className="mx-auto mt-16 grid max-w-[1140px] grid-cols-[250px_240px_240px_250px] items-end justify-center gap-10 xl:gap-12 max-xl:grid-cols-[235px_225px_225px_235px] max-xl:gap-8 max-lg:grid-cols-2 max-lg:items-center max-md:mt-14 max-sm:grid-cols-1">
+            <div className="pb-9 text-right max-lg:order-3 max-lg:text-center max-sm:order-none max-sm:pb-0">
               <h3
                 className={`${headingClass} m-0 text-[22px] leading-[1.22] !text-[#14B8A6] max-md:text-[21px]`}
               >
@@ -712,47 +588,27 @@ const OnePage = () => {
               <p className="ml-auto mt-3 max-w-[230px] text-[13px] leading-6 text-[#333333] max-lg:mx-auto">
                 Wawasan otomatis membantu kamu memahami kebiasaanmu.
               </p>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={scaleUpVariants} 
-              custom={0} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className="relative h-[390px] w-full max-w-[240px] justify-self-center max-xl:h-[370px] max-xl:max-w-[225px] max-md:h-[390px] max-md:max-w-[240px]"
-            >
+            <div className="relative h-[390px] w-full max-w-[240px] justify-self-center max-xl:h-[370px] max-xl:max-w-[225px] max-md:h-[390px] max-md:max-w-[240px]">
               <div className="absolute inset-x-0 bottom-0 h-[300px] rounded-[16px] bg-[#14B8A6] max-xl:h-[285px] max-md:h-[300px]" />
               <img
                 src={girlPhone}
                 alt="Pengguna SADAR memegang ponsel"
                 className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto max-w-none -translate-x-1/2 object-contain pointer-events-none select-none max-xl:h-[370px] max-md:h-[390px]"
               />
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={scaleUpVariants} 
-              custom={1} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className="relative h-[390px] w-full max-w-[240px] justify-self-center max-xl:h-[370px] max-xl:max-w-[225px] max-md:h-[390px] max-md:max-w-[240px]"
-            >
+            <div className="relative h-[390px] w-full max-w-[240px] justify-self-center max-xl:h-[370px] max-xl:max-w-[225px] max-md:h-[390px] max-md:max-w-[240px]">
               <div className="absolute inset-x-0 bottom-0 h-[300px] rounded-[16px] bg-[#1E3A8A] max-xl:h-[285px] max-md:h-[300px]" />
               <img
                 src={boyLaptop}
                 alt="Pengguna SADAR memakai laptop"
                 className="absolute bottom-0 left-1/2 z-10 h-[390px] w-auto max-w-none -translate-x-1/2 object-contain pointer-events-none select-none max-xl:h-[370px] max-md:h-[390px]"
               />
-            </motion.div>
+            </div>
 
-            <motion.div 
-              variants={slideFromRightVariants} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className="pb-9 text-left lg:pl-4 xl:pl-6 max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-center max-sm:order-none max-sm:pt-0"
-            >
+            <div className="pb-9 text-left lg:pl-4 xl:pl-6 max-lg:order-4 max-lg:self-start max-lg:pt-7 max-lg:pb-0 max-lg:text-center max-sm:order-none max-sm:pt-0">
               <h3
                 className={`${headingClass} m-0 text-[22px] leading-[1.22] max-md:text-[21px]`}
               >
@@ -764,8 +620,8 @@ const OnePage = () => {
               <p className="mt-3 max-w-[240px] text-[13px] leading-6 text-[#333333] max-lg:mx-auto">
                 Lihat semua pengeluaranmu dengan jelas dan tanpa tebakan.
               </p>
-            </motion.div>
-          </div>
+            </div>
+          </GsapReveal>
         </div>
       </section>
 
@@ -774,12 +630,9 @@ const OnePage = () => {
         className="bg-[#F8FBFF] pb-28 pt-24 max-md:pb-20 max-md:pt-16"
       >
         <div className={shellClass}>
-          <motion.div 
-            initial="offscreen" 
-            whileInView="onscreen" 
-            viewport={{ once: true, amount: 0.3 }} 
-            variants={headerFadeInVariants} 
+          <GsapReveal
             className="mx-auto max-w-[640px] text-center"
+            stagger={0.15}
           >
             <span className={sectionBadgeClass}>Cara Kerja</span>
             <h2 className={sectionHeadingClass}>
@@ -793,18 +646,11 @@ const OnePage = () => {
               lalu wawasan dan peringatan muncul saat kamu perlu ambil
               keputusan.
             </p>
-          </motion.div>
+          </GsapReveal>
 
-          <div className="mx-auto mt-11 grid grid-cols-4 gap-6 max-lg:grid-cols-2 max-sm:grid-cols-1 max-w-[1200px]">
+          <GsapReveal className="mx-auto mt-11 grid grid-cols-4 gap-6 max-lg:grid-cols-2 max-sm:grid-cols-1 max-w-[1200px]">
             {/* Step 1 */}
-            <motion.article 
-              variants={chronologicalStepVariants} 
-              custom={0} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}
-            >
+            <article className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}>
               <div className="w-full h-[160px] rounded-[20px] bg-[#F8FBFF] border border-[#EFF4FA] flex items-center justify-center relative overflow-hidden">
                 {/* Glowing Concentric Circles */}
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -825,17 +671,10 @@ const OnePage = () => {
                   Catat pemasukan dan pengeluaran harian dengan cepat, rapi, dan mudah ditinjau ulang.
                 </p>
               </div>
-            </motion.article>
+            </article>
 
             {/* Step 2 */}
-            <motion.article 
-              variants={chronologicalStepVariants} 
-              custom={1} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}
-            >
+            <article className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}>
               <div className="w-full h-[160px] rounded-[20px] bg-[#F8FBFF] border border-[#EFF4FA] flex items-center justify-center relative overflow-hidden">
                 {/* Auto Categorization Graphic */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -863,17 +702,10 @@ const OnePage = () => {
                   SADAR membaca pola transaksi lalu menampilkan ringkasan yang membantu kamu mengambil keputusan.
                 </p>
               </div>
-            </motion.article>
+            </article>
 
             {/* Step 3 */}
-            <motion.article 
-              variants={chronologicalStepVariants} 
-              custom={2} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}
-            >
+            <article className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}>
               <div className="w-full h-[160px] rounded-[20px] bg-[#F8FBFF] border border-[#EFF4FA] flex items-center justify-center relative overflow-hidden">
                 {/* Budget Limit warning */}
                 <div className="w-full px-6 flex flex-col items-center gap-3">
@@ -894,17 +726,10 @@ const OnePage = () => {
                   Tetapkan batas anggaran dan dapatkan sinyal lebih awal saat pengeluaran mulai mendekati batas.
                 </p>
               </div>
-            </motion.article>
+            </article>
 
             {/* Step 4 */}
-            <motion.article 
-              variants={chronologicalStepVariants} 
-              custom={3} 
-              initial="offscreen" 
-              whileInView="onscreen" 
-              viewport={{ once: true, amount: 0.2 }} 
-              className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}
-            >
+            <article className={`${cardClass} flex flex-col justify-between min-h-[360px] p-6`}>
               <div className="w-full h-[160px] rounded-[20px] bg-[#F8FBFF] border border-[#EFF4FA] flex items-center justify-center relative overflow-hidden">
                 {/* Health Score graphic */}
                 <div className="relative flex flex-col items-center justify-center">
@@ -926,8 +751,8 @@ const OnePage = () => {
                   Lihat gambaran kondisi finansial dari arus kas, kebiasaan belanja, dan progres tabungan.
                 </p>
               </div>
-            </motion.article>
-          </div>
+            </article>
+          </GsapReveal>
         </div>
       </section>
 
