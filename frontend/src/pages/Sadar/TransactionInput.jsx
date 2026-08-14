@@ -41,6 +41,7 @@ const initialForm = {
   merchant: "",
   transactionDate: new Date().toISOString().slice(0, 10),
   categoryGroup: "needs",
+  categoryDetail: "",
   amount: "",
   description: "",
   source: "manual",
@@ -63,7 +64,24 @@ const currencyFormatter = new Intl.NumberFormat("id-ID", {
 const normalizeBackendAccount = (account) => ({
   id: account.account_id || account.id,
   name: account.account_name || account.accountName || account.name || "Akun",
+  number: account.account_number || account.accountNumber || "",
 });
+
+const findAccountForHint = (accounts, hint) => {
+  const key = String(hint || "").toLowerCase();
+  if (!key) return "";
+  const hintDigits = key.replace(/\D/g, "");
+  const aliases = key.includes("btn") || key.includes("bale") ? ["btn", "bale"]
+    : key.includes("dana") ? ["dana"]
+      : key.includes("jago") ? ["jago"]
+        : /cash|tunai|kas/.test(key) ? ["cash", "tunai", "kas"] : [key];
+  const matches = accounts.filter((account) => {
+    const label = `${account.name} ${account.number}`.toLowerCase();
+    const numberDigits = String(account.number || "").replace(/\D/g, "");
+    return aliases.some((alias) => label.includes(alias)) || (hintDigits.length >= 4 && numberDigits.endsWith(hintDigits.slice(-4)));
+  });
+  return matches.length === 1 ? matches[0].id : "";
+};
 
 const onlyDigits = (value) => String(value || "").replace(/\D/g, "");
 
@@ -122,10 +140,10 @@ const getScanId = (scan) => scan?.ocr_id || scan?.ocrId || scan?.id || "";
 
 const getParsedDate = (dateValue) => {
   const rawDate = String(dateValue || "").trim();
-  if (!rawDate) return initialForm.transactionDate;
+  if (!rawDate) return "";
 
   const date = new Date(rawDate);
-  return Number.isNaN(date.getTime()) ? initialForm.transactionDate : date.toISOString().slice(0, 10);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
 };
 
 const buildDescription = (merchant, items) => {
@@ -182,6 +200,12 @@ const TransactionInput = () => {
     const parsed = normalizeParsedData(scanResult);
     return Array.isArray(parsed?.items) ? parsed.items : [];
   }, [scanResult]);
+  const parsedResult = useMemo(() => normalizeParsedData(scanResult), [scanResult]);
+  const confidenceBadge = (field) => {
+    const score = Number(parsedResult?.confidence?.[field]);
+    if (!scanResult || !Number.isFinite(score) || score >= 0.75) return null;
+    return <Badge color="warning" pill className="ms-2">Periksa {Math.round(score * 100)}%</Badge>;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -304,15 +328,16 @@ const TransactionInput = () => {
 
   const applyScanToForm = (scan) => {
     const parsed = normalizeParsedData(scan);
-    const merchant = parsed?.merchant || "";
-    const description = buildDescription(merchant, parsed?.items);
+    const merchant = parsed?.expenseName || parsed?.merchant || "";
+    const description = parsed?.description || buildDescription(merchant, parsed?.items);
     const amount = parseAmountValue(parsed?.total || parsed?.amount || parsed?.grandTotal || parsed?.grand_total);
 
     setForm({
-      accountId: form.accountId,
+      accountId: findAccountForHint(accounts, parsed?.accountHint) || form.accountId,
       merchant,
       transactionDate: getParsedDate(parsed?.date || parsed?.transactionDate || parsed?.transaction_date),
       categoryGroup: normalizeCategoryGroup(parsed?.categoryGroup || parsed?.category_group || parsed?.category || "needs"),
+      categoryDetail: parsed?.categoryDetail || parsed?.category_detail || "",
       amount: amount ? String(amount) : "",
       description,
       source: "ocr",
@@ -373,6 +398,11 @@ const TransactionInput = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (mode === "ocr" && parsedResult?.isExpense === false) {
+      setNotice({ color: "warning", message: "Bukti ini bukan pengeluaran. Beralih ke input manual bila tetap ingin mencatatnya." });
+      return;
+    }
+
     if (!form.accountId) {
       setNotice({ color: "warning", message: "Pilih account terlebih dahulu." });
       return;
@@ -394,6 +424,7 @@ const TransactionInput = () => {
     try {
       const payload = {
         categoryGroup: form.categoryGroup,
+        categoryDetail: form.categoryDetail || null,
         accountId: form.accountId,
         transactionDate,
         description: form.description || form.merchant,
@@ -688,6 +719,17 @@ const TransactionInput = () => {
                   </div>
                 </CardHeader>
                 <CardBody>
+                  {parsedResult?.needsReview && (
+                    <Alert color="warning" className="py-2">
+                      <strong>Perlu ditinjau.</strong> Periksa kembali field yang diisi sebelum menyimpan.
+                    </Alert>
+                  )}
+                  {parsedResult?.isExpense === false && (
+                    <Alert color="danger" className="py-2">Bukti ini terdeteksi bukan sebagai pengeluaran.</Alert>
+                  )}
+                  {(parsedResult?.warnings || []).map((warning, index) => (
+                    <div className="small text-warning mb-1" key={`${warning}-${index}`}>• {warning}</div>
+                  ))}
                   <div className="d-flex justify-content-between mb-2">
                     <span className="text-muted">Tingkat keyakinan</span>
                     <strong>{Math.round(Number(scanResult.confidence || 0) * 100)}%</strong>
@@ -755,7 +797,7 @@ const TransactionInput = () => {
                     </Col>
 
                     <Col md={6}>
-                      <Label htmlFor="merchant" className="form-label">Nama Pengeluaran</Label>
+                      <Label htmlFor="merchant" className="form-label">Nama Pengeluaran {confidenceBadge("merchant")}</Label>
                       <Input
                         id="merchant"
                         value={form.merchant}
@@ -765,7 +807,7 @@ const TransactionInput = () => {
                     </Col>
 
                     <Col md={6}>
-                      <Label htmlFor="transactionDate" className="form-label">Tanggal</Label>
+                      <Label htmlFor="transactionDate" className="form-label">Tanggal {confidenceBadge("date")}</Label>
                       <Input
                         id="transactionDate"
                         type="date"
@@ -775,7 +817,7 @@ const TransactionInput = () => {
                     </Col>
 
                     <Col md={6}>
-                      <Label htmlFor="categoryGroup" className="form-label">Kategori</Label>
+                      <Label htmlFor="categoryGroup" className="form-label">Kategori {confidenceBadge("category")}</Label>
                       <Input
                         id="categoryGroup"
                         type="select"
@@ -791,7 +833,7 @@ const TransactionInput = () => {
                     </Col>
 
                     <Col md={6}>
-                      <Label htmlFor="amount" className="form-label">Nominal</Label>
+                      <Label htmlFor="amount" className="form-label">Nominal {confidenceBadge("total")}</Label>
                       <Input
                         id="amount"
                         type="text"
@@ -840,7 +882,7 @@ const TransactionInput = () => {
                         <i className="ri-refresh-line align-bottom me-1" />
                         Atur Ulang
                       </Button>
-                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length || isUploadingManual}>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length || isUploadingManual || (mode === "ocr" && parsedResult?.isExpense === false)}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
                         Simpan Pengeluaran
                       </Button>
@@ -953,5 +995,3 @@ const TransactionInput = () => {
 };
 
 export default TransactionInput;
-
-

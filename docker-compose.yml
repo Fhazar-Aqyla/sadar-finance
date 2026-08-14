@@ -36,6 +36,17 @@ services:
       CORS_ORIGINS: "*"
       AI_SERVICE_URL: ${AI_SERVICE_URL:-https://sadar-finance-sadar-finance-ai.hf.space}
       AI_API_KEY: ${AI_API_KEY:-}
+      HF_OCR_PRIMARY_URL: ${HF_OCR_PRIMARY_URL:-https://sadar-finance-sadar-finance-ai.hf.space}
+      HF_OCR_PRIMARY_TOKEN: ${HF_OCR_PRIMARY_TOKEN:-}
+      HF_OCR_SECONDARY_URL: ${HF_OCR_SECONDARY_URL:-}
+      HF_OCR_SECONDARY_TOKEN: ${HF_OCR_SECONDARY_TOKEN:-}
+      HF_OCR_TIMEOUT_MS: ${HF_OCR_TIMEOUT_MS:-20000}
+      HF_OCR_MIN_QUALITY: ${HF_OCR_MIN_QUALITY:-0.65}
+      OCR_LOCAL_FALLBACK: ${OCR_LOCAL_FALLBACK:-true}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
+      GROQ_TIMEOUT_MS: ${GROQ_TIMEOUT_MS:-15000}
+      GROQ_REASONING_EFFORT: ${GROQ_REASONING_EFFORT:-low}
 
   desktop:
     build:

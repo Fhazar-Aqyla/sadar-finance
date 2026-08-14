@@ -6,12 +6,13 @@
 const { query } = require('../config/database');
 
 class IncomeRepository {
-  async findById(incomeId, userId) {
-    const result = await query(
+  async findById(incomeId, userId, db = query, { forUpdate = false } = {}) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `SELECT i.*, a.account_name
        FROM incomes i
        LEFT JOIN accounts a ON i.account_id = a.account_id
-       WHERE i.income_id = $1 AND i.user_id = $2`,
+       WHERE i.income_id = $1 AND i.user_id = $2${forUpdate ? ' FOR UPDATE OF i' : ''}`,
       [incomeId, userId]
     );
     return result.rows[0] || null;
@@ -75,8 +76,9 @@ class IncomeRepository {
     return { data: dataResult.rows, total };
   }
 
-  async create(userId, data) {
-    const result = await query(
+  async create(userId, data, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
@@ -85,7 +87,7 @@ class IncomeRepository {
     return result.rows[0];
   }
 
-  async update(incomeId, userId, data) {
+  async update(incomeId, userId, data, db = query) {
     const fields = [];
     const params = [incomeId, userId];
     let paramIndex = 3;
@@ -106,7 +108,8 @@ class IncomeRepository {
 
     if (fields.length === 0) return null;
 
-    const result = await query(
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `UPDATE incomes SET ${fields.join(', ')}
        WHERE income_id = $1 AND user_id = $2
        RETURNING *`,
@@ -115,8 +118,9 @@ class IncomeRepository {
     return result.rows[0] || null;
   }
 
-  async delete(incomeId, userId) {
-    const result = await query(
+  async delete(incomeId, userId, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `DELETE FROM incomes WHERE income_id = $1 AND user_id = $2 RETURNING income_id`,
       [incomeId, userId]
     );

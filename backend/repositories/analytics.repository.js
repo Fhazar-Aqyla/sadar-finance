@@ -56,7 +56,7 @@ class AnalyticsRepository {
     const needsBudget = row.needs_budget ?? row.needs_amount ?? '0';
     const wantsBudget = row.wants_budget ?? row.wants_amount ?? '0';
     const investmentBudget = row.investment_budget ?? row.investment_amount ?? row.savings_amount ?? '0';
-    const budgetLimit = row.budget_limit ?? row.limit_amount ?? String(Number(needsBudget) + Number(wantsBudget));
+    const budgetLimit = row.budget_limit ?? row.limit_amount ?? String(Number(needsBudget) + Number(wantsBudget) + Number(investmentBudget));
 
     return {
       ...row,

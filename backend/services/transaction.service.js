@@ -28,24 +28,21 @@ const canonicalGroupByKey = new Map([
 class TransactionService {
   async create(userId, data) {
     const input = this._normalizeTransactionInput(data, { defaultSource: 'manual' });
-
-    await this._ensureAccountBelongsToUser(input.accountId, userId);
-
     const normalized = this._normalizeCategoryData(input);
-    if (!input.ocrScanId) {
-      return transactionRepository.create(userId, normalized);
-    }
-
-    await this._ensureLinkableOcrScan(input.ocrScanId, userId);
+    this._validateAmount(normalized.amount);
 
     const client = await getClient();
     try {
       await client.query('BEGIN');
+      await this._ensureAccountBelongsToUser(normalized.accountId, userId, client, true);
+      if (input.ocrScanId) await this._ensureLinkableOcrScan(input.ocrScanId, userId, client);
       const transaction = await transactionRepository.create(userId, normalized, client);
-      const linkedScan = await ocrRepository.linkTransaction(input.ocrScanId, transaction.transaction_id, client);
-
-      if (!linkedScan) {
-        throw new BadRequestError('OCR scan is already linked to a transaction');
+      if (normalized.accountId) {
+        await accountRepository.adjustBalance(normalized.accountId, userId, -Number(normalized.amount), client);
+      }
+      if (input.ocrScanId) {
+        const linkedScan = await ocrRepository.linkTransaction(input.ocrScanId, transaction.transaction_id, client);
+        if (!linkedScan) throw new BadRequestError('OCR scan is already linked to a transaction');
       }
 
       await client.query('COMMIT');
@@ -71,19 +68,48 @@ class TransactionService {
   }
 
   async update(transactionId, userId, data) {
-    const input = this._normalizeTransactionInput(data);
-
-    await this.findById(transactionId, userId);
-    await this._ensureAccountBelongsToUser(input.accountId, userId);
-    return transactionRepository.update(transactionId, userId, this._normalizeCategoryData(input));
+    const input = this._normalizeTransactionInput(data, { partial: true });
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const previous = await transactionRepository.findById(transactionId, userId, client, { forUpdate: true });
+      if (!previous) throw new NotFoundError('Transaction not found');
+      const merged = {
+        ...input,
+        accountId: this._provided(data, ['accountId', 'account_id']) ? input.accountId : previous.account_id,
+        amount: this._provided(data, ['amount']) ? input.amount : Number(previous.amount),
+      };
+      this._validateAmount(merged.amount);
+      await this._ensureAccountBelongsToUser(merged.accountId, userId, client, true);
+      if (previous.account_id) await accountRepository.adjustBalance(previous.account_id, userId, Number(previous.amount), client);
+      const updated = await transactionRepository.update(transactionId, userId, this._normalizeCategoryData(merged), client);
+      if (merged.accountId) await accountRepository.adjustBalance(merged.accountId, userId, -Number(merged.amount), client);
+      await client.query('COMMIT');
+      return updated;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async delete(transactionId, userId) {
-    const deleted = await transactionRepository.delete(transactionId, userId);
-    if (!deleted) {
-      throw new NotFoundError('Transaction not found');
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const previous = await transactionRepository.findById(transactionId, userId, client, { forUpdate: true });
+      if (!previous) throw new NotFoundError('Transaction not found');
+      await transactionRepository.delete(transactionId, userId, client);
+      if (previous.account_id) await accountRepository.adjustBalance(previous.account_id, userId, Number(previous.amount), client);
+      await client.query('COMMIT');
+      return true;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
-    return true;
   }
 
   async getSummary(userId, startDate, endDate) {
@@ -111,17 +137,17 @@ class TransactionService {
     return transactionRepository.getMonthlyExpenseTrend(userId, months);
   }
 
-  async _ensureAccountBelongsToUser(accountId, userId) {
+  async _ensureAccountBelongsToUser(accountId, userId, db, forUpdate = false) {
     if (!accountId) return;
 
-    const account = await accountRepository.findById(accountId, userId);
+    const account = await accountRepository.findById(accountId, userId, db, { forUpdate });
     if (!account) {
       throw new BadRequestError('Account does not exist or does not belong to the current user');
     }
   }
 
-  async _ensureLinkableOcrScan(ocrScanId, userId) {
-    const scan = await ocrRepository.findById(ocrScanId, userId);
+  async _ensureLinkableOcrScan(ocrScanId, userId, db) {
+    const scan = await ocrRepository.findById(ocrScanId, userId, db);
     if (!scan) {
       throw new BadRequestError('OCR scan does not exist or does not belong to the current user');
     }
@@ -134,18 +160,24 @@ class TransactionService {
     return scan;
   }
 
-  _normalizeTransactionInput(data = {}, { defaultSource = undefined } = {}) {
-    return {
-      ...data,
-      accountId: data.accountId ?? data.account_id ?? null,
-      categoryGroup: data.categoryGroup ?? data.category_group ?? data.budgetGroup ?? data.budget_group ?? null,
-      categoryDetail: data.categoryDetail ?? data.category_detail ?? data.category ?? null,
-      transactionDate: data.transactionDate ?? data.transaction_date ?? data.date ?? undefined,
-      description: data.description ?? data.name ?? data.merchant ?? data.note ?? null,
-      source: data.source || defaultSource,
-      amount: data.amount,
-      ocrScanId: data.ocrScanId ?? data.ocr_scan_id ?? null,
+  _normalizeTransactionInput(data = {}, { defaultSource = undefined, partial = false } = {}) {
+    const normalized = { ...data };
+    const assign = (key, aliases, fallback) => {
+      const provided = this._provided(data, aliases);
+      if (provided || !partial) {
+        const found = aliases.find((alias) => Object.prototype.hasOwnProperty.call(data, alias));
+        normalized[key] = found ? data[found] : fallback;
+      }
     };
+    assign('accountId', ['accountId', 'account_id'], null);
+    assign('categoryGroup', ['categoryGroup', 'category_group', 'budgetGroup', 'budget_group'], null);
+    assign('categoryDetail', ['categoryDetail', 'category_detail', 'category'], null);
+    assign('transactionDate', ['transactionDate', 'transaction_date', 'date'], undefined);
+    assign('description', ['description', 'name', 'merchant', 'note'], null);
+    assign('amount', ['amount'], undefined);
+    assign('ocrScanId', ['ocrScanId', 'ocr_scan_id'], null);
+    if (data.source !== undefined || !partial) normalized.source = data.source || defaultSource;
+    return normalized;
   }
 
   _normalizeCategoryData(data) {
@@ -171,6 +203,16 @@ class TransactionService {
     }
 
     return normalized;
+  }
+
+  _provided(data, keys) {
+    return keys.some((key) => Object.prototype.hasOwnProperty.call(data || {}, key));
+  }
+
+  _validateAmount(amount) {
+    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+      throw new BadRequestError('Transaction amount must be greater than zero');
+    }
   }
 
   _cleanCategory(value) {
