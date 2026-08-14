@@ -5,6 +5,8 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 ENV VITE_API_URL=/api/v1
+ENV VITE_DEFAULTAUTH=sadar
+ENV VITE_SADAR_DATA_SCENARIO=backend-only
 RUN npm run build
 
 # Stage 2: Serve menggunakan Nginx

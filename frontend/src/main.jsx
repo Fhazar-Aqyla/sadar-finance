@@ -24,6 +24,15 @@ if (defaultAuth === 'fake') {
   fakeBackend()
 }
 
+for (const storage of [localStorage, sessionStorage]) {
+  try {
+    const authUser = JSON.parse(storage.getItem('authUser') || 'null')
+    if (authUser?.token === 'mock-jwt-token-demo-sadar-finance') storage.removeItem('authUser')
+  } catch {
+    storage.removeItem('authUser')
+  }
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
