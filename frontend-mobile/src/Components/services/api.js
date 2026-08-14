@@ -8,6 +8,7 @@ import {
   transactions as mockTransactions,
 } from "../../pages/SadarShared/mockData";
 import { isSadarMockDataScenario } from "./sadarScenario";
+import { compressOcrFormData } from "./receiptImage";
 
 const apiClient = axios.create({
   baseURL: api.API_URL,
@@ -285,8 +286,8 @@ export const analyticsApi = {
 };
 
 export const ocrApi = {
-  upload: (formData) =>
-    apiClient.post("/ocr/upload", formData, {
+  upload: async (formData) =>
+    apiClient.post("/ocr/upload", await compressOcrFormData(formData), {
       headers: { "Content-Type": "multipart/form-data" },
     }).then(unwrapData),
   get: (id) => apiClient.get(`/ocr/${id}`).then(unwrapData),
