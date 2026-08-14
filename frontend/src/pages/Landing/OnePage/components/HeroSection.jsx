@@ -212,7 +212,7 @@ export const HeroSection = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-24 pb-24 lg:pt-32 lg:pb-32 overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/50 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-32 pb-32 lg:pt-40 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/50 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
       {/* Primary ambient mesh */}
       <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[360px] bg-gradient-to-tr from-blue-500/15 via-sky-400/10 to-indigo-500/15 blur-[70px] rounded-full -z-10" />
@@ -237,10 +237,10 @@ export const HeroSection = () => {
         {/* Floating Card Left: Live OCR Transaction Scan (3D Mouse Parallax) */}
         <motion.div
           style={{ x: cardLeftX, y: cardLeftY, rotate: cardLeftRotate }}
-          className="hero-card-left-wrap hidden lg:flex absolute top-4 left-0 z-20 pointer-events-none"
+          className="hero-card-left-wrap hidden lg:flex absolute top-10 left-0 z-20 pointer-events-none"
         >
-          <div className="hero-float-inner-1 pointer-events-auto flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
-            <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/70 flex items-center justify-center text-[#1E3A8A] dark:text-sky-400 shrink-0 shadow-xs">
+          <div className="hero-float-inner-1 pointer-events-auto flex items-center gap-3 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/70 flex items-center justify-center text-[#1E3A8A] dark:text-sky-400 shrink-0 shadow-xs">
               <Receipt className="w-5 h-5" />
             </div>
             <div>
@@ -264,10 +264,10 @@ export const HeroSection = () => {
         {/* Floating Card Right: Live Financial Score (3D Mouse Parallax) */}
         <motion.div
           style={{ x: cardRightX, y: cardRightY, rotate: cardRightRotate }}
-          className="hero-card-right-wrap hidden lg:flex absolute top-12 right-0 z-20 pointer-events-none"
+          className="hero-card-right-wrap hidden lg:flex absolute top-16 right-0 z-20 pointer-events-none"
         >
-          <div className="hero-float-inner-2 pointer-events-auto flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
-            <div className="w-11 h-11 rounded-xl bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-xs">
+          <div className="hero-float-inner-2 pointer-events-auto flex items-center gap-3 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
+            <div className="w-10 h-10 rounded-xl bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-xs">
               <Activity className="w-5 h-5" />
             </div>
             <div>
@@ -289,12 +289,12 @@ export const HeroSection = () => {
         </motion.div>
 
         {/* Hero Main Content */}
-        <div className="hero-content-wrap max-w-3xl mx-auto text-center relative z-10">
+        <div className="hero-content-wrap max-w-4xl mx-auto text-center relative z-10">
 
           {/* Hero Main Headline with Kinetic Word Stagger */}
           <h1
             ref={headlineRef}
-            className="hero-title text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-2xl mx-auto leading-[1.18] sm:leading-[1.14] [perspective:1000px]"
+            className="hero-title text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-3xl mx-auto leading-[1.18] sm:leading-[1.12] [perspective:1000px]"
           >
             {headlineWords.map((word, idx) => (
               <motion.span
@@ -311,14 +311,14 @@ export const HeroSection = () => {
           </h1>
 
           {/* Hero Subtitle */}
-          <p className="hero-subtitle mt-7 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
+          <p className="hero-subtitle mt-8 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
             Foto struknya, sisanya urusan AI. SADAR mencatat pengeluaran,
             membagi anggaran 50/30/20, dan menjaga skor kesehatan
             finansialmu tetap terkontrol.
           </p>
 
           {/* Call to Actions with Shimmer Effect */}
-          <div className="hero-actions mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <div className="hero-actions mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -326,7 +326,7 @@ export const HeroSection = () => {
             >
               <Link
                 to="/register"
-                className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-base shadow-md hover:shadow-lg transition-all overflow-hidden"
+                className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-9 py-4 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-base shadow-md hover:shadow-lg transition-all overflow-hidden"
               >
                 {/* Shimmer Sweep Animation */}
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
@@ -343,7 +343,7 @@ export const HeroSection = () => {
             >
               <a
                 href="#features"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-base shadow-xs hover:bg-slate-50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-base shadow-xs hover:bg-slate-50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
               >
                 Pelajari Fitur
               </a>
@@ -351,22 +351,22 @@ export const HeroSection = () => {
           </div>
 
           {/* Hero Trust Badges Bar */}
-          <div className="mt-14 sm:mt-16 pt-8 border-t border-slate-200/80 dark:border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="mt-16 sm:mt-20 pt-10 border-t border-slate-200/80 dark:border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
             {trustHighlights.map((item, idx) => {
               const Icon = item.icon;
               return (
                 <div
                   key={idx}
-                  className="hero-trust-item flex items-center justify-center sm:justify-start gap-2.5 p-2 rounded-xl text-left bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs hover:scale-105 transition-transform"
+                  className="hero-trust-item flex items-center justify-center sm:justify-start gap-2.5 p-3 rounded-xl text-left bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs hover:scale-105 transition-transform"
                 >
-                  <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shrink-0">
+                  <div className="p-2.5 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shrink-0">
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                       {item.label}
                     </p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       {item.sub}
                     </p>
                   </div>
