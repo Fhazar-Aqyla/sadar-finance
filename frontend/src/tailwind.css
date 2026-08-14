@@ -32,6 +32,19 @@ html.lenis, html.lenis body {
   }
 }
 
+@keyframes textShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.hero-text-shimmer {
+  animation: textShimmer 4s linear infinite;
+}
+
 @keyframes moveAurora2 {
   from {
     transform: translate(0, 0);

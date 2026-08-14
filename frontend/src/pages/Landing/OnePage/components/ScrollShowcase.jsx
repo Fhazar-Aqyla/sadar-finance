@@ -4,7 +4,6 @@ import {
   useScroll,
   useTransform,
   useSpring,
-  useMotionValue,
 } from "framer-motion";
 import {
   TrendingUp,
@@ -19,31 +18,6 @@ import dashboardMobilePreview from "@/assets/images/landing/dashboard-mobile-pre
 
 export const ScrollShowcase = () => {
   const containerRef = useRef(null);
-
-  // Mouse tilt motion values for 3D card tilt on hover
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springTiltConfig = { damping: 20, stiffness: 100 };
-  const smoothMouseX = useSpring(mouseX, springTiltConfig);
-  const smoothMouseY = useSpring(mouseY, springTiltConfig);
-
-  const hoverRotateY = useTransform(smoothMouseX, [-0.5, 0.5], [-8, 8]);
-  const hoverRotateX = useTransform(smoothMouseY, [-0.5, 0.5], [8, -8]);
-
-  const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
 
   // Scroll parallax progression (gentle spring keeps the 3D tilt buttery smooth)
   const { scrollYProgress } = useScroll({
@@ -75,8 +49,6 @@ export const ScrollShowcase = () => {
   return (
     <section
       ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       className="relative py-16 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden [perspective:1400px]"
     >
       {/* Background glow beneath dashboard */}
@@ -106,6 +78,7 @@ export const ScrollShowcase = () => {
       </motion.div>
 
       {/* 3D Mockup Container with Perspective Parallax and Interactive Mouse Tilt */}
+      <div className="relative px-4 sm:px-6 lg:px-10 pt-10 lg:pt-12 pb-10 lg:pb-12 [perspective:1400px]">
       <motion.div
         style={{
           rotateX: scrollRotateX,
@@ -113,18 +86,9 @@ export const ScrollShowcase = () => {
           y: yMockup,
           opacity,
           transformPerspective: 1400,
-          transformStyle: "preserve-3d",
         }}
         className="relative rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-slate-900/95 p-2.5 sm:p-4 shadow-2xl transition-shadow"
       >
-        <motion.div
-          style={{
-            rotateY: hoverRotateY,
-            rotateX: hoverRotateX,
-            transformStyle: "preserve-3d",
-          }}
-          className="relative w-full"
-        >
           {/* Mockup Window Header Dots & URL bar */}
           <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-800/80 mb-2 bg-slate-950/60 rounded-t-2xl">
             <div className="flex items-center gap-2">
@@ -162,8 +126,8 @@ export const ScrollShowcase = () => {
 
           {/* Floating Interactive Micro-Cards (Scroll Parallax only, no infinite loop) */}
           <motion.div
-            style={{ y: yBadge1, translateZ: 40 }}
-            whileHover={{ scale: 1.08, translateZ: 60 }}
+            style={{ y: yBadge1 }}
+            whileHover={{ scale: 1.08 }}
             className="hidden lg:flex items-center gap-3 absolute -top-8 -left-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
           >
             <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs">
@@ -183,8 +147,8 @@ export const ScrollShowcase = () => {
           </motion.div>
 
           <motion.div
-            style={{ y: yBadge2, translateZ: 40 }}
-            whileHover={{ scale: 1.08, translateZ: 60 }}
+            style={{ y: yBadge2 }}
+            whileHover={{ scale: 1.08 }}
             className="hidden lg:flex items-center gap-3 absolute -top-8 -right-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
           >
             <div className="p-2.5 rounded-xl bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 shadow-xs">
@@ -202,8 +166,8 @@ export const ScrollShowcase = () => {
           </motion.div>
 
           <motion.div
-            style={{ y: yBadge3, translateZ: 40 }}
-            whileHover={{ scale: 1.08, translateZ: 60 }}
+            style={{ y: yBadge3 }}
+            whileHover={{ scale: 1.08 }}
             className="hidden lg:flex items-center gap-3 absolute -bottom-8 -right-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
           >
             <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 shadow-xs">
@@ -218,8 +182,8 @@ export const ScrollShowcase = () => {
               </p>
             </div>
           </motion.div>
-        </motion.div>
       </motion.div>
+      </div>
     </section>
   );
 };

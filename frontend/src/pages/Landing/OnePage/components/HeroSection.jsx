@@ -212,7 +212,7 @@ export const HeroSection = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-32 pb-32 lg:pt-40 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/50 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-36 pb-32 lg:pt-44 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-200/90 via-indigo-100/70 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
       {/* Primary ambient mesh */}
       <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[360px] bg-gradient-to-tr from-blue-500/15 via-sky-400/10 to-indigo-500/15 blur-[70px] rounded-full -z-10" />
@@ -294,14 +294,14 @@ export const HeroSection = () => {
           {/* Hero Main Headline with Kinetic Word Stagger */}
           <h1
             ref={headlineRef}
-            className="hero-title text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-3xl mx-auto leading-[1.18] sm:leading-[1.12] [perspective:1000px]"
+            className="hero-title text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-3xl mx-auto leading-[1.15] sm:leading-[1.1] [perspective:1000px]"
           >
             {headlineWords.map((word, idx) => (
               <motion.span
                 key={idx}
                 className={`hero-title-word inline-block mr-[0.25em] ${
                   word.highlight
-                    ? "bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent [background-size:200%_auto] dark:from-sky-300 dark:via-blue-300 dark:to-sky-300"
+                    ? "hero-text-shimmer bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent [background-size:200%_auto] dark:from-sky-300 dark:via-blue-300 dark:to-sky-300"
                     : ""
                 }`}
               >
@@ -326,12 +326,12 @@ export const HeroSection = () => {
             >
               <Link
                 to="/register"
-                className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-9 py-4 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-base shadow-md hover:shadow-lg transition-all overflow-hidden"
+                className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden"
               >
                 {/* Shimmer Sweep Animation */}
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-2">
-                  Mulai Gratis Sekarang <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  Mulai Gratis Sekarang <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </motion.div>
@@ -343,7 +343,7 @@ export const HeroSection = () => {
             >
               <a
                 href="#features"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-base shadow-xs hover:bg-slate-50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-sm shadow-xs hover:bg-slate-50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
               >
                 Pelajari Fitur
               </a>
@@ -351,22 +351,22 @@ export const HeroSection = () => {
           </div>
 
           {/* Hero Trust Badges Bar */}
-          <div className="mt-16 sm:mt-20 pt-10 border-t border-slate-200/80 dark:border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <div className="mt-16 sm:mt-20 pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
             {trustHighlights.map((item, idx) => {
               const Icon = item.icon;
               return (
                 <div
                   key={idx}
-                  className="hero-trust-item flex items-center justify-center sm:justify-start gap-2.5 p-3 rounded-xl text-left bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs hover:scale-105 transition-transform"
+                  className="hero-trust-item flex items-center justify-center sm:justify-start gap-2.5 p-2.5 rounded-xl text-left bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs hover:scale-105 transition-transform"
                 >
-                  <div className="p-2.5 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shrink-0">
+                  <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shrink-0">
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
                       {item.label}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                       {item.sub}
                     </p>
                   </div>
@@ -375,13 +375,6 @@ export const HeroSection = () => {
             })}
           </div>
         </div>
-      </div>
-
-      {/* Bottom Wave SVG Divider */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none -z-0 overflow-hidden">
-        <svg viewBox="0 0 1440 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
-          <path d="M0,36 C360,72 1080,0 1440,36 L1440,72 L0,72 Z" fill="white" className="dark:fill-slate-900" fillOpacity="1"/>
-        </svg>
       </div>
     </section>
   );
