@@ -340,7 +340,7 @@ const EmptyFinancialScore = ({ hasIncome, hasBudget, hasTransactions }) => {
                           key={step.key}
                           className={`sadar-step-card ${step.completed ? "completed" : ""} ${isNext ? "active" : ""}`}
                         >
-                          <div className="d-flex align-items-start gap-3 w-100">
+                          <div className="sadar-step-layout">
                             <div className="sadar-step-icon-wrapper">
                               {step.completed ? (
                                 <span className="sadar-step-status-icon success-icon">
@@ -352,8 +352,8 @@ const EmptyFinancialScore = ({ hasIncome, hasBudget, hasTransactions }) => {
                                 </span>
                               )}
                             </div>
-                            <div className="flex-grow-1">
-                              <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div className="sadar-step-copy">
+                              <div className="sadar-step-heading">
                                 <h5 className="sadar-step-title mb-1 fw-bold">
                                   {step.title}
                                 </h5>
@@ -361,21 +361,22 @@ const EmptyFinancialScore = ({ hasIncome, hasBudget, hasTransactions }) => {
                                   <span className="badge bg-success-subtle text-success px-2.5 py-1.5 rounded-pill fw-bold font-size-12">
                                     Sudah Selesai
                                   </span>
-                                ) : (
-                                  <Button
-                                    tag={Link}
-                                    to={step.to}
-                                    color={isNext ? "primary" : "outline-secondary"}
-                                    size="sm"
-                                    className="sadar-step-cta px-3 font-size-12 fw-semibold"
-                                  >
-                                    {step.ctaLabel}
-                                  </Button>
-                                )}
+                                ) : null}
                               </div>
                               <p className="sadar-step-desc text-muted mb-0 font-size-13 mt-1">
                                 {step.description}
                               </p>
+                              {!step.completed && (
+                                <Button
+                                  tag={Link}
+                                  to={step.to}
+                                  color={isNext ? "primary" : "outline-secondary"}
+                                  size="sm"
+                                  className="sadar-step-cta px-3 mt-3 font-size-12 fw-semibold"
+                                >
+                                  {step.ctaLabel}
+                                </Button>
+                              )}
                             </div>
                           </div>
                         </div>

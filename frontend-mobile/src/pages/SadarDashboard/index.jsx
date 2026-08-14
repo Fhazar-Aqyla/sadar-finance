@@ -1529,7 +1529,7 @@ const DashboardWithData = () => {
             </Button>
           </CardHeader>
           <CardBody className="pt-0">
-            <div className="table-responsive sadar-table-wrap">
+            <div className="table-responsive sadar-table-wrap sadar-dashboard-history">
               <Table className="align-middle mb-0 sadar-table">
                 <thead>
                   <tr>
@@ -1547,14 +1547,14 @@ const DashboardWithData = () => {
                       <td>
                         <div className="fw-semibold text-dark">{transaction.name}</div>
                       </td>
-                      <td>{transaction.category}</td>
-                      <td>{transaction.account}</td>
-                      <td>{transaction.formattedDate}</td>
+                      <td data-label="Kategori">{transaction.category}</td>
+                      <td data-label="Akun">{transaction.account}</td>
+                      <td data-label="Tanggal">{transaction.formattedDate}</td>
                       <td className={`text-end fw-semibold ${transaction.amount > 0 ? "text-success" : "text-danger"}`}>
                         {transaction.amount > 0 ? "+" : "-"}
                         {rupiah(Math.abs(transaction.amount))}
                       </td>
-                      <td>
+                      <td data-label="Status">
                         <Badge color={transaction.amount > 0 ? "success" : "secondary"} className={`bg-${transaction.amount > 0 ? "success" : "secondary"}-subtle text-${transaction.amount > 0 ? "success" : "secondary"}`}>
                           {transaction.status}
                         </Badge>
