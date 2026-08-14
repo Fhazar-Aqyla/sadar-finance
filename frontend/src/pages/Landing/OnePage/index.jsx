@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -23,10 +23,10 @@ gsap.registerPlugin(ScrollTrigger);
 const LandingOnePage = () => {
   const [showFloatingBar, setShowFloatingBar] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const lenisRef = useRef(null);
 
   useEffect(() => {
     document.title = "SADAR Finance — Smart AI-Driven Personal Finance Platform";
-    window.scrollTo({ top: 0, behavior: "smooth" });
 
     // Initialize butter-smooth Lenis momentum scrolling
     const lenis = new Lenis({
@@ -35,6 +35,10 @@ const LandingOnePage = () => {
       smoothWheel: true,
       touchMultiplier: 1.8,
     });
+    lenisRef.current = lenis;
+
+    // Jump straight to top on mount without animating
+    lenis.scrollTo(0, { immediate: true });
 
     // Synchronize Lenis with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
@@ -55,6 +59,7 @@ const LandingOnePage = () => {
 
     return () => {
       lenis.destroy();
+      lenisRef.current = null;
       gsap.ticker.remove(tickerCallback);
       window.removeEventListener("scroll", handleScroll);
     };
@@ -65,7 +70,11 @@ const LandingOnePage = () => {
   };
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0);
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
@@ -88,29 +97,28 @@ const LandingOnePage = () => {
         {/* 1. Hero Section with Multi-Layer Parallax & 3D Interactive Cards */}
         <HeroSection />
 
+        {/* 2. Interactive Comparison: Sebelum vs Sesudah SADAR */}
+        <ComparisonSection />
 
-        {/* 3. 3D Perspective Scroll Showcase */}
-        <ScrollShowcase />
-
-        {/* 4. Bento Features: OCR Scanner, Health Score, Predictive Alerts */}
+        {/* 3. Bento Features: OCR Scanner, Health Score, Predictive Alerts */}
         <BentoFeatures />
 
-        {/* 5. Interactive Comparison: Sebelum vs Sesudah SADAR */}
-        <ComparisonSection />
+        {/* 4. 3D Perspective Scroll Showcase */}
+        <ScrollShowcase />
+
+        {/* 5. 3-Step How It Works with Connected Neon Conduit Motion Flow */}
+        <HowItWorksSection />
 
         {/* 6. Interactive 50/30/20 Budget Simulator */}
         <BudgetSimulatorSection />
 
-        {/* 7. 3-Step How It Works with Connected Neon Conduit Motion Flow */}
-        <HowItWorksSection />
-
-        {/* 8. Engineering & AI Team with 3D Mouse Tilt Cards */}
+        {/* 7. Engineering & AI Team with 3D Mouse Tilt Cards */}
         <TeamSection />
 
-        {/* 9. Comprehensive FAQ */}
+        {/* 8. Comprehensive FAQ */}
         <FaqSection />
 
-        {/* 10. High-Conversion Final CTA with Aurora Mesh */}
+        {/* 9. High-Conversion Final CTA with Aurora Mesh */}
         <CtaSection />
       </main>
 

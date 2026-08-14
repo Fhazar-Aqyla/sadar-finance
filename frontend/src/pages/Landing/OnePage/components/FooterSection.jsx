@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
-import { Heart, Github, Linkedin, Instagram, Shield, Zap, ArrowRight } from "lucide-react";
+import { Heart, Shield, Zap } from "lucide-react";
 
 const GithubIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -25,8 +25,8 @@ export const FooterSection = () => {
   const productLinks = [
     { label: "Beranda", href: "#home" },
     { label: "Fitur Unggulan", href: "#features" },
-    { label: "Simulasi Anggaran", href: "#simulator" },
     { label: "Cara Kerja", href: "#how-it-works" },
+    { label: "Simulasi Anggaran", href: "#simulator" },
     { label: "Tim Kami", href: "#team" },
     { label: "FAQ", href: "#faq" },
   ];
@@ -54,7 +54,7 @@ export const FooterSection = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Main Footer Grid */}
-        <div className="py-12 lg:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+        <div className="py-12 lg:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
 
           {/* Column 1 — Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
@@ -152,28 +152,6 @@ export const FooterSection = () => {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Column 4 — CTA Card */}
-          <div>
-            <h4 className="text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-widest mb-5">
-              Mulai Sekarang
-            </h4>
-            <div className="rounded-2xl bg-gradient-to-br from-[#1E3A8A]/90 to-blue-700 p-5 text-white shadow-lg shadow-blue-500/15">
-              <p className="text-sm font-bold leading-snug">
-                Gratis selamanya. Tanpa kartu kredit.
-              </p>
-              <p className="text-xs text-blue-100 mt-1.5 leading-relaxed">
-                Mulai lacak keuanganmu hari ini dengan SADAR Finance — 100% bebas iklan.
-              </p>
-              <Link
-                to="/register"
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-[#1E3A8A] text-xs font-extrabold hover:bg-blue-50 transition-colors shadow-sm group"
-              >
-                Coba Gratis
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
           </div>
         </div>
 

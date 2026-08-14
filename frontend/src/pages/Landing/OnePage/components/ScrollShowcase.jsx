@@ -77,7 +77,7 @@ export const ScrollShowcase = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative py-14 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden [perspective:1400px]"
+      className="relative py-16 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden [perspective:1400px]"
     >
       {/* Background glow beneath dashboard */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-80 bg-blue-600/10 dark:bg-sky-500/10 blur-[100px] rounded-full pointer-events-none -z-10" />
@@ -90,17 +90,17 @@ export const ScrollShowcase = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-2xl mx-auto mb-12 lg:mb-16 relative z-10"
+        className="text-center max-w-3xl mx-auto mb-16 relative z-10"
       >
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs border border-blue-100 dark:border-blue-900/40">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs border border-blue-100 dark:border-blue-900/40">
           <Layers className="w-3.5 h-3.5" />
           Dashboard Preview
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
           <span className="text-slate-900 dark:text-white">Semua dalam Satu </span>
           <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">Dashboard Modern.</span>
         </h2>
-        <p className="mt-3 text-sm sm:text-base text-slate-500 dark:text-slate-400">
+        <p className="mt-4 text-base sm:text-lg text-slate-500 dark:text-slate-400">
           Ringkasan pengeluaran, skor finansial, dan peringatan anggaran — semuanya dalam satu tampilan bersih dan responsif.
         </p>
       </motion.div>

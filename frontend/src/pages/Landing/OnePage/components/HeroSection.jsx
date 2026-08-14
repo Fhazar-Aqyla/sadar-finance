@@ -211,15 +211,10 @@ export const HeroSection = () => {
   );
 
   const headlineWords = [
-    { text: "Ketahui", highlight: false },
-    { text: "ke", highlight: false },
-    { text: "Mana", highlight: false },
     { text: "Uangmu", highlight: false },
-    { text: "Pergi", highlight: false },
-    { text: "Tanpa", highlight: false },
-    { text: "Repot", highlight: true },
-    { text: "Mencatat", highlight: true },
-    { text: "Manual.", highlight: true },
+    { text: "Kemana,", highlight: false },
+    { text: "Kamu", highlight: true },
+    { text: "Tahu.", highlight: true },
   ];
 
   const trustHighlights = [
@@ -235,17 +230,20 @@ export const HeroSection = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-32 pb-24 lg:pt-40 lg:pb-36 overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-slate-50/60 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-32 pb-24 lg:pt-40 lg:pb-36 overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/50 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
       {/* Primary large animated ambient mesh */}
-      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[420px] bg-gradient-to-tr from-blue-500/15 via-sky-300/10 to-indigo-400/12 blur-[100px] rounded-full -z-10 animate-pulse" />
+      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] bg-gradient-to-tr from-blue-500/20 via-sky-400/12 to-indigo-500/20 blur-[100px] rounded-full -z-10 animate-pulse" />
+      {/* Deep radial glow behind headline */}
+      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.14),transparent_65%)] blur-2xl rounded-full -z-10" />
       {/* Secondary accent orbs */}
-      <div className="pointer-events-none absolute top-8 left-0 w-80 h-80 bg-blue-600/8 blur-[90px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute top-16 right-0 w-80 h-80 bg-emerald-500/8 blur-[90px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute bottom-20 left-1/4 w-64 h-64 bg-sky-400/6 blur-[80px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-8 left-0 w-80 h-80 bg-indigo-500/10 blur-[90px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-16 right-0 w-80 h-80 bg-emerald-500/10 blur-[90px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute bottom-20 left-1/4 w-64 h-64 bg-sky-400/8 blur-[80px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute bottom-10 right-1/4 w-72 h-72 bg-violet-500/8 blur-[90px] rounded-full -z-10" />
 
       {/* Fine dot-grid texture overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#93c5fd_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.25] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] dark:opacity-[0.2] -z-10" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#93c5fd_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.3] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] dark:opacity-[0.25] -z-10" />
 
       {/* Decorative animated geometric particles */}
       <div className="pointer-events-none absolute top-32 left-[8%] w-2.5 h-2.5 rounded-full bg-blue-400/40 dark:bg-sky-400/30 animate-bounce" style={{animationDuration:'3.1s'}} />
@@ -318,42 +316,35 @@ export const HeroSection = () => {
             className="hero-title text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-2xl xl:max-w-3xl mx-auto leading-[1.18] sm:leading-[1.14] [perspective:1000px]"
           >
             {headlineWords.map((word, idx) => (
-              <span
+              <motion.span
                 key={idx}
                 className={`hero-title-word inline-block mr-[0.25em] ${
-                  word.highlight ? "text-[#1E3A8A] dark:text-sky-400" : ""
+                  word.highlight
+                    ? "bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent [background-size:200%_auto] dark:from-sky-300 dark:via-blue-300 dark:to-sky-300"
+                    : ""
                 }`}
+                animate={
+                  word.highlight
+                    ? { backgroundPosition: ["0% 50%", "200% 50%", "0% 50%"] }
+                    : undefined
+                }
+                transition={
+                  word.highlight
+                    ? { duration: 8, repeat: Infinity, ease: "linear" }
+                    : undefined
+                }
               >
                 {word.text}
-              </span>
+              </motion.span>
             ))}
           </h1>
 
           {/* Hero Subtitle */}
           <p className="hero-subtitle mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            Ekstraksi struk kasir otomatis dengan AI OCR, pantau limit alokasi
-            50/30/20 secara realtime, dan ketahui skor kesehatan finansialmu
-            secara objektif.
+            Foto struknya, sisanya urusan AI. SADAR mencatat pengeluaran,
+            membagi anggaran 50/30/20, dan menjaga skor kesehatan
+            finansialmu tetap terkontrol.
           </p>
-
-          {/* Social Proof Chip */}
-          <div className="hero-subtitle mt-8 flex items-center justify-center gap-3 flex-wrap">
-            {/* Avatar stack */}
-            <div className="flex -space-x-2.5">
-              {['bg-gradient-to-br from-blue-400 to-blue-600','bg-gradient-to-br from-emerald-400 to-emerald-600','bg-gradient-to-br from-violet-400 to-violet-600','bg-gradient-to-br from-amber-400 to-amber-500'].map((grad, i) => (
-                <div key={i} className={`w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 ${grad} shadow-sm flex items-center justify-center text-white text-[9px] font-black`}>
-                  {['F','H','D','Z'][i]}
-                </div>
-              ))}
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Dipercaya <span className="text-[#1E3A8A] dark:text-sky-400">500+ pengguna aktif</span></p>
-              <div className="flex items-center gap-0.5 mt-0.5">
-                {[...Array(5)].map((_, i) => <span key={i} className="text-amber-400 text-[10px]">★</span>)}
-                <span className="text-[10px] text-slate-500 ml-1 font-medium">4.9/5</span>
-              </div>
-            </div>
-          </div>
 
           {/* Call to Actions with Shimmer Effect */}
           <div className="hero-actions mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">

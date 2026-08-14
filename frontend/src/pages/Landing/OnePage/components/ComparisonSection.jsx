@@ -69,7 +69,7 @@ export const ComparisonSection = () => {
   return (
     <section
       ref={containerRef}
-      className="py-20 lg:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
       {/* Ambient background blobs */}
       <div className="absolute inset-0 pointer-events-none">
@@ -83,7 +83,7 @@ export const ComparisonSection = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-3xl mx-auto mb-20 relative z-10"
+        className="text-center max-w-3xl mx-auto mb-16 relative z-10"
       >
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm border border-blue-100 dark:border-blue-900/40">
           <ArrowLeftRight className="w-3.5 h-3.5" />
