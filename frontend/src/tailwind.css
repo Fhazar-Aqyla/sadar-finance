@@ -89,3 +89,15 @@ html {
   animation: blob 7s infinite ease-in-out;
 }
 
+@keyframes cta-pulse {
+  0%,
+  100% {
+    opacity: 0.14;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.28;
+    transform: scale(1.08);
+  }
+}
+

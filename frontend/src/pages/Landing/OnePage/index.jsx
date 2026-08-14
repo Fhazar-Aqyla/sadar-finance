@@ -836,6 +836,7 @@ const OnePage = () => {
       <Footer
         logo={<img src={sadarLogo} alt="SADAR" className="h-[30px] w-auto brightness-0 invert" />}
         brandName="SADAR Finance"
+        description="SADAR Finance membantu kamu mencatat, memahami, dan mengontrol keuangan pribadi dengan lebih sadar — dari transaksi harian sampai skor kesehatan finansial."
         socialLinks={[
           {
             icon: (
