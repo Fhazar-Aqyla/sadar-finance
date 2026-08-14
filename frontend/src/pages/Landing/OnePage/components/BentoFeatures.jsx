@@ -16,7 +16,7 @@ import {
   TrendingUp,
   Info,
 } from "lucide-react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export const BentoFeatures = () => {
   const containerRef = useRef(null);
@@ -27,15 +27,9 @@ export const BentoFeatures = () => {
     offset: ["start end", "end start"],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    restDelta: 0.001,
-  });
-
-  // Parallax offsets for cards
-  const yCard1 = useTransform(smoothProgress, [0, 1], [25, -20]);
-  const yBottomGrid = useTransform(smoothProgress, [0, 1], [35, -25]);
+  // Parallax offsets for cards (direct, no spring for performance)
+  const yCard1 = useTransform(scrollYProgress, [0, 1], [25, -20]);
+  const yBottomGrid = useTransform(scrollYProgress, [0, 1], [35, -25]);
 
   // Helper to get score status theme & dynamically calculated factors based on activeScore
   // Exact Score Ranges per SADAR Finance Specification:

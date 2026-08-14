@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Camera, Cpu, Gauge, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export const HowItWorksSection = () => {
   const containerRef = useRef(null);
@@ -11,19 +11,10 @@ export const HowItWorksSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    restDelta: 0.001,
-  });
-
   // Parallax shifts on cards
-  const yCard1 = useTransform(smoothProgress, [0, 1], [35, -30]);
-  const yCard2 = useTransform(smoothProgress, [0, 1], [15, -15]);
-  const yCard3 = useTransform(smoothProgress, [0, 1], [-25, 25]);
-
-  // Animated line connector with smooth progress
-  const lineScale = useTransform(smoothProgress, [0.2, 0.7], [0, 1]);
+  const yCard1 = useTransform(scrollYProgress, [0, 1], [35, -30]);
+  const yCard2 = useTransform(scrollYProgress, [0, 1], [15, -15]);
+  const yCard3 = useTransform(scrollYProgress, [0, 1], [-25, 25]);
 
   const steps = [
     {
@@ -32,6 +23,8 @@ export const HowItWorksSection = () => {
       title: "Foto Struk atau Catat Transaksi",
       desc: "Unggah foto struk belanjaan kasir dari minimarket/restoran atau masukkan transaksi harianmu dalam 3 detik.",
       accent: "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300",
+      numberClass: "text-blue-200 dark:text-blue-900 group-hover:text-[#1E3A8A]/30",
+      dotClass: "bg-[#1E3A8A] dark:bg-sky-400",
       pill: "Deteksi Otomatis",
       y: yCard1,
     },
@@ -40,7 +33,9 @@ export const HowItWorksSection = () => {
       icon: Cpu,
       title: "AI Memproses & Mengelompokkan",
       desc: "Algoritma cerdas mengenali merchant, memvalidasi total nominal, dan memetakan pos 50/30/20 secara presisi.",
-      accent: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+      accent: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
+      numberClass: "text-sky-200 dark:text-sky-900 group-hover:text-sky-600/30",
+      dotClass: "bg-sky-500 dark:bg-sky-400",
       pill: "NLP Categorization",
       y: yCard2,
     },
@@ -51,6 +46,8 @@ export const HowItWorksSection = () => {
       desc: "Dapatkan skor kesehatan finansial objektif dan terima peringatan otomatis sebelum kuota anggaranmu overbudget.",
       accent:
         "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+      numberClass: "text-emerald-200 dark:text-emerald-900 group-hover:text-emerald-600/30",
+      dotClass: "bg-emerald-500 dark:bg-emerald-400",
       pill: "Skor Finansial",
       y: yCard3,
     },
@@ -84,11 +81,16 @@ export const HowItWorksSection = () => {
 
       {/* Steps Container with Connecting Neon Conduit Line */}
       <div className="relative z-10">
-        {/* Desktop Dynamic Connector Line */}
-        <div className="hidden md:block absolute top-1/2 left-[12%] right-[12%] h-[3px] bg-slate-200 dark:bg-slate-800 -translate-y-12 -z-0 rounded-full overflow-hidden shadow-inner">
+        {/* Desktop Conduit Line — always lit, with traveling light pulse */}
+        <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] -translate-y-14 h-[3px] pointer-events-none">
+          {/* Base glow track */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#1E3A8A]/40 via-sky-400/40 to-emerald-500/40 shadow-[0_0_18px_rgba(56,189,248,0.35)]" />
+          {/* Bright moving pulse */}
           <motion.div
-            style={{ scaleX: lineScale }}
-            className="h-full w-full bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-emerald-500 origin-left rounded-full shadow-[0_0_10px_#38bdf8]"
+            animate={{ x: ["0%", "100%"] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/2 -translate-y-1/2 w-16 h-[3px] rounded-full bg-gradient-to-r from-transparent via-sky-300 to-transparent origin-left"
+            style={{ left: 0 }}
           />
         </div>
 
@@ -106,12 +108,13 @@ export const HowItWorksSection = () => {
                       >
                         <Icon className="w-7 h-7" />
                       </motion.div>
-                      <span className="text-4xl sm:text-5xl font-black text-slate-200 dark:text-slate-800 tracking-tight group-hover:text-[#1E3A8A]/20 dark:group-hover:text-sky-400/20 transition-colors">
+                      <span className={`text-4xl sm:text-5xl font-black tracking-tight transition-colors ${step.numberClass}`}>
                         {step.number}
                       </span>
                     </div>
 
-                    <div className="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold dark:bg-slate-800 dark:text-slate-300 mb-3 border border-slate-200/60 dark:border-slate-700">
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold dark:bg-slate-800 dark:text-slate-300 mb-3 border border-slate-200/60 dark:border-slate-700`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${step.dotClass}`} />
                       {step.pill}
                     </div>
 

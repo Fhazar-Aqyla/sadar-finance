@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { InteractiveBudgetSlider } from "@/Components/ui/interactive-budget-slider";
 import { Calculator } from "lucide-react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export const BudgetSimulatorSection = () => {
   const containerRef = useRef(null);
@@ -11,13 +11,7 @@ export const BudgetSimulatorSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    restDelta: 0.001,
-  });
-
-  const yWidget = useTransform(smoothProgress, [0, 1], [30, -30]);
+  const yWidget = useTransform(scrollYProgress, [0, 1], [30, -30]);
 
   return (
     <section

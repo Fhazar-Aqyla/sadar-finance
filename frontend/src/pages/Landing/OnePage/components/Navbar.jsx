@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 
 export const Navbar = () => {
@@ -9,30 +9,36 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    const sections = ["home", "features", "how-it-works", "simulator", "team", "faq"];
 
-      const sections = ["home", "features", "how-it-works", "simulator", "team", "faq"];
+    const computeActive = () => {
       const scrollPosition = window.scrollY + 100;
-
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
         if (el) {
           const top = el.offsetTop;
           const height = el.offsetHeight;
           if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(sectionId);
-            break;
+            return sectionId;
           }
         }
+      }
+      return null;
+    };
+
+    let ticking = false;
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+
+      // Throttle the DOM-read active-section detection to one pass per frame
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          const next = computeActive();
+          if (next) setActiveSection(next);
+        });
       }
     };
 
@@ -50,21 +56,15 @@ export const Navbar = () => {
   ];
 
   return (
-    <motion.header
-      initial={{ y: -60, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
         isScrolled
-          ? "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-xs py-3"
-          : "bg-transparent py-5"
+          ? "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm py-3"
+          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 py-4"
       }`}
     >
       {/* Top Scroll Progress Line */}
-      <motion.div
-        style={{ scaleX }}
-        className="absolute top-0 left-0 right-0 h-[2.5px] bg-[#1E3A8A] dark:bg-sky-400 origin-left z-50"
-      />
+      <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-[#1E3A8A] dark:bg-sky-400 origin-left z-50" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
@@ -183,6 +183,6 @@ export const Navbar = () => {
           )}
         </AnimatePresence>
       </div>
-    </motion.header>
+    </header>
   );
 };

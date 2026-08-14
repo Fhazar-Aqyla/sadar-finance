@@ -45,14 +45,14 @@ export const ScrollShowcase = () => {
     mouseY.set(0);
   };
 
-  // Scroll parallax progression
+  // Scroll parallax progression (gentle spring keeps the 3D tilt buttery smooth)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
+    stiffness: 70,
     damping: 24,
     restDelta: 0.001,
   });
@@ -115,7 +115,7 @@ export const ScrollShowcase = () => {
           transformPerspective: 1400,
           transformStyle: "preserve-3d",
         }}
-        className="relative rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-slate-900/95 p-2.5 sm:p-4 shadow-2xl transition-shadow backdrop-blur-md"
+        className="relative rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-slate-900/95 p-2.5 sm:p-4 shadow-2xl transition-shadow"
       >
         <motion.div
           style={{
@@ -160,13 +160,11 @@ export const ScrollShowcase = () => {
             />
           </div>
 
-          {/* Floating Interactive Micro-Cards (Parallax Float & Spring Elevation) */}
+          {/* Floating Interactive Micro-Cards (Scroll Parallax only, no infinite loop) */}
           <motion.div
             style={{ y: yBadge1, translateZ: 40 }}
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             whileHover={{ scale: 1.08, translateZ: 60 }}
-            className="hidden lg:flex items-center gap-3 absolute -top-8 -left-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            className="hidden lg:flex items-center gap-3 absolute -top-8 -left-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
           >
             <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs">
               <TrendingUp className="w-5 h-5" />
@@ -186,10 +184,8 @@ export const ScrollShowcase = () => {
 
           <motion.div
             style={{ y: yBadge2, translateZ: 40 }}
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
             whileHover={{ scale: 1.08, translateZ: 60 }}
-            className="hidden lg:flex items-center gap-3 absolute -top-8 -right-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            className="hidden lg:flex items-center gap-3 absolute -top-8 -right-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
           >
             <div className="p-2.5 rounded-xl bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 shadow-xs">
               <Sparkles className="w-5 h-5" />
@@ -207,10 +203,8 @@ export const ScrollShowcase = () => {
 
           <motion.div
             style={{ y: yBadge3, translateZ: 40 }}
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             whileHover={{ scale: 1.08, translateZ: 60 }}
-            className="hidden lg:flex items-center gap-3 absolute -bottom-8 -right-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            className="hidden lg:flex items-center gap-3 absolute -bottom-8 -right-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
           >
             <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 shadow-xs">
               <AlertTriangle className="w-5 h-5" />

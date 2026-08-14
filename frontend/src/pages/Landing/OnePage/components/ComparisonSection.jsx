@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   XCircle,
   CheckCircle2,
@@ -19,14 +19,8 @@ export const ComparisonSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    restDelta: 0.001,
-  });
-
-  const yManual = useTransform(smoothProgress, [0, 1], [30, -30]);
-  const ySadar = useTransform(smoothProgress, [0, 1], [-25, 25]);
+  const yManual = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const ySadar = useTransform(scrollYProgress, [0, 1], [-25, 25]);
 
   const manualDrawbacks = [
     {

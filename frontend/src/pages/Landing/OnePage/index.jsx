@@ -22,11 +22,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 const LandingOnePage = () => {
   const [showFloatingBar, setShowFloatingBar] = useState(false);
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    document.title = "SADAR Finance — Smart AI-Driven Personal Finance Platform";
+    document.title = "SADAR Finance — Sadar ke Mana Uangmu Pergi";
 
     // Initialize butter-smooth Lenis momentum scrolling
     const lenis = new Lenis({
@@ -65,10 +64,6 @@ const LandingOnePage = () => {
     };
   }, []);
 
-  const handleMouseMove = (e) => {
-    setCursorPos({ x: e.clientX, y: e.clientY });
-  };
-
   const scrollToTop = () => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0);
@@ -79,17 +74,8 @@ const LandingOnePage = () => {
 
   return (
     <div
-      onMouseMove={handleMouseMove}
       className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white dark:from-slate-950 dark:via-slate-900/80 dark:to-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#1E3A8A] selection:text-white overflow-x-hidden font-sans relative"
     >
-      {/* Interactive Global Ambient Cursor Glow Follower */}
-      <div
-        className="pointer-events-none fixed w-[500px] h-[500px] rounded-full bg-radial from-blue-500/6 dark:from-sky-400/6 to-transparent blur-3xl -z-0 transition-transform duration-75 ease-out"
-        style={{
-          transform: `translate3d(${cursorPos.x - 250}px, ${cursorPos.y - 250}px, 0)`,
-        }}
-      />
-
       {/* Top Glassmorphic Navigation */}
       <Navbar />
 
@@ -97,14 +83,14 @@ const LandingOnePage = () => {
         {/* 1. Hero Section with Multi-Layer Parallax & 3D Interactive Cards */}
         <HeroSection />
 
-        {/* 2. Interactive Comparison: Sebelum vs Sesudah SADAR */}
-        <ComparisonSection />
+        {/* 2. 3D Perspective Scroll Showcase */}
+        <ScrollShowcase />
 
         {/* 3. Bento Features: OCR Scanner, Health Score, Predictive Alerts */}
         <BentoFeatures />
 
-        {/* 4. 3D Perspective Scroll Showcase */}
-        <ScrollShowcase />
+        {/* 4. Interactive Comparison: Sebelum vs Sesudah SADAR */}
+        <ComparisonSection />
 
         {/* 5. 3-Step How It Works with Connected Neon Conduit Motion Flow */}
         <HowItWorksSection />

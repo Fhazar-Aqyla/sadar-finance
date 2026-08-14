@@ -152,25 +152,7 @@ export const HeroSection = () => {
           "-=0.4"
         );
 
-      // 2. Physics-inspired ambient float loops
-      gsap.to(".hero-float-inner-1", {
-        y: -10,
-        rotation: 1,
-        duration: 3.6,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
-
-      gsap.to(".hero-float-inner-2", {
-        y: 10,
-        rotation: -1,
-        duration: 4.2,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: 0.5,
-      });
+      // 2. (removed infinite float loops for performance; scroll & mouse parallax remain)
 
       // 3. ScrollTrigger Parallax scrub
       gsap.to(".hero-content-wrap", {
@@ -230,35 +212,34 @@ export const HeroSection = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-32 pb-24 lg:pt-40 lg:pb-36 overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/50 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-24 pb-24 lg:pt-32 lg:pb-32 overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/50 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
-      {/* Primary large animated ambient mesh */}
-      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[480px] bg-gradient-to-tr from-blue-500/20 via-sky-400/12 to-indigo-500/20 blur-[100px] rounded-full -z-10 animate-pulse" />
+      {/* Primary ambient mesh */}
+      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[360px] bg-gradient-to-tr from-blue-500/15 via-sky-400/10 to-indigo-500/15 blur-[70px] rounded-full -z-10" />
       {/* Deep radial glow behind headline */}
-      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.14),transparent_65%)] blur-2xl rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[560px] h-[320px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_65%)] blur-2xl rounded-full -z-10" />
       {/* Secondary accent orbs */}
-      <div className="pointer-events-none absolute top-8 left-0 w-80 h-80 bg-indigo-500/10 blur-[90px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute top-16 right-0 w-80 h-80 bg-emerald-500/10 blur-[90px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute bottom-20 left-1/4 w-64 h-64 bg-sky-400/8 blur-[80px] rounded-full -z-10" />
-      <div className="pointer-events-none absolute bottom-10 right-1/4 w-72 h-72 bg-violet-500/8 blur-[90px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-8 left-0 w-64 h-64 bg-indigo-500/10 blur-[70px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute top-16 right-0 w-64 h-64 bg-emerald-500/10 blur-[70px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute bottom-20 left-1/4 w-56 h-56 bg-sky-400/8 blur-[60px] rounded-full -z-10" />
+      <div className="pointer-events-none absolute bottom-10 right-1/4 w-64 h-64 bg-violet-500/8 blur-[70px] rounded-full -z-10" />
 
       {/* Fine dot-grid texture overlay */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#93c5fd_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.3] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] dark:opacity-[0.25] -z-10" />
 
-      {/* Decorative animated geometric particles */}
-      <div className="pointer-events-none absolute top-32 left-[8%] w-2.5 h-2.5 rounded-full bg-blue-400/40 dark:bg-sky-400/30 animate-bounce" style={{animationDuration:'3.1s'}} />
-      <div className="pointer-events-none absolute top-48 right-[12%] w-2 h-2 rounded-full bg-emerald-400/50 dark:bg-emerald-400/30 animate-bounce" style={{animationDuration:'4.3s', animationDelay:'0.8s'}} />
-      <div className="pointer-events-none absolute top-72 left-[18%] w-1.5 h-1.5 rounded-full bg-indigo-400/40 dark:bg-indigo-400/25 animate-bounce" style={{animationDuration:'3.7s', animationDelay:'1.4s'}} />
-      <div className="pointer-events-none absolute top-40 right-[22%] w-3 h-3 rotate-45 bg-sky-300/30 dark:bg-sky-300/20 animate-pulse" style={{animationDuration:'5s'}} />
-      <div className="pointer-events-none absolute top-20 left-1/3 w-1.5 h-1.5 rounded-full bg-blue-300/50 animate-ping" style={{animationDuration:'3s', animationDelay:'2s'}} />
+      {/* Decorative static particles */}
+      <div className="pointer-events-none absolute top-32 left-[8%] w-2.5 h-2.5 rounded-full bg-blue-400/40 dark:bg-sky-400/30" />
+      <div className="pointer-events-none absolute top-48 right-[12%] w-2 h-2 rounded-full bg-emerald-400/50 dark:bg-emerald-400/30" />
+      <div className="pointer-events-none absolute top-72 left-[18%] w-1.5 h-1.5 rounded-full bg-indigo-400/40 dark:bg-indigo-400/25" />
+      <div className="pointer-events-none absolute top-40 right-[22%] w-3 h-3 rotate-45 bg-sky-300/30 dark:bg-sky-300/20" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
         {/* Floating Card Left: Live OCR Transaction Scan (3D Mouse Parallax) */}
         <motion.div
           style={{ x: cardLeftX, y: cardLeftY, rotate: cardLeftRotate }}
-          className="hero-card-left-wrap hidden lg:flex absolute top-4 left-0 xl:-left-4 2xl:-left-10 z-20 pointer-events-none"
+          className="hero-card-left-wrap hidden lg:flex absolute top-4 left-0 z-20 pointer-events-none"
         >
-          <div className="hero-float-inner-1 pointer-events-auto flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
+          <div className="hero-float-inner-1 pointer-events-auto flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
             <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/70 flex items-center justify-center text-[#1E3A8A] dark:text-sky-400 shrink-0 shadow-xs">
               <Receipt className="w-5 h-5" />
             </div>
@@ -283,9 +264,9 @@ export const HeroSection = () => {
         {/* Floating Card Right: Live Financial Score (3D Mouse Parallax) */}
         <motion.div
           style={{ x: cardRightX, y: cardRightY, rotate: cardRightRotate }}
-          className="hero-card-right-wrap hidden lg:flex absolute top-12 right-0 xl:-right-4 2xl:-right-10 z-20 pointer-events-none"
+          className="hero-card-right-wrap hidden lg:flex absolute top-12 right-0 z-20 pointer-events-none"
         >
-          <div className="hero-float-inner-2 pointer-events-auto flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
+          <div className="hero-float-inner-2 pointer-events-auto flex items-center gap-3.5 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
             <div className="w-11 h-11 rounded-xl bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-xs">
               <Activity className="w-5 h-5" />
             </div>
@@ -308,12 +289,12 @@ export const HeroSection = () => {
         </motion.div>
 
         {/* Hero Main Content */}
-        <div className="hero-content-wrap max-w-3xl xl:max-w-3xl 2xl:max-w-4xl mx-auto text-center relative z-10">
+        <div className="hero-content-wrap max-w-3xl mx-auto text-center relative z-10">
 
           {/* Hero Main Headline with Kinetic Word Stagger */}
           <h1
             ref={headlineRef}
-            className="hero-title text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-2xl xl:max-w-3xl mx-auto leading-[1.18] sm:leading-[1.14] [perspective:1000px]"
+            className="hero-title text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-2xl mx-auto leading-[1.18] sm:leading-[1.14] [perspective:1000px]"
           >
             {headlineWords.map((word, idx) => (
               <motion.span
@@ -323,16 +304,6 @@ export const HeroSection = () => {
                     ? "bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent [background-size:200%_auto] dark:from-sky-300 dark:via-blue-300 dark:to-sky-300"
                     : ""
                 }`}
-                animate={
-                  word.highlight
-                    ? { backgroundPosition: ["0% 50%", "200% 50%", "0% 50%"] }
-                    : undefined
-                }
-                transition={
-                  word.highlight
-                    ? { duration: 8, repeat: Infinity, ease: "linear" }
-                    : undefined
-                }
               >
                 {word.text}
               </motion.span>
@@ -340,14 +311,14 @@ export const HeroSection = () => {
           </h1>
 
           {/* Hero Subtitle */}
-          <p className="hero-subtitle mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
+          <p className="hero-subtitle mt-7 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
             Foto struknya, sisanya urusan AI. SADAR mencatat pengeluaran,
             membagi anggaran 50/30/20, dan menjaga skor kesehatan
             finansialmu tetap terkontrol.
           </p>
 
           {/* Call to Actions with Shimmer Effect */}
-          <div className="hero-actions mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <div className="hero-actions mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -380,7 +351,7 @@ export const HeroSection = () => {
           </div>
 
           {/* Hero Trust Badges Bar */}
-          <div className="mt-12 sm:mt-14 pt-8 border-t border-slate-200/80 dark:border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="mt-14 sm:mt-16 pt-8 border-t border-slate-200/80 dark:border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             {trustHighlights.map((item, idx) => {
               const Icon = item.icon;
               return (

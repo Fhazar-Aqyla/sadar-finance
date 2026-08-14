@@ -162,15 +162,9 @@ export const TeamSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    restDelta: 0.001,
-  });
-
-  const yCol1 = useTransform(smoothProgress, [0, 1], [30, -30]);
-  const yCol2 = useTransform(smoothProgress, [0, 1], [-20, 20]);
-  const yCol3 = useTransform(smoothProgress, [0, 1], [35, -35]);
+  const yCol1 = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const yCol2 = useTransform(scrollYProgress, [0, 1], [-20, 20]);
+  const yCol3 = useTransform(scrollYProgress, [0, 1], [35, -35]);
 
   const team = [
     {
