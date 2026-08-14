@@ -6,6 +6,22 @@ Aplikasi ini mengintegrasikan pemrosesan citra struk digital otomatis menggunaka
 
 ---
 
+## 📚 Dokumentasi
+
+| Dokumen | Isi |
+|---|---|
+| [`docs/PRD.md`](docs/PRD.md) | Product Requirements Document — kebutuhan fitur, persona, acceptance criteria |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | Arsitektur & desain sistem — komponen, alur data, keputusan desain |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Arsitektur teknis detail — alur request, integrasi AI, deployment |
+| [`docs/SCHEMA.md`](docs/SCHEMA.md) | Skema database lengkap — tabel, relasi, index, enum |
+| [`docs/RULES.md`](docs/RULES.md) | Aturan bisnis & validasi — budget 50/30/20, validasi input, financial score |
+| [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) | Referensi lengkap endpoint REST API |
+| [`sadar-finance.md`](sadar-finance.md) | Dokumentasi rancangan sistem asli |
+| [`docs/AI_DEPLOYMENT_AND_FINALIZATION.md`](docs/AI_DEPLOYMENT_AND_FINALIZATION.md) | Panduan deploy & finalisasi AI |
+| [`docs/SADAR_DATA_SCENARIOS.md`](docs/SADAR_DATA_SCENARIOS.md) | Skenario data mock vs backend |
+
+---
+
 ## 🌟 Status Aplikasi
 
 **SADAR Finance kini telah rampung 100% (Production-Ready).** Proyek ini menerapkan pendekatan arsitektur *Decoupled Full-Stack* yang terdiri atas tiga layanan mandiri:
