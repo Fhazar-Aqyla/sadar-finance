@@ -12,6 +12,7 @@ import { ScrollShowcase } from "./components/ScrollShowcase";
 import { BentoFeatures } from "./components/BentoFeatures";
 import { ComparisonSection } from "./components/ComparisonSection";
 import { BudgetSimulatorSection } from "./components/BudgetSimulatorSection";
+import { TestimonialsSection } from "./components/TestimonialsSection";
 import { HowItWorksSection } from "./components/HowItWorksSection";
 import { TeamSection } from "./components/TeamSection";
 import { FaqSection } from "./components/FaqSection";
@@ -98,13 +99,16 @@ const LandingOnePage = () => {
         {/* 6. Interactive 50/30/20 Budget Simulator */}
         <BudgetSimulatorSection />
 
-        {/* 7. Engineering & AI Team with 3D Mouse Tilt Cards */}
+        {/* 7. Testimonials: Center Featured Card with Smooth Carousel & Side Previews */}
+        <TestimonialsSection />
+
+        {/* 8. Engineering & AI Team with 3D Mouse Tilt Cards */}
         <TeamSection />
 
-        {/* 8. Comprehensive FAQ */}
+        {/* 9. Comprehensive FAQ */}
         <FaqSection />
 
-        {/* 9. High-Conversion Final CTA with Aurora Mesh */}
+        {/* 10. High-Conversion Final CTA with Aurora Mesh */}
         <CtaSection />
       </main>
 

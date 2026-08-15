@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+﻿import React, { useRef } from "react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { Users, Sparkles } from "lucide-react";
 import {
@@ -99,10 +99,11 @@ const TeamMemberCard = ({ member }) => {
           <h3 className="font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-[#1E3A8A] dark:group-hover:text-sky-400 transition-colors">
             {member.name}
           </h3>
-          <p className="text-sm font-semibold text-[#1E3A8A] dark:text-sky-400 mt-0.5">
+          <span className="mt-1.5 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#1E3A8A] to-sky-500 text-white text-xs font-bold shadow-sm border border-white/20 dark:border-sky-400/30">
+            <Sparkles className="w-3 h-3" />
             {member.role}
-          </p>
-          <span className="mt-2.5 inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold dark:bg-slate-800 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 shadow-2xs">
+          </span>
+          <span className="mt-2.5 inline-block px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A]/80 text-xs font-bold dark:bg-blue-950/50 dark:text-sky-300/90 border border-blue-100/80 dark:border-blue-900/40 shadow-2xs">
             {member.badge}
           </span>
         </div>
@@ -169,7 +170,7 @@ export const TeamSection = () => {
   const team = [
     {
       name: "Fhazar Raffiful Aqyla",
-      role: "Full Stack Developer",
+      role: "Frontend Developer",
       avatar: fhazarAvatar,
       objectPosition: "center 30%",
       badge: "Lead Architecture",
@@ -182,7 +183,7 @@ export const TeamSection = () => {
     },
     {
       name: "Muhammad Habib Rafi",
-      role: "Full Stack Developer",
+      role: "Backend Developer",
       avatar: habibAvatar,
       badge: "Frontend & UI/UX",
       yOffset: yCol2,

@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+
+  // Real scroll progress for the top progress line
+  const { scrollYProgress } = useScroll();
+  const scrollProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   useEffect(() => {
     const sections = ["home", "features", "how-it-works", "simulator", "team", "faq"];
@@ -29,7 +37,7 @@ export const Navbar = () => {
 
     let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 16);
 
       // Throttle the DOM-read active-section detection to one pass per frame
       if (!ticking) {
@@ -57,14 +65,17 @@ export const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm py-3"
-          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 py-4"
+          ? "bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl border-b border-slate-200/70 dark:border-slate-800/70 shadow-sm shadow-slate-900/5 py-3"
+          : "bg-transparent border-b border-transparent py-4 lg:py-5"
       }`}
     >
       {/* Top Scroll Progress Line */}
-      <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-[#1E3A8A] dark:bg-sky-400 origin-left z-50" />
+      <motion.div
+        style={{ scaleX: scrollProgress }}
+        className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#1E3A8A] via-sky-400 to-emerald-400 origin-left z-50"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
