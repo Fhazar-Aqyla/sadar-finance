@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Activity,
@@ -11,7 +11,6 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useSelector } from "react-redux";
 import sadarLogo from "../assets/images/landing/sadar-logo.png";
 import sadarLogoLight from "../assets/images/landing/logo-sadar-light.png";
 
@@ -29,79 +28,12 @@ const sidebarWidths = {
   collapsed: 84,
 };
 
-const getStoredUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem("authUser") || "null");
-  } catch (error) {
-    return null;
-  }
-};
-
-const getInitials = (name) => {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-};
-
-const normalizeAccountName = (value) => {
-  const name = String(value || "").trim();
-  if (!name || name.toLowerCase() === "admin" || name.toLowerCase().includes("themesbrand")) {
-    return "Aqyla";
-  }
-  return name;
-};
-
-const normalizeAccountEmail = (value) => {
-  const email = String(value || "").trim();
-  if (!email || email.toLowerCase().includes("themesbrand")) {
-    return "aqyla@example.com";
-  }
-  return email;
-};
-
 const Sidebar = ({ className = "", onLogoutClick }) => {
   const location = useLocation();
-  const profileUser = useSelector((state) => state.Profile?.user ?? {});
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(
     document.documentElement.getAttribute("data-sidebar-size") === "sm",
   );
-
-  const userName = useMemo(() => {
-    const storedUser = getStoredUser();
-
-    return normalizeAccountName(
-      profileUser?.first_name ||
-      profileUser?.username ||
-      storedUser?.user?.first_name ||
-      storedUser?.user?.username ||
-      storedUser?.data?.first_name ||
-      storedUser?.data?.username ||
-      storedUser?.first_name ||
-      storedUser?.username ||
-      storedUser?.user?.email ||
-      storedUser?.email ||
-      "Aqyla"
-    );
-  }, [profileUser]);
-
-  const userEmail = useMemo(() => {
-    const storedUser = getStoredUser();
-
-    return normalizeAccountEmail(
-      profileUser?.email ||
-      storedUser?.user?.email ||
-      storedUser?.data?.email ||
-      storedUser?.email ||
-      "aqyla@example.com"
-    );
-  }, [profileUser]);
-
-  const userInitials = getInitials(userName) || "AF";
 
   useEffect(() => {
     const handleResize = () => {
@@ -138,10 +70,13 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
   }, []);
 
   useEffect(() => {
-    const shouldShowMobile = document.body.classList.contains("vertical-sidebar-enable");
-    if (window.innerWidth < 992) {
-      setIsOpen(shouldShowMobile);
-    }
+    if (window.innerWidth >= 992) return undefined;
+
+    const frameId = window.requestAnimationFrame(() => {
+      setIsOpen(document.body.classList.contains("vertical-sidebar-enable"));
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, [location.pathname]);
 
   const toggleSidebar = () => {

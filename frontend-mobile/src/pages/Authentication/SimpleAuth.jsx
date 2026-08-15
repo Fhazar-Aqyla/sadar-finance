@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardBody, Col, Container, Input, Label, Row } from "reactstrap";
 import logoLight from "../../assets/images/logo-light.png";
@@ -59,7 +59,9 @@ const AuthShell = ({ title, subtitle, children, footer }) => (
 );
 
 const Login = () => {
-  document.title = "Login | SADAR Finance";
+  useEffect(() => {
+    document.title = "Login | SADAR Finance";
+  }, []);
 
   return (
     <AuthShell
@@ -99,7 +101,9 @@ const Login = () => {
 };
 
 const Register = () => {
-  document.title = "Register | SADAR Finance";
+  useEffect(() => {
+    document.title = "Register | SADAR Finance";
+  }, []);
 
   return (
     <AuthShell
@@ -135,7 +139,9 @@ const Register = () => {
 };
 
 const ForgotPassword = () => {
-  document.title = "Forgot Password | SADAR Finance";
+  useEffect(() => {
+    document.title = "Forgot Password | SADAR Finance";
+  }, []);
 
   return (
     <AuthShell

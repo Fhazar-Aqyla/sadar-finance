@@ -39,7 +39,6 @@ const authProtectedRoutes = [
   { path: "/profile", component: <UserProfile /> },
 
   // this route should be at the end of all other routes
-  // eslint-disable-next-line react/display-name
   { path: "*", component: <Navigate to="/dashboard" /> },
 ];
 

@@ -29,7 +29,9 @@ export const changeLayout = (layout) => async (dispatch) => {
         }
         changeHTMLAttribute("data-layout", layout);
         dispatch(changeLayoutAction(layout));
-    } catch (error) { }
+    } catch {
+        // Layout changes are best-effort and must not interrupt navigation.
+    }
 };
 
 /**
@@ -40,7 +42,9 @@ export const changeLayoutMode = (layoutMode) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-bs-theme", layoutMode);
         dispatch(changeLayoutModeAction(layoutMode));
-    } catch (error) { }
+    } catch {
+        // Layout changes are best-effort and must not interrupt navigation.
+    }
 };
 
 /**
@@ -176,5 +180,7 @@ export const changeSidebarVisibility = (sidebarVisibilitytype) => async (dispatc
     try {
         changeHTMLAttribute("data-sidebar-visibility", sidebarVisibilitytype);
         dispatch(changeSidebarVisibilityAction(sidebarVisibilitytype));
-    } catch (error) { }
+    } catch {
+        // Layout changes are best-effort and must not interrupt navigation.
+    }
 };

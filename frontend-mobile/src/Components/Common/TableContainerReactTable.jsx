@@ -15,8 +15,7 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 
 // Column Filter
 const Filter = ({
-  column,
-  table
+  column
 }) => {
   const columnFilterValue = column.getFilterValue();
 
@@ -45,7 +44,8 @@ const DebouncedInput = ({
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue);
+    const timeout = setTimeout(() => setValue(initialValue), 0);
+    return () => clearTimeout(timeout);
   }, [initialValue]);
 
   useEffect(() => {
@@ -158,14 +158,13 @@ const TableContainer = ({
                           header.column.columnDef.header,
                           header.getContext()
                         )}
-                        {{
+                        {({
                           asc: ' ',
                           desc: ' ',
-                        }
-                        [header.column.getIsSorted()] ?? null}
+                        })[header.column.getIsSorted()] ?? null}
                         {header.column.getCanFilter() ? (
                           <div>
-                            <Filter column={header.column} table={table} />
+                            <Filter column={header.column} />
                           </div>
                         ) : null}
                       </React.Fragment>

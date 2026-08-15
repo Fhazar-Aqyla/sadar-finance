@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 
+const MotionSpan = motion.span;
+
 function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
   const titles = useMemo(
@@ -38,7 +40,7 @@ function Hero() {
               style={{ marginTop: "8px" }}
             >
               <AnimatePresence mode="popLayout">
-                <motion.span
+                <MotionSpan
                   key={titles[titleNumber]}
                   className="absolute font-black leading-[1.04]"
                   initial={{ opacity: 0, y: -72 }}
@@ -47,7 +49,7 @@ function Hero() {
                   transition={{ type: "spring", stiffness: 86, damping: 20, opacity: { duration: 0.16 } }}
                 >
                   {titles[titleNumber]}
-                </motion.span>
+                </MotionSpan>
               </AnimatePresence>
             </span>
           </h1>

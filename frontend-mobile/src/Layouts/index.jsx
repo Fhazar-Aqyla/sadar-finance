@@ -30,7 +30,6 @@ import { useNavigate } from 'react-router-dom';
 import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap';
 
 
-// eslint-disable-next-line react-refresh/only-export-components
 const Layout = (props) => {
     const [headerClass, setHeaderClass] = useState("");
     const dispatch = useDispatch();

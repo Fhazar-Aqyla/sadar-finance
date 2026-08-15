@@ -5,7 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores([
+    'dist',
+    // Unused Velzon demo pages are kept as upstream reference templates.
+    'src/pages/AuthenticationInner/{Errors,LockScreen,Login,Logout,PasswordCreate,PasswordReset,Register,SuccessMessage,TwoStepVerification}/**',
+  ]),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -23,7 +27,21 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', {
+        argsIgnorePattern: '^[A-Z_]',
+        caughtErrors: 'none',
+        varsIgnorePattern: '^[A-Z_]',
+      }],
+      'react-refresh/only-export-components': ['error', {
+        allowConstantExport: true,
+        extraHOCs: ['withRouter'],
+      }],
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx}'],
+    languageOptions: {
+      globals: globals.jest,
     },
   },
 ])

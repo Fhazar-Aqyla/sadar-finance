@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+const MotionDiv = motion.div;
+
 export const ContainerScroll = ({ titleComponent, children }) => {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -40,18 +42,18 @@ export const ContainerScroll = ({ titleComponent, children }) => {
 
 export const Header = ({ translate, titleComponent }) => {
   return (
-    <motion.div
+    <MotionDiv
       style={{ translateY: translate }}
       className="mx-auto max-w-5xl text-center"
     >
       {titleComponent}
-    </motion.div>
+    </MotionDiv>
   );
 };
 
 export const Card = ({ rotate, scale, children }) => {
   return (
-    <motion.div
+    <MotionDiv
       style={{
         rotateX: rotate,
         scale,
@@ -63,6 +65,6 @@ export const Card = ({ rotate, scale, children }) => {
       <div className="h-full w-full overflow-hidden rounded-2xl bg-[#F8FBFF]">
         {children}
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 };
