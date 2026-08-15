@@ -34,7 +34,7 @@ createRoot(document.getElementById('root')).render(
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
+    navigator.serviceWorker.register('/sw.js?v=2').catch((error) => {
       console.warn('PWA service worker gagal didaftarkan:', error)
     })
   })

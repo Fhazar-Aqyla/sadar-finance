@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sadar-mobile-static-v1'
+const CACHE_NAME = 'sadar-mobile-static-v2'
 const PRECACHE_URLS = [
   '/manifest.webmanifest',
   '/offline.html',
