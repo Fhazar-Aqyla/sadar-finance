@@ -163,8 +163,8 @@ export const FaqSection = () => {
           </p>
         </motion.div>
 
-        {/* FAQ Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 items-start">
+        {/* FAQ Cards — single column, rapi tanpa lubang */}
+        <div className="max-w-5xl mx-auto space-y-3 lg:space-y-3.5">
           {faqs.map((faq, index) => (
             <FaqCard
               key={faq.id}
