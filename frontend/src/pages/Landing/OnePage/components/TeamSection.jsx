@@ -1,13 +1,7 @@
 ﻿import React, { useRef } from "react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { Users, Sparkles } from "lucide-react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  useMotionValue,
-} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import diahAvatar from "@/assets/images/users/diah.png";
 import marselaAvatar from "@/assets/images/users/marsela.png";
 import dzakyAvatar from "@/assets/images/users/dzaky.png";
@@ -38,68 +32,43 @@ const InstagramIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-// Individual 3D Interactive Team Card Component
+// Individual Team Card Component
 const TeamMemberCard = ({ member }) => {
-  const cardRef = useRef(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), {
-    damping: 20,
-    stiffness: 150,
-  });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), {
-    damping: 20,
-    stiffness: 150,
-  });
-
-  const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
   return (
     <motion.div
-      ref={cardRef}
-      style={{ y: member.yOffset, rotateX, rotateY, transformPerspective: 800 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="h-full [transform-style:preserve-3d]"
+      style={{ y: member.yOffset }}
+      className="h-full"
     >
-      <SpotlightCard className="h-full p-6 text-center flex flex-col items-center justify-between shadow-xs border-slate-200/90 dark:border-slate-800 transition-shadow duration-300 hover:shadow-xl group">
-        <div className="flex flex-col items-center">
-          {/* Avatar Photo with Glow Ring */}
+      <SpotlightCard className="relative h-full p-6 pt-8 text-center flex flex-col items-center justify-between shadow-xs border-slate-200/90 dark:border-slate-800 transition-shadow duration-300 hover:shadow-xl group overflow-hidden">
+        {/* Soft Ambient Glow */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 bg-gradient-to-br from-[#1E3A8A]/10 to-sky-400/10 blur-2xl rounded-full pointer-events-none" />
+
+        <div className="relative flex flex-col items-center">
+          {/* Avatar with Gradient Ring & Glow */}
           <motion.div
             whileHover={{ scale: 1.08, rotate: 2 }}
-            className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-[#1E3A8A]/20 dark:border-sky-500/30 p-0.5 bg-slate-50 dark:bg-slate-800 shadow-md mb-4 cursor-pointer"
+            className="relative w-24 h-24 mb-4 cursor-pointer"
           >
-            <img
-              src={member.avatar}
-              alt={member.name}
-              style={
-                member.objectPosition
-                  ? { objectPosition: member.objectPosition }
-                  : {}
-              }
-              className="w-full h-full object-cover rounded-xl bg-slate-100 dark:bg-slate-800"
-            />
+            <div className="absolute -inset-2 bg-gradient-to-br from-[#1E3A8A]/20 to-sky-400/20 dark:from-[#1E3A8A]/30 dark:to-sky-500/15 blur-xl rounded-full" />
+            <div className="relative w-full h-full p-[3px] rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-sky-400 to-emerald-400 shadow-md">
+              <img
+                src={member.avatar}
+                alt={member.name}
+                style={
+                  member.objectPosition
+                    ? { objectPosition: member.objectPosition }
+                    : {}
+                }
+                className="w-full h-full object-cover rounded-[13px] bg-slate-100 dark:bg-slate-800"
+              />
+            </div>
           </motion.div>
 
           {/* Name & Role */}
           <h3 className="font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-[#1E3A8A] dark:group-hover:text-sky-400 transition-colors">
             {member.name}
           </h3>
-          <span className="mt-1.5 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#1E3A8A] to-sky-500 text-white text-xs font-bold shadow-sm border border-white/20 dark:border-sky-400/30">
+          <span className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#1E3A8A] to-sky-500 text-white text-xs font-bold shadow-sm border border-white/20 dark:border-sky-400/30">
             <Sparkles className="w-3 h-3" />
             {member.role}
           </span>
@@ -109,45 +78,39 @@ const TeamMemberCard = ({ member }) => {
         </div>
 
         {/* Verified Social Links */}
-        <div className="flex items-center gap-2.5 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="relative flex items-center gap-2 mt-6 pt-4 w-full border-t border-slate-100 dark:border-slate-800 justify-center">
           {member.socials.github && (
-            <motion.a
-              whileHover={{ scale: 1.2, y: -2 }}
-              whileTap={{ scale: 0.9 }}
+            <a
               href={member.socials.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
               aria-label="GitHub"
             >
               <GithubIcon className="w-4 h-4" />
-            </motion.a>
+            </a>
           )}
           {member.socials.linkedin && (
-            <motion.a
-              whileHover={{ scale: 1.2, y: -2 }}
-              whileTap={{ scale: 0.9 }}
+            <a
               href={member.socials.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl text-slate-400 hover:text-[#1E3A8A] hover:bg-blue-50 dark:hover:text-sky-400 dark:hover:bg-blue-950/40 transition-colors"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-[#1E3A8A] hover:bg-blue-50 dark:hover:text-sky-400 dark:hover:bg-blue-950/40 transition-colors"
               aria-label="LinkedIn"
             >
               <LinkedinIcon className="w-4 h-4" />
-            </motion.a>
+            </a>
           )}
           {member.socials.instagram && (
-            <motion.a
-              whileHover={{ scale: 1.2, y: -2 }}
-              whileTap={{ scale: 0.9 }}
+            <a
               href={member.socials.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl text-slate-400 hover:text-pink-600 hover:bg-pink-50 dark:hover:text-pink-400 dark:hover:bg-pink-950/40 transition-colors"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-pink-600 hover:bg-pink-50 dark:hover:text-pink-400 dark:hover:bg-pink-950/40 transition-colors"
               aria-label="Instagram"
             >
               <InstagramIcon className="w-4 h-4" />
-            </motion.a>
+            </a>
           )}
         </div>
       </SpotlightCard>
@@ -169,29 +132,28 @@ export const TeamSection = () => {
 
   const team = [
     {
+      name: "Diah Ayu Puspasari",
+      role: "Data Scientist",
+      avatar: diahAvatar,
+      badge: "Behavior & Forecasting",
+      yOffset: yCol1,
+      socials: {
+        github: "https://github.com/Diahayuups",
+        linkedin: "https://www.linkedin.com/in/diahaps/",
+        instagram: "https://www.instagram.com/diahayupsss",
+      },
+    },
+    {
       name: "Fhazar Raffiful Aqyla",
       role: "Frontend Developer",
       avatar: fhazarAvatar,
       objectPosition: "center 30%",
-      badge: "Lead Architecture",
-      yOffset: yCol1,
+      badge: "Frontend & Web Architecture",
+      yOffset: yCol2,
       socials: {
         github: "https://github.com/Fhazar-Aqyla",
         linkedin: "https://www.linkedin.com/in/fhazaraqyla/",
         instagram: "https://www.instagram.com/fhazar_aqyla/",
-      },
-    },
-    {
-      name: "Muhammad Habib Rafi",
-      role: "Backend Developer",
-      avatar: habibAvatar,
-      badge: "Frontend & UI/UX",
-      yOffset: yCol2,
-      socials: {
-        github: "https://github.com/mhmdhabibrafi",
-        linkedin: "https://www.linkedin.com/in/mhmdhabibrafi",
-        instagram:
-          "https://www.instagram.com/mhmdhabibrafi?igsh=MWV6bnR1N2R2Njd2YQ==",
       },
     },
     {
@@ -207,41 +169,42 @@ export const TeamSection = () => {
       },
     },
     {
+      name: "Marsela",
+      role: "Data Scientist",
+      avatar: marselaAvatar,
+      badge: "Data Modeling & Insights",
+      yOffset: yCol1,
+      socials: {
+        github: "https://github.com/Marsela0603",
+        linkedin: "https://www.linkedin.com/in/marsela-marsela-30a763248",
+        instagram: "https://www.linkedin.com/in/marsela-marsela-30a763248",
+      },
+    },
+    {
+      name: "Muhammad Habib Rafi",
+      role: "Backend Developer",
+      avatar: habibAvatar,
+      badge: "Backend & API Services",
+      yOffset: yCol2,
+      socials: {
+        github: "https://github.com/mhmdhabibrafi",
+        linkedin: "https://www.linkedin.com/in/mhmdhabibrafi",
+        instagram:
+          "https://www.instagram.com/mhmdhabibrafi?igsh=MWV6bnR1N2R2Njd2YQ==",
+      },
+    },
+    {
       name: "Farrel Al Faqih Ekatama",
       role: "AI Engineer",
       avatar: farrelAvatar,
       badge: "ML Modeling & Analytics",
-      yOffset: yCol1,
+      yOffset: yCol3,
       socials: {
         github: "https://github.com/farrelalfaqih",
         linkedin:
           "https://www.linkedin.com/in/farrel-al-faqih-ekatama-339980217/",
         instagram:
           "https://www.instagram.com/farrelalfaqih.fae?igsh=MWEzcDZnMW1nMjE5dQ==",
-      },
-    },
-    {
-      name: "Diah Ayu Puspasari",
-      role: "Data Scientist",
-      avatar: diahAvatar,
-      badge: "Behavior & Forecasting",
-      yOffset: yCol2,
-      socials: {
-        github: "https://github.com/Diahayuups",
-        linkedin: "https://www.linkedin.com/in/diahaps/",
-        instagram: "https://www.instagram.com/diahayupsss",
-      },
-    },
-    {
-      name: "Marsela",
-      role: "Data Scientist",
-      avatar: marselaAvatar,
-      badge: "Data Modeling & Insights",
-      yOffset: yCol3,
-      socials: {
-        github: "https://github.com/Marsela0603",
-        linkedin: "https://www.linkedin.com/in/marsela-marsela-30a763248",
-        instagram: "https://www.linkedin.com/in/marsela-marsela-30a763248",
       },
     },
   ];
@@ -269,7 +232,7 @@ export const TeamSection = () => {
           </span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-500 dark:text-slate-400">
-          Dikembangkan secara kolaboratif oleh talenta Full Stack, AI Engineer, dan Data Scientist untuk menghadirkan platform personal finance yang cerdas dan nyaman.
+          Dikembangkan secara kolaboratif oleh talenta Frontend, Backend, AI Engineer, dan Data Scientist untuk menghadirkan platform personal finance yang cerdas dan nyaman.
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { MessageSquareQuote } from "lucide-react";
 
@@ -161,6 +161,8 @@ export const TestimonialsSection = () => {
   const [testimonialsList, setTestimonialsList] = useState(testimonials);
   const [paused, setPaused] = useState(false);
   const reducedMotion = useReducedMotion();
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
 
   const handleMove = useCallback((steps) => {
     setTestimonialsList((prev) => {
@@ -194,10 +196,12 @@ export const TestimonialsSection = () => {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion || paused) return undefined;
-    const id = setInterval(() => handleMove(1), 2000);
+    if (reducedMotion) return undefined;
+    const id = setInterval(() => {
+      if (!pausedRef.current) handleMove(1);
+    }, 5000);
     return () => clearInterval(id);
-  }, [reducedMotion, paused, handleMove]);
+  }, [reducedMotion, handleMove]);
 
   return (
     <section

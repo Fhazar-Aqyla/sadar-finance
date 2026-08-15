@@ -18,7 +18,7 @@ export const Navbar = () => {
   });
 
   useEffect(() => {
-    const sections = ["home", "features", "how-it-works", "simulator", "team", "faq"];
+    const sections = ["home", "features", "how-it-works", "simulator", "testimonials", "team", "faq"];
 
     const computeActive = () => {
       const scrollPosition = window.scrollY + 100;
@@ -59,6 +59,7 @@ export const Navbar = () => {
     { id: "features", label: "Fitur", href: "#features" },
     { id: "how-it-works", label: "Cara Kerja", href: "#how-it-works" },
     { id: "simulator", label: "Simulasi Anggaran", href: "#simulator" },
+    { id: "testimonials", label: "Testimoni", href: "#testimonials" },
     { id: "team", label: "Tim", href: "#team" },
     { id: "faq", label: "FAQ", href: "#faq" },
   ];
