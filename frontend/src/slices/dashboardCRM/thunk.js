@@ -76,7 +76,7 @@ export const getSalesChartsData = createAsyncThunk("dashboardCrm/getSalesChartsD
     }
     return response;
   }
-  catch (error) {
+  catch {
     return response;
   }
 });

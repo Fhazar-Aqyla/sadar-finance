@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import { BarChart3, LineChart, PieChart, Receipt } from "lucide-react";
@@ -247,7 +247,7 @@ const buildBudgetRows = (budget, transactions = []) => {
 
 const getStoredProfile = () => {
   try {
-    const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
     const user = authUser?.user || authUser?.data || authUser || {};
     const name = user?.first_name || user?.username || user?.name || user?.email || "SADAR";
 
@@ -261,7 +261,7 @@ const getStoredProfile = () => {
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = sessionStorage.getItem("authUser");
+    const rawAuth = localStorage.getItem("authUser");
     if (!rawAuth) return;
     const authData = JSON.parse(rawAuth);
 
@@ -275,9 +275,9 @@ const updateSessionUser = (updatedUser) => {
       Object.assign(authData, updatedUser);
     }
 
-    sessionStorage.setItem("authUser", JSON.stringify(authData));
+    localStorage.setItem("authUser", JSON.stringify(authData));
   } catch (e) {
-    console.error("Failed to update sessionStorage user", e);
+    console.error("Failed to update localStorage user", e);
   }
 };
 
@@ -366,7 +366,7 @@ const getSetupWizardStorageKey = () => {
   if (typeof window === "undefined") return "sadar_setup_wizard_api";
 
   try {
-    const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
     const user = authUser?.user || authUser?.data?.user || authUser?.data || authUser || {};
     const userId = user?.id || user?.user_id || user?.email || user?.username || "guest";
     return `sadar_setup_wizard_api_${userId}`;

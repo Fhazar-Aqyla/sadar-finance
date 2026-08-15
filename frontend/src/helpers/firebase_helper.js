@@ -1,4 +1,4 @@
-import firebase from 'firebase/compat/app';
+﻿import firebase from 'firebase/compat/app';
 
 // Add the Firebase products that you want to use
 import "firebase/compat/auth";
@@ -11,9 +11,9 @@ class FirebaseAuthBackend {
       firebase.initializeApp(firebaseConfig);
       firebase.auth().onAuthStateChanged(user => {
         if (user) {
-          sessionStorage.setItem("authUser", JSON.stringify(user));
+          localStorage.setItem("authUser", JSON.stringify(user));
         } else {
-          sessionStorage.removeItem("authUser");
+          localStorage.removeItem("authUser");
         }
       });
     }
@@ -28,7 +28,7 @@ class FirebaseAuthBackend {
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then(
-          user => {
+          () => {
             resolve(firebase.auth().currentUser);
           },
           error => {
@@ -47,7 +47,7 @@ class FirebaseAuthBackend {
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then(
-          user => {
+          () => {
             resolve(firebase.auth().currentUser);
           },
           error => {
@@ -66,7 +66,7 @@ class FirebaseAuthBackend {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then(
-          user => {
+          () => {
             resolve(firebase.auth().currentUser);
           },
           error => {
@@ -150,15 +150,15 @@ class FirebaseAuthBackend {
   };
 
   setLoggeedInUser = user => {
-    sessionStorage.setItem("authUser", JSON.stringify(user));
+    localStorage.setItem("authUser", JSON.stringify(user));
   };
 
   /**
    * Returns the authenticated user
    */
   getAuthenticatedUser = () => {
-    if (!sessionStorage.getItem("authUser")) return null;
-    return JSON.parse(sessionStorage.getItem("authUser"));
+    if (!localStorage.getItem("authUser")) return null;
+    return JSON.parse(localStorage.getItem("authUser"));
   };
 
   /**

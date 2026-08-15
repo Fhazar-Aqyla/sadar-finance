@@ -274,7 +274,7 @@ const toCategoryPrimary = (category) => {
   const text = String(category || "").toLowerCase();
   if (/tagihan|makanan|transport|kesehatan|pendidikan/.test(text))
     return "Needs";
-  if (/tabungan|invest|dana darurat/.test(text)) return "Investment";
+  if (/tabungan|saving|savings|invest|dana darurat/.test(text)) return "Investment";
   return "Wants";
 };
 

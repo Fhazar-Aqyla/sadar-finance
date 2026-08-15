@@ -1,0 +1,17 @@
+// 
+// _utilities.scss
+//
+
+$utilities: (
+    "font-size-custom": (property: font-size,
+        class: fs,
+        values: $font-size-custom 
+    ),
+
+    // Add new utilities
+    "cursor": (property: cursor,
+        class: cursor,
+        responsive: true,
+        values: auto pointer grab,
+    )
+);

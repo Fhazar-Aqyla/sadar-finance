@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 import { api } from "../../config";
 import {
   accounts as mockAccounts,
@@ -17,8 +17,8 @@ const apiClient = axios.create({
 
 const getAuthUser = () => {
   try {
-    return JSON.parse(sessionStorage.getItem("authUser") || "null");
-  } catch (_error) {
+    return JSON.parse(localStorage.getItem("authUser") || "null");
+  } catch {
     return null;
   }
 };
@@ -229,41 +229,11 @@ const mockApi = {
 };
 
 export const authApi = {
-  register: (payload) =>
-    isSadarMockDataScenario
-      ? mockApi.auth.register(payload)
-      : apiClient
-          .post("/auth/register", payload)
-          .then(unwrapData)
-          .catch(() => mockApi.auth.register(payload)),
-  login: (payload) =>
-    isSadarMockDataScenario
-      ? mockApi.auth.login(payload)
-      : apiClient
-          .post("/auth/login", payload)
-          .then(unwrapData)
-          .catch((err) => {
-            console.warn(
-              "Backend login unavailable, fallback to mock auth:",
-              err.message
-            );
-            return mockApi.auth.login(payload);
-          }),
-  forgotPassword: (payload) =>
-    isSadarMockDataScenario
-      ? mockApi.auth.forgotPassword(payload)
-      : apiClient.post("/auth/forgot-password", payload).then(unwrapData),
-  me: () =>
-    isSadarMockDataScenario
-      ? mockApi.auth.me()
-      : apiClient.get("/auth/me").then(unwrapData).catch(() => mockApi.auth.me()),
-  updateMe: (payload) =>
-    isSadarMockDataScenario
-      ? mockApi.auth.updateMe(payload)
-      : apiClient
-          .put("/auth/me", payload)
-          .then(unwrapData)
-          .catch(() => mockApi.auth.updateMe(payload)),
+  register: (payload) => apiClient.post("/auth/register", payload).then(unwrapData),
+  login: (payload) => apiClient.post("/auth/login", payload).then(unwrapData),
+  forgotPassword: (payload) => apiClient.post("/auth/forgot-password", payload).then(unwrapData),
+  me: () => apiClient.get("/auth/me").then(unwrapData),
+  updateMe: (payload) => apiClient.put("/auth/me", payload).then(unwrapData),
   updateAvatar: (formData) =>
     isSadarMockDataScenario
       ? Promise.resolve({ profile_picture: "" })
@@ -272,10 +242,7 @@ export const authApi = {
             headers: { "Content-Type": "multipart/form-data" },
           })
           .then(unwrapData),
-  deleteAccount: (password) =>
-    isSadarMockDataScenario
-      ? Promise.resolve({ message: "Account deleted (Mock)" })
-      : apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
+  deleteAccount: (password) => apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
 };
 
 export const accountApi = {

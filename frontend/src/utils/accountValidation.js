@@ -1,129 +1,10 @@
-import { INSTITUTION_TYPES, inferAccountType, findInstitutionByName } from "../constants/bankData";
+import { INSTITUTION_TYPES, inferAccountType } from "../constants/bankData";
 
-export const INSTITUTION_RULES = {
-  bca: {
-    name: "Bank Central Asia (BCA)",
-    minLength: 10,
-    maxLength: 10,
-    exactLength: true,
-    mask: "xxx-xxx-xxxx",
-    errorMsg: "Nomor rekening BCA harus terdiri dari 10 digit angka.",
-  },
-  mandiri: {
-    name: "Bank Mandiri",
-    minLength: 13,
-    maxLength: 13,
-    exactLength: true,
-    mask: "xxx-xx-xxxxxxx-x",
-    errorMsg: "Nomor rekening Mandiri harus terdiri dari 13 digit angka.",
-  },
-  bri: {
-    name: "Bank Rakyat Indonesia (BRI)",
-    minLength: 15,
-    maxLength: 15,
-    exactLength: true,
-    mask: "xxxx-xxxx-xxxx-xxx",
-    errorMsg: "Nomor rekening BRI harus terdiri dari 15 digit angka.",
-  },
-  bni: {
-    name: "Bank Negara Indonesia (BNI)",
-    minLength: 10,
-    maxLength: 10,
-    exactLength: true,
-    mask: "xxx-xxx-xxxx",
-    errorMsg: "Nomor rekening BNI harus terdiri dari 10 digit angka.",
-  },
-  bsi: {
-    name: "Bank Syariah Indonesia (BSI)",
-    minLength: 10,
-    maxLength: 10,
-    exactLength: true,
-    mask: "xxx-xxx-xxxx",
-    errorMsg: "Nomor rekening BSI harus terdiri dari 10 digit angka.",
-  },
-  cimb: {
-    name: "CIMB Niaga",
-    minLength: 12,
-    maxLength: 13,
-    exactLength: false,
-    mask: "xxxx-xxxx-xxxx",
-    errorMsg: "Nomor rekening CIMB Niaga harus terdiri dari 12–13 digit angka.",
-  },
-  btn: {
-    name: "Bank Tabungan Negara (BTN)",
-    minLength: 16,
-    maxLength: 16,
-    exactLength: true,
-    mask: "xxxx-xxxx-xxxx-xxxx",
-    errorMsg: "Nomor rekening BTN harus terdiri dari 16 digit angka.",
-  },
-  danamon: {
-    name: "Bank Danamon",
-    minLength: 10,
-    maxLength: 10,
-    exactLength: true,
-    mask: "xxx-xxx-xxxx",
-    errorMsg: "Nomor rekening Danamon harus terdiri dari 10 digit angka.",
-  },
-  ocbc: {
-    name: "OCBC",
-    minLength: 12,
-    maxLength: 12,
-    exactLength: true,
-    mask: "xxxx-xxxx-xxxx",
-    errorMsg: "Nomor rekening OCBC harus terdiri dari 12 digit angka.",
-  },
-  permata: {
-    name: "PermataBank",
-    minLength: 8,
-    maxLength: 16,
-    exactLength: false,
-    errorMsg: "Masukkan nomor rekening PermataBank yang valid.",
-  },
-  jago: {
-    name: "Bank Jago",
-    minLength: 8,
-    maxLength: 16,
-    exactLength: false,
-    errorMsg: "Masukkan nomor rekening Bank Jago yang valid.",
-  },
-  seabank: {
-    name: "SeaBank",
-    minLength: 8,
-    maxLength: 16,
-    exactLength: false,
-    errorMsg: "Masukkan nomor rekening SeaBank yang valid.",
-  },
-  neobank: {
-    name: "Bank Neo Commerce",
-    minLength: 8,
-    maxLength: 16,
-    exactLength: false,
-    errorMsg: "Masukkan nomor rekening Bank Neo Commerce yang valid.",
-  },
-  maybank: {
-    name: "Maybank Indonesia",
-    minLength: 8,
-    maxLength: 16,
-    exactLength: false,
-    errorMsg: "Masukkan nomor rekening Maybank yang valid.",
-  },
-};
-
-export const applyFormatMask = (digits, mask) => {
-  if (!digits) return "";
-  let formatted = "";
-  let digitIndex = 0;
-  for (let i = 0; i < mask.length; i++) {
-    if (digitIndex >= digits.length) break;
-    if (mask[i] === "x") {
-      formatted += digits[digitIndex];
-      digitIndex++;
-    } else {
-      formatted += mask[i];
-    }
-  }
-  return formatted;
+export const GENERIC_BANK_RULE = {
+  minLength: 6,
+  maxLength: 20,
+  exactLength: false,
+  errorMsg: "Nomor rekening bank harus terdiri dari 6-20 digit.",
 };
 
 /**
@@ -147,7 +28,6 @@ export const validateAccountForm = (values = {}, mode = "add") => {
   const isBank = inferredType === INSTITUTION_TYPES.BANK;
 
   // 2. Account Number validation
-  const foundInst = findInstitutionByName(bankName);
   const digitsOnly = accountNumber.replace(/\D/g, "");
 
   if (digitsOnly) {
@@ -163,22 +43,10 @@ export const validateAccountForm = (values = {}, mode = "add") => {
       } else if (digitsOnly.length < requiredMin || digitsOnly.length > requiredMax) {
         errors.accountNumber = `Nomor HP e-wallet harus terdiri dari ${requiredMin}-${requiredMax} digit.`;
       }
-    } else if (foundInst && INSTITUTION_RULES[foundInst.id]) {
-      // Bank validation:
-      const rule = INSTITUTION_RULES[foundInst.id];
-      if (rule.exactLength) {
-        if (digitsOnly.length !== rule.maxLength) {
-          errors.accountNumber = rule.errorMsg;
-        }
-      } else {
-        if (digitsOnly.length < rule.minLength || digitsOnly.length > rule.maxLength) {
-          errors.accountNumber = rule.errorMsg;
-        }
-      }
     } else {
-      // Generic bank validation:
-      if (digitsOnly.length < 10 || digitsOnly.length > 18) {
-        errors.accountNumber = "Nomor rekening bank harus terdiri dari 10-18 digit.";
+      // Generic bank validation (applies to all banks)
+      if (digitsOnly.length < GENERIC_BANK_RULE.minLength || digitsOnly.length > GENERIC_BANK_RULE.maxLength) {
+        errors.accountNumber = GENERIC_BANK_RULE.errorMsg;
       }
     }
   } else if (isBank && bankName) {
@@ -220,7 +88,7 @@ export const formatRupiahInput = (value) => {
 /**
  * Helper to format Bank Account Number or E-Wallet Phone Number
  */
-export const formatAccountNumberInput = (value, type, bankName = "") => {
+export const formatAccountNumberInput = (value, type) => {
   const digits = sanitizeDigitsOnly(value);
   if (!digits) return "";
 
@@ -242,12 +110,6 @@ export const formatAccountNumberInput = (value, type, bankName = "") => {
     }
   }
 
-  // If Bank, resolve the specific mask
-  const inst = findInstitutionByName(bankName || type);
-  if (inst && INSTITUTION_RULES[inst.id] && INSTITUTION_RULES[inst.id].mask) {
-    return applyFormatMask(digits, INSTITUTION_RULES[inst.id].mask);
-  }
-
-  // Fallback default grouping by 4s
+  // Bank account numbers: generic grouping by 4s
   return digits.replace(/(\d{4})(?=\d)/g, "$1-");
 };

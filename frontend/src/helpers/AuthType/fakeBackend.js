@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import * as url from "../url_helper";
 import { accessToken, nodeApiToken } from "../jwt-token-access/accessToken";
@@ -22,7 +22,7 @@ const fakeBackend = () => {
     const user = JSON.parse(config["data"]);
     users.push(user);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         resolve([200, user]);
       });
@@ -105,8 +105,8 @@ const fakeBackend = () => {
             users[objIndex].username = user.username;
 
             // Assign a value to locastorage
-            sessionStorage.removeItem("authUser");
-            sessionStorage.setItem("authUser", JSON.stringify(users[objIndex]));
+            localStorage.removeItem("authUser");
+            localStorage.setItem("authUser", JSON.stringify(users[objIndex]));
 
             resolve([200, "Profile Updated Successfully"]);
           } else {

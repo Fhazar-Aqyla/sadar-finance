@@ -1,0 +1,154 @@
+//
+// custom-variables
+//
+
+// Vertical menu
+$vertical-menu-width:                             250px;
+$vertical-menu-width-md:                          180px;
+$vertical-menu-width-sm:                          70px;
+
+$vertical-menu-z-index:                           1002;
+$vertical-menu-item-font-size:                    0.9375rem;
+$vertical-menu-item-font-family:                  $font-family-secondary;
+$vertical-menu-sub-item-font-family:              $font-family-primary;
+$vertical-menu-item-padding-x:                    1.5rem;
+$vertical-menu-item-padding-y:                    0.625rem;
+$vertical-menu-sub-item-font-size:                0.875rem;
+$vertical-menu-item-icon-width:                   1.75rem;
+$vertical-menu-sub-item-padding-x:                1.5rem;
+$vertical-menu-sub-item-padding-y:                0.55rem;
+
+// Light Menu
+$vertical-menu-bg:                                #f6f8fa;
+$vertical-menu-border:                            $border-color;
+$vertical-menu-item-color:                        darken($gray-600, 10%);
+$vertical-menu-item-bg:                           rgba($primary, .15);
+$vertical-menu-item-hover-color:                  $primary;
+$vertical-menu-item-active-color:                 $primary;
+$vertical-menu-item-active-bg:                    rgba($primary, .15);
+$vertical-menu-sub-item-color:                    darken($gray-600, 4%);
+$vertical-menu-sub-item-hover-color:              $primary;
+$vertical-menu-sub-item-active-color:             $primary;
+$vertical-menu-title-color:                       #919da9;
+$vertical-menu-box-shadow:                        none;
+$vertical-menu-dropdown-box-shadow:               0 2px 4px rgba(15, 34, 58, 0.12);
+
+//sidebar dark 
+$dark-vertical-menu-bg:                           #0A2B3D;
+$dark-vertical-menu-border:                       #0A2B3D;
+$dark-vertical-menu-item-color:                   #9aaab3;
+$dark-vertical-menu-item-bg:                      rgba($white, .15);
+$dark-vertical-menu-item-hover-color:             $white;
+$dark-vertical-menu-item-active-color:            $white;
+$dark-vertical-menu-item-active-bg:               rgba($white, .15);
+$dark-vertical-menu-sub-item-color:               #9aaab3;
+$dark-vertical-menu-sub-item-hover-color:         $white;
+$dark-vertical-menu-sub-item-active-color:        $white;
+$dark-vertical-menu-title-color:                  #aeafaf;
+$dark-vertical-menu-box-shadow:                   none;
+$dark-vertical-menu-dropdown-box-shadow:          0 2px 4px rgba(15,34,58,0.12);
+$dark-twocolumn-menu-iconview-bg:                 darken($dark-vertical-menu-bg, 2%);
+
+//sidebar gradient
+$vertical-menu-item-color-gradient:               rgba($white, .5);
+$vertical-menu-item-bg-gradient:                  rgba($white, .15);
+$vertical-menu-item-hover-color-gradient:         $white;
+$vertical-menu-item-active-color-gradient:        $white;
+$vertical-menu-item-active-bg-gradient:           rgba($white, .15);
+$vertical-menu-sub-item-color-gradient:           rgba($white, .5);
+$vertical-menu-sub-item-hover-color-gradient:     $white;
+$vertical-menu-sub-item-active-color-gradient:    $white;
+$vertical-menu-title-color-gradient:              rgba($white, .5);
+$vertical-menu-box-shadow-gradient:               0 2px 4px rgba(15,34,58,0.12);
+$vertical-menu-dropdown-box-shadow-gradient:      0 2px 4px rgba(15,34,58,0.12);
+
+//gradient one
+$vertical-menu-bg-gradient:                       linear-gradient(to right, var(--#{$prefix}primary), var(--#{$prefix}success));
+$vertical-menu-border-gradient:                   var(--#{$prefix}success);
+$twocolumn-menu-iconview-bg-gradient:             var(--#{$prefix}primary);
+
+//gradient-2
+$vertical-menu-bg-gradient-2:                     linear-gradient(to right, var(--#{$prefix}info), var(--#{$prefix}secondary));
+$vertical-menu-border-gradient-2:                 var(--#{$prefix}secondary);
+$twocolumn-menu-iconview-bg-gradient-2:           var(--#{$prefix}info);
+
+//gradient-3
+$vertical-menu-bg-gradient-3:                     linear-gradient(to right, var(--#{$prefix}info), var(--#{$prefix}success));
+$vertical-menu-border-gradient-3:                 var(--#{$prefix}success);
+$twocolumn-menu-iconview-bg-gradient-3:           var(--#{$prefix}info);
+
+//gradient-4
+$vertical-menu-bg-gradient-4:                     linear-gradient(to right, #1a1d21, var(--#{$prefix}primary));
+$vertical-menu-border-gradient-4:                 var(--#{$prefix}primary);
+$twocolumn-menu-iconview-bg-gradient-4:           #1a1d21;
+
+// Topbar - (Default Light)
+$header-height:                                   70px;
+$header-bg:                                       $white;
+$header-border:                                   $border-color;
+$header-item-color:                               $gray-700;
+$header-item-bg:                                  rgba($secondary, .12);
+$header-item-sub-color:                           #878a99;  
+$topbar-user-bg:                                  #f3f3f9;
+$topbar-search-bg:                                #f3f3f9;
+$topbar-search-color:                             $gray-700;
+
+//page title 
+$page-title-box-shadow:                           none;
+$page-title-border:                               var(--#{$prefix}border-color);
+
+// Topbar - dark
+$dark-header-bg:                                  #133b50;
+$dark-header-border:                              #133b50;
+$dark-header-item-color:                          rgba($white, .85);
+$dark-header-item-bg:                             #16445c;
+$dark-header-item-sub-color:                      #b0c4d9; 
+$dark-topbar-user-bg:                             #214c62;
+$dark-topbar-search-bg:                           rgba($white, .05);
+$dark-topbar-search-color:                        $white;
+
+// Horizontal Menu
+$horizontal-menu-box-shadow:                      0 2px 4px rgba(15,34,58,0.12);
+$horizontal-menu-dropdown-box-shadow:             0 0px 5px rgba(15,34,58,0.15);
+$horizontal-menu-dropdown-min-width:              12rem; 
+$horizontal-menu-item-padding-x:                  1.5rem;
+$horizontal-menu-item-padding-y:                  0.75rem;
+$topnav-bg:                                       $white;
+$topnav-item-color:                               darken($gray-600, 10%);
+$topnav-item-active-color:                        $primary;
+
+// Two Column Menu (Default Light)
+$twocolumn-menu-iconview-width:                   70px;
+$twocolumn-menu-width:                            220px;
+$twocolumn-menu-box-shadow:                       0 2px 4px rgba(15,34,58,0.12);
+$twocolumn-menu-z-index:                          1002;
+$twocolumn-menu-iconview-bg:                      $white;
+
+//semibox layout
+$semibox-width:                                   110px;
+
+// Brand 
+$navbar-brand-box-width:                          240px;
+
+// Boxed layout width
+$boxed-layout-width:                              1300px;
+$boxed-body-bg:                                   darken($body-bg, 4%);
+
+// Footer
+$footer-height:                                   60px;
+$footer-bg:                                       #f6f8fa;
+$footer-color:                                    #98a6ad;
+
+// Chat
+$chat-primary-bg:                                 var(--#{$prefix}light);
+$chat-secondary-bg:                               rgba(var(--#{$prefix}primary-rgb), 0.15);
+$chat-secondary-color:                            var(--#{$prefix}primary);
+
+// Timeline
+$timeline-color:                                  var(--#{$prefix}border-color);     
+
+//auth pages
+$auth-bg-cover:                                   linear-gradient(-45deg, $primary 50%, $success);
+
+$input-bg-custom:                                 $body-secondary-bg;
+$input-border-custom:                             $border-color-translucent;

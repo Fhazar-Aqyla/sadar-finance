@@ -11,6 +11,20 @@ const { BadRequestError, NotFoundError } = require('../utils/errors');
 
 const primaryCategoryGroups = new Set(['Needs', 'Wants', 'Savings', 'Other']);
 
+const canonicalGroupByKey = new Map([
+  ['needs', 'Needs'],
+  ['kebutuhan', 'Needs'],
+  ['wants', 'Wants'],
+  ['keinginan', 'Wants'],
+  ['savings', 'Savings'],
+  ['saving', 'Savings'],
+  ['tabungan', 'Savings'],
+  ['investment', 'Savings'],
+  ['investasi', 'Savings'],
+  ['other', 'Other'],
+  ['lainnya', 'Other'],
+]);
+
 class TransactionService {
   async create(userId, data) {
     const input = this._normalizeTransactionInput(data, { defaultSource: 'manual' });
@@ -139,13 +153,13 @@ class TransactionService {
     const categoryGroup = this._cleanCategory(normalized.categoryGroup);
     const categoryDetail = this._cleanCategory(normalized.categoryDetail);
 
-    if (categoryGroup && primaryCategoryGroups.has(categoryGroup)) {
-      normalized.categoryGroup = categoryGroup;
+    if (categoryGroup && this._isPrimaryGroup(categoryGroup)) {
+      normalized.categoryGroup = this._canonicalGroup(categoryGroup);
       normalized.categoryDetail = categoryDetail || null;
       return normalized;
     }
 
-    if (categoryGroup && !primaryCategoryGroups.has(categoryGroup)) {
+    if (categoryGroup && !this._isPrimaryGroup(categoryGroup)) {
       normalized.categoryGroup = this._inferCategoryGroup(categoryGroup);
       normalized.categoryDetail = categoryDetail || categoryGroup;
       return normalized;
@@ -164,8 +178,21 @@ class TransactionService {
     return text || null;
   }
 
+  _isPrimaryGroup(value) {
+    const key = String(value || '').toLowerCase();
+    return primaryCategoryGroups.has(value) || canonicalGroupByKey.has(key);
+  }
+
+  _canonicalGroup(value) {
+    const key = String(value || '').toLowerCase();
+    if (primaryCategoryGroups.has(value)) return value;
+    return canonicalGroupByKey.get(key) || 'Other';
+  }
+
   _inferCategoryGroup(value) {
     const text = String(value || '').toLowerCase();
+    if (/kebutuhan|needs|need/.test(text)) return 'Needs';
+    if (/keinginan|wants|want/.test(text)) return 'Wants';
     if (/tabungan|saving|savings|invest|dana darurat/.test(text)) return 'Savings';
     if (/makan|food|beverage|groceries|transport|tagihan|utilit|kesehatan|health|pendidikan|education|bills/.test(text)) return 'Needs';
     if (!text || text === 'other' || text === 'lainnya') return 'Other';

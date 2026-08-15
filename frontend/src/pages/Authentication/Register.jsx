@@ -55,7 +55,7 @@ const Register = () => {
                 .required("Konfirmasi password wajib diisi"),
         }),
         onSubmit: (values) => {
-            dispatch(registerUser(values));
+            dispatch(registerUser(values, history));
         }
     });
 
@@ -78,10 +78,6 @@ const Register = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (success) {
-            setTimeout(() => history("/login"), 3000);
-        }
-
         setTimeout(() => {
             dispatch(resetRegisterFlag());
         }, 3000);
@@ -95,7 +91,7 @@ const Register = () => {
 
     return (
         <React.Fragment>
-            <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover d-flex justify-content-center align-items-center min-vh-100">
+            <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover sadar-register-page d-flex justify-content-center align-items-center min-vh-100">
                 <div className="bg-overlay"></div>
                 <div className="auth-page-content">
                     <Container>

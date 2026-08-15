@@ -34,12 +34,37 @@ const RECEIPT_STORAGE_KEY = "sadar-financial-history-receipts";
 const DEFAULT_EDIT_FORM = {
   name: "",
   accountId: "",
-  category: "Lainnya",
+  category: "needs",
   date: "",
   amount: "",
   receiptFile: null,
   receiptPreview: "",
   receiptName: "",
+};
+
+const categoryOptions = [
+  { value: "needs", label: "Kebutuhan" },
+  { value: "wants", label: "Keinginan" },
+  { value: "savings", label: "Tabungan" },
+];
+
+const getCategoryLabel = (value) =>
+  categoryOptions.find((option) => option.value === value)?.label || "Kebutuhan";
+
+const getTransactionBudgetGroup = (transaction) => {
+  const raw =
+    transaction.category_group ||
+    transaction.categoryGroup ||
+    transaction.budget_group ||
+    transaction.budgetGroup ||
+    "";
+  const text = String(raw || "").toLowerCase();
+  if (["needs", "wants", "savings"].includes(text)) return text;
+
+  const category = String(transaction.category || "").toLowerCase();
+  if (/tabungan|invest|saving|dana darurat/.test(category)) return "savings";
+  if (/makan|food|dining|transport|tagihan|utilit|kesehatan|health|pendidikan|education|bills|groceries/.test(category)) return "needs";
+  return "wants";
 };
 
 const rupiah = (value) =>
@@ -108,6 +133,7 @@ const normalizeTransaction = (transaction) => ({
   account_id: transaction.account_id || transaction.accountId,
   name: transaction.description || transaction.merchant || "Pengeluaran",
   category: getTransactionCategory(transaction),
+  categoryGroup: getTransactionBudgetGroup(transaction),
   amount: Number(transaction.amount || 0),
   date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
   status: "Tercatat",
@@ -247,6 +273,7 @@ const SadarFinancialHistory = () => {
       type: "expense",
       name: transaction.name,
       category: transaction.category,
+      categoryGroup: transaction.categoryGroup,
       account_id: transaction.account_id,
       date: transaction.date,
       amount: transaction.amount,
@@ -374,7 +401,7 @@ const SadarFinancialHistory = () => {
     setEditForm({
       name: transaction.name,
       accountId: transaction.account_id || "",
-      category: transaction.category || "Lainnya",
+      category: transaction.categoryGroup || getTransactionBudgetGroup(transaction),
       date: transaction.date,
       amount: String(transaction.amount || ""),
       receiptFile: null,
@@ -469,7 +496,8 @@ const SadarFinancialHistory = () => {
                   ...transaction,
                   account_id: editForm.accountId || null,
                   name: editForm.name.trim(),
-                  category: editForm.category,
+                  category: getCategoryLabel(editForm.category),
+                  categoryGroup: editForm.category,
                   amount,
                   date: editForm.date,
                 }
@@ -828,10 +856,16 @@ const SadarFinancialHistory = () => {
                   <Label htmlFor="history-category">Kategori</Label>
                   <Input
                     id="history-category"
+                    type="select"
                     value={editForm.category}
                     onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))}
-                    placeholder="Contoh: Makanan"
-                  />
+                  >
+                    {categoryOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Input>
                 </div>
               )}
               <div>

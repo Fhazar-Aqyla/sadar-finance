@@ -1,10 +1,11 @@
-//Include Both Helper File with needed methods
+﻿//Include Both Helper File with needed methods
 import { getFirebaseBackend } from "../../../helpers/firebase_helper";
 import {
   postFakeRegister,
   postJwtRegister,
 } from "../../../helpers/fakebackend_helper";
 import { authApi } from "../../../Components/services/api";
+import { setAuthorization } from "../../../helpers/api_helper";
 
 // action
 import {
@@ -44,7 +45,7 @@ const splitFullName = (fullName = "") => {
 };
 
 // Is user register successfull then direct plot user in redux.
-export const registerUser = (user) => async (dispatch) => {
+export const registerUser = (user, history) => async (dispatch) => {
   try {
     let response;
 
@@ -57,7 +58,15 @@ export const registerUser = (user) => async (dispatch) => {
         password: user.password,
       });
 
-      dispatch(registerUserSuccessful(response?.data || response));
+      const data = response?.data || response;
+      if (!data?.token) {
+        throw new Error("Registrasi berhasil, tetapi sesi login tidak tersedia.");
+      }
+
+      localStorage.setItem("authUser", JSON.stringify(data));
+      setAuthorization(data.token);
+      dispatch(registerUserSuccessful(data.user));
+      history("/dashboard", { replace: true });
       return;
     }
 

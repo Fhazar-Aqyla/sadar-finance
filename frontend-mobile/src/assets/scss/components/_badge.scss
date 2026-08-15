@@ -1,0 +1,59 @@
+// 
+// badge.scss
+//
+
+.badge {
+    line-height: 0.95;
+}
+
+@each $color, $value in $theme-colors {
+   
+    .badge-label {
+        &.bg-#{$color} {
+            &:before {
+                border-right-color: $value;
+            }
+        }
+    }
+}
+
+// badge-border
+.badge-border {
+    border-left: 2px solid;
+}
+
+// badge-label
+.badge-label {
+    margin-left: 8px;
+    position: relative;
+    &:before {
+        content: "";
+        position: absolute;
+        border: 8px solid transparent;
+        border-right-color: $primary;
+        left: -14px;
+        top: 0;
+    }
+}
+
+//Badge Gradient Style
+$gradients: ();
+$gradients: map-merge((primary: linear-gradient(135deg, $primary 0%, $success 100%),
+        secondary: linear-gradient(135deg, $secondary 0%, $info 100%),
+        success: linear-gradient(135deg, $success 0%, $warning 100%),
+        danger: linear-gradient(135deg, $danger 0%, $secondary 100%),
+        warning: linear-gradient(135deg, $warning 0%, darken($warning, 15%) 100%),
+        info: linear-gradient(135deg, $info 0%, $success 100%),
+        dark: linear-gradient(135deg, $dark 0%, $primary 100%)),
+    $gradients);
+
+@mixin badge-gradient($parent, $gradient) {
+    #{$parent} {
+        background: $gradient;
+    }
+}
+
+@each $gradient,
+$value in $gradients {
+    @include badge-gradient(".badge-gradient-#{$gradient}", $value);
+}
