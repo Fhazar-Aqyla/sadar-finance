@@ -246,7 +246,7 @@ const buildBudgetRows = (budget, transactions = []) => {
 
 const getStoredProfile = () => {
   try {
-    const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
     const user = authUser?.user || authUser?.data || authUser || {};
     const name = user?.first_name || user?.username || user?.name || user?.email || "SADAR";
 
@@ -260,7 +260,7 @@ const getStoredProfile = () => {
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = sessionStorage.getItem("authUser");
+    const rawAuth = localStorage.getItem("authUser");
     if (!rawAuth) return;
     const authData = JSON.parse(rawAuth);
 
@@ -274,9 +274,9 @@ const updateSessionUser = (updatedUser) => {
       Object.assign(authData, updatedUser);
     }
 
-    sessionStorage.setItem("authUser", JSON.stringify(authData));
+    localStorage.setItem("authUser", JSON.stringify(authData));
   } catch (e) {
-    console.error("Failed to update sessionStorage user", e);
+    console.error("Failed to update localStorage user", e);
   }
 };
 
@@ -365,7 +365,7 @@ const getSetupWizardStorageKey = () => {
   if (typeof window === "undefined") return "sadar_setup_wizard_api";
 
   try {
-    const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
     const user = authUser?.user || authUser?.data?.user || authUser?.data || authUser || {};
     const userId = user?.id || user?.user_id || user?.email || user?.username || "guest";
     return `sadar_setup_wizard_api_${userId}`;
@@ -525,9 +525,8 @@ const NewUserDashboard = ({ profileName = "SADAR" }) => {
             </Badge>
             <h1>Halo, {profileName}</h1>
             <p>Dashboard kamu masih kosong. Mulai catat akun, pemasukan, anggaran, dan transaksi agar ringkasan keuangan mulai terbaca.</p>
-            <div className="sadar-overview-actions">
-              {!hasDismissedSetup ? (
-                <>
+            {!hasDismissedSetup && (
+              <div className="sadar-overview-actions">
                 <Button color="primary" onClick={() => setIsGuideOpen(true)}>
                   <i className="ri-play-circle-line align-bottom me-1"></i>
                   Mulai Pengaturan
@@ -535,14 +534,8 @@ const NewUserDashboard = ({ profileName = "SADAR" }) => {
                 <Button color="light" className="sadar-ghost-btn" onClick={skipSetupWizard}>
                   Lewati Dulu
                 </Button>
-                </>
-              ) : (
-                <Button color="primary" onClick={() => setIsGuideOpen(true)}>
-                  <i className="ri-compass-3-line align-bottom me-1"></i>
-                  Buka Tutorial
-                </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
           <div className="sadar-overview-note sadar-new-user-note">
             <span className="sadar-note-icon bg-teal-subtle text-teal">

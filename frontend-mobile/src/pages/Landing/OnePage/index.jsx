@@ -30,7 +30,7 @@ const navItems = [
 
 const hasAuthToken = () => {
   try {
-    return Boolean(JSON.parse(sessionStorage.getItem("authUser") || "null")?.token);
+    return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
   } catch {
     return false;
   }

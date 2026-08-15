@@ -63,7 +63,7 @@ export const registerUser = (user, history) => async (dispatch) => {
         throw new Error("Registrasi berhasil, tetapi sesi login tidak tersedia.");
       }
 
-      sessionStorage.setItem("authUser", JSON.stringify(data));
+      localStorage.setItem("authUser", JSON.stringify(data));
       setAuthorization(data.token);
       dispatch(registerUserSuccessful(data.user));
       history("/dashboard", { replace: true });

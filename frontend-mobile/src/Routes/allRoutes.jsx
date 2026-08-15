@@ -45,12 +45,12 @@ const authProtectedRoutes = [
 
 const publicRoutes = [
   // Authentication Page
-  { path: "/", component: <OnePage /> },
+  { path: "/", component: <OnePage />, guestOnly: true },
   { path: "/logout", component: <Logout /> },
-  { path: "/login", component: <Login /> },
+  { path: "/login", component: <Login />, guestOnly: true },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
-  { path: "/register", component: <Register /> },
-  { path: "/landing", component: <OnePage /> },
+  { path: "/register", component: <Register />, guestOnly: true },
+  { path: "/landing", component: <OnePage />, guestOnly: true },
 ];
 
 export { authProtectedRoutes, publicRoutes };

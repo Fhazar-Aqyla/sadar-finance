@@ -15,7 +15,7 @@ import {
   sanitizeDigitsOnly,
   formatRupiahInput,
   formatAccountNumberInput,
-  GENERIC_BANK_RULE,
+  INSTITUTION_RULES,
 } from "../../utils/accountValidation";
 import { findInstitutionByName, inferAccountType, INSTITUTION_TYPES } from "../../constants/bankData";
 
@@ -75,9 +75,10 @@ const AccountFormModal = ({
             }
           }
         }
-      } else if (selectedInst) {
-        if (cleanNum.length > GENERIC_BANK_RULE.maxLength) {
-          cleanNum = cleanNum.slice(0, GENERIC_BANK_RULE.maxLength);
+      } else if (selectedInst && INSTITUTION_RULES[selectedInst.id]) {
+        const rule = INSTITUTION_RULES[selectedInst.id];
+        if (cleanNum.length > rule.maxLength) {
+          cleanNum = cleanNum.slice(0, rule.maxLength);
         }
       }
 
@@ -122,9 +123,10 @@ const AccountFormModal = ({
       if (digitsOnly.length > maxDigits) {
         return;
       }
-    } else if (currentInst) {
-      // Bank validation during typing (generic rule for all banks)
-      if (digitsOnly.length > GENERIC_BANK_RULE.maxLength) {
+    } else if (currentInst && INSTITUTION_RULES[currentInst.id]) {
+      // Bank validation rules during typing:
+      const rule = INSTITUTION_RULES[currentInst.id];
+      if (digitsOnly.length > rule.maxLength) {
         return;
       }
     } else {

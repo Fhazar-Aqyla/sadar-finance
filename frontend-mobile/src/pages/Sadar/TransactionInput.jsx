@@ -28,8 +28,10 @@ const categories = [
 
 const normalizeCategoryGroup = (value) => {
   const text = String(value || "").trim().toLowerCase();
-  if (/keinginan|wants|want|hiburan|entertainment|belanja|shopping/.test(text)) return "wants";
+  if (/keinginan|wants|want|hiburan|entertainment|belanja|shopping|game|nonton|bioskop|liburan|travel/.test(text)) return "wants";
   if (/tabungan|savings|saving|invest|dana darurat/.test(text)) return "savings";
+  if (/kebutuhan|needs|need/.test(text)) return "needs";
+  if (/makan|food|beverage|minum|groceries|sembako|transport|tagihan|utilit|kesehatan|health|pendidikan|education|bills/.test(text)) return "needs";
   return "needs";
 };
 
@@ -106,7 +108,10 @@ const parseAmountValue = (value) => {
 };
 
 const toIsoDate = (dateValue) => {
-  const date = new Date(`${dateValue}T00:00:00`);
+  const rawDate = String(dateValue || "").trim();
+  if (!rawDate) return "";
+  const cleanDate = rawDate.slice(0, 10);
+  const date = new Date(`${cleanDate}T12:00:00.000Z`);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 };
 

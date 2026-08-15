@@ -243,7 +243,7 @@ const AccountFormModal = ({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                value={formatAccountNumberInput(formState.accountNumber, formState.type)}
+                value={formatAccountNumberInput(formState.accountNumber, formState.type, formState.bank)}
                 onChange={handleAccountNumberChange}
                 placeholder={
                   isBankSelected

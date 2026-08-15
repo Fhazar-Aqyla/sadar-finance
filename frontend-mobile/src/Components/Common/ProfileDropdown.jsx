@@ -30,7 +30,7 @@ const ProfileDropdown = () => {
     const fallbackName = normalizeAccountName(
       user?.first_name || user?.username || "Aqyla",
     );
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
 
     if (!storedUser) {
       return fallbackName;
@@ -61,7 +61,7 @@ const ProfileDropdown = () => {
       user?.profile_picture || user?.profilePicture || user?.avatar;
     if (rawAvatar) return resolveAvatarUrl(rawAvatar);
 
-    const storedUser = sessionStorage.getItem("authUser");
+    const storedUser = localStorage.getItem("authUser");
     if (storedUser) {
       try {
         const authUser = JSON.parse(storedUser);
