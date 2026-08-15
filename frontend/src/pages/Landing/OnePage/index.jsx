@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp, Sparkles, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
 
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
@@ -22,7 +19,6 @@ import { FooterSection } from "./components/FooterSection";
 gsap.registerPlugin(ScrollTrigger);
 
 const LandingOnePage = () => {
-  const [showFloatingBar, setShowFloatingBar] = useState(false);
   const lenisRef = useRef(null);
 
   useEffect(() => {
@@ -50,28 +46,12 @@ const LandingOnePage = () => {
     gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
 
-    // Scroll listener for floating quick-action pill
-    const handleScroll = () => {
-      setShowFloatingBar(window.scrollY > 650);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
     return () => {
       lenis.destroy();
       lenisRef.current = null;
       gsap.ticker.remove(tickerCallback);
-      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  const scrollToTop = () => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0);
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
 
   return (
     <div
@@ -114,36 +94,6 @@ const LandingOnePage = () => {
 
       {/* 11. Minimalist Footer */}
       <FooterSection />
-
-      {/* 12. Dynamic Floating Quick-Action Pill (Visible on Scroll) */}
-      <AnimatePresence>
-        {showFloatingBar && (
-          <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2"
-          >
-            <Link
-              to="/register"
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1E3A8A] text-white text-xs font-bold shadow-xl hover:bg-[#1A3175] hover:scale-105 transition-all border border-blue-400/30"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Coba SADAR Gratis</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-
-            <button
-              onClick={scrollToTop}
-              aria-label="Kembali ke atas"
-              className="p-3 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:scale-110 active:scale-95 transition-all"
-            >
-              <ArrowUp className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
