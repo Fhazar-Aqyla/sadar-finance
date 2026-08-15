@@ -2092,8 +2092,9 @@ html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
 /* --- SADAR Finance Responsive Adaptations --- */
 
 @media (max-width: 991.98px) {
-  .sadar-page {
-    padding-bottom: 4.5rem;
+  .sadar-page,
+  .sadar-dashboard {
+    padding-bottom: 1rem;
   }
 }
 
@@ -2874,7 +2875,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
 
   .sadar-page,
   .sadar-dashboard {
-    padding-bottom: 4.5rem;
+    padding-bottom: 1rem;
   }
 
   .sadar-page .container-fluid,
@@ -5402,7 +5403,7 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .page-content.sadar-page,
   .page-content.sadar-dashboard {
     padding-top: calc(var(--vz-header-height, 70px) + 0.9rem);
-    padding-bottom: calc(98px + env(safe-area-inset-bottom));
+    padding-bottom: 1rem;
   }
 
   .sadar-page .container-fluid,
