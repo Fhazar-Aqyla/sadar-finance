@@ -5312,9 +5312,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     justify-content: center;
     min-height: 44px;
     line-height: 1.2;
-    white-space: nowrap;
-    word-break: normal;
-    overflow-wrap: normal;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
   }
 
   .sadar-page .btn :where(i, svg, .spinner-border),
