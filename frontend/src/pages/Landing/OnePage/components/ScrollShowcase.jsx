@@ -97,17 +97,9 @@ export const ScrollShowcase = () => {
               <span className="w-3 h-3 rounded-full bg-emerald-500/90 inline-block shadow-xs" />
             </div>
             <div className="text-[11px] font-mono text-slate-400 bg-slate-800/70 border border-slate-700/50 px-4 py-0.5 rounded-full flex items-center gap-2 shadow-inner">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1E3A8A] dark:bg-sky-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1E3A8A] dark:bg-sky-400"></span>
-              </span>
               <span>https://sadar.app/dashboard</span>
             </div>
-            <div className="w-12 text-right">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                LIVE
-              </span>
-            </div>
+            <div className="w-12 text-right" />
           </div>
 
           {/* Dashboard Image Preview with Neon Border Accent */}
@@ -160,7 +152,6 @@ export const ScrollShowcase = () => {
               </p>
               <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300 flex items-center gap-1.5">
                 <span>84 / 100</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
               </p>
             </div>
           </motion.div>

@@ -24,7 +24,6 @@ export const HowItWorksSection = () => {
       desc: "Unggah foto struk belanjaan kasir dari minimarket/restoran atau masukkan transaksi harianmu dalam 3 detik.",
       accent: "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300",
       numberClass: "text-blue-200 dark:text-blue-900 group-hover:text-[#1E3A8A]/30",
-      dotClass: "bg-[#1E3A8A] dark:bg-sky-400",
       pill: "Deteksi Otomatis",
       y: yCard1,
     },
@@ -35,7 +34,6 @@ export const HowItWorksSection = () => {
       desc: "Algoritma cerdas mengenali merchant, memvalidasi total nominal, dan memetakan pos 50/30/20 secara presisi.",
       accent: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
       numberClass: "text-sky-200 dark:text-sky-900 group-hover:text-sky-600/30",
-      dotClass: "bg-sky-500 dark:bg-sky-400",
       pill: "NLP Categorization",
       y: yCard2,
     },
@@ -47,7 +45,6 @@ export const HowItWorksSection = () => {
       accent:
         "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
       numberClass: "text-emerald-200 dark:text-emerald-900 group-hover:text-emerald-600/30",
-      dotClass: "bg-emerald-500 dark:bg-emerald-400",
       pill: "Skor Finansial",
       y: yCard3,
     },
@@ -113,8 +110,7 @@ export const HowItWorksSection = () => {
                       </span>
                     </div>
 
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold dark:bg-slate-800 dark:text-slate-300 mb-3 border border-slate-200/60 dark:border-slate-700`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${step.dotClass}`} />
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold dark:bg-slate-800 dark:text-slate-300 mb-3 border border-slate-200/60 dark:border-slate-700`}>
                       {step.pill}
                     </div>
 

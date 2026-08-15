@@ -4,7 +4,6 @@ import { ReceiptScannerDemo } from "@/Components/ui/receipt-scanner-demo";
 import {
   Scan,
   Activity,
-  AlertTriangle,
   Wallet,
   Sparkles,
   CheckCircle2,
@@ -157,15 +156,15 @@ export const BentoFeatures = () => {
             <div className="max-w-2xl mb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 mb-2.5 border border-blue-100 dark:border-blue-900/30">
                 <Scan className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
-                AI OCR Scanner
+                Kategorisasi Transaksi Otomatis
               </div>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Cukup Foto Struk Belanja, AI yang Menginput Datanya
+                Setiap Transaksi Digital Otomatis Tercatat & Terkategori
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed font-normal">
-                Tak perlu lagi mencatat struk belanja satu per satu. Sistem
-                cerdas SADAR mengekstrak merchant, tanggal, total nominal, dan
-                membaginya ke pos 50/30/20 secara otomatis.
+                Sambungkan rekening bank, e-wallet, dan QRIS. Sistem cerdas
+                SADAR membaca setiap transaksi, lalu mengkategorikannya ke
+                Kebutuhan, Keinginan, dan Tabungan secara otomatis.
               </p>
             </div>
             <ReceiptScannerDemo />
@@ -185,10 +184,6 @@ export const BentoFeatures = () => {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30">
                   <Activity className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                   Financial Health Score
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1 rounded-full border border-emerald-200/80 dark:border-emerald-900/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Evaluator AI Live
                 </div>
               </div>
 
@@ -391,18 +386,6 @@ export const BentoFeatures = () => {
             {/* Subcard A: Predictive Overspending Alert */}
             <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-md">
               <div>
-                {/* Header Badge */}
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    Sistem Prediksi Dini
-                  </div>
-                  <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-0.5 rounded-full border border-amber-200/80 dark:border-amber-900/40 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                    Peringatan Proaktif
-                  </span>
-                </div>
-
                 <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Deteksi Dini Sebelum Anggaran Bocor
                 </h4>
@@ -416,7 +399,6 @@ export const BentoFeatures = () => {
                 <div className="mt-4 p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 shadow-2xs">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">
                     <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500" />
                       Kategori Keinginan (Wants)
                     </span>
                     <span className="text-amber-800 dark:text-amber-300 font-extrabold">
@@ -465,9 +447,6 @@ export const BentoFeatures = () => {
                     <Wallet className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                     Multi-Akun Terpadu
                   </div>
-                  <span className="text-[11px] font-bold text-[#1E3A8A] bg-blue-50 dark:bg-blue-950/50 px-2.5 py-0.5 rounded-full border border-blue-100 dark:border-blue-900/30">
-                    Semua Terkoneksi
-                  </span>
                 </div>
 
                 <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -500,7 +479,6 @@ export const BentoFeatures = () => {
                         Rp 14.850.000
                       </p>
                       <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-end gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />{" "}
                         Terhubung
                       </span>
                     </div>
@@ -525,7 +503,6 @@ export const BentoFeatures = () => {
                         Rp 620.000
                       </p>
                       <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-end gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />{" "}
                         Terhubung
                       </span>
                     </div>

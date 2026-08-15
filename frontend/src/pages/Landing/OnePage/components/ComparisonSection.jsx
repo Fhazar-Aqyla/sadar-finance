@@ -202,7 +202,6 @@ export const ComparisonSection = () => {
                   <div>
                     <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-tight flex items-center gap-2">
                       Bersama SADAR Finance
-                      <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     </h3>
                     <p className="text-xs text-[#1E3A8A] dark:text-sky-400 font-semibold mt-0.5">
                       AI Powered & Realtime Ecosystem

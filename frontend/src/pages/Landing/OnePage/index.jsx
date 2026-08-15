@@ -67,7 +67,7 @@ const LandingOnePage = () => {
         {/* 2. 3D Perspective Scroll Showcase */}
         <ScrollShowcase />
 
-        {/* 3. Bento Features: OCR Scanner, Health Score, Predictive Alerts */}
+        {/* 3. Bento Features: Auto Categorization, Health Score, Predictive Alerts */}
         <BentoFeatures />
 
         {/* 4. Interactive Comparison: Sebelum vs Sesudah SADAR */}

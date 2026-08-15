@@ -246,10 +246,6 @@ export const HeroSection = () => {
             <div>
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400">
                 <span>Struk Terdeteksi AI</span>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
               </div>
               <p className="text-sm font-black text-slate-900 dark:text-white mt-0.5">
                 +Rp {ocrAmount.toLocaleString("id-ID")}{" "}
@@ -273,10 +269,6 @@ export const HeroSection = () => {
             <div>
               <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                 <span>Skor Kesehatan Finansial</span>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1E3A8A] dark:bg-sky-400"></span>
-                </span>
               </div>
               <div className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2 mt-0.5">
                 <span>{healthScore} / 100</span>
