@@ -518,7 +518,7 @@ const TransactionInput = () => {
           <Col xl={4}>
             <div className="sadar-entry-tabs mb-3">
               <Button
-                className={entryType === "transaction" ? "active" : ""}
+                className={`entry-transaction ${entryType === "transaction" ? "active" : ""}`}
                 onClick={() => {
                   setEntryType("transaction");
                   setNotice(null);
@@ -528,7 +528,7 @@ const TransactionInput = () => {
                 Pengeluaran
               </Button>
               <Button
-                className={entryType === "income" ? "active" : ""}
+                className={`entry-income ${entryType === "income" ? "active" : ""}`}
                 onClick={() => {
                   setEntryType("income");
                   setNotice(null);
@@ -977,7 +977,7 @@ const TransactionInput = () => {
                         <i className="ri-refresh-line align-bottom me-1" />
                         Atur Ulang
                       </Button>
-                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length}>
+                      <Button type="submit" className="sadar-save-button income" disabled={isSaving || isLoadingAccounts || !accounts.length}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
                         Simpan Pemasukan
                       </Button>

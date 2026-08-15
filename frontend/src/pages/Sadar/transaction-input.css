@@ -1,16 +1,16 @@
 .sadar-mode-badge {
   border-radius: 999px;
   padding: 0.35rem 0.65rem;
-  border-color: #25a0e2 !important;
-  background: #25a0e2 !important;
+  border-color: #1e3a8a !important;
+  background: #1e3a8a !important;
   font-size: 0.68rem;
   font-weight: 750;
   letter-spacing: 0.04em;
 }
 
 .sadar-mode-badge.income {
-  border-color: #22c55e !important;
-  background: #22c55e !important;
+  border-color: #16a34a !important;
+  background: #16a34a !important;
 }
 
 .sadar-entry-tabs {
@@ -35,14 +35,20 @@
 }
 
 .sadar-entry-tabs .btn:hover {
-  color: #25a0e2;
-  background: #eef5ff;
+  color: #1e3a8a;
+  background: #eef2f8;
 }
 
-.sadar-entry-tabs .btn.active {
-  color: #25a0e2;
-  background: #ffffff;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+.sadar-entry-tabs .btn.entry-transaction.active {
+  color: #1e3a8a;
+  background: #e3eaf8;
+  box-shadow: inset 0 0 0 1px rgba(30, 58, 138, 0.16), 0 3px 10px rgba(30, 58, 138, 0.08);
+}
+
+.sadar-entry-tabs .btn.entry-income.active {
+  color: #15803d;
+  background: #e3f2e8;
+  box-shadow: inset 0 0 0 1px rgba(22, 163, 74, 0.2), 0 3px 10px rgba(22, 163, 74, 0.08);
 }
 
 .sadar-transaction-row > [class*="col-"] {
@@ -85,14 +91,14 @@
 }
 
 .sadar-mode-toggle .btn:hover {
-  color: #25a0e2;
-  background: #eef5ff;
+  color: #1e3a8a;
+  background: #eef2f8;
 }
 
 .sadar-mode-toggle .btn.active {
-  color: #25a0e2;
-  background: #ffffff;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  color: #1e3a8a;
+  background: #e3eaf8;
+  box-shadow: inset 0 0 0 1px rgba(30, 58, 138, 0.16), 0 3px 10px rgba(30, 58, 138, 0.08);
 }
 
 .sadar-method-content,
@@ -125,9 +131,9 @@
 }
 
 .sadar-receipt-dropzone:hover {
-  border-color: #25a0e2;
-  background: #f5fbff;
-  box-shadow: inset 0 0 0 1px rgba(37, 160, 226, 0.08);
+  border-color: #1e3a8a;
+  background: #f5f8ff;
+  box-shadow: inset 0 0 0 1px rgba(30, 58, 138, 0.1);
 }
 
 .sadar-receipt-dropzone.has-preview {
@@ -175,8 +181,8 @@
   height: 42px;
   margin-bottom: 0.35rem;
   border-radius: 12px;
-  color: #25a0e2;
-  background: rgba(37, 160, 226, 0.12);
+  color: #1e3a8a;
+  background: rgba(30, 58, 138, 0.1);
   font-size: 1.35rem;
 }
 
@@ -208,28 +214,55 @@
 
 .sadar-ocr-button,
 .sadar-save-button {
-  border-color: #25a0e2 !important;
-  background: #25a0e2 !important;
-  box-shadow: none;
+  border-color: #1e3a8a !important;
+  color: #ffffff !important;
+  background: #1e3a8a !important;
+  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
   font-weight: 700;
 }
 
+.sadar-ocr-button:hover,
+.sadar-save-button:hover {
+  border-color: #142a63 !important;
+  color: #ffffff !important;
+  background: #142a63 !important;
+}
+
+.sadar-save-button.income {
+  border-color: #16a34a !important;
+  background: #16a34a !important;
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.sadar-save-button.income:hover {
+  border-color: #15803d !important;
+  color: #ffffff !important;
+  background: #15803d !important;
+}
+
 .sadar-dropzone-icon.income {
-  color: #22c55e;
-  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
 }
 
 .sadar-ocr-button {
-  border-color: #25a0e2 !important;
-  background: #25a0e2 !important;
+  border-color: #1e3a8a !important;
+  color: #ffffff !important;
+  background: #1e3a8a !important;
   box-shadow: none;
 }
 
 .sadar-reset-button {
-  border-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
   color: #334155 !important;
-  background: #f8fafc !important;
+  background: #f1f5f9 !important;
   font-weight: 700;
+}
+
+.sadar-reset-button:hover {
+  border-color: #94a3b8 !important;
+  color: #1e293b !important;
+  background: #e2e8f0 !important;
 }
 
 .sadar-manual-state {
