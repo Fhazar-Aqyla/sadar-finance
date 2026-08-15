@@ -89,18 +89,18 @@ export const Navbar = () => {
                   href={link.href}
                   className={`text-sm font-medium transition-colors relative py-1 group ${
                     isActive
-                      ? "text-[#1E3A8A] dark:text-sky-400 font-bold"
-                      : "text-[#1E3A8A]/60 hover:text-[#1E3A8A] dark:text-slate-300 dark:hover:text-sky-400"
+                      ? "text-slate-900 dark:text-white font-bold"
+                      : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                   }`}
                 >
                   {link.label}
                   {isActive ? (
                     <motion.span
                       layoutId="activeNavIndicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1E3A8A] dark:bg-sky-400 rounded-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 dark:bg-slate-200 rounded-full"
                     />
                   ) : (
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#1E3A8A] dark:bg-sky-400 transition-all duration-200 group-hover:w-full rounded-full" />
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-slate-900 dark:bg-slate-200 transition-all duration-200 group-hover:w-full rounded-full" />
                   )}
                 </a>
               );
@@ -111,7 +111,7 @@ export const Navbar = () => {
           <div className="hidden sm:flex items-center gap-3">
             <Link
               to="/login"
-              className="text-sm font-semibold text-slate-700 hover:text-[#1E3A8A] dark:text-slate-200 dark:hover:text-sky-400 px-4 py-2 rounded-xl transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white px-4 py-2 rounded-xl transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               Masuk
             </Link>
@@ -156,8 +156,8 @@ export const Navbar = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block px-3 py-2 rounded-lg text-base font-medium ${
                     activeSection === link.id
-                      ? "bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 font-bold"
-                      : "text-slate-700 hover:bg-slate-50 hover:text-[#1E3A8A] dark:text-slate-300 dark:hover:bg-slate-800"
+                      ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white font-bold"
+                      : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                   }`}
                 >
                   {link.label}
