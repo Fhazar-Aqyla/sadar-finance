@@ -6543,6 +6543,15 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     background: #243041 !important;
     box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
   }
+
+  html[data-bs-theme="dark"] .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row),
+  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody tr {
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    outline-color: rgba(2, 6, 23, 0.42) !important;
+    color: #f8fafc !important;
+    background: #1f2a37 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+  }
 }
 
 @media (max-width: 575.98px) {

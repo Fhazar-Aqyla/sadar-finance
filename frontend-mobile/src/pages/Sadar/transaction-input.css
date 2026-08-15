@@ -713,21 +713,48 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     white-space: nowrap;
   }
 
-  html[data-bs-theme="dark"] .sadar-transaction-page :where(.sadar-input-card, .sadar-detail-card) {
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-input-card,
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card {
     border-color: rgba(148, 163, 184, 0.2) !important;
     background: linear-gradient(145deg, rgba(31, 42, 55, 0.96), rgba(24, 33, 44, 0.96)) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-transaction-page :where(.sadar-receipt-dropzone, .sadar-manual-state, .sadar-file-meta) {
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-receipt-dropzone,
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-manual-state,
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-file-meta {
     border-color: rgba(148, 163, 184, 0.22) !important;
     color: #f8fafc !important;
     background: rgba(31, 42, 55, 0.9) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-transaction-page :where(.sadar-entry-tabs, .sadar-mode-toggle) .btn.active {
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-entry-tabs .btn.active,
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-mode-toggle .btn.active {
     color: #7dd3fc !important;
     background: #243041 !important;
     box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card .form-control,
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card .form-select {
+    border-color: rgba(165, 180, 202, 0.2) !important;
+    color: #f8fafc !important;
+    background: #1f2a37 !important;
+    box-shadow: none !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-ocr-button,
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-save-button {
+    border-color: #25a0e2 !important;
+    color: #ffffff !important;
+    background: #25a0e2 !important;
+    box-shadow: 0 8px 18px rgba(37, 160, 226, 0.2) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-reset-button {
+    border-color: rgba(148, 163, 184, 0.28) !important;
+    color: #f8fafc !important;
+    background: #243041 !important;
+    box-shadow: none !important;
   }
 }
 
