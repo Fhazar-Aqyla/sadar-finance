@@ -548,7 +548,7 @@ const OnePage = () => {
           className="pointer-events-none absolute inset-x-0 top-[54rem] h-[26rem] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.72)_54%,#FFFFFF_100%)] max-md:top-[48rem] max-md:h-[22rem]"
         />
         <div className="relative z-10">
-          <Hero />
+          <Hero isAuthenticated={isAuthenticated} />
 
           <ContainerScroll>
             <DashboardPreview />
@@ -1004,7 +1004,10 @@ const OnePage = () => {
 
       <section className="pb-[66px] pt-16 max-md:pb-10 max-md:pt-10">
         <div className={shellClass}>
-          <Cta4 />
+          <Cta4
+            buttonText={isAuthenticated ? "Buka Dashboard" : "Mulai Sekarang"}
+            buttonUrl={isAuthenticated ? "/dashboard" : "/register"}
+          />
         </div>
       </section>
 

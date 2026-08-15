@@ -5307,7 +5307,19 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
 
   .sadar-page .btn,
   .sadar-dashboard .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 44px;
+    line-height: 1.2;
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  .sadar-page .btn :where(i, svg, .spinner-border),
+  .sadar-dashboard .btn :where(i, svg, .spinner-border) {
+    flex: 0 0 auto;
   }
 
   .sadar-page :where(h1, h2, h3, h4, h5, h6, p, .card-title, .sadar-step-title, .sadar-step-desc),

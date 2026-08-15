@@ -573,6 +573,15 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08) !important;
   }
 
+  .sadar-transaction-page .sadar-entry-tabs .sadar-entry-tab.is-income:is(:hover, .active) {
+    color: #15803d !important;
+  }
+
+  .sadar-transaction-page .sadar-entry-tabs .sadar-entry-tab.is-income.active {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(220, 252, 231, 0.9)) !important;
+    box-shadow: 0 7px 18px rgba(34, 197, 94, 0.15), inset 0 1px 0 #ffffff !important;
+  }
+
   .sadar-transaction-page .sadar-transaction-row {
     --bs-gutter-y: 0.85rem;
   }
@@ -676,6 +685,17 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     opacity: 0.58;
   }
 
+  .sadar-transaction-page.is-income-flow .sadar-save-button {
+    border-color: #16a34a !important;
+    background: #16a34a !important;
+    box-shadow: 0 8px 18px rgba(22, 163, 74, 0.22) !important;
+  }
+
+  .sadar-transaction-page.is-income-flow .sadar-save-button:is(:hover, :focus-visible) {
+    border-color: #15803d !important;
+    background: #15803d !important;
+  }
+
   .sadar-transaction-page .sadar-form-row {
     --bs-gutter-x: 0.75rem;
     --bs-gutter-y: 0.78rem;
@@ -734,6 +754,15 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
   }
 
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-entry-tabs .sadar-entry-tab.is-income:is(:hover, .active) {
+    color: #86efac !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page .sadar-entry-tabs .sadar-entry-tab.is-income.active {
+    background: linear-gradient(145deg, rgba(20, 83, 45, 0.72), rgba(22, 101, 52, 0.45)) !important;
+    box-shadow: 0 8px 20px rgba(0, 5, 18, 0.24), inset 0 1px 0 rgba(187, 247, 208, 0.12) !important;
+  }
+
   html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card .form-control,
   html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card .form-select {
     border-color: rgba(165, 180, 202, 0.2) !important;
@@ -748,6 +777,12 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     color: #ffffff !important;
     background: #25a0e2 !important;
     box-shadow: 0 8px 18px rgba(37, 160, 226, 0.2) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page.is-income-flow .sadar-save-button {
+    border-color: #22c55e !important;
+    background: #16803d !important;
+    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.18) !important;
   }
 
   html[data-bs-theme="dark"] .sadar-transaction-page .sadar-reset-button {

@@ -513,7 +513,7 @@ const TransactionInput = () => {
           <Col xl={4}>
             <div className="sadar-entry-tabs mb-3">
               <Button
-                className={entryType === "transaction" ? "active" : ""}
+                className={`sadar-entry-tab is-expense ${entryType === "transaction" ? "active" : ""}`}
                 onClick={() => {
                   setEntryType("transaction");
                   setNotice(null);
@@ -523,7 +523,7 @@ const TransactionInput = () => {
                 Pengeluaran
               </Button>
               <Button
-                className={entryType === "income" ? "active" : ""}
+                className={`sadar-entry-tab is-income ${entryType === "income" ? "active" : ""}`}
                 onClick={() => {
                   setEntryType("income");
                   setNotice(null);
