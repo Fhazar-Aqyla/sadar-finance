@@ -568,9 +568,9 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
   }
 
   .sadar-transaction-page .sadar-entry-tabs .btn.active {
-    color: #ffffff !important;
-    background: #1e3a8a !important;
-    box-shadow: 0 8px 18px rgba(30, 58, 138, 0.22) !important;
+    color: #25a0e2 !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08) !important;
   }
 
   .sadar-transaction-page .sadar-transaction-row {
@@ -622,9 +622,9 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
   }
 
   .sadar-transaction-page .sadar-mode-toggle .btn.active {
-    color: #ffffff !important;
-    background: #1e3a8a !important;
-    box-shadow: 0 7px 16px rgba(30, 58, 138, 0.18) !important;
+    color: #25a0e2 !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08) !important;
   }
 
   .sadar-transaction-page .sadar-receipt-dropzone,
@@ -660,9 +660,15 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
 
   .sadar-transaction-page .sadar-ocr-button,
   .sadar-transaction-page .sadar-save-button {
-    border-color: #1e3a8a !important;
+    border-color: #25a0e2 !important;
     color: #ffffff !important;
-    background: #1e3a8a !important;
+    background: #25a0e2 !important;
+    box-shadow: 0 8px 18px rgba(37, 160, 226, 0.2) !important;
+  }
+
+  .sadar-transaction-page :where(.sadar-ocr-button, .sadar-save-button):is(:hover, :focus-visible) {
+    border-color: #1687c4 !important;
+    background: #168fd0 !important;
   }
 
   .sadar-transaction-page :where(.sadar-ocr-button, .sadar-save-button):disabled {
@@ -705,6 +711,23 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     border-radius: 13px;
     font-size: 0.8rem;
     white-space: nowrap;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page :where(.sadar-input-card, .sadar-detail-card) {
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    background: linear-gradient(145deg, rgba(31, 42, 55, 0.96), rgba(24, 33, 44, 0.96)) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page :where(.sadar-receipt-dropzone, .sadar-manual-state, .sadar-file-meta) {
+    border-color: rgba(148, 163, 184, 0.22) !important;
+    color: #f8fafc !important;
+    background: rgba(31, 42, 55, 0.9) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-transaction-page :where(.sadar-entry-tabs, .sadar-mode-toggle) .btn.active {
+    color: #7dd3fc !important;
+    background: #243041 !important;
+    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
   }
 }
 

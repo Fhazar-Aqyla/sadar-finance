@@ -91,6 +91,10 @@
     @keyframes sadarChoiceSpin { to { transform: rotate(360deg); } }
     @media (max-height: 690px) { .sadar-ui-choice-content { padding: 19px; } .sadar-ui-choice-copy { margin-bottom: 14px; } .sadar-ui-choice-option { min-height: 74px; padding: 10px 12px; } .sadar-ui-choice-note { margin-top: 11px; } }
     @media (max-width: 370px) { .sadar-ui-choice-option { grid-template-columns: 42px minmax(0,1fr) 18px; gap: 10px; } .sadar-ui-choice-icon { width: 42px; height: 42px; } .sadar-ui-choice-badge { display: table; margin: 4px 0 0; } }
+    @media (max-width: 575px) {
+      .sadar-ui-choice-switch { top: calc(12px + env(safe-area-inset-top)); right: 12px; bottom: auto; width: 40px; min-height: 40px; justify-content: center; padding: 0; border-radius: 14px; }
+      .sadar-ui-choice-switch span:last-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    }
     @media (prefers-reduced-motion: reduce) { .sadar-ui-choice-overlay, .sadar-ui-choice-dialog, .sadar-ui-choice-option, .sadar-ui-choice-arrow, .sadar-ui-choice-aura::before, .sadar-ui-choice-aura::after, .sadar-ui-choice-switch { animation: none !important; transition: none !important; } }
   `;
   document.head.appendChild(style);
