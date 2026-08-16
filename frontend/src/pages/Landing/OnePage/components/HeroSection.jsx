@@ -182,7 +182,7 @@ export const HeroSection = () => {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-36 pb-32 lg:pt-40 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-200/90 via-indigo-100/70 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-32 pb-24 lg:pt-40 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-200/90 via-indigo-100/70 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
       {/* Primary ambient mesh */}
       <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[360px] bg-gradient-to-tr from-blue-500/15 via-sky-400/10 to-indigo-500/15 blur-[70px] rounded-full -z-10" />
@@ -251,7 +251,7 @@ export const HeroSection = () => {
         </motion.div>
 
         {/* Hero Main Content */}
-        <div className="hero-content-wrap max-w-7xl mx-auto text-center relative z-10 flex flex-col items-center justify-center min-h-[62vh] lg:min-h-[70vh] py-[20px] lg:py-[24px]">
+        <div className="hero-content-wrap max-w-7xl mx-auto text-center relative z-10 flex flex-col items-center justify-center min-h-[58vh] lg:min-h-[70vh] py-[20px] lg:py-[24px]">
 
           {/* Hero Main Headline */}
           <h1
@@ -266,7 +266,7 @@ export const HeroSection = () => {
           </h1>
 
           {/* Hero Subtitle */}
-          <p className="hero-subtitle text-xl sm:text-[21px] lg:text-[22px] text-slate-600 dark:text-slate-300 max-w-[760px] mx-auto leading-[1.5] font-normal">
+          <p className="hero-subtitle text-base sm:text-[21px] lg:text-[22px] text-slate-600 dark:text-slate-300 max-w-[760px] mx-auto leading-[1.5] font-normal">
             Kelola transaksi, atur pengeluaran, dan pahami kondisi keuanganmu
             dengan lebih mudah. SADAR membantu kamu membuat keputusan finansial
             yang lebih tepat dan terarah.

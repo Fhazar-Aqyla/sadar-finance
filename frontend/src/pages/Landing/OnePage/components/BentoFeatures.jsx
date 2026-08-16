@@ -268,22 +268,22 @@ export const BentoFeatures = () => {
                 </p>
 
                 {/* Official Score Range Reference Legend Bar */}
-                <div className="mt-4 w-full max-w-md p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                <div className="mt-4 w-full max-w-md p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-x-3 gap-y-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
                   <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
                     <Info className="w-3 h-3 text-[#1E3A8A] dark:text-sky-400" />
                     Rentang Skor:
                   </span>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <span className="flex items-center gap-1.5 whitespace-nowrap text-emerald-600 dark:text-emerald-400 font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                       80–100 (Sehat)
                     </span>
-                    <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
-                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span className="flex items-center gap-1.5 whitespace-nowrap text-amber-600 dark:text-amber-400 font-bold">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
                       60–79 (Cukup)
                     </span>
-                    <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400 font-bold">
-                      <span className="w-2 h-2 rounded-full bg-rose-500" />
+                    <span className="flex items-center gap-1.5 whitespace-nowrap text-rose-600 dark:text-rose-400 font-bold">
+                      <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
                       0–59 (Perlu Perhatian)
                     </span>
                   </div>
@@ -430,7 +430,7 @@ export const BentoFeatures = () => {
               </div>
 
               {/* AI Proactive Advice Banner */}
-              <div className="mt-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400">
+              <div className="mt-4 p-[12px] sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400">
                 <Sparkles className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed font-medium">
                   <strong className="text-slate-900 dark:text-slate-200 font-bold">

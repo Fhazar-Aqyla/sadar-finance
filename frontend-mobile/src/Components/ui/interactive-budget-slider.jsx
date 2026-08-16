@@ -56,14 +56,14 @@ export const InteractiveBudgetSlider = () => {
           </div>
 
           {/* Quick Preset Pills — sejajar kanan bawah header */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 self-start sm:self-end shrink-0">
+          <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 self-start sm:self-end shrink-0">
             {presets.map((preset) => {
               const isSelected = income === preset.value;
               return (
                 <button
                   key={preset.value}
                   onClick={() => setIncome(preset.value)}
-                  className="relative px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-colors z-10"
+                  className="relative px-2 sm:px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-colors z-10 shrink-0"
                 >
                   {isSelected && (
                     <motion.div
@@ -278,17 +278,17 @@ export const InteractiveBudgetSlider = () => {
             className="h-full bg-emerald-600 rounded-r-full"
           />
         </div>
-        <div className="flex items-center justify-between mt-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-sky-500 inline-block" />
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 mt-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-sky-500 inline-block shrink-0" />
             Kebutuhan 50%
           </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+          <span className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0" />
             Gaya Hidup 30%
           </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
+          <span className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" />
             Tabungan 20%
           </span>
         </div>

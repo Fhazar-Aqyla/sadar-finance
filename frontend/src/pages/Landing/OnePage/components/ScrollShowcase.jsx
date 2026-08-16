@@ -102,16 +102,16 @@ export const ScrollShowcase = () => {
           </div>
 
           {/* Dashboard Image Preview with Neon Border Accent */}
-          <div className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-[16/10] sm:aspect-[16/9] shadow-2xl border border-slate-800/60">
+          <div className="relative rounded-2xl overflow-hidden bg-slate-950 sm:aspect-[16/9] shadow-2xl border border-slate-800/60">
             <img
               src={dashboardPreview}
               alt="SADAR Finance Dashboard Desktop"
-              className="hidden lg:block w-full h-full object-cover object-top hover:scale-[1.01] transition-transform duration-700"
+              className="hidden sm:block w-full h-full object-cover object-top hover:scale-[1.01] transition-transform duration-700"
             />
             <img
               src={dashboardMobilePreview}
               alt="SADAR Finance Dashboard Mobile"
-              className="block lg:hidden w-full h-full object-contain object-top"
+              className="block sm:hidden w-full h-auto object-contain object-top"
             />
           </div>
 

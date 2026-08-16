@@ -92,14 +92,14 @@ export const ReceiptScannerDemo = () => {
         </div>
 
         {/* Receipt Switcher Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
           {receipts.map((r) => {
             const isSelected = activeReceipt.id === r.id;
             return (
               <button
                 key={r.id}
                 onClick={() => handleSelect(r)}
-                className="relative px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors z-10"
+                className="relative px-2 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors z-10"
               >
                 {isSelected && (
                   <motion.div

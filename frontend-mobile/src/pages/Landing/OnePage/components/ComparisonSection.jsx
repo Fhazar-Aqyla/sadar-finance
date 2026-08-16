@@ -82,14 +82,14 @@ export const ComparisonSection = () => {
               className="grid grid-cols-1 sm:grid-cols-[1.6fr_0.7fr_0.7fr] items-stretch"
             >
               {/* Feature */}
-              <div className="flex items-center px-5 sm:px-8 lg:px-10 py-5 sm:py-7 bg-white dark:bg-slate-900">
+              <div className="flex items-center px-5 sm:px-8 lg:px-10 py-[12px] sm:py-7 bg-white dark:bg-slate-900">
                 <span className="text-[17px] sm:text-[18px] font-semibold text-[#0F172A] dark:text-white leading-snug">
                   {feature}
                 </span>
               </div>
 
               {/* Platform Lain */}
-              <div className="flex items-center justify-between sm:justify-center gap-3 px-4 sm:px-4 py-3.5 sm:py-7 border-t sm:border-t-0 border-slate-100/80 dark:border-slate-800/60 sm:border-l sm:border-[#F1D5D8] dark:sm:border-rose-900/40 bg-[#FFFAFA] dark:bg-rose-950/20">
+              <div className="flex items-center justify-between sm:justify-center gap-3 px-4 sm:px-4 py-2.5 sm:py-7 border-t sm:border-t-0 border-slate-100/80 dark:border-slate-800/60 sm:border-l sm:border-[#F1D5D8] dark:sm:border-rose-900/40 bg-[#FFFAFA] dark:bg-rose-950/20">
                 <span className="sm:hidden text-xs font-semibold uppercase tracking-wider text-[#9F1239]">
                   Platform Lain
                 </span>
@@ -99,7 +99,7 @@ export const ComparisonSection = () => {
               </div>
 
               {/* SADAR Finance */}
-              <div className="flex items-center justify-between sm:justify-center gap-3 px-4 sm:px-4 py-3.5 sm:py-7 border-t sm:border-t-0 sm:border-l border-slate-100/80 dark:border-slate-800/60 sm:border-blue-200 dark:sm:border-blue-900/50 bg-[#F2F7FF] dark:bg-blue-950/40">
+              <div className="flex items-center justify-between sm:justify-center gap-3 px-4 sm:px-4 py-2.5 sm:py-7 border-t sm:border-t-0 sm:border-l border-slate-100/80 dark:border-slate-800/60 sm:border-blue-200 dark:sm:border-blue-900/50 bg-[#F2F7FF] dark:bg-blue-950/40">
                 <span className="sm:hidden text-xs font-semibold uppercase tracking-wider text-[#23408F] dark:text-sky-300">
                   SADAR Finance
                 </span>
