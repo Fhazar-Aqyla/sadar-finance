@@ -1,7 +1,7 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Card, CardBody, Col, Container, Row } from 'reactstrap'
-import BreadCrumb from '../../../Components/Common/BreadCrumb'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Card, CardBody, Col, Container, Row } from 'reactstrap';
+import BreadCrumb from '../../../Components/Common/BreadCrumb';
 import FeatherIcon from 'feather-icons-react';
 
 const PrivancyPolicy = () => {
@@ -9,108 +9,55 @@ const PrivancyPolicy = () => {
         <React.Fragment>
             <div className='page-content'>
                 <Container fluid>
-                    <BreadCrumb title="Privancy Policy" pageTitle="Pages" />
+                    <BreadCrumb title="Kebijakan Privasi" pageTitle="Halaman" />
                 </Container>
                 <Row className="justify-content-center">
                     <Col lg={10}>
-                        <Card>
-                            <div className="bg-primary-subtle position-relative">
-                                <CardBody className='p-5'>
-                                    <div className="text-center">
-                                        <h3 className="fw-semibold">Privacy Policy</h3>
-                                        <p className="mb-0 text-muted">Last update: 20 Nov, 2022</p>
-                                    </div>
-                                </CardBody>
-                                <div className="shape">
-                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1440" height="60" preserveAspectRatio="none" viewBox="0 0 1440 60">
-                                        <g mask="url(&quot;#SvgjsMask1001&quot;)" fill="none">
-                                            <path d="M 0,4 C 144,13 432,48 720,49 C 1008,50 1296,17 1440,9L1440 60L0 60z" style={{ fill: "var(--vz-secondary-bg)" }}></path>
-                                        </g>
-                                        <defs>
-                                            <mask id="SvgjsMask1001">
-                                                <rect width="1440" height="60" fill="#ffffff"></rect>
-                                            </mask>
-                                        </defs>
-                                    </svg>
-                                </div>
+                        <Card className="rounded-4 border-0 shadow-sm overflow-hidden">
+                            <div className="bg-primary-subtle p-4 p-md-5 text-center border-bottom border-primary-subtle">
+                                <h3 className="fw-bold text-primary mb-1">Kebijakan Privasi</h3>
+                                <p className="mb-0 text-muted">Terakhir diperbarui: Januari 2025</p>
                             </div>
-                            <CardBody>
-                                <div className="d-flex">
+                            <CardBody className="p-4 p-md-5">
+                                <div className="d-flex mb-4">
                                     <div className="flex-shrink-0 me-3">
-                                        {/* <i data-feather="check-circle"  className="text-success icon-dual-success icon-xs"></i> */}
-                                        <FeatherIcon icon="check-circle" className={"text-success icon-dual-success icon-xs"} />
+                                        <FeatherIcon icon="shield" className="text-primary icon-dual-primary icon-sm" />
                                     </div>
                                     <div className="flex-grow-1">
-                                        <h5>Privacy Policy for velzon</h5>
-                                        <p className="text-muted">At Website Name, accessible at Website.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Website Name and how we use it.</p>
-                                        <p className="text-muted">If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us through email at Email@Website.com</p>
-                                        <p className="text-muted">This privacy policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in Website Name. This policy is not applicable to any information collected offline or via channels other than this website.</p>
-                                        <p className="text-muted">How we use your information:</p>
-                                        <ul className="text-muted">
-                                            <li>
-                                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</p>
-                                            </li>
-                                            <li>
-                                                <p>If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
-                                            </li>
-                                            <li>
-                                                <p>On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment.</p>
-                                            </li>
-                                            <li>
-                                                <p>It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.</p>
-                                            </li>
-                                        </ul>
+                                        <h5 className="fw-semibold text-primary">Komitmen Privasi SADAR Finance</h5>
+                                        <p className="text-muted">Di <strong>SADAR Finance</strong> (dapat diakses di platform web dan mobile), privasi dan keamanan data finansial pengguna adalah prioritas tertinggi kami. Dokumen Kebijakan Privasi ini menjelaskan jenis informasi yang kami kumpulkan dan bagaimana kami menggunakannya secara bertanggung jawab.</p>
+                                        <p className="text-muted">Jika Anda memiliki pertanyaan lebih lanjut mengenai Kebijakan Privasi ini, silakan hubungi tim kami melalui email di <a href="mailto:support@sadarfinance.id" className="text-primary fw-semibold">support@sadarfinance.id</a>.</p>
                                     </div>
                                 </div>
 
-                                <div className="d-flex">
+                                <div className="d-flex mb-4">
                                     <div className="flex-shrink-0 me-3">
-                                        {/* <i data-feather="check-circle" className="text-success icon-dual-success icon-xs"></i> */}
-                                        <FeatherIcon icon="check-circle" className={"text-success icon-dual-success icon-xs"} />
+                                        <FeatherIcon icon="database" className="text-primary icon-dual-primary icon-sm" />
                                     </div>
                                     <div className="flex-grow-1">
-                                        <h5>How we use your information</h5>
-                                        <p className="text-muted">If you contact us directly, we may receive additional information about you such as your name, email address, phone number, the contents of the message and/or attachments you may send us, and any other information you may choose to provide.</p>
-                                        <p className="text-muted">Communicate with you, either directly or through one of our partners, including for customer service, to provide you with updates and other information relating to the website, and for marketing and promotional purposes.</p>
-                                        <p className="text-muted">When you register for an Account, we may ask for your contact information, including items such as name, company name, address, email address, and telephone number.</p>
-                                        <p className="text-muted">We use the information we collect in various ways, including to:</p>
+                                        <h5 className="fw-semibold text-primary">Informasi yang Kami Kumpulkan</h5>
+                                        <p className="text-muted">Kami hanya mengumpulkan informasi yang diperlukan untuk memberikan layanan pencatatan dan analisis keuangan terbaik bagi Anda:</p>
                                         <ul className="text-muted vstack gap-2">
-                                            <li>
-                                                Provide, operate, and maintain our website
-                                            </li>
-                                            <li>
-                                                Improve, personalize, and expand our website
-                                            </li>
-                                            <li>
-                                                Understand and analyze how you use our website
-                                            </li>
-                                            <li>
-                                                Develop new products, services, features, and functionality
-                                            </li>
-                                            <li>
-                                                Send you emails
-                                            </li>
-                                            <li>
-                                                Find and prevent fraud
-                                            </li>
+                                            <li><strong>Informasi Akun:</strong> Nama, alamat email, dan kredensial autentikasi terenkripsi saat mendaftar.</li>
+                                            <li><strong>Data Keuangan Pengguna:</strong> Riwayat pemasukan, pengeluaran, kategori transaksi, dan preferensi anggaran yang Anda masukkan secara mandiri.</li>
+                                            <li><strong>Log Penggunaan & Analitik:</strong> Informasi teknis perangkat dan sesi untuk meningkatkan performa dan keandalan sistem.</li>
                                         </ul>
-                                        <p className="text-muted">Like any other website, Website Name uses ‘cookies'. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.</p>
                                     </div>
                                 </div>
 
-                                <div className="d-flex">
+                                <div className="d-flex mb-4">
                                     <div className="flex-shrink-0 me-3">
-                                        {/* <i data-feather="check-circle" className="text-success icon-dual-success icon-xs"></i> */}
-                                        <FeatherIcon icon="check-circle" className={"text-success icon-dual-success icon-xs"} />
+                                        <FeatherIcon icon="lock" className="text-primary icon-dual-primary icon-sm" />
                                     </div>
                                     <div className="flex-grow-1">
-                                        <p className="text-muted">Some of advertisers on our site may use cookies and web beacons. Our advertising partners are listed below. Each of our advertising partners has their own Privacy Policy for their policies on user data. For easier access, we hyperlinked to their Privacy Policies below.</p>
-                                        <p className="text-muted"><b>Website Name's Privacy Policy does not apply to other advertisers or websites. Thus, we are advising you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options. You may find a complete list of these Privacy Policies and their links here: Privacy Policy Links.</b></p>
+                                        <h5 className="fw-semibold text-primary">Keamanan Data</h5>
+                                        <p className="text-muted">Seluruh komunikasi data di SADAR Finance dilindungi dengan enkripsi SSL/TLS (HTTPS). Data sensitif Anda disimpan dalam database terisolasi dengan akses yang diawasi ketat. Kami <strong>tidak pernah</strong> menjual data keuangan pribadi Anda kepada pengiklan atau pihak ketiga manapun.</p>
                                     </div>
                                 </div>
 
-                                <div className="text-end">
-                                    <Link to="#!" className="btn btn-danger">I'm Understand</Link>
+                                <div className="text-end pt-3 border-top">
+                                    <Link to="/dashboard" className="btn btn-primary px-4 me-2">Mengerti</Link>
+                                    <Link to="/" className="btn btn-outline-secondary px-4">Kembali ke Beranda</Link>
                                 </div>
                             </CardBody>
                         </Card>
@@ -118,7 +65,7 @@ const PrivancyPolicy = () => {
                 </Row>
             </div>
         </React.Fragment>
-    )
-}
+    );
+};
 
-export default PrivancyPolicy
+export default PrivancyPolicy;

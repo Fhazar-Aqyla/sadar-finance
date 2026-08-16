@@ -8,99 +8,49 @@ const TermAndConditions = () => {
         <React.Fragment>
             <div className='page-content'>
                 <Container fluid>
-                    <BreadCrumb title="Term & Conditions" pageTitle="Pages" />
+                    <BreadCrumb title="Syarat & Ketentuan" pageTitle="Halaman" />
                 </Container>
 
                 <Row className="justify-content-center">
                     <Col lg={10}>
-                        <Card>
-                            <div className="bg-primary-subtle position-relative">
-                                <div className="card-body p-5">
-                                    <div className="text-center">
-                                        <h3 className="fw-semibold">Term & Conditions</h3>
-                                        <p className="mb-0 text-muted">Last update: 16 Sept, 2022</p>
-                                    </div>
-                                </div>
-                                <div className="shape">
-                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1440" height="60" preserveAspectRatio="none" viewBox="0 0 1440 60">
-                                        <g mask="url(&quot;#SvgjsMask1001&quot;)" fill="none">
-                                            <path d="M 0,4 C 144,13 432,48 720,49 C 1008,50 1296,17 1440,9L1440 60L0 60z" style={{ fill: "var(--vz-secondary-bg)" }}></path>
-                                        </g>
-                                        <defs>
-                                            <mask id="SvgjsMask1001">
-                                                <rect width="1440" height="60" fill="#ffffff"></rect>
-                                            </mask>
-                                        </defs>
-                                    </svg>
-                                </div>
+                        <Card className="rounded-4 border-0 shadow-sm overflow-hidden">
+                            <div className="bg-primary-subtle p-4 p-md-5 text-center border-bottom border-primary-subtle">
+                                <h3 className="fw-bold text-primary mb-1">Syarat & Ketentuan</h3>
+                                <p className="mb-0 text-muted">Terakhir diperbarui: Januari 2025</p>
                             </div>
 
-                            <CardBody className='p-4'>
-                                <div>
-                                    <h5>Welcome to Velzon!</h5>
-                                    <p className="text-muted">These terms and conditions outline the rules and regulations for the use of Company Name's Website, located at Website.com.</p>
-                                    <p className="text-muted">By accessing this website we assume you accept these terms and conditions. Do not continue to use Website Name if you do not agree to take all of the terms and conditions stated on this page.</p>
-                                    <p className="text-muted">Most interactive websites use cookies to let us retrieve the user's details for each visit. Cookies are used by our website to enable the functionality of certain areas to make it easier for people visiting our website. Some of our affiliate/advertising partners may also use cookies.</p>
+                            <CardBody className='p-4 p-md-5'>
+                                <div className="mb-4">
+                                    <h5 className="fw-semibold text-primary">1. Ketentuan Umum</h5>
+                                    <p className="text-muted">Selamat datang di <strong>SADAR Finance</strong>. Dengan mengakses dan menggunakan platform SADAR Finance (situs web maupun aplikasi seluler), Anda menyetujui untuk terikat oleh Syarat dan Ketentuan ini. Jika Anda tidak menyetujui salah satu ketentuan, mohon untuk tidak melanjutkan penggunaan layanan kami.</p>
+                                    <p className="text-muted">SADAR Finance menyediakan fitur pencatatan, pemantauan, simulasi anggaran (50/30/20), dan analisis keuangan berbasis AI untuk membantu pengguna mengelola keuangan pribadi secara lebih terarah.</p>
                                 </div>
 
-                                <div>
-                                    <h5>License</h5>
-                                    <p className="text-muted">Unless otherwise stated, Company Name and/or its licensors own the intellectual property rights for all material on Website Name. All intellectual property rights are reserved. You may access this from Website Name for your own personal use subjected to restrictions set in these terms and conditions.</p>
-                                    <p className="text-muted">You must not:</p>
+                                <div className="mb-4">
+                                    <h5 className="fw-semibold text-primary">2. Akun dan Keamanan</h5>
+                                    <p className="text-muted">Pengguna bertanggung jawab penuh atas kerahasiaan informasi akun, termasuk kata sandi dan kredensial akses. Anda setuju untuk segera memberitahukan kepada tim SADAR Finance jika mengetahui adanya penggunaan akun tanpa izin.</p>
+                                    <p className="text-muted">Anda tidak diperkenankan untuk:</p>
                                     <ul className="text-muted vstack gap-2">
-                                        <li>
-                                            Republish material from Website Name
-                                        </li>
-                                        <li>
-                                            Sell, rent or sub-license material from Website Name
-                                        </li>
-                                        <li>
-                                            Reproduce, duplicate or copy material from Website Name
-                                        </li>
-                                        <li>
-                                            Redistribute content from Website Name
-                                        </li>
+                                        <li>Menggunakan akun pihak lain tanpa izin yang sah.</li>
+                                        <li>Menyalahgunakan API atau mengganggu integritas sistem dan infrastruktur SADAR Finance.</li>
+                                        <li>Melakukan rekayasa balik (*reverse engineering*) terhadap platform kami.</li>
                                     </ul>
-                                    <p className="text-muted">This Agreement shall begin on the date hereof.</p>
-                                    <p className="text-muted">Parts of this website offer an opportunity for users to post and exchange opinions and information in certain areas of the website. Company Name does not filter, edit, publish or review Comments prior to their presence on the website. Comments do not reflect the views and opinions of Company Name,its agents and/or affiliates.</p>
                                 </div>
 
-                                <div>
-                                    <p className="text-muted">Company Name reserves the right to monitor all Comments and to remove any Comments which can be considered inappropriate, offensive or causes breach of these Terms and Conditions.</p>
-                                    <p className="text-muted">You warrant and represent that:</p>
-                                    <ul className="text-muted vstack gap-2">
-                                        <li>
-                                            You are entitled to post the Comments on our website and have all necessary licenses and consents to do so;
-                                        </li>
-                                        <li>
-                                            The Comments do not invade any intellectual property right, including without limitation copyright, patent or trademark of any third party;
-                                        </li>
-                                        <li>
-                                            The Comments do not contain any defamatory, libelous, offensive, indecent or otherwise unlawful material which is an invasion of privacy
-                                        </li>
-                                        <li>
-                                            The Comments will not be used to solicit or promote business or custom or present commercial activities or unlawful activity.
-                                        </li>
-                                    </ul>
-                                    <p className="text-muted">You hereby grant Company Name a non-exclusive license to use, reproduce, edit and authorize others to use, reproduce and edit any of your Comments in any and all forms, formats or media.</p>
-                                    <p className="text-muted">Approved organizations may hyperlink to our Website as follows:</p>
-                                    <ul className="text-muted vstack gap-2">
-                                        <li>
-                                            By use of our corporate name; or
-                                        </li>
-                                        <li>
-                                            By use of the uniform resource locator being linked to; or
-                                        </li>
-                                        <li>
-                                            By use of any other description of our Website being linked to that makes sense within the context and format of content on the linking party's site.
-                                        </li>
-                                    </ul>
-                                    <p className="text-muted fw-semibold">No use of Company Name's logo or other artwork will be allowed for linking absent a trademark license agreement.</p>
+                                <div className="mb-4">
+                                    <h5 className="fw-semibold text-primary">3. Privasi & Data Finansial</h5>
+                                    <p className="text-muted">Kami sangat menghormati privasi data finansial Anda. Seluruh catatan transaksi dan data pribadi disimpan dengan enkripsi standar industri dan tidak akan diperjualbelikan kepada pihak ketiga tanpa persetujuan Anda.</p>
+                                    <p className="text-muted">Ketentuan lengkap mengenai pengelolaan data pengguna dapat dibaca pada halaman <Link to="/pages-privacy-policy" className="text-primary text-decoration-underline">Kebijakan Privasi</Link>.</p>
                                 </div>
 
-                                <div className="text-end">
-                                    <Link to="#!" className="btn btn-primary me-1">Accept</Link>
-                                    <Link to="#!" className="btn btn-outline-danger"><i className="ri-close-line align-bottom me-1"></i> Decline</Link>
+                                <div className="mb-4">
+                                    <h5 className="fw-semibold text-primary">4. Batasan Tanggung Jawab</h5>
+                                    <p className="text-muted">Analisis, grafik, dan simulasi anggaran yang disediakan oleh SADAR Finance bersifat informatif dan edukatif untuk membantu perencanaan finansial Anda. SADAR Finance bukan merupakan lembaga penasihat investasi berlisensi, dan keputusan finansial akhir tetap berada di tangan pengguna.</p>
+                                </div>
+
+                                <div className="text-end pt-3 border-top">
+                                    <Link to="/dashboard" className="btn btn-primary px-4 me-2">Saya Setuju</Link>
+                                    <Link to="/" className="btn btn-outline-secondary px-4">Kembali ke Beranda</Link>
                                 </div>
                             </CardBody>
                         </Card>
@@ -108,7 +58,7 @@ const TermAndConditions = () => {
                 </Row>
             </div>
         </React.Fragment>
-    )
-}
+    );
+};
 
-export default TermAndConditions
+export default TermAndConditions;
