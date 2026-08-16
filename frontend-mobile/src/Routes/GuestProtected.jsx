@@ -4,7 +4,8 @@ import { Navigate } from "react-router-dom";
 const GuestProtected = (props) => {
   const hasToken = (() => {
     try {
-      return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
+      const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
+      return Boolean(authUser?.token || authUser?.data?.token);
     } catch {
       return false;
     }

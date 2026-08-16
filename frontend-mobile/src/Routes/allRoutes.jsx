@@ -41,13 +41,13 @@ const authProtectedRoutes = [
 ];
 
 const publicRoutes = [
-  // Authentication & Landing Pages
-  { path: "/", component: <OnePage /> },
+  // Authentication & Landing Pages (Redirect to dashboard if already logged in)
+  { path: "/", component: <OnePage />, guestOnly: true },
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login />, guestOnly: true },
-  { path: "/forgot-password", component: <ForgetPasswordPage /> },
+  { path: "/forgot-password", component: <ForgetPasswordPage />, guestOnly: true },
   { path: "/register", component: <Register />, guestOnly: true },
-  { path: "/landing", component: <OnePage /> },
+  { path: "/landing", component: <OnePage />, guestOnly: true },
   { path: "/privancy-policy", component: <PrivancyPolicy /> },
   { path: "/privacy-policy", component: <PrivancyPolicy /> },
   { path: "/term-conditions", component: <TermAndConditions /> },
