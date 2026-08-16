@@ -83,9 +83,9 @@ const Login = () => {
 
   return (
     <React.Fragment>
-      <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover sadar-auth-login py-5 d-flex justify-content-center align-items-center min-vh-100">
+      <div className="auth-page-wrapper auth-bg-cover sadar-auth-cover sadar-auth-login d-flex justify-content-center align-items-center min-vh-100">
         <div className="bg-overlay"></div>
-        <div className="auth-page-content sadar-auth-content pt-lg-5">
+        <div className="auth-page-content sadar-auth-content">
           <Container>
             <Row>
               <Col lg={12}>

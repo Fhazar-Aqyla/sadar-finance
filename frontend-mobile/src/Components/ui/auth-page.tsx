@@ -50,7 +50,7 @@ export function AuthPage() {
 
   return (
     <Col lg={6} className="sadar-auth-visual-panel">
-      <div className="sadar-auth-visual relative flex h-full overflow-hidden bg-[#1e3a8a] p-10 text-white">
+      <div className="sadar-auth-visual relative flex h-full overflow-hidden bg-[#1e3a8a] p-2 lg:p-10 text-white">
         <div className="sadar-auth-visual-depth absolute inset-0" />
 
         <div className="sadar-auth-aurora" aria-hidden="true">
@@ -62,7 +62,7 @@ export function AuthPage() {
         <GradientWave />
 
         <div className="relative z-10 flex w-full flex-col">
-          <div className="sadar-auth-quote max-w-[680px] pt-12">
+          <div className="sadar-auth-quote max-w-[680px] pt-0 lg:pt-12">
             <div className="sadar-auth-quote-glass">
               <div className="sadar-auth-quote-shine" aria-hidden="true" />
               <div className="sadar-auth-quote-kicker">
