@@ -467,7 +467,7 @@ export const BentoFeatures = () => {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-900 dark:text-white leading-none">
-                          Bank BCA & Mandiri
+                          Bank DBS Indonesia
                         </p>
                         <p className="text-[10px] text-slate-400 mt-0.5 font-medium">
                           Rekening Tabungan Utama
@@ -508,16 +508,6 @@ export const BentoFeatures = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Total Consolidated Balance Bar */}
-              <div className="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs">
-                <span className="text-slate-500 dark:text-slate-400 font-semibold">
-                  Total Kekayaan Bersih (Net Worth):
-                </span>
-                <span className="font-black text-sm text-[#1E3A8A] dark:text-sky-400">
-                  Rp 15.470.000
-                </span>
               </div>
             </SpotlightCard>
           </div>
