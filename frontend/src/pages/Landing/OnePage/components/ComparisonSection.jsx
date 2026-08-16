@@ -64,7 +64,7 @@ export const ComparisonSection = () => {
           </div>
           <div className="flex items-center justify-center px-4 py-6 border-l border-slate-200/70 dark:border-slate-800">
             <span className="text-sm font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-              Cara Konvensional
+              Platform Lain
             </span>
           </div>
           <div className="flex items-center justify-center px-4 py-6 bg-[#1E3A8A] dark:bg-[#1E3A8A]">
@@ -92,10 +92,10 @@ export const ComparisonSection = () => {
                 </span>
               </div>
 
-              {/* Cara Konvensional */}
+              {/* Platform Lain */}
               <div className="flex items-center justify-between sm:justify-center gap-3 px-6 sm:px-4 py-3.5 sm:py-7 border-t sm:border-t-0 border-slate-100/80 dark:border-slate-800/60 sm:border-l sm:border-slate-200/70 dark:sm:border-slate-800">
                 <span className="sm:hidden text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Cara Konvensional
+                  Platform Lain
                 </span>
                 <span className="w-10 h-10 shrink-0 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-100/80 dark:border-rose-900/50 flex items-center justify-center">
                   <X className="w-5 h-5 text-rose-500 dark:text-rose-400" strokeWidth={2.5} />

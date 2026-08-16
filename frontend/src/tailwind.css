@@ -45,6 +45,31 @@ html.lenis, html.lenis body {
   animation: textShimmer 4s linear infinite;
 }
 
+/* Override admin theme unlayered h1 rule (Velzon) that otherwise
+   overrides Tailwind utilities on the hero headline. */
+.hero-title {
+  margin: 0 !important;
+  font-family: "Plus Jakarta Sans", "Open Sans", sans-serif !important;
+  font-weight: 900 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.02em !important;
+  color: #0f172a !important;
+  font-size: clamp(2.25rem, 3.75vw, 3.75rem) !important;
+}
+
+html[data-bs-theme="dark"] .hero-title {
+  color: #ffffff !important;
+}
+
+.hero-subtitle {
+  margin: 0 !important;
+  margin-top: 2.5rem !important;
+}
+
+.hero-actions {
+  margin-top: 3.75rem !important;
+}
+
 @keyframes moveAurora2 {
   from {
     transform: translate(0, 0);

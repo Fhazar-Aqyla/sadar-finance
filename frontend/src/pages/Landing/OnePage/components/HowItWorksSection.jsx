@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Camera, Cpu, Gauge, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import { Camera, Cpu, Gauge, Sparkles } from "lucide-react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { motion, useScroll, useTransform } from "framer-motion";
 
@@ -120,11 +120,6 @@ export const HowItWorksSection = () => {
                     <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
                       {step.desc}
                     </p>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center text-xs font-semibold text-[#1E3A8A] dark:text-sky-400 gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>Otomatis & Realtime</span>
                   </div>
                 </SpotlightCard>
               </motion.div>

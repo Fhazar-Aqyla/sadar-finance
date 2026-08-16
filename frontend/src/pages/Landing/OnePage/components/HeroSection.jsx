@@ -1,17 +1,12 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  ShieldCheck,
   Sparkles,
   CheckCircle2,
   ChevronRight,
   Receipt,
   Activity,
-  Zap,
-  Lock,
-  EyeOff,
-  Cpu,
 } from "lucide-react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import gsap from "gsap";
@@ -87,13 +82,12 @@ export const HeroSection = () => {
         ease: "back.out(1.4)",
       })
         .from(
-          ".hero-title-word",
+          ".hero-title",
           {
             opacity: 0,
             y: 35,
             rotateX: 40,
             duration: 0.9,
-            stagger: 0.04,
             ease: "power3.out",
           },
           "-=0.5"
@@ -140,16 +134,6 @@ export const HeroSection = () => {
             ease: "back.out(1.2)",
           },
           "-=0.7"
-        )
-        .from(
-          ".hero-trust-item",
-          {
-            opacity: 0,
-            y: 15,
-            duration: 0.6,
-            stagger: 0.08,
-          },
-          "-=0.4"
         );
 
       // 2. (removed infinite float loops for performance; scroll & mouse parallax remain)
@@ -192,27 +176,13 @@ export const HeroSection = () => {
     { scope: containerRef }
   );
 
-  const headlineWords = [
-    { text: "Uangmu", highlight: false },
-    { text: "Kemana,", highlight: false },
-    { text: "Kamu", highlight: true },
-    { text: "Tahu.", highlight: true },
-  ];
-
-  const trustHighlights = [
-    { icon: Zap, label: "Deteksi OCR Cepat", sub: "< 2 Detik Struk" },
-    { icon: Cpu, label: "Formula 50/30/20", sub: "Alokasi Otomatis" },
-    { icon: ShieldCheck, label: "Keamanan Terenkripsi", sub: "Standar Perbankan" },
-    { icon: EyeOff, label: "100% Bebas Iklan", sub: "Fokus Finansial" },
-  ];
-
   return (
     <section
       id="home"
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative pt-36 pb-32 lg:pt-44 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-200/90 via-indigo-100/70 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
+      className="relative pt-36 pb-32 lg:pt-40 lg:pb-40 overflow-hidden bg-gradient-to-b from-blue-200/90 via-indigo-100/70 to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"
     >
       {/* Primary ambient mesh */}
       <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[360px] bg-gradient-to-tr from-blue-500/15 via-sky-400/10 to-indigo-500/15 blur-[70px] rounded-full -z-10" />
@@ -237,9 +207,9 @@ export const HeroSection = () => {
         {/* Floating Card Left: Live OCR Transaction Scan (3D Mouse Parallax) */}
         <motion.div
           style={{ x: cardLeftX, y: cardLeftY, rotate: cardLeftRotate }}
-          className="hero-card-left-wrap hidden lg:flex absolute top-10 left-0 z-20 pointer-events-none"
+          className="hero-card-left-wrap hidden lg:flex absolute top-[-30px] left-0 z-20 pointer-events-none"
         >
-          <div className="hero-float-inner-1 pointer-events-auto flex items-center gap-3 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
+          <div className="hero-float-inner-1 pointer-events-auto flex items-center gap-3 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105 -rotate-2">
             <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/70 flex items-center justify-center text-[#1E3A8A] dark:text-sky-400 shrink-0 shadow-xs">
               <Receipt className="w-5 h-5" />
             </div>
@@ -260,9 +230,9 @@ export const HeroSection = () => {
         {/* Floating Card Right: Live Financial Score (3D Mouse Parallax) */}
         <motion.div
           style={{ x: cardRightX, y: cardRightY, rotate: cardRightRotate }}
-          className="hero-card-right-wrap hidden lg:flex absolute top-16 right-0 z-20 pointer-events-none"
+          className="hero-card-right-wrap hidden lg:flex absolute top-[-6px] right-0 z-20 pointer-events-none"
         >
-          <div className="hero-float-inner-2 pointer-events-auto flex items-center gap-3 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105">
+          <div className="hero-float-inner-2 pointer-events-auto flex items-center gap-3 p-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all hover:scale-105 rotate-2">
             <div className="w-10 h-10 rounded-xl bg-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-xs">
               <Activity className="w-5 h-5" />
             </div>
@@ -281,36 +251,29 @@ export const HeroSection = () => {
         </motion.div>
 
         {/* Hero Main Content */}
-        <div className="hero-content-wrap max-w-4xl mx-auto text-center relative z-10">
+        <div className="hero-content-wrap max-w-7xl mx-auto text-center relative z-10 flex flex-col items-center justify-center min-h-[62vh] lg:min-h-[70vh]">
 
-          {/* Hero Main Headline with Kinetic Word Stagger */}
+          {/* Hero Main Headline */}
           <h1
             ref={headlineRef}
-            className="hero-title text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-3xl mx-auto leading-[1.15] sm:leading-[1.1] [perspective:1000px]"
+            className="hero-title font-black tracking-tight text-slate-900 dark:text-white max-w-[1760px] mx-auto leading-[1.02] [perspective:1000px]"
           >
-            {headlineWords.map((word, idx) => (
-              <motion.span
-                key={idx}
-                className={`hero-title-word inline-block mr-[0.25em] ${
-                  word.highlight
-                    ? "hero-text-shimmer bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent [background-size:200%_auto] dark:from-sky-300 dark:via-blue-300 dark:to-sky-300"
-                    : ""
-                }`}
-              >
-                {word.text}
-              </motion.span>
-            ))}
+            Kelola Keuangan Lebih Cerdas
+            <br className="hidden sm:block" />{" "}
+            <span className="hero-text-shimmer bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent [background-size:200%_auto] dark:from-sky-300 dark:via-blue-300 dark:to-sky-300">
+              dengan SADAR
+            </span>
           </h1>
 
           {/* Hero Subtitle */}
-          <p className="hero-subtitle mt-8 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            Foto struknya, sisanya urusan AI. SADAR mencatat pengeluaran,
-            membagi anggaran 50/30/20, dan menjaga skor kesehatan
-            finansialmu tetap terkontrol.
+          <p className="hero-subtitle text-xl sm:text-[21px] lg:text-[22px] text-slate-600 dark:text-slate-300 max-w-[760px] mx-auto leading-[1.5] font-normal">
+            Kelola transaksi, atur pengeluaran, dan pahami kondisi keuanganmu
+            dengan lebih mudah. SADAR membantu kamu membuat keputusan finansial
+            yang lebih tepat dan terarah.
           </p>
 
           {/* Call to Actions with Shimmer Effect */}
-          <div className="hero-actions mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
+          <div className="hero-actions flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -340,31 +303,6 @@ export const HeroSection = () => {
                 Pelajari Fitur
               </a>
             </motion.div>
-          </div>
-
-          {/* Hero Trust Badges Bar */}
-          <div className="mt-16 sm:mt-20 pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {trustHighlights.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={idx}
-                  className="hero-trust-item flex items-center justify-center sm:justify-start gap-2.5 p-2.5 rounded-xl text-left bg-white/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs hover:scale-105 transition-transform"
-                >
-                  <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shrink-0">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
-                      {item.label}
-                    </p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                      {item.sub}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>
