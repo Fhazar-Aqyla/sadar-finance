@@ -74,10 +74,10 @@ const testimonials = [
   },
   {
     tempId: 8,
-    text: "Shift dinas rumah sakit yang padat bikin nggak sempat catat manual. Pakai SADAR simpel banget, apalagi ada alert limit yang bikin pengeluaran harian tetap aman terkontrol.",
+    text: "Shift dinas klinis dan IGD rumah sakit yang padat bikin nggak sempat catat manual. Pakai SADAR simpel banget, apalagi ada alert limit yang bikin pengeluaran harian tetap aman terkontrol.",
     image: ireneImg,
     name: "Irene Delfine Harya",
-    role: "Mahasiswa Ners",
+    role: "Praktisi Keperawatan",
   },
   {
     tempId: 9,
