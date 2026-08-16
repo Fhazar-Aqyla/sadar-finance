@@ -36,7 +36,7 @@ export const CtaSection = () => {
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 text-white text-xs font-bold uppercase tracking-wider mb-5 border border-white/20 shadow-xs"
           >
             <Sparkles className="w-3.5 h-3.5 text-sky-300 animate-spin-slow" />
-            Akses Penuh Gratis Selamanya
+            Saatnya Lebih Sadar Soal Keuangan
           </motion.div>
 
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">
@@ -44,8 +44,7 @@ export const CtaSection = () => {
           </h2>
 
           <p className="mt-4 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto font-normal leading-relaxed">
-            Buat akun gratis dalam 30 detik. Tanpa kartu kredit, bebas iklan
-            yang mengganggu, dan dirancang khusus untuk ketenangan finansialmu.
+            Buat akun gratis dalam 30 detik. Tanpa kartu kredit, tanpa biaya tersembunyi, dan dirancang khusus untuk membantu kamu mengelola keuangan dengan lebih tenang.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -60,7 +59,7 @@ export const CtaSection = () => {
               >
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-[#1E3A8A]/10 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-2">
-                  Mulai Gratis Sekarang <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Mulai Sekarang <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </motion.div>

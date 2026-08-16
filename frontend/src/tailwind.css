@@ -67,6 +67,40 @@ html[data-bs-theme="dark"] .hero-title {
   margin: 0 !important;
 }
 
+/* Neutralize Velzon/Bootstrap unlayered h3 + ul rules inside the landing
+   footer so column headings/lists render at their intended sizes. */
+#site-footer h3 {
+  margin: 0 0 0.75rem 0 !important;
+  font-size: 0.75rem !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+}
+
+#site-footer ul {
+  margin-bottom: 0 !important;
+}
+
+#site-footer ul li {
+  margin-bottom: 0 !important;
+}
+
+/* Bootstrap unlayered p margin would add phantom space inside the footer. */
+#site-footer p {
+  margin-bottom: 0 !important;
+}
+
+/* Velzon unlayered a { color } would otherwise override the muted link color. */
+#site-footer a {
+  color: rgba(191, 219, 254, 0.75) !important;
+}
+
+#site-footer a:hover {
+  color: #7dd3fc !important;
+}
+
 .hero-subtitle {
   margin: 0 !important;
   margin-top: 2.5rem !important;
