@@ -1,10 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
 @import "tailwindcss";
 
 @variant dark (&:where([data-bs-theme="dark"], [data-bs-theme="dark"] *));
 
-html {
-  scroll-behavior: smooth;
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 @keyframes moveAurora1 {
@@ -14,6 +30,117 @@ html {
   to {
     transform: translate(100px, 80px);
   }
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.hero-text-shimmer {
+  animation: textShimmer 4s linear infinite;
+}
+
+/* Override admin theme unlayered h1 rule (Velzon) that otherwise
+   overrides Tailwind utilities on the hero headline. */
+.hero-title {
+  margin: 0 !important;
+  font-family: "Plus Jakarta Sans", "Open Sans", sans-serif !important;
+  font-weight: 900 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.02em !important;
+  color: #0f172a !important;
+  font-size: clamp(2.25rem, 3.75vw, 3.75rem) !important;
+}
+
+html[data-bs-theme="dark"] .hero-title {
+  color: #ffffff !important;
+}
+
+/* Neutralize admin theme unlayered p margin (Velzon) inside testimonial
+   footers so the avatar and name/role block center on the same axis. */
+#testimonials footer p {
+  margin: 0 !important;
+}
+
+/* Neutralize Velzon/Bootstrap unlayered h3 + ul rules inside the landing
+   footer so column headings/lists render at their intended sizes. */
+#site-footer h3 {
+  margin: 0 0 0.75rem 0 !important;
+  font-size: 0.75rem !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+}
+
+#site-footer ul {
+  margin-bottom: 0 !important;
+}
+
+#site-footer ul li {
+  margin-bottom: 0 !important;
+}
+
+/* Bootstrap unlayered p margin would add phantom space inside the footer. */
+#site-footer p {
+  margin-bottom: 0 !important;
+}
+
+/* Velzon unlayered a { color } would otherwise override the muted link color. */
+#site-footer a {
+  color: rgba(191, 219, 254, 0.75) !important;
+}
+
+#site-footer a:hover {
+  color: #7dd3fc !important;
+}
+
+.hero-subtitle {
+  margin: 0 !important;
+  margin-top: 2.5rem !important;
+}
+
+/* Neutralize Velzon/Bootstrap unlayered p { margin-bottom } inside FAQ
+   question rows so the question icon centers on the text line, not the
+   inflated row height. */
+#faq .flex.items-center p {
+  margin-bottom: 0 !important;
+}
+
+/* Neutralize Velzon/Bootstrap unlayered p { margin-bottom } inside the
+   floating dashboard micro-cards so they stay compact and content-sized. */
+.showcase-float-card p {
+  margin-bottom: 0 !important;
+}
+
+/* Velzon redefines .p-4 as 1.5rem !important, overriding Tailwind's p-4.
+   Pin the floating micro-card padding: horizontal stays 1.5rem so the card
+   width and visual presence are preserved; vertical drops to 0.875rem so the
+   cards are noticeably slimmer than the bulky 1.5rem default. */
+.showcase-float-card[class] {
+  padding: 0.875rem 1.5rem !important;
+}
+
+.hero-actions {
+  margin-top: 3.75rem !important;
+}
+
+/* Neutralize Velzon/Bootstrap unlayered p { margin-bottom } inside the
+   account-balance rows so the icon, name, and subtext align as one group
+   and the name→subtext gap matches the intended mt-0.5 spacing. */
+.account-row p {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+.account-row p + p {
+  margin-top: 2px !important;
 }
 
 @keyframes moveAurora2 {
@@ -39,7 +166,7 @@ html {
   width: 60%;
   height: 60%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.35) 0%, rgba(20, 184, 166, 0) 70%);
+  background: radial-gradient(circle, rgba(11, 185, 168, 0.35) 0%, rgba(11, 185, 168, 0) 70%);
   animation: moveAurora1 20s infinite alternate ease-in-out;
 }
 
@@ -50,7 +177,7 @@ html {
   width: 60%;
   height: 60%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(30, 58, 138, 0.35) 0%, rgba(30, 58, 138, 0) 70%);
+  background: radial-gradient(circle, rgba(37, 160, 226, 0.35) 0%, rgba(37, 160, 226, 0) 70%);
   animation: moveAurora2 20s infinite alternate ease-in-out;
 }
 
@@ -87,57 +214,4 @@ html {
 
 .animate-blob {
   animation: blob 7s infinite ease-in-out;
-}
-
-@media (max-width: 1023.98px) {
-  .sadar-landing-header-shell {
-    display: flex !important;
-    width: min(calc(100% - 28px), 1080px) !important;
-    justify-content: space-between;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-  }
-
-  .sadar-landing-actions {
-    grid-column: 2;
-    min-width: 0;
-  }
-
-  .sadar-landing-heading-line {
-    white-space: normal !important;
-    overflow-wrap: anywhere;
-  }
-
-  [data-landing-copy] {
-    width: 100%;
-    max-width: 100%;
-    overflow-wrap: anywhere;
-  }
-
-  [data-landing-copy] > span {
-    display: inline;
-  }
-
-  [data-landing-copy] > span:not(:last-child)::after {
-    content: " ";
-  }
-}
-
-@media (max-width: 359.98px) {
-  .sadar-landing-header-shell {
-    width: calc(100% - 16px) !important;
-    gap: 0.5rem !important;
-  }
-
-  .sadar-landing-actions {
-    gap: 0.45rem !important;
-  }
-
-  .sadar-landing-actions > a:first-child {
-    font-size: 11px !important;
-  }
-
-  .sadar-landing-actions button {
-    width: 38px;
-    height: 38px;
-  }
 }

@@ -20,20 +20,21 @@ function Hero() {
   }, [titleNumber, titles]);
 
   return (
-    <section id="home" className="relative flex min-h-[620px] items-center overflow-hidden pb-10 pt-[104px] max-md:min-h-[560px] max-md:pb-8 max-md:pt-[92px] max-sm:min-h-0 max-sm:pb-5 max-sm:pt-[76px]">
+    <section id="home" className="relative flex min-h-[620px] items-center overflow-hidden pb-10 pt-[104px] max-md:min-h-[560px] max-md:pb-8 max-md:pt-[92px]">
       <div
-        className="mx-auto flex w-[min(calc(100%_-_64px),1480px)] flex-col items-center gap-[22px] text-center max-md:w-[min(calc(100%_-_32px),960px)] max-sm:gap-3"
+        className="mx-auto flex w-[min(calc(100%_-_64px),1480px)] flex-col items-center text-center max-md:w-[min(calc(100%_-_32px),960px)]"
+        style={{ gap: "22px" }}
       >
-        <div className="flex w-full min-w-0 max-w-[1320px] flex-col items-center">
+        <div className="flex max-w-[1320px] flex-col items-center">
           <h1
-            className="w-full min-w-0 max-w-full overflow-hidden font-['Plus_Jakarta_Sans',sans-serif] !text-[52px] font-black !leading-[1.06] tracking-normal text-[#1E3A8A] max-xl:!text-[48px] max-lg:!text-[44px] max-md:!text-[38px] max-sm:!text-[28px]"
+            className="font-['Plus_Jakarta_Sans',sans-serif] !text-[52px] font-black !leading-[1.06] tracking-normal text-[#1E3A8A] max-xl:!text-[48px] max-lg:!text-[44px] max-md:!text-[38px] max-sm:!text-[31px]"
             style={{ margin: 0 }}
           >
-            <span className="sadar-landing-heading-line block whitespace-nowrap max-lg:whitespace-normal">
+            <span className="block whitespace-nowrap max-lg:whitespace-normal">
               Bikin kamu lebih sadar sama
             </span>
             <span
-              className="relative flex h-[62px] w-full justify-center overflow-hidden text-center text-[#14B8A6] max-xl:h-[58px] max-lg:h-[54px] max-md:h-[44px] max-sm:h-[34px]"
+              className="relative flex h-[62px] w-full justify-center overflow-hidden text-center text-[#14B8A6] max-xl:h-[58px] max-lg:h-[54px] max-md:h-[44px] max-sm:h-[36px]"
               style={{ marginTop: "8px" }}
             >
               <AnimatePresence mode="popLayout">
@@ -52,8 +53,8 @@ function Hero() {
           </h1>
 
           <p
-            data-landing-copy
-            className="mt-[30px] max-w-[820px] text-center text-[18px] leading-8 text-[#475569] max-lg:max-w-[720px] max-lg:text-[16px] max-lg:leading-7 max-md:text-[14px] max-md:leading-6 max-sm:mt-3 max-sm:text-[12px] max-sm:leading-5"
+            className="max-w-[820px] text-center text-[18px] leading-8 text-[#475569] max-lg:max-w-[720px] max-lg:text-[16px] max-lg:leading-7 max-md:text-[14px] max-md:leading-6"
+            style={{ margin: "30px 0 0" }}
           >
             <span className="block">Kelola pemasukan, pengeluaran, budget, dan tabungan dalam satu tempat</span>
             <span className="block">supaya kamu lebih gampang melihat ke mana uang berjalan</span>

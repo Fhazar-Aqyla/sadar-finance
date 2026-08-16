@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, useScroll, useTransform } from "framer-motion";
 
 export const ContainerScroll = ({ titleComponent, children }) => {
@@ -19,9 +20,9 @@ export const ContainerScroll = ({ titleComponent, children }) => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const rotate = useTransform(scrollYProgress, [0, 1], [20, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], isMobile ? [0.7, 0.9] : [1.05, 1]);
-  const translate = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const rotate = useTransform(scrollYProgress, [0, 1], isMobile ? [10, 0] : [20, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], isMobile ? [0.92, 1] : [1.05, 1]);
+  const translate = useTransform(scrollYProgress, [0, 1], isMobile ? [0, -30] : [0, -100]);
 
   return (
     <div
@@ -58,9 +59,12 @@ export const Card = ({ rotate, scale, children }) => {
         boxShadow:
           "0 0 #0000004d, 0 9px 20px #00000024, 0 37px 37px #0000001f, 0 84px 50px #00000014, 0 149px 60px #00000008",
       }}
-      className="mx-auto mt-0 h-[30rem] w-full max-w-6xl rounded-[30px] border-4 border-[#253342] bg-[#17212B] p-2 shadow-2xl md:h-[40rem] md:p-5"
+      className="relative mx-auto mt-0 h-[524px] w-[300px] max-w-[90vw] rounded-[42px] border-[6px] border-[#1E293B] bg-[#0F172A] p-1 shadow-2xl md:h-[40rem] md:w-full md:max-w-6xl md:rounded-[30px] md:border-4 md:border-[#253342] md:bg-[#17212B] md:p-5"
     >
-      <div className="h-full w-full overflow-hidden rounded-2xl bg-[#F8FBFF]">
+      {/* Smartphone Speaker / Notch on Mobile */}
+      <div className="absolute top-2.5 left-1/2 -translate-x-1/2 h-3.5 w-20 rounded-full bg-[#0F172A] z-20 md:hidden" />
+
+      <div className="h-full w-full overflow-hidden rounded-[34px] md:rounded-2xl bg-[#F8FBFF]">
         {children}
       </div>
     </motion.div>
