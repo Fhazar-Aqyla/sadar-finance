@@ -5,14 +5,10 @@ const PrismCode = (props) => {
     const ref = useRef();
 
     useEffect(() => {
-        highlight();
-    }, []);
-
-    const highlight = () => {
-        if (ref && ref.current) {
+        if (ref.current) {
             Prism.highlightElement(ref.current);
         }
-    };
+    }, []);
 
     const { code, language } = props;
     return (

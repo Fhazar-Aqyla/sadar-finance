@@ -15,6 +15,15 @@ export const CtaSection = () => {
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.92, 1, 0.96]);
   const yCard = useTransform(scrollYProgress, [0, 1], [40, -30]);
 
+  const hasAuthToken = () => {
+    try {
+      return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
+    } catch {
+      return false;
+    }
+  };
+  const isAuthenticated = hasAuthToken();
+
   return (
     <section
       ref={containerRef}
@@ -54,12 +63,12 @@ export const CtaSection = () => {
               className="w-full sm:w-auto relative group overflow-hidden rounded-xl"
             >
               <Link
-                to="/register"
+                to={isAuthenticated ? "/dashboard" : "/register"}
                 className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-[#1E3A8A] hover:bg-slate-50 font-extrabold text-sm shadow-xl transition-all overflow-hidden"
               >
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-[#1E3A8A]/10 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-2">
-                  Mulai Sekarang <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {isAuthenticated ? "Buka Dashboard" : "Mulai Sekarang"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </motion.div>
@@ -70,10 +79,10 @@ export const CtaSection = () => {
               className="w-full sm:w-auto"
             >
               <Link
-                to="/login"
+                to={isAuthenticated ? "/dashboard" : "/login"}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white font-bold text-sm transition-all backdrop-blur-xs"
               >
-                Masuk ke Akun
+                {isAuthenticated ? "Ke Dashboard" : "Masuk ke Akun"}
               </Link>
             </motion.div>
           </div>

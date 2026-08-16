@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { getLoggedinUser } from "../../helpers/api_helper";
 
 const useProfile = () => {
@@ -6,20 +5,8 @@ const useProfile = () => {
   var token =
   userProfileSession &&
   userProfileSession["token"];
-  const [loading, setLoading] = useState(userProfileSession ? false : true);
-  const [userProfile, setUserProfile] = useState(
-    userProfileSession ? userProfileSession : null
-  );
-
-  useEffect(() => {
-    const userProfileSession = getLoggedinUser();
-    var token =
-      userProfileSession &&
-      userProfileSession["token"];
-    setUserProfile(userProfileSession ? userProfileSession : null);
-    setLoading(token ? false : true);
-  }, []);
-
+  const loading = !token;
+  const userProfile = userProfileSession || null;
 
   return { userProfile, loading,token };
 };

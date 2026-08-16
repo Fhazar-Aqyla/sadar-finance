@@ -99,7 +99,7 @@ export const logoutUser = () => async (dispatch) => {
       dispatch(logoutUserSuccess(true));
     }
 
-  } catch (error) {
+  } catch {
     dispatch(apiError("Logout gagal."));
   }
 };
@@ -123,7 +123,7 @@ export const socialLogin = (type, history) => async (dispatch) => {
       history('/dashboard')
     }
 
-  } catch (error) {
+  } catch {
     dispatch(apiError("Login gagal."));
   }
 };
@@ -133,7 +133,7 @@ export const resetLoginFlag = () => async (dispatch) =>{
   try {
     const response = dispatch(reset_login_flag());
     return response;
-  } catch (error) {
+  } catch {
     dispatch(apiError("Login gagal."));
   }
 };

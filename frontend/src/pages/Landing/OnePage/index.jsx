@@ -8,9 +8,9 @@ import { HeroSection } from "./components/HeroSection";
 import { ScrollShowcase } from "./components/ScrollShowcase";
 import { BentoFeatures } from "./components/BentoFeatures";
 import { ComparisonSection } from "./components/ComparisonSection";
+import { HowItWorksSection } from "./components/HowItWorksSection";
 import { BudgetSimulatorSection } from "./components/BudgetSimulatorSection";
 import { TestimonialsSection } from "./components/TestimonialsSection";
-import { HowItWorksSection } from "./components/HowItWorksSection";
 import { TeamSection } from "./components/TeamSection";
 import { FaqSection } from "./components/FaqSection";
 import { CtaSection } from "./components/CtaSection";
@@ -54,9 +54,7 @@ const LandingOnePage = () => {
   }, []);
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white dark:from-slate-950 dark:via-slate-900/80 dark:to-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#1E3A8A] selection:text-white overflow-x-hidden font-sans relative"
-    >
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white dark:from-slate-950 dark:via-slate-900/80 dark:to-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-[#1E3A8A] selection:text-white overflow-x-hidden font-sans relative">
       {/* Top Glassmorphic Navigation */}
       <Navbar />
 
@@ -85,17 +83,18 @@ const LandingOnePage = () => {
         {/* 8. Engineering & AI Team with 3D Mouse Tilt Cards */}
         <TeamSection />
 
-        {/* 9. Comprehensive FAQ */}
+        {/* 9. Comprehensive FAQ with Smooth Accordion */}
         <FaqSection />
 
         {/* 10. High-Conversion Final CTA with Aurora Mesh */}
         <CtaSection />
       </main>
 
-      {/* 11. Minimalist Footer */}
+      {/* 11. Minimalist Footer with Partner Branding */}
       <FooterSection />
     </div>
   );
 };
 
+export const OnePage = LandingOnePage;
 export default LandingOnePage;

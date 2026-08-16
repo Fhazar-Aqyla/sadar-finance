@@ -22,7 +22,7 @@ const fakeBackend = () => {
     const user = JSON.parse(config["data"]);
     users.push(user);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         resolve([200, user]);
       });

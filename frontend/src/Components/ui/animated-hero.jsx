@@ -4,7 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 
-function Hero() {
+const MotionSpan = motion.span;
+
+function Hero({ isAuthenticated = false }) {
   const [titleNumber, setTitleNumber] = useState(0);
   const titles = useMemo(
     () => ["pengeluaran", "tabungan", "budget", "cashflow", "keputusan"],
@@ -38,7 +40,7 @@ function Hero() {
               style={{ marginTop: "8px" }}
             >
               <AnimatePresence mode="popLayout">
-                <motion.span
+                <MotionSpan
                   key={titles[titleNumber]}
                   className="absolute font-black leading-[1.04]"
                   initial={{ opacity: 0, y: -72 }}
@@ -47,7 +49,7 @@ function Hero() {
                   transition={{ type: "spring", stiffness: 86, damping: 20, opacity: { duration: 0.16 } }}
                 >
                   {titles[titleNumber]}
-                </motion.span>
+                </MotionSpan>
               </AnimatePresence>
             </span>
           </h1>
@@ -68,8 +70,8 @@ function Hero() {
             size="lg"
             className="h-12 min-w-[190px] rounded-md bg-[#1E3A8A] px-6 text-[14px] font-bold text-white shadow-[0_14px_28px_rgba(30,58,138,0.15)] hover:bg-[#1A3175] max-md:h-11 max-md:min-w-[170px] max-md:text-[13px] max-sm:w-full"
           >
-            <Link to="/register" className="gap-2 no-underline">
-              Mulai Sekarang
+            <Link to={isAuthenticated ? "/dashboard" : "/register"} className="gap-2 no-underline">
+              {isAuthenticated ? "Buka Dashboard" : "Mulai Sekarang"}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>

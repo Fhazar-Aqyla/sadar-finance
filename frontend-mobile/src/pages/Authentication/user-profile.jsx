@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { isEmpty } from "lodash";
 
 import {
@@ -27,13 +27,20 @@ import avatar from "../../assets/images/users/avatar-1.jpg";
 import { editProfile, resetProfileFlag } from "../../slices/thunks";
 import { createSelector } from "reselect";
 
+const getStoredAuthUser = () => {
+  const storedUser = localStorage.getItem("authUser");
+
+  if (!storedUser) return null;
+
+  try {
+    return JSON.parse(storedUser);
+  } catch {
+    return null;
+  }
+};
+
 const UserProfile = () => {
   const dispatch = useDispatch();
-
-  const [email, setemail] = useState("admin@gmail.com");
-  const [idx, setidx] = useState("1");
-
-  const [userName, setUserName] = useState("Admin");
 
   const selectLayoutState = (state) => state.Profile;
   const userprofileData = createSelector(
@@ -49,43 +56,36 @@ const UserProfile = () => {
     user, success, error 
   } = useSelector(userprofileData);
 
-  const getStoredAuthUser = () => {
-    const storedUser = localStorage.getItem("authUser");
-
-    if (!storedUser) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(storedUser);
-    } catch (error) {
-      return null;
-    }
-  };
+  const authUser = getStoredAuthUser();
+  const storedProfile = authUser?.data ?? authUser ?? {};
+  const userName = user?.first_name || storedProfile.first_name || storedProfile.username || "Admin";
+  const email = storedProfile.email || "admin@gmail.com";
+  const idx = storedProfile._id || storedProfile.idx || "1";
 
   useEffect(() => {
     const authUser = getStoredAuthUser();
     const storedProfile = authUser?.data ?? authUser;
 
-    if (storedProfile) {
-      if (!isEmpty(user)) {
-        const updatedAuthUser = authUser?.data
-          ? { ...authUser, data: { ...authUser.data, first_name: user.first_name } }
-          : { ...authUser, first_name: user.first_name };
+    if (!storedProfile) return undefined;
 
-        localStorage.setItem("authUser", JSON.stringify(updatedAuthUser));
-      }
+    if (!isEmpty(user)) {
+      const updatedAuthUser = authUser?.data
+        ? { ...authUser, data: { ...authUser.data, first_name: user.first_name } }
+        : { ...authUser, first_name: user.first_name };
 
-      setUserName(user?.first_name || storedProfile.first_name || storedProfile.username || "Admin");
-      setemail(storedProfile.email || "admin@gmail.com");
-      setidx(storedProfile._id || storedProfile.idx || "1");
-
-      setTimeout(() => {
-        dispatch(resetProfileFlag());
-      }, 3000);
+      localStorage.setItem("authUser", JSON.stringify(updatedAuthUser));
     }
+
+    const timeoutId = window.setTimeout(() => {
+      dispatch(resetProfileFlag());
+    }, 3000);
+
+    return () => window.clearTimeout(timeoutId);
   }, [dispatch, user]);
 
+  useEffect(() => {
+    document.title = "Profil | SADAR Finance";
+  }, []);
 
 
   const validation = useFormik({
@@ -104,7 +104,6 @@ const UserProfile = () => {
     }
   });
 
-  document.title = "Profil | SADAR Finance";
   return (
     <React.Fragment>
       <div className="page-content">

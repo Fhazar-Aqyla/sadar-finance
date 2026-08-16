@@ -39,18 +39,17 @@ const authProtectedRoutes = [
   { path: "/profile", component: <UserProfile /> },
 
   // this route should be at the end of all other routes
-  // eslint-disable-next-line react/display-name
   { path: "*", component: <Navigate to="/dashboard" /> },
 ];
 
 const publicRoutes = [
   // Authentication Page
-  { path: "/", component: <OnePage />, guestOnly: true },
+  { path: "/", component: <OnePage /> },
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login />, guestOnly: true },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
   { path: "/register", component: <Register />, guestOnly: true },
-  { path: "/landing", component: <OnePage />, guestOnly: true },
+  { path: "/landing", component: <OnePage /> },
 ];
 
 export { authProtectedRoutes, publicRoutes };

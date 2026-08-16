@@ -176,6 +176,15 @@ export const HeroSection = () => {
     { scope: containerRef }
   );
 
+  const hasAuthToken = () => {
+    try {
+      return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
+    } catch {
+      return false;
+    }
+  };
+  const isAuthenticated = hasAuthToken();
+
   return (
     <section
       id="home"
@@ -280,13 +289,13 @@ export const HeroSection = () => {
               className="w-full sm:w-auto relative group overflow-hidden rounded-xl"
             >
               <Link
-                to="/register"
+                to={isAuthenticated ? "/dashboard" : "/register"}
                 className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden"
               >
                 {/* Shimmer Sweep Animation */}
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-2">
-                  Mulai Gratis Sekarang <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {isAuthenticated ? "Buka Dashboard" : "Mulai Gratis Sekarang"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </motion.div>

@@ -5307,7 +5307,19 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
 
   .sadar-page .btn,
   .sadar-dashboard .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 44px;
+    line-height: 1.2;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+
+  .sadar-page .btn :where(i, svg, .spinner-border),
+  .sadar-dashboard .btn :where(i, svg, .spinner-border) {
+    flex: 0 0 auto;
   }
 
   .sadar-page :where(h1, h2, h3, h4, h5, h6, p, .card-title, .sadar-step-title, .sadar-step-desc),
@@ -6049,8 +6061,14 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
 @media (max-width: 991.98px) {
   .sadar-page,
   .sadar-dashboard {
+    --sadar-action: #25a0e2;
+    --sadar-action-hover: #168fd0;
     --sadar-glass-blue: #1e3a8a;
     --sadar-glass-cyan: #1e3a8a;
+    --sadar-glass-ink: #172033;
+    --sadar-glass-copy: #475569;
+    --sadar-glass-muted: #64748b;
+    padding-bottom: calc(6.75rem + env(safe-area-inset-bottom)) !important;
     background:
       radial-gradient(circle at 100% 0%, rgba(30, 58, 138, 0.12), transparent 22rem),
       radial-gradient(circle at 0% 72%, rgba(30, 58, 138, 0.07), transparent 20rem),
@@ -6117,10 +6135,64 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   .sadar-dashboard :where(.btn-primary, .btn-success),
   .sadar-history-modal .btn-primary,
   .sadar-setup-modal .btn-primary {
-    border-color: #1e3a8a !important;
+    border-color: var(--sadar-action, #25a0e2) !important;
     color: #ffffff !important;
-    background: #1e3a8a !important;
-    box-shadow: 0 8px 18px rgba(30, 58, 138, 0.18) !important;
+    background: var(--sadar-action, #25a0e2) !important;
+    box-shadow: 0 8px 18px rgba(37, 160, 226, 0.2) !important;
+  }
+
+  .sadar-page :where(.btn-primary, .btn-success):is(:hover, :focus-visible),
+  .sadar-dashboard :where(.btn-primary, .btn-success):is(:hover, :focus-visible),
+  .sadar-history-modal .btn-primary:is(:hover, :focus-visible),
+  .sadar-setup-modal .btn-primary:is(:hover, :focus-visible) {
+    border-color: var(--sadar-action-hover, #168fd0) !important;
+    background: var(--sadar-action-hover, #168fd0) !important;
+  }
+
+  .sadar-page :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle),
+  .sadar-dashboard :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle) {
+    border-color: #e2e8f0 !important;
+    color: #334155 !important;
+    background: rgba(248, 250, 252, 0.92) !important;
+    box-shadow: none !important;
+  }
+
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn.active,
+  .sadar-period-toggle .btn.btn-primary {
+    border-color: transparent !important;
+    color: var(--sadar-action) !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  .sadar-empty-state-center,
+  .sadar-empty-card {
+    min-height: 178px;
+    justify-content: center;
+    padding: 1.35rem !important;
+    text-align: center;
+  }
+
+  .sadar-empty-state-center h4,
+  .sadar-empty-card h4 {
+    margin: 0.7rem 0 0.3rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .sadar-empty-state-center p,
+  .sadar-empty-card p {
+    max-width: 280px;
+    margin-inline: auto;
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  .sadar-empty-state-center .btn,
+  .sadar-empty-card .btn {
+    min-height: 42px;
+    margin-top: 0.8rem;
+    padding-inline: 1rem;
   }
 
   .sadar-searchable-select-menu,
@@ -6323,12 +6395,12 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
 @media (max-width: 991.98px) {
   html[data-bs-theme="dark"] .sadar-page,
   html[data-bs-theme="dark"] .sadar-dashboard {
-    --sadar-glass-ink: #f4f7fb;
+    --sadar-glass-ink: #f8fafc;
     --sadar-glass-copy: #cbd5e1;
-    --sadar-glass-muted: #9eafc3;
+    --sadar-glass-muted: #94a3b8;
     background:
-      radial-gradient(circle at 100% 0%, rgba(30, 58, 138, 0.24), transparent 24rem),
-      linear-gradient(165deg, #07111f 0%, #0b1728 55%, #07111f 100%) !important;
+      radial-gradient(circle at 100% 0%, rgba(30, 58, 138, 0.26), transparent 24rem),
+      linear-gradient(165deg, #111827 0%, #151e2b 55%, #111827 100%) !important;
   }
 
   html[data-bs-theme="dark"] .sadar-page .card,
@@ -6340,8 +6412,8 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   html[data-bs-theme="dark"] .sadar-detail-card {
     border-color: rgba(165, 180, 202, 0.17) !important;
     outline-color: rgba(2, 6, 23, 0.42) !important;
-    color: #f4f7fb !important;
-    background: linear-gradient(145deg, rgba(24, 39, 60, 0.96), rgba(10, 24, 42, 0.96)) !important;
+    color: #f8fafc !important;
+    background: linear-gradient(145deg, rgba(31, 42, 55, 0.96), rgba(24, 33, 44, 0.96)) !important;
     box-shadow: 0 12px 30px rgba(0, 4, 15, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -6372,16 +6444,16 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     .sadar-empty-card
   ) {
     border-color: rgba(165, 180, 202, 0.14) !important;
-    color: #f4f7fb !important;
-    background: rgba(17, 33, 53, 0.9) !important;
+    color: #f8fafc !important;
+    background: rgba(31, 42, 55, 0.9) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
   }
 
   html[data-bs-theme="dark"] .sadar-page :where(.form-control, .form-select),
   html[data-bs-theme="dark"] .sadar-dashboard :where(.form-control, .form-select) {
     border-color: rgba(165, 180, 202, 0.2) !important;
-    color: #f4f7fb !important;
-    background: #0c1d31 !important;
+    color: #f8fafc !important;
+    background: #1f2a37 !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -6397,8 +6469,8 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   html[data-bs-theme="dark"] .sadar-row-action-menu,
   html[data-bs-theme="dark"] .profile-photo-dropdown {
     border-color: rgba(165, 180, 202, 0.18) !important;
-    color: #f4f7fb !important;
-    background: rgba(12, 29, 49, 0.97) !important;
+    color: #f8fafc !important;
+    background: rgba(31, 42, 55, 0.98) !important;
     box-shadow: 0 20px 48px rgba(0, 4, 15, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
   }
 
@@ -6416,10 +6488,10 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   ) {
     border-color: rgba(165, 180, 202, 0.18) !important;
     outline-color: rgba(2, 6, 23, 0.46) !important;
-    color: #f4f7fb !important;
+    color: #f8fafc !important;
     background:
       radial-gradient(circle at 92% -18%, rgba(30, 58, 138, 0.28), transparent 42%),
-      rgba(10, 24, 42, 0.98) !important;
+      rgba(24, 33, 44, 0.99) !important;
     box-shadow: 0 28px 72px rgba(0, 4, 15, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
   }
 
@@ -6430,7 +6502,7 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     .sadar-setup-modal
   ) :where(.modal-header, .modal-body, .modal-footer) {
     border-color: rgba(165, 180, 202, 0.14) !important;
-    color: #f4f7fb !important;
+    color: #f8fafc !important;
     background: transparent !important;
   }
 
@@ -6439,7 +6511,7 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     .sadar-account-modal,
     .sadar-setup-modal
   ) :where(.modal-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label) {
-    color: #f4f7fb !important;
+    color: #f8fafc !important;
   }
 
   html[data-bs-theme="dark"] :where(
@@ -6452,12 +6524,45 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
 
   html[data-bs-theme="dark"] :where(.sadar-history-modal, .sadar-account-modal) :where(.form-control, .form-select) {
     border-color: rgba(165, 180, 202, 0.2) !important;
-    color: #f4f7fb !important;
-    background: #0c1d31 !important;
+    color: #f8fafc !important;
+    background: #1f2a37 !important;
   }
 
   html[data-bs-theme="dark"] .sadar-history-edit-modal .modal-footer {
-    background: rgba(10, 24, 42, 0.98) !important;
+    background: rgba(24, 33, 44, 0.99) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-page :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle),
+  html[data-bs-theme="dark"] .sadar-dashboard :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle) {
+    border-color: rgba(148, 163, 184, 0.28) !important;
+    color: #f8fafc !important;
+    background: #243041 !important;
+    box-shadow: none !important;
+  }
+
+  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) {
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    background: #18212c !important;
+  }
+
+  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn {
+    color: #cbd5e1 !important;
+  }
+
+  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn.active,
+  html[data-bs-theme="dark"] .sadar-period-toggle .btn.btn-primary {
+    color: #7dd3fc !important;
+    background: #243041 !important;
+    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
+  }
+
+  html[data-bs-theme="dark"] .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row),
+  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody tr {
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    outline-color: rgba(2, 6, 23, 0.42) !important;
+    color: #f8fafc !important;
+    background: #1f2a37 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
   }
 }
 
