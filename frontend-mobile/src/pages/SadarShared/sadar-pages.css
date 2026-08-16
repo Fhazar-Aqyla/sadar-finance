@@ -4925,10 +4925,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-panel,
   .sadar-input-card,
   .sadar-detail-card {
-    border: 1px solid var(--sadar-glass-border) !important;
-    outline: 1px solid var(--sadar-glass-stroke);
-    outline-offset: -1px;
+    border: 1px solid rgba(91, 134, 171, 0.24) !important;
     border-radius: 22px !important;
+    overflow: hidden;
     color: var(--sadar-glass-ink);
     background: var(--sadar-glass-surface) !important;
     box-shadow: var(--sadar-glass-shadow) !important;
@@ -4969,7 +4968,7 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-page .card-header,
   .sadar-dashboard .card-header {
     border-bottom: 1px solid rgba(91, 134, 171, 0.11) !important;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent) !important;
+    background: transparent !important;
   }
 
   .sadar-page :where(.card-title, h1, h2, h3, h4, h5, h6, strong),
@@ -5017,9 +5016,7 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-manual-state,
   .sadar-step-status-list span,
   .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row) {
-    border: 1px solid var(--sadar-glass-border) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.14);
-    outline-offset: -1px;
+    border: 1px solid rgba(91, 134, 171, 0.18) !important;
     border-radius: 17px !important;
     color: var(--sadar-glass-ink);
     background: var(--sadar-glass-surface-soft) !important;
@@ -5108,9 +5105,7 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-entry-tabs,
   .sadar-mode-toggle,
   .sadar-period-toggle {
-    border: 1px solid var(--sadar-glass-border) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.16);
-    outline-offset: -1px;
+    border: 1px solid rgba(91, 134, 171, 0.2) !important;
     border-radius: 15px !important;
     background: var(--sadar-glass-surface-soft) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 7px 18px rgba(37, 76, 119, 0.07);
@@ -5128,10 +5123,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   }
 
   .sadar-table-wrap {
-    border: 1px solid var(--sadar-glass-border) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.14);
-    outline-offset: -1px;
+    border: 1px solid rgba(91, 134, 171, 0.18) !important;
     border-radius: 18px !important;
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.38) !important;
     box-shadow: var(--sadar-glass-shadow-soft);
     backdrop-filter: blur(18px) saturate(155%);
@@ -5166,10 +5160,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-searchable-select-menu,
   .sadar-row-action-menu,
   .profile-photo-dropdown {
-    border: 1px solid var(--sadar-glass-border) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.18);
-    outline-offset: -1px;
+    border: 1px solid rgba(91, 134, 171, 0.2) !important;
     border-radius: 16px !important;
+    overflow: hidden;
     color: var(--sadar-glass-ink);
     background: var(--sadar-glass-surface-raised) !important;
     box-shadow: 0 22px 54px rgba(37, 76, 119, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
@@ -5207,9 +5200,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   }
 
   .sadar-profile-page .sadar-profile-photo-row {
-    border: 1px solid var(--sadar-glass-border) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.16);
-    outline-offset: -1px;
+    border: 1px solid rgba(91, 134, 171, 0.2) !important;
+    border-radius: 18px !important;
+    overflow: hidden;
     background:
       radial-gradient(circle at 50% -15%, rgba(56, 189, 248, 0.25), transparent 58%),
       radial-gradient(circle at 8% 110%, rgba(45, 212, 191, 0.18), transparent 50%),
@@ -5241,8 +5234,6 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-photo-lightbox-modal .modal-content,
   .sadar-setup-modal .modal-content {
     border: 1px solid rgba(255, 255, 255, 0.82) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.2);
-    outline-offset: -1px;
     color: var(--sadar-glass-ink);
     background:
       radial-gradient(circle at 88% -12%, rgba(56, 189, 248, 0.22), transparent 42%),
@@ -5270,8 +5261,6 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-swal-popup,
   .Toastify__toast {
     border: 1px solid rgba(255, 255, 255, 0.8) !important;
-    outline: 1px solid rgba(91, 134, 171, 0.18);
-    outline-offset: -1px;
     border-radius: 18px !important;
     color: var(--sadar-glass-ink) !important;
     background: var(--sadar-glass-surface-raised) !important;
