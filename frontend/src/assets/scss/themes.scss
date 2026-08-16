@@ -229,30 +229,31 @@ $value in $theme-colors {
   margin-right: 2px;
 }
 
-.sadar-partner-badge {
+.sadar-partner-item {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  height: 28px;
-  padding: 3px 8px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.82;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 
   &:hover {
+    opacity: 1;
     transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.09);
-    background: #ffffff;
   }
 
   img {
-    height: 16px;
+    height: 18px;
     width: auto;
-    max-width: 110px;
+    max-width: 120px;
     object-fit: contain;
   }
+}
+
+.sadar-partner-dark-mode {
+  display: none;
+}
+
+.sadar-partner-light-mode {
+  display: inline-block;
 }
 
 .sadar-logo-dark-mode {
@@ -426,15 +427,12 @@ $value in $theme-colors {
     color: var(--sadar-shell-muted);
   }
 
-  .sadar-partner-badge {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  .sadar-partner-light-mode {
+    display: none !important;
+  }
 
-    &:hover {
-      background: #ffffff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-    }
+  .sadar-partner-dark-mode {
+    display: inline-block !important;
   }
 
   .sadar-logo-light-mode {

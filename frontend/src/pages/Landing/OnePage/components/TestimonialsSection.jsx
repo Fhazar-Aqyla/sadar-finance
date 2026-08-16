@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion as Motion, useReducedMotion } from "framer-motion";
 import { MessageSquareQuote } from "lucide-react";
 
 import afifahImg from "@/assets/images/testimonial/Afifah Rosita (Mahasiswa Akutansi).png";
@@ -18,84 +18,84 @@ import wardahImg from "@/assets/images/testimonial/Wardah Ulfiyatusholihah (Maha
 const testimonials = [
   {
     tempId: 0,
-    text: "Fitur alokasi otomatis 50/30/20 di SADAR sangat sesuai dengan prinsip budgeting yang aku pelajari. Rekap keuangannya rapi, transparan, dan mempermudah evaluasi cash flow bulanan.",
+    text: "Alokasi 50/30/20 di SADAR ngebantu banget buat nerapin budgeting yang ideal. Rekap pengeluaran bulanannya rapi, transparan, dan bikin evaluasi cash flow jadi jauh lebih gampang.",
     image: afifahImg,
     name: "Afifah Rosita",
     role: "Mahasiswa Akuntansi",
   },
   {
     tempId: 1,
-    text: "UI-nya clean banget dan UX alur pencatatan transaksinya sangat intuitif. Dark mode dan micro-interaction-nya bikin aktivitas tracking finansial harian jadi super nyaman dan estetik.",
+    text: "UI-nya clean dan estetik parah, micro-interaction-nya juga super halus. Aktivitas tracking pengeluaran harian yang tadinya malesin sekarang malah jadi satisfying banget.",
     image: daffaImg,
     name: "Daffa Nazriel Zaidan",
     role: "Junior UI/UX Designer",
   },
   {
     tempId: 2,
-    text: "SADAR bikin tracking pengeluaran jadi terstruktur tanpa ribet. Skor Finansialnya jujur dan analitiknya detail, ngebantu banget memantau rasio tabungan secara disiplin.",
+    text: "Tracking pengeluaran jadi sat-set tanpa ribet. Fitur skor finansialnya jujur dan analitiknya detail banget, beneran bikin makin termotivasi buat disiplin nabung tiap bulannya.",
     image: darrenImg,
     name: "Darren Jokin Genova",
     role: "Mahasiswa Akuntansi",
   },
   {
     tempId: 3,
-    text: "Manajemen uang saku bulanan jadi jauh lebih terarah. SADAR bantu aku mengontrol alokasi dana darurat dan kebutuhan primer sebelum tergoda impulsive spending.",
+    text: "Manajemen uang saku bulanan jadi jauh lebih awet dan terarah. Ngebantu banget ngerem kebiasaan jajan impulsif di awal bulan biar pos dana darurat tetap aman terjaga.",
     image: fachryImg,
     name: "Fachry Jiyad Setiawan",
     role: "Mahasiswa Manajemen",
   },
   {
     tempId: 4,
-    text: "Sebagai founder, memisahkan arus kas pribadi dan operasional usaha kini jauh lebih mudah. Fitur net worth tracking SADAR memberikan visibilitas aset yang sangat akurat dan real-time.",
+    text: "Praktis banget buat misahin kas pribadi sama operasional usaha. Fitur net worth tracking SADAR ngasih visibilitas aset yang jelas, akurat, dan real-time tanpa perlu spreadsheet manual.",
     image: fadelImg,
     name: "Fadel Rahmadhan",
     role: "Founder JD Nirwana",
   },
   {
     tempId: 5,
-    text: "Aktivitas organisasi yang padat sering bikin lupa catat pengeluaran. Dengan scan foto struk SADAR, semua transaksi langsung tercatat otomatis dalam hitungan detik!",
+    text: "Aktivitas organisasi yang padat sering bikin lupa catat uang keluar. Tinggal foto struk belanjaan, transaksinya langsung kecatat otomatis dalam hitungan detik, praktis banget!",
     image: fadilahImg,
     name: "Fadilah Nur Yasin",
     role: "Member AIESEC President University",
   },
   {
     tempId: 6,
-    text: "Performanya super responsif, enteng, dan bebas iklan yang mengganggu. Fitur AI rekomendasi anggarannya sangat solutif dan data privasi terasa sangat aman.",
+    text: "Aplikasinya enteng, responsif, dan bebas iklan yang ganggu. Rekomendasi anggarannya beneran masuk akal, plus data privasi terasa sangat aman buat pemakaian jangka panjang.",
     image: ferryImg,
     name: "Ferry Noer Henriawan",
     role: "Junior Web Programmer",
   },
   {
     tempId: 7,
-    text: "Sebagai desainer lepas dengan penghasilan project-based, SADAR ngebantu banget membagi fee ke pos operasional dan tabungan. Visualisasi chart-nya gampang dipahami!",
+    text: "Sebagai freelancer dengan income project-based, SADAR ngebantu banget misahin fee ke pos tabungan dan operasional. Visual chart grafiknya juga gampang banget dipahami.",
     image: haidarImg,
     name: "Haidar Sabillul Haq",
     role: "Graphic Designer",
   },
   {
     tempId: 8,
-    text: "Shift dinas rumah sakit yang padat bikin waktu buat catat manual hampir nggak ada. SADAR praktis banget, reminder limit anggarannya bikin keuangan tetap aman terkontrol.",
+    text: "Shift dinas rumah sakit yang padat bikin nggak sempat catat manual. Pakai SADAR simpel banget, apalagi ada alert limit yang bikin pengeluaran harian tetap aman terkontrol.",
     image: ireneImg,
     name: "Irene Delfine Harya",
     role: "Mahasiswa Ners",
   },
   {
     tempId: 9,
-    text: "Arsitektur integrasi dan sistem kategorisasi datanya sangat solid. Solusi pencatatan keuangan modern yang reliable dan sangat efisien untuk profesional IT.",
+    text: "Kategorisasi transaksinya cerdas dan sangat akurat. Arsitektur aplikasinya terasa solid, kencang, dan sangat solutif buat yang butuh pencatatan finansial otomatis yang reliable.",
     image: komarudinImg,
     name: "Komarudin",
     role: "Senior Software Developer",
   },
   {
     tempId: 10,
-    text: "Insight cerdas berbasis AI di SADAR ngasih analisis pola belanja yang beneran actionable. Sekarang aku bisa tahu pos mana yang bocor alus dan memperbaikinya.",
+    text: "Insight AI-nya mantap dan solutif banget. Sekarang langsung ketahuan pos mana yang sering bikin boncos atau bocor alus tiap bulannya, jadi bisa langsung segera dievaluasi.",
     image: rifqyImg,
     name: "Rifqy Syaripudin",
     role: "Mahasiswa Sistem Informasi",
   },
   {
     tempId: 11,
-    text: "Sering kalap belanja online di awal bulan, tapi sejak pakai SADAR ada peringatan overbudget yang ngerem kebiasaan boros. Manajemen pengeluaranku jadi jauh lebih sehat!",
+    text: "Dulu sering kalap belanja online pas awal bulan. Sejak pakai SADAR, ada peringatan batas budget yang sukses ngerem kebiasaan boros dan bikin tabungan makin bertambah.",
     image: wardahImg,
     name: "Wardah Ulfiyatusholihah",
     role: "Mahasiswa Manajemen",
@@ -130,11 +130,13 @@ const TestimonialCard = ({ position, testimonial, handleMove, cardSize }) => {
       {isCenter && (
         <div className="absolute inset-x-7 top-0 h-[2px] rounded-full bg-gradient-to-r from-[#1E3A8A] via-sky-400 to-emerald-400" />
       )}
-      <div className="flex flex-col h-full pt-10">
-        <p className="text-base sm:text-lg font-medium italic leading-relaxed line-clamp-5 text-slate-600 dark:text-slate-400">
-          “{testimonial.text}”
-        </p>
-        <footer className="flex items-center gap-2.5 mt-auto pt-8">
+      <div className="flex flex-col h-full justify-between pt-1">
+        <div className="flex-1 flex items-center my-auto">
+          <p className="text-base sm:text-lg font-medium italic leading-relaxed text-slate-600 dark:text-slate-400">
+            “{testimonial.text}”
+          </p>
+        </div>
+        <footer className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-auto">
           <img
             width={40}
             height={40}
@@ -143,7 +145,7 @@ const TestimonialCard = ({ position, testimonial, handleMove, cardSize }) => {
             loading="lazy"
             className="h-10 w-10 rounded-full object-cover ring-2 ring-[#1E3A8A]/15 dark:ring-sky-500/30"
           />
-          <div className="min-w-0 flex flex-col justify-center gap-1">
+          <div className="min-w-0 flex flex-col justify-center gap-0.5">
             <p className="text-sm font-bold leading-tight truncate text-slate-900 dark:text-white">
               {testimonial.name}
             </p>
@@ -163,7 +165,10 @@ export const TestimonialsSection = () => {
   const [paused, setPaused] = useState(false);
   const reducedMotion = useReducedMotion();
   const pausedRef = useRef(paused);
-  pausedRef.current = paused;
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   const handleMove = useCallback((steps) => {
     setTestimonialsList((prev) => {
@@ -214,7 +219,7 @@ export const TestimonialsSection = () => {
       <div className="absolute bottom-1/4 -right-24 w-80 h-80 bg-violet-400/5 dark:bg-violet-500/4 blur-[110px] rounded-full pointer-events-none" />
 
       {/* Section Header */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -234,7 +239,7 @@ export const TestimonialsSection = () => {
         <p className="mt-4 text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl mx-auto">
           Ribuan orang telah merasakan perubahan nyata dalam mengelola keuangan bersama SADAR. Ini cerita mereka.
         </p>
-      </motion.div>
+      </Motion.div>
 
       {/* Stagger Fan Deck */}
       <div

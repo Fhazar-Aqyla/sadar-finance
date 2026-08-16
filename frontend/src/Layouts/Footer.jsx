@@ -3,7 +3,9 @@ import { Col, Container, Row } from "reactstrap";
 import sadarLogo from "../assets/images/landing/sadar-logo.png";
 import sadarLogoLight from "../assets/images/landing/logo-sadar-light.png";
 import logoDbsDicoding from "../assets/images/logo-dbs-dicoding-cropped.png";
+import logoDbsDicodingLight from "../assets/images/logo-dbs-dicoding-light.png";
 import logoCodingCamp from "../assets/images/logo-coding-camp-cropped.png";
+import logoCodingCampLight from "../assets/images/logo-coding-camp-light.png";
 
 const Footer = () => {
   return (
@@ -19,15 +21,17 @@ const Footer = () => {
               </div>
             </Col>
             <Col sm={6} xs={12}>
-              <div className="sadar-footer-partners d-flex align-items-center justify-content-start justify-content-sm-end gap-2">
+              <div className="sadar-footer-partners d-flex align-items-center justify-content-start justify-content-sm-end gap-3">
                 <span className="sadar-footer-partner-label d-none d-md-inline-block">
                   Didukung oleh:
                 </span>
-                <div className="sadar-partner-badge" title="DBS Foundation x Dicoding">
-                  <img src={logoDbsDicoding} alt="DBS Foundation x Dicoding" />
+                <div className="sadar-partner-item" title="DBS Foundation x Dicoding">
+                  <img src={logoDbsDicoding} alt="DBS Foundation x Dicoding" className="sadar-partner-light-mode" />
+                  <img src={logoDbsDicodingLight} alt="DBS Foundation x Dicoding" className="sadar-partner-dark-mode" />
                 </div>
-                <div className="sadar-partner-badge" title="Coding Camp 2025 powered by DBS Foundation">
-                  <img src={logoCodingCamp} alt="Coding Camp 2025" />
+                <div className="sadar-partner-item" title="Coding Camp 2025 powered by DBS Foundation">
+                  <img src={logoCodingCamp} alt="Coding Camp 2025" className="sadar-partner-light-mode" />
+                  <img src={logoCodingCampLight} alt="Coding Camp 2025" className="sadar-partner-dark-mode" />
                 </div>
               </div>
             </Col>
@@ -39,4 +43,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
 
