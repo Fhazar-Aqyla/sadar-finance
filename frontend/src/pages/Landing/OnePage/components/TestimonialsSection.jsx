@@ -129,7 +129,7 @@ const TestimonialCard = ({ position, testimonial, handleMove, cardSize }) => {
       {isCenter && (
         <div className="absolute inset-x-7 top-0 h-[2px] rounded-full bg-gradient-to-r from-[#1E3A8A] via-sky-400 to-emerald-400" />
       )}
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full pt-10">
         <p className="text-base sm:text-lg font-semibold leading-relaxed line-clamp-5 text-slate-700 dark:text-slate-300">
           “{testimonial.text}”
         </p>
