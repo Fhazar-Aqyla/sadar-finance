@@ -135,7 +135,7 @@ export const TeamSection = () => {
       name: "Diah Ayu Puspasari",
       role: "Data Scientist",
       avatar: diahAvatar,
-      badge: "Behavior & Forecasting",
+      badge: "Behavior Analysis & Feature Engineering",
       yOffset: yCol1,
       socials: {
         github: "https://github.com/Diahayuups",
@@ -172,7 +172,7 @@ export const TeamSection = () => {
       name: "Marsela",
       role: "Data Scientist",
       avatar: marselaAvatar,
-      badge: "Data Modeling & Insights",
+      badge: "Data Analysis & Insights",
       yOffset: yCol1,
       socials: {
         github: "https://github.com/Marsela0603",

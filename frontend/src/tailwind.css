@@ -113,6 +113,20 @@ html[data-bs-theme="dark"] .hero-title {
   margin-bottom: 0 !important;
 }
 
+/* Neutralize Velzon/Bootstrap unlayered p { margin-bottom } inside the
+   floating dashboard micro-cards so they stay compact and content-sized. */
+.showcase-float-card p {
+  margin-bottom: 0 !important;
+}
+
+/* Velzon redefines .p-3 as 1rem !important, overriding Tailwind's 0.75rem.
+   Pin the floating micro-card padding so heights stay compact. Vertical
+   padding is reduced (0.5rem) to slim the cards; horizontal stays 0.75rem
+   so the card width is preserved. */
+.showcase-float-card[class] {
+  padding: 0.5rem 0.75rem !important;
+}
+
 .hero-actions {
   margin-top: 3.75rem !important;
 }

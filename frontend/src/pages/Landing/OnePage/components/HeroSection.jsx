@@ -251,7 +251,7 @@ export const HeroSection = () => {
         </motion.div>
 
         {/* Hero Main Content */}
-        <div className="hero-content-wrap max-w-7xl mx-auto text-center relative z-10 flex flex-col items-center justify-center min-h-[62vh] lg:min-h-[70vh]">
+        <div className="hero-content-wrap max-w-7xl mx-auto text-center relative z-10 flex flex-col items-center justify-center min-h-[62vh] lg:min-h-[70vh] py-[20px] lg:py-[24px]">
 
           {/* Hero Main Headline */}
           <h1
