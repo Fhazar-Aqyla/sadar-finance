@@ -56,7 +56,9 @@ export const SpotlightCard = ({
           WebkitMaskImage: `radial-gradient(300px circle at ${position.x}px ${position.y}px, black, transparent)`,
         }}
       />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 flex flex-col flex-1 h-full w-full justify-between">
+        {children}
+      </div>
     </div>
   );
 };

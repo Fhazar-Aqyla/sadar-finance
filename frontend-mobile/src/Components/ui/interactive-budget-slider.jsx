@@ -278,16 +278,16 @@ export const InteractiveBudgetSlider = () => {
             className="h-full bg-emerald-600 rounded-r-full"
           />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 mt-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-          <span className="flex items-center gap-1.5 whitespace-nowrap">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-4 mt-2.5 text-[10px] xs:text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-[#1E3A8A] dark:bg-sky-500 inline-block shrink-0" />
             Kebutuhan 50%
           </span>
-          <span className="flex items-center gap-1.5 whitespace-nowrap">
+          <span className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0" />
             Gaya Hidup 30%
           </span>
-          <span className="flex items-center gap-1.5 whitespace-nowrap">
+          <span className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" />
             Tabungan 20%
           </span>

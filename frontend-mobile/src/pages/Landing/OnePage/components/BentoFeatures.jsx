@@ -430,7 +430,7 @@ export const BentoFeatures = () => {
               </div>
 
               {/* AI Proactive Advice Banner */}
-              <div className="mt-4 p-[12px] sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 text-left">
+              <div className="mt-4 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 text-left">
                 <Sparkles className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed font-medium">
                   <strong className="text-slate-900 dark:text-slate-200 font-bold">
