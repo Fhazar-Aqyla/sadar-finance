@@ -39,7 +39,7 @@ export const InteractiveBudgetSlider = () => {
       <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
 
       {/* ── Header ── */}
-      <div className="mb-6">
+      <div className="mb-6 [text-align:center] sm:[text-align:left]">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 mb-2 border border-blue-100 dark:border-blue-900/30">
           <Sparkles className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
           Simulasi Rumus 50 / 30 / 20
@@ -56,7 +56,7 @@ export const InteractiveBudgetSlider = () => {
           </div>
 
           {/* Quick Preset Pills — sejajar kanan bawah header */}
-          <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 self-start sm:self-end shrink-0">
+          <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 self-center sm:self-end shrink-0">
             {presets.map((preset) => {
               const isSelected = income === preset.value;
               return (

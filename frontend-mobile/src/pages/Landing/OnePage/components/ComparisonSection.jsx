@@ -57,18 +57,18 @@ export const ComparisonSection = () => {
       >
         {/* Header */}
         <div className="grid grid-cols-[1.5fr_0.75fr_0.75fr] sm:grid-cols-[1.6fr_0.7fr_0.7fr] items-stretch border-b border-slate-200/80 dark:border-slate-800">
-          <div className="flex items-center px-[14px] lg:px-10 py-[10px] lg:py-6 bg-[#F8FAFC] dark:bg-slate-800/60">
-            <span className="text-[11px] lg:text-[15px] font-bold uppercase tracking-wide lg:tracking-wider text-[#0F172A] dark:text-slate-100">
+          <div className="flex items-center justify-center sm:justify-start px-[14px] lg:px-10 py-[10px] lg:py-6 bg-[#F8FAFC] dark:bg-slate-800/60">
+            <span className="text-[11px] lg:text-[15px] font-bold uppercase tracking-wide lg:tracking-wider text-[#0F172A] dark:text-slate-100 [text-align:center] sm:[text-align:left]">
               Fitur / Aspek
             </span>
           </div>
           <div className="flex items-center justify-center px-[10px] lg:px-4 py-[10px] lg:py-6 border-l border-[#F1D5D8] dark:border-rose-900/40 bg-[#FFF1F2] dark:bg-rose-950/40">
-            <span className="text-[11px] lg:text-[15px] font-bold uppercase tracking-wide lg:tracking-wider text-[#9F1239] dark:text-rose-300">
+            <span className="text-[11px] lg:text-[15px] font-bold uppercase tracking-wide lg:tracking-wider text-[#9F1239] dark:text-rose-300 [text-align:center] sm:[text-align:left]">
               Platform Lain
             </span>
           </div>
           <div className="flex items-center justify-center px-[10px] lg:px-4 py-[10px] lg:py-6 border-l border-[#23408F] bg-[#23408F] dark:bg-[#23408F]">
-            <span className="text-[11px] lg:text-[15px] font-extrabold uppercase tracking-wide lg:tracking-wider text-white">
+            <span className="text-[11px] lg:text-[15px] font-extrabold uppercase tracking-wide lg:tracking-wider text-white [text-align:center] sm:[text-align:left]">
               SADAR Finance
             </span>
           </div>

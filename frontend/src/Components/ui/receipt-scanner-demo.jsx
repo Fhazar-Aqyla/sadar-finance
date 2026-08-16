@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Receipt,
   ArrowRight,
+  ArrowDown,
   Tag,
   Calendar,
   Store,
@@ -76,7 +77,7 @@ export const ReceiptScannerDemo = () => {
     <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-xs dark:border-slate-800 dark:bg-slate-900">
       {/* Header Tabs with Framer Motion layoutId */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div className="flex items-start gap-2.5">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2.5 [text-align:center] sm:[text-align:left]">
           <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shadow-xs -mt-1">
             <ScanLine className="w-4 h-4" />
           </div>
@@ -84,7 +85,7 @@ export const ReceiptScannerDemo = () => {
             <h4 className="font-bold text-slate-900 dark:text-white text-base">
               Simulasi Kategorisasi Transaksi Otomatis
             </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[300px] mx-auto sm:max-w-none sm:mx-0">
               Pilih contoh transaksi di bawah ini untuk melihat SADAR membaca
               data dan mengkategorikannya secara otomatis.
             </p>
@@ -92,7 +93,7 @@ export const ReceiptScannerDemo = () => {
         </div>
 
         {/* Receipt Switcher Pills */}
-        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-center sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
           {receipts.map((r) => {
             const isSelected = activeReceipt.id === r.id;
             return (
@@ -181,6 +182,17 @@ export const ReceiptScannerDemo = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Down Arrow Connector (mobile/tablet vertical flow) */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="flex lg:hidden justify-center items-center py-1 text-slate-300 dark:text-slate-600"
+        >
+          <ArrowDown className="w-5 h-5 text-[#1E3A8A] dark:text-sky-400" />
+        </motion.div>
 
         {/* Arrow Transition */}
         <div className="hidden lg:flex lg:col-span-1 justify-center items-center text-slate-300 dark:text-slate-600">

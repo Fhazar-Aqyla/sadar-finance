@@ -153,7 +153,7 @@ export const BentoFeatures = () => {
         {/* Card 1: Interactive OCR Scanner (Full-Width Large Card) */}
         <motion.div style={{ y: yCard1 }}>
           <SpotlightCard className="p-6 sm:p-8 lg:p-10 border-slate-200/90 dark:border-slate-800 shadow-md">
-            <div className="max-w-2xl mb-6">
+            <div className="max-w-2xl mb-6 [text-align:center] sm:[text-align:left]">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 mb-2.5 border border-blue-100 dark:border-blue-900/30">
                 <Scan className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                 Kategorisasi Transaksi Otomatis
@@ -180,17 +180,17 @@ export const BentoFeatures = () => {
           <SpotlightCard className="h-full flex flex-col justify-between p-6 sm:p-8 border-slate-200/90 dark:border-slate-800 shadow-md relative overflow-hidden">
             <div>
               {/* Header Badge & Title */}
-              <div className="flex items-center justify-between gap-2 mb-4">
+              <div className="flex items-center justify-center sm:justify-between gap-2 mb-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30">
                   <Activity className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                   Financial Health Score
                 </div>
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight [text-align:center] sm:[text-align:left]">
                 Evaluasi Kesehatan Finansial Realtime
               </h3>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal leading-relaxed [text-align:center] sm:[text-align:left]">
                 SADAR mengevaluasi rasio tabungan, kepatuhan anggaran, dan
                 ketahanan dana daruratmu untuk menghasilkan skor objektif
                 (0–100).
@@ -268,12 +268,12 @@ export const BentoFeatures = () => {
                 </p>
 
                 {/* Official Score Range Reference Legend Bar */}
-                <div className="mt-4 w-full max-w-md p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-x-3 gap-y-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                <div className="mt-4 w-full max-w-md p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-col items-center sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-x-3 gap-y-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
                   <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
                     <Info className="w-3 h-3 text-[#1E3A8A] dark:text-sky-400" />
                     Rentang Skor:
                   </span>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1.5">
                     <span className="flex items-center gap-1.5 whitespace-nowrap text-emerald-600 dark:text-emerald-400 font-bold">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                       80–100 (Sehat)
@@ -385,7 +385,7 @@ export const BentoFeatures = () => {
           <div className="flex flex-col gap-6 lg:gap-8 h-full">
             {/* Subcard A: Predictive Overspending Alert */}
             <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-md">
-              <div>
+              <div className="[text-align:center] sm:[text-align:left]">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30 mb-2.5">
                   <TrendingUp className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                   Behavioral Finance Insight
@@ -400,7 +400,7 @@ export const BentoFeatures = () => {
                 </p>
 
                 {/* Simulated Overspending Progress Card */}
-                <div className="mt-4 p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 shadow-2xs">
+                <div className="mt-4 p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 shadow-2xs text-left">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">
                     <span className="flex items-center gap-1.5">
                       Kategori Keinginan (Wants)
@@ -430,7 +430,7 @@ export const BentoFeatures = () => {
               </div>
 
               {/* AI Proactive Advice Banner */}
-              <div className="mt-4 p-[12px] sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400">
+              <div className="mt-4 p-[12px] sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 text-left">
                 <Sparkles className="w-4 h-4 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed font-medium">
                   <strong className="text-slate-900 dark:text-slate-200 font-bold">
@@ -446,17 +446,17 @@ export const BentoFeatures = () => {
             <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-md">
               <div>
                 {/* Header Badge */}
-                <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center justify-center sm:justify-between gap-2 mb-3">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30">
                     <Wallet className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
                     Multi-Akun Terpadu
                   </div>
                 </div>
 
-                <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight [text-align:center] sm:[text-align:left]">
                   Semua Rekening & Saldo dalam Satu Tempat
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-normal [text-align:center] sm:[text-align:left]">
                   Gabungkan saldo rekening bank, dompet tunai, hingga e-wallet
                   favoritmu ke dalam satu ringkasan kekayaan bersih (Net Worth)
                   yang selalu sinkron.

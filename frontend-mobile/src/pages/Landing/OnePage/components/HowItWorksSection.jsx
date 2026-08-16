@@ -97,8 +97,8 @@ export const HowItWorksSection = () => {
             return (
               <motion.div key={idx} style={{ y: step.y }} className="h-full">
                 <SpotlightCard className="relative p-6 sm:p-8 flex flex-col justify-between h-full border-slate-200/90 dark:border-slate-800 transition-all duration-300 hover:-translate-y-2 shadow-xs hover:shadow-xl group">
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
+                  <div className="[text-align:center] sm:[text-align:left]">
+                    <div className="flex items-center justify-center sm:justify-between gap-6 mb-6">
                       <motion.div
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         className={`w-14 h-14 p-3.5 rounded-2xl ${step.accent} flex items-center justify-center shadow-xs transition-transform`}
