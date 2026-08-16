@@ -34,7 +34,7 @@ export const loginUser = (user, history) => async (dispatch) => {
         throw new Error("Login gagal.");
       }
 
-      sessionStorage.setItem("authUser", JSON.stringify(data));
+      localStorage.setItem("authUser", JSON.stringify(data));
       setAuthorization(data.token);
       dispatch(loginSuccess(data.user));
       history('/dashboard');
@@ -63,13 +63,13 @@ export const loginUser = (user, history) => async (dispatch) => {
     var data = await response;
 
     if (data) {
-      sessionStorage.setItem("authUser", JSON.stringify(data));
+      localStorage.setItem("authUser", JSON.stringify(data));
       if (defaultAuth === "fake") {
         var finallogin = JSON.stringify(data);
         finallogin = JSON.parse(finallogin)
         data = finallogin.data;
         if (finallogin.status === "success") {
-          sessionStorage.setItem("authUser", JSON.stringify({
+          localStorage.setItem("authUser", JSON.stringify({
             token: finallogin.data?.accessToken,
             user: finallogin.data,
           }));
@@ -90,7 +90,7 @@ export const loginUser = (user, history) => async (dispatch) => {
 
 export const logoutUser = () => async (dispatch) => {
   try {
-    sessionStorage.removeItem("authUser");
+    localStorage.removeItem("authUser");
     let fireBaseBackend = getFirebaseBackend();
     if (defaultAuth === "firebase") {
       const response = fireBaseBackend.logout;
@@ -118,7 +118,7 @@ export const socialLogin = (type, history) => async (dispatch) => {
       
       const socialdata = await response;
     if (socialdata) {
-      sessionStorage.setItem("authUser", JSON.stringify(response));
+      localStorage.setItem("authUser", JSON.stringify(response));
       dispatch(loginSuccess(response));
       history('/dashboard')
     }

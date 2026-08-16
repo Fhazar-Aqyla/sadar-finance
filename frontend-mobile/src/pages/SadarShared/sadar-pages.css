@@ -2092,8 +2092,9 @@ html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
 /* --- SADAR Finance Responsive Adaptations --- */
 
 @media (max-width: 991.98px) {
-  .sadar-page {
-    padding-bottom: 4.5rem;
+  .sadar-page,
+  .sadar-dashboard {
+    padding-bottom: 1rem;
   }
 }
 
@@ -2874,7 +2875,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
 
   .sadar-page,
   .sadar-dashboard {
-    padding-bottom: 4.5rem;
+    padding-bottom: 1rem;
   }
 
   .sadar-page .container-fluid,
@@ -5290,11 +5291,119 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   }
 }
 
+/* Final narrow-phone spacing and touch sizing; scoped to SADAR application pages. */
+@media (max-width: 575.98px) {
+  .sadar-page .container-fluid,
+  .sadar-dashboard .container-fluid {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  .sadar-page :where(.form-control, .form-select),
+  .sadar-dashboard :where(.form-control, .form-select) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .sadar-page .btn,
+  .sadar-dashboard .btn {
+    min-height: 44px;
+  }
+
+  .sadar-page :where(h1, h2, h3, h4, h5, h6, p, .card-title, .sadar-step-title, .sadar-step-desc),
+  .sadar-dashboard :where(h1, h2, h3, h4, h5, h6, p, .card-title) {
+    overflow-wrap: anywhere;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history {
+    overflow: visible;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table,
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table thead {
+    display: none;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(226, 232, 240, 0.92);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(30, 41, 59, 0.045);
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 68px minmax(0, 1fr);
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0 !important;
+    border: 0;
+    color: #475569;
+    font-size: 0.76rem !important;
+    line-height: 1.4;
+    text-align: left !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td:first-child,
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td:nth-child(5) {
+    display: block;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td:first-child {
+    color: #0f172a;
+    font-size: 0.9rem !important;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td:nth-child(5) {
+    padding: 0.15rem 0 !important;
+    font-size: 0.95rem !important;
+  }
+
+  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td[data-label]::before {
+    color: #94a3b8;
+    content: attr(data-label);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody tr {
+    border-color: rgba(148, 163, 184, 0.18);
+    background: #111827;
+  }
+
+  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td:first-child {
+    color: #f8fafc;
+  }
+}
+
 @media (max-width: 767.98px) {
   .page-content.sadar-page,
   .page-content.sadar-dashboard {
     padding-top: calc(var(--vz-header-height, 70px) + 0.9rem);
-    padding-bottom: calc(98px + env(safe-area-inset-bottom));
+    padding-bottom: 1rem;
   }
 
   .sadar-page .container-fluid,

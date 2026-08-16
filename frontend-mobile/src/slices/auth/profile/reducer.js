@@ -18,7 +18,7 @@ const ProfileSlice = createSlice({
         state.error = action.payload
     },
     editProfileChange(state){
-      state = { ...state };
+      return { ...state };
     },
     resetProfileFlagChange(state){
       state.success = null

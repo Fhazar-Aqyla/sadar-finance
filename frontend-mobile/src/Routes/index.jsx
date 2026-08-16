@@ -8,6 +8,7 @@ import VerticalLayout from "../Layouts/index";
 //routes
 import { authProtectedRoutes, publicRoutes } from "./allRoutes";
 import { AuthProtected } from './AuthProtected';
+import { GuestProtected } from './GuestProtected';
 
 const Index = () => {
     return (
@@ -19,7 +20,13 @@ const Index = () => {
                             path={route.path}
                             element={
                                 <NonAuthLayout>
-                                    <Suspense fallback={null}>{route.component}</Suspense>
+                                    {route.guestOnly ? (
+                                        <GuestProtected>
+                                            <Suspense fallback={null}>{route.component}</Suspense>
+                                        </GuestProtected>
+                                    ) : (
+                                        <Suspense fallback={null}>{route.component}</Suspense>
+                                    )}
                                 </NonAuthLayout>
                             }
                             key={idx}

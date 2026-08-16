@@ -81,7 +81,7 @@ const showAccountAlert = ({ icon, title, text }) =>
 
 const getStoredUserProfile = () => {
   try {
-    const authUser = JSON.parse(sessionStorage.getItem("authUser") || "null");
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
     const user = authUser?.user || authUser?.data?.user || {};
     const firstName = user.first_name || user.firstName || "";
     const lastName = user.last_name || user.lastName || "";
@@ -123,7 +123,7 @@ const normalizeProfile = (user) => {
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = sessionStorage.getItem("authUser");
+    const rawAuth = localStorage.getItem("authUser");
     if (!rawAuth) return;
     const authData = JSON.parse(rawAuth);
 
@@ -137,9 +137,9 @@ const updateSessionUser = (updatedUser) => {
       Object.assign(authData, updatedUser);
     }
 
-    sessionStorage.setItem("authUser", JSON.stringify(authData));
+    localStorage.setItem("authUser", JSON.stringify(authData));
   } catch (e) {
-    console.error("Failed to update sessionStorage user", e);
+    console.error("Failed to update localStorage user", e);
   }
 };
 

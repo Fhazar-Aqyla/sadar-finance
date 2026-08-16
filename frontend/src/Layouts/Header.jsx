@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Dropdown, DropdownMenu, DropdownToggle } from 'reactstrap';
+import { LogOut, User } from 'lucide-react';
 
 //import Components
 import SearchOption from '../Components/Common/SearchOption';
@@ -8,13 +9,46 @@ import FullScreenDropdown from '../Components/Common/FullScreenDropdown';
 import LightDark from '../Components/Common/LightDark';
 import NotificationDropdown from '../Components/Common/NotificationDropdown';
 import sadarLogo from '../assets/images/landing/sadar-logo.png';
+import dummyAvatar from '../assets/images/users/user-dummy-img.jpg';
 
 import { changeSidebarVisibility } from '../slices/thunks';
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from 'reselect';
 
-const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
+const getStoredUser = () => {
+    try {
+        return JSON.parse(localStorage.getItem("authUser") || "null");
+    } catch {
+        return null;
+    }
+};
+
+const normalizeAccountName = (value) => {
+    const name = String(value || "").trim();
+    if (!name || name.toLowerCase() === "admin" || name.toLowerCase().includes("themesbrand")) {
+        return "Aqyla";
+    }
+    return name;
+};
+
+const normalizeAccountEmail = (value) => {
+    const email = String(value || "").trim();
+    if (!email || email.toLowerCase().includes("themesbrand")) {
+        return "aqyla@example.com";
+    }
+    return email;
+};
+
+const resolveAvatarUrl = (url) => {
+    if (!url) return dummyAvatar;
+    if (/^(https?:|data:)/i.test(url)) return url;
+    const serverUrl = "https://sadar-finance.up.railway.app";
+    return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+};
+
+const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick }) => {
     const dispatch = useDispatch();
+    const profileUser = useSelector((state) => state.Profile?.user ?? {});
 
     const selectDashboardData = createSelector(
         (state) => state.Layout,
@@ -28,6 +62,36 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
     const toogleSearch = () => {
         setSearch(!search);
     };
+
+    const userName = (() => {
+        const storedUser = getStoredUser();
+        return normalizeAccountName(
+            profileUser?.first_name ||
+            profileUser?.username ||
+            storedUser?.user?.first_name ||
+            storedUser?.user?.username ||
+            storedUser?.data?.first_name ||
+            storedUser?.data?.username ||
+            storedUser?.first_name ||
+            storedUser?.username ||
+            storedUser?.user?.email ||
+            storedUser?.email ||
+            "Aqyla"
+        );
+    })();
+
+    const userEmail = (() => {
+        const storedUser = getStoredUser();
+        return normalizeAccountEmail(
+            profileUser?.email ||
+            storedUser?.user?.email ||
+            storedUser?.data?.email ||
+            storedUser?.email ||
+            "aqyla@example.com"
+        );
+    })();
+
+    const userAvatar = resolveAvatarUrl(profileUser?.profile_image || profileUser?.avatar || dummyAvatar);
 
     const toogleMenuBtn = () => {
         var windowSize = document.documentElement.clientWidth;
@@ -139,6 +203,25 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                         style={{ top: "100%" }}
                         aria-label="Menu Mobile"
                     >
+                        <div className="mb-1 flex items-center gap-3 rounded-lg bg-slate-50/80 p-3">
+                            <img
+                                src={userAvatar}
+                                alt={userName}
+                                className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                                onError={(e) => {
+                                    e.currentTarget.src = dummyAvatar;
+                                }}
+                            />
+                            <span className="flex-grow-1 min-w-0">
+                                <span className="block truncate text-sm font-semibold !text-slate-800 dark:!text-slate-100">
+                                    {userName}
+                                </span>
+                                <span className="block truncate text-xs text-slate-500 dark:text-slate-400">
+                                    {userEmail}
+                                </span>
+                            </span>
+                        </div>
+
                         {[
                             { name: "Dashboard", href: "/dashboard" },
                             { name: "Catat Keuangan", href: "/catat-keuangan" },
@@ -156,6 +239,28 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
                                 <i className="ri-arrow-right-s-line text-slate-400"></i>
                             </Link>
                         ))}
+
+                        <div className="mt-1 border-t border-slate-200 pt-1 dark:border-slate-800">
+                            <Link
+                                to="/profile-account"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-semibold no-underline transition-all duration-200 text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+                            >
+                                <User className="h-4 w-4 flex-shrink-0" size={16} />
+                                <span>Profil & Akun</span>
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsMobileMenuOpen(false);
+                                    if (onLogoutClick) onLogoutClick();
+                                }}
+                                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-[13px] font-semibold no-underline transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            >
+                                <LogOut className="h-4 w-4 flex-shrink-0" size={16} />
+                                <span>Keluar</span>
+                            </button>
+                        </div>
                     </nav>
                 )}
             </header>

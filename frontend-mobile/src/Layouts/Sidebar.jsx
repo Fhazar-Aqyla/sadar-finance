@@ -31,7 +31,7 @@ const sidebarWidths = {
 
 const getStoredUser = () => {
   try {
-    return JSON.parse(sessionStorage.getItem("authUser") || "null");
+    return JSON.parse(localStorage.getItem("authUser") || "null");
   } catch (error) {
     return null;
   }

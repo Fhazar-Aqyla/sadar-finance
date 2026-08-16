@@ -174,8 +174,22 @@ const AccountFormModal = ({
       mode
     );
 
-    if (!isValid) {
-      setErrors(validationErrors);
+    // Rekening lama yang nomornya tidak diubah tetap boleh disimpan
+    const accountNumberUnchanged =
+      isEdit &&
+      initialData &&
+      sanitizeDigitsOnly(formState.accountNumber) ===
+        sanitizeDigitsOnly(String(initialData.accountNumber || ""));
+
+    const finalErrors = accountNumberUnchanged
+      ? { ...validationErrors, accountNumber: "" }
+      : validationErrors;
+    const finalValid = accountNumberUnchanged
+      ? Object.keys(finalErrors).every((key) => !finalErrors[key])
+      : isValid;
+
+    if (!finalValid) {
+      setErrors(finalErrors);
       return;
     }
 
@@ -243,7 +257,7 @@ const AccountFormModal = ({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                value={formatAccountNumberInput(formState.accountNumber, formState.type)}
+                value={formatAccountNumberInput(formState.accountNumber, formState.type, formState.bank)}
                 onChange={handleAccountNumberChange}
                 placeholder={
                   isBankSelected

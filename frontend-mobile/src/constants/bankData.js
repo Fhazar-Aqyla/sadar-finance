@@ -9,6 +9,9 @@ export const INSTITUTION_TYPES = {
 };
 
 export const FINANCIAL_INSTITUTIONS = [
+  // Featured Bank (DBS) pinned on top
+  { id: "dbs", name: "Bank DBS Indonesia", shortName: "DBS", type: INSTITUTION_TYPES.BANK, icon: "ri-bank-line", featured: true },
+
   // Bank List (Ordered by popularity)
   { id: "bca", name: "Bank Central Asia (BCA)", shortName: "BCA", type: INSTITUTION_TYPES.BANK, icon: "ri-bank-line" },
   { id: "mandiri", name: "Bank Mandiri", shortName: "Mandiri", type: INSTITUTION_TYPES.BANK, icon: "ri-bank-line" },

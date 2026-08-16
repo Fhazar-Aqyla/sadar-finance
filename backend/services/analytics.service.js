@@ -548,7 +548,7 @@ class AnalyticsService {
       data.limitAmount,
       data.budget_limit,
       data.limit_amount,
-      needsBudget + wantsBudget
+      needsBudget + wantsBudget + investmentBudget
     );
 
     return {
@@ -576,8 +576,8 @@ class AnalyticsService {
 
     const toPrimaryBucket = (categoryGroup) => {
       const text = String(categoryGroup || '').toLowerCase();
-      if (/tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|dining|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
-      if (/tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
+      if (/needs|kebutuhan|tagihan|makanan|transport|kesehatan|pendidikan|sewa|listrik|air|internet|obat|pulsa|food|groceries|beverage|utility|utilities|bill|health|education/.test(text)) return 'needs';
+      if (/savings|tabungan|invest|dana darurat|saving|saham|reksadana|deposito|investment/.test(text)) return 'savings';
       return 'wants';
     };
 

@@ -206,8 +206,8 @@ const migrate = async () => {
         needs_amount = COALESCE(NULLIF(needs_amount, 0), needs_budget, 0),
         wants_amount = COALESCE(NULLIF(wants_amount, 0), wants_budget, 0),
         savings_amount = COALESCE(NULLIF(savings_amount, 0), NULLIF(investment_budget, 0), NULLIF(investment_amount, 0), 0),
-        limit_amount = COALESCE(NULLIF(limit_amount, 0), NULLIF(budget_limit, 0), needs_budget + wants_budget, 0),
-        budget_limit = COALESCE(NULLIF(budget_limit, 0), needs_budget + wants_budget, NULLIF(limit_amount, 0), 0);
+        limit_amount = COALESCE(NULLIF(limit_amount, 0), NULLIF(budget_limit, 0), needs_budget + wants_budget + investment_budget, 0),
+        budget_limit = COALESCE(NULLIF(budget_limit, 0), needs_budget + wants_budget + investment_budget, NULLIF(limit_amount, 0), 0);
     `);
 
     await client.query(`

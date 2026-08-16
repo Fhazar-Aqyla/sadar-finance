@@ -265,7 +265,7 @@ const Register = () => {
                                                 )}
 
                                                 <div className="mt-4">
-                                                    <button className="btn btn-success w-100" type="submit">Daftar</button>
+                                                    <button className="btn btn-success w-100" type="submit" disabled={!agreeTerms}>Daftar</button>
                                                 </div>
 
 

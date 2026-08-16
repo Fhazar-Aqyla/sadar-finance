@@ -4,6 +4,7 @@ google-generativeai==0.8.5
 ipykernel==6.29.5
 matplotlib==3.10.7
 numpy==1.26.4
+opencv-python-headless==4.10.0.84
 pandas==2.2.3
 Pillow==10.4.0
 python-dotenv==1.0.1

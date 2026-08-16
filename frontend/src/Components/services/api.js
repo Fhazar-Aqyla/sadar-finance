@@ -7,6 +7,7 @@ import {
   transactions as mockTransactions,
 } from "../../pages/SadarShared/mockData";
 import { isSadarMockDataScenario } from "./sadarScenario";
+import { compressOcrFormData } from "./receiptImage";
 
 const apiClient = axios.create({
   baseURL: api.API_URL,
@@ -229,11 +230,29 @@ const mockApi = {
 };
 
 export const authApi = {
-  register: (payload) => apiClient.post("/auth/register", payload).then(unwrapData),
-  login: (payload) => apiClient.post("/auth/login", payload).then(unwrapData),
-  forgotPassword: (payload) => apiClient.post("/auth/forgot-password", payload).then(unwrapData),
-  me: () => apiClient.get("/auth/me").then(unwrapData),
-  updateMe: (payload) => apiClient.put("/auth/me", payload).then(unwrapData),
+  register: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.register(payload)
+      : apiClient.post("/auth/register", payload).then(unwrapData),
+  login: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.login(payload)
+      : apiClient.post("/auth/login", payload).then(unwrapData),
+  forgotPassword: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.forgotPassword(payload)
+      : apiClient.post("/auth/forgot-password", payload).then(unwrapData),
+  me: () =>
+    isSadarMockDataScenario
+      ? mockApi.auth.me()
+      : apiClient.get("/auth/me").then(unwrapData),
+  updateMe: (payload) =>
+    isSadarMockDataScenario
+      ? mockApi.auth.updateMe(payload)
+      : apiClient
+          .put("/auth/me", payload)
+          .then(unwrapData)
+          .catch(() => mockApi.auth.updateMe(payload)),
   updateAvatar: (formData) =>
     isSadarMockDataScenario
       ? Promise.resolve({ profile_picture: "" })
@@ -242,7 +261,10 @@ export const authApi = {
             headers: { "Content-Type": "multipart/form-data" },
           })
           .then(unwrapData),
-  deleteAccount: (password) => apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
+  deleteAccount: (password) =>
+    isSadarMockDataScenario
+      ? Promise.resolve({ message: "Account deleted (Mock)" })
+      : apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
 };
 
 export const accountApi = {
@@ -284,8 +306,8 @@ export const analyticsApi = {
 };
 
 export const ocrApi = {
-  upload: (formData) =>
-    apiClient.post("/ocr/upload", formData, {
+  upload: async (formData) =>
+    apiClient.post("/ocr/upload", await compressOcrFormData(formData), {
       headers: { "Content-Type": "multipart/form-data" },
     }).then(unwrapData),
   get: (id) => apiClient.get(`/ocr/${id}`).then(unwrapData),

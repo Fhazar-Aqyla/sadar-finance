@@ -6,9 +6,10 @@
 const { query } = require('../config/database');
 
 class AccountRepository {
-  async findById(accountId, userId) {
-    const result = await query(
-      `SELECT * FROM accounts WHERE account_id = $1 AND user_id = $2`,
+  async findById(accountId, userId, db = query, { forUpdate = false } = {}) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
+      `SELECT * FROM accounts WHERE account_id = $1 AND user_id = $2${forUpdate ? ' FOR UPDATE' : ''}`,
       [accountId, userId]
     );
     return result.rows[0] || null;
@@ -71,12 +72,13 @@ class AccountRepository {
     return result.rowCount > 0;
   }
 
-  async updateBalance(accountId, amount) {
-    const result = await query(
+  async adjustBalance(accountId, userId, amount, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `UPDATE accounts SET balance = balance + $2, updated_at = NOW()
-       WHERE account_id = $1
+       WHERE account_id = $1 AND user_id = $3
        RETURNING *`,
-      [accountId, amount]
+      [accountId, amount, userId]
     );
     return result.rows[0] || null;
   }

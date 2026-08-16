@@ -66,6 +66,26 @@ const config = {
     mockMode: process.env.AI_MOCK_MODE === 'true',
   },
 
+  hfOcr: {
+    primaryUrl: process.env.HF_OCR_PRIMARY_URL || process.env.AI_SERVICE_URL || 'https://sadar-finance-sadar-finance-ai.hf.space',
+    primaryToken: process.env.HF_OCR_PRIMARY_TOKEN || process.env.AI_API_KEY || process.env.HF_TOKEN || '',
+    secondaryUrl: process.env.HF_OCR_SECONDARY_URL || '',
+    secondaryToken: process.env.HF_OCR_SECONDARY_TOKEN || '',
+    timeoutMs: parseInt(process.env.HF_OCR_TIMEOUT_MS, 10) || 20000,
+    minQuality: Number.parseFloat(process.env.HF_OCR_MIN_QUALITY || '0.65'),
+  },
+
+  groq: {
+    apiKey: process.env.GROQ_API_KEY || '',
+    model: process.env.GROQ_MODEL || 'openai/gpt-oss-20b',
+    timeoutMs: parseInt(process.env.GROQ_TIMEOUT_MS, 10) || 15000,
+    reasoningEffort: process.env.GROQ_REASONING_EFFORT || 'low',
+  },
+
+  ocr: {
+    localFallback: process.env.OCR_LOCAL_FALLBACK !== 'false',
+  },
+
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
     max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 600,

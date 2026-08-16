@@ -2512,3 +2512,82 @@ html[data-bs-theme='dark'] .sadar-notification-item-arrow {
         animation: none !important;
     }
 }
+
+// Keep the mobile header useful without crowding five controls into one row.
+@media (max-width: 575.98px) {
+    .sadar-fullscreen-control {
+        display: none !important;
+    }
+
+    #page-topbar .navbar-header {
+        gap: 0.5rem;
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
+    }
+
+    .sadar-mobile-header-brand {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    .sadar-mobile-header-brand img {
+        width: 96px;
+    }
+
+    .sadar-topbar-actions {
+        min-width: 0;
+        justify-content: flex-end;
+        gap: 0.1rem !important;
+    }
+
+    .sadar-theme-toggle {
+        width: 40px;
+        min-width: 40px;
+        flex-basis: 40px;
+    }
+
+    .sadar-topbar-actions .btn-topbar,
+    .sadar-profile .btn {
+        width: 40px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        padding: 0 !important;
+    }
+
+    .sadar-profile {
+        margin-left: 0;
+    }
+
+    .sadar-mobile-bottom-nav {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+
+    .sadar-mobile-bottom-nav-surface {
+        width: 100%;
+    }
+}
+
+@media (max-width: 359.98px) {
+    .sadar-mobile-header-brand {
+        width: 88px;
+        min-width: 88px;
+    }
+
+    .sadar-mobile-header-brand img {
+        width: 84px;
+    }
+
+    .sadar-topbar-actions .btn-topbar,
+    .sadar-profile .btn,
+    .sadar-theme-toggle {
+        width: 38px !important;
+        min-width: 38px !important;
+    }
+
+    .sadar-mobile-bottom-label {
+        font-size: 0.6rem;
+        letter-spacing: -0.02em;
+    }
+}

@@ -7,12 +7,13 @@
 const { query } = require('../config/database');
 
 class TransactionRepository {
-  async findById(transactionId, userId) {
-    const result = await query(
+  async findById(transactionId, userId, db = query, { forUpdate = false } = {}) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `SELECT t.*, a.account_name
        FROM transactions t
        LEFT JOIN accounts a ON t.account_id = a.account_id
-       WHERE t.transaction_id = $1 AND t.user_id = $2`,
+       WHERE t.transaction_id = $1 AND t.user_id = $2${forUpdate ? ' FOR UPDATE OF t' : ''}`,
       [transactionId, userId]
     );
     return result.rows[0] || null;
@@ -120,7 +121,7 @@ class TransactionRepository {
     return result.rows[0];
   }
 
-  async update(transactionId, userId, data) {
+  async update(transactionId, userId, data, db = query) {
     const fields = [];
     const params = [transactionId, userId];
     let paramIndex = 3;
@@ -144,7 +145,8 @@ class TransactionRepository {
 
     if (fields.length === 0) return null;
 
-    const result = await query(
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `UPDATE transactions SET ${fields.join(', ')}
        WHERE transaction_id = $1 AND user_id = $2
        RETURNING *`,
@@ -153,8 +155,9 @@ class TransactionRepository {
     return result.rows[0] || null;
   }
 
-  async delete(transactionId, userId) {
-    const result = await query(
+  async delete(transactionId, userId, db = query) {
+    const runQuery = typeof db === 'function' ? db : db.query.bind(db);
+    const result = await runQuery(
       `DELETE FROM transactions WHERE transaction_id = $1 AND user_id = $2 RETURNING transaction_id`,
       [transactionId, userId]
     );

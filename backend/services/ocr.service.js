@@ -1,15 +1,14 @@
 /**
  * OCR Service — Business logic for receipt scanning and parsing.
  *
- * Integrates with the AI microservice via `aiClient`. Provides a fallback
- * parsed result when the AI service is unavailable.
+ * Hugging Face recognizes text, Groq interprets it, and the backend validates
+ * the result before it reaches the editable confirmation form.
  */
 
 const ocrRepository = require("../repositories/ocr.repository");
 const fs = require("fs/promises");
 const config = require("../config");
-const aiClient = require("./aiClient.service");
-const localOcrService = require("./localOcr.service");
+const receiptPipeline = require("./receiptPipeline.service");
 const analyticsService = require("./analytics.service");
 const transactionService = require("./transaction.service");
 const { NotFoundError, BadRequestError } = require("../utils/errors");
@@ -67,6 +66,12 @@ class OcrService {
     }
 
     const parsedData = this._getParsedData(scan);
+
+    if (parsedData.isExpense === false && input.source === "ocr") {
+      throw new BadRequestError(
+        "Bukti ini terdeteksi sebagai transfer antarakun atau top-up saldo sendiri. Beralih ke input manual jika tetap ingin mencatatnya.",
+      );
+    }
     const amount = Number(input.amount ?? parsedData.total);
 
     if (!amount || Number.isNaN(amount) || amount <= 0) {
@@ -76,7 +81,7 @@ class OcrService {
     }
 
     const description =
-      input.description || this._buildReceiptDescription(parsedData);
+      input.description || parsedData.description || this._buildReceiptDescription(parsedData);
     let categoryGroup =
       input.categoryGroup ||
       parsedData.categoryGroup ||
@@ -124,8 +129,7 @@ class OcrService {
     try {
       await ocrRepository.updateStatus(scanId, "processing");
 
-      const parsedData = await this._extractReceipt(file, scanId);
-      await this._attachCategory(userId, parsedData);
+      const parsedData = await this._extractReceipt(file);
 
       await ocrRepository.updateStatus(scanId, "completed", parsedData);
     } catch (err) {
@@ -139,21 +143,8 @@ class OcrService {
     }
   }
 
-  async _extractReceipt(file, scanId) {
-    try {
-      const localResult = await localOcrService.extractReceipt(file);
-      if (this._hasUsableReceiptData(localResult)) {
-        return localResult;
-      }
-    } catch (_err) {
-      // Fall back to the AI service below when local OCR cannot read the image.
-    }
-
-    return aiClient.extractReceipt({ file, scanId });
-  }
-
-  _hasUsableReceiptData(parsedData) {
-    return Boolean(parsedData?.data?.total);
+  async _extractReceipt(file) {
+    return receiptPipeline.extract(file);
   }
 
   async _attachCategory(userId, parsedData) {
@@ -205,7 +196,7 @@ class OcrService {
   }
 
   _buildReceiptDescription(parsedData) {
-    const merchant = parsedData.merchant || "OCR receipt";
+    const merchant = parsedData.expenseName || parsedData.merchant || "OCR receipt";
     const items = Array.isArray(parsedData.items)
       ? parsedData.items
           .map((item) => item.name)
