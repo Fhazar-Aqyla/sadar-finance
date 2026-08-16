@@ -464,16 +464,16 @@ export const BentoFeatures = () => {
 
                 {/* Account Balances Visual Row Cards */}
                 <div className="mt-4 space-y-2.5">
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 account-row border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-sky-400 flex items-center justify-center shrink-0 shadow-2xs">
                         <Landmark className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white leading-none">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white leading-[16px]">
                           Bank DBS Indonesia
                         </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium leading-none">
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium leading-[14px]">
                           Rekening Tabungan Utama
                         </p>
                       </div>
@@ -488,16 +488,16 @@ export const BentoFeatures = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/80 account-row border border-slate-200/80 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#1E3A8A] dark:text-sky-400 flex items-center justify-center shrink-0 shadow-2xs">
                         <Smartphone className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white leading-none">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white leading-[16px]">
                           GoPay, OVO & DANA
                         </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium leading-none">
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium leading-[14px]">
                           E-Wallet Operasional
                         </p>
                       </div>

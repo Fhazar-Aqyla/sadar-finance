@@ -117,57 +117,81 @@ export const ScrollShowcase = () => {
 
           {/* Floating Interactive Micro-Cards (Scroll Parallax only, no infinite loop) */}
           <motion.div
-            style={{ y: yBadge1 }}
-            whileHover={{ scale: 1.08 }}
-            className="hidden lg:flex items-center gap-3 absolute -top-8 -left-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
+            className="hidden lg:block absolute -top-8 -left-6 z-10"
           >
-            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Pemasukan Rutin
-              </p>
-              <p className="text-sm font-black text-slate-900 dark:text-white">
-                +Rp 12.500.000
-              </p>
-            </div>
+            <motion.div
+              style={{ y: yBadge1 }}
+              whileHover={{ scale: 1.05 }}
+              className="showcase-float-card flex items-center gap-3 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            >
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 shadow-xs">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                  Pemasukan Rutin
+                </p>
+                <p className="text-sm font-black text-slate-900 dark:text-white whitespace-nowrap">
+                  +Rp 12.500.000
+                </p>
+              </div>
+            </motion.div>
           </motion.div>
 
           <motion.div
-            style={{ y: yBadge2 }}
-            whileHover={{ scale: 1.08 }}
-            className="hidden lg:flex items-center gap-3 absolute -top-8 -right-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.22, ease: "easeOut" }}
+            className="hidden lg:block absolute -top-8 -right-6 z-10"
           >
-            <div className="p-2.5 rounded-xl bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 shadow-xs">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Skor Finansial
-              </p>
-              <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300">
-                71 / 100
-              </p>
-            </div>
+            <motion.div
+              style={{ y: yBadge2 }}
+              whileHover={{ scale: 1.05 }}
+              className="showcase-float-card flex items-center gap-3 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            >
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 shadow-xs">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                  Peringatan Anggaran
+                </p>
+                <p className="text-sm font-black text-amber-700 dark:text-amber-400 whitespace-nowrap">
+                  Anggaran Tabungan Capai 80%
+                </p>
+              </div>
+            </motion.div>
           </motion.div>
 
           <motion.div
-            style={{ y: yBadge3 }}
-            whileHover={{ scale: 1.08 }}
-            className="hidden lg:flex items-center gap-3 absolute -bottom-8 -right-6 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.34, ease: "easeOut" }}
+            className="hidden lg:block absolute -bottom-8 -right-6 z-10"
           >
-            <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 shadow-xs">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Peringatan Anggaran
-              </p>
-              <p className="text-sm font-black text-amber-700 dark:text-amber-400">
-                Anggaran Tabungan Capai 80%
-              </p>
-            </div>
+            <motion.div
+              style={{ y: yBadge3 }}
+              whileHover={{ scale: 1.05 }}
+              className="showcase-float-card flex items-center gap-3 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xl transition-all cursor-default"
+            >
+              <div className="p-2.5 rounded-xl bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 shadow-xs">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                  Skor Finansial
+                </p>
+                <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300 whitespace-nowrap">
+                  71 / 100
+                </p>
+              </div>
+            </motion.div>
           </motion.div>
       </motion.div>
       </div>

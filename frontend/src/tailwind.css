@@ -119,16 +119,28 @@ html[data-bs-theme="dark"] .hero-title {
   margin-bottom: 0 !important;
 }
 
-/* Velzon redefines .p-3 as 1rem !important, overriding Tailwind's 0.75rem.
-   Pin the floating micro-card padding so heights stay compact. Vertical
-   padding is reduced (0.5rem) to slim the cards; horizontal stays 0.75rem
-   so the card width is preserved. */
+/* Velzon redefines .p-4 as 1.5rem !important, overriding Tailwind's p-4.
+   Pin the floating micro-card padding: horizontal stays 1.5rem so the card
+   width and visual presence are preserved; vertical drops to 0.875rem so the
+   cards are noticeably slimmer than the bulky 1.5rem default. */
 .showcase-float-card[class] {
-  padding: 0.5rem 0.75rem !important;
+  padding: 0.875rem 1.5rem !important;
 }
 
 .hero-actions {
   margin-top: 3.75rem !important;
+}
+
+/* Neutralize Velzon/Bootstrap unlayered p { margin-bottom } inside the
+   account-balance rows so the icon, name, and subtext align as one group
+   and the name→subtext gap matches the intended mt-0.5 spacing. */
+.account-row p {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+.account-row p + p {
+  margin-top: 2px !important;
 }
 
 @keyframes moveAurora2 {
