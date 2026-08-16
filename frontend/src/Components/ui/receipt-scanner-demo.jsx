@@ -14,7 +14,7 @@ export const ReceiptScannerDemo = () => {
   const receipts = [
     {
       id: "listrik",
-      title: "Listrik (Kebutuhan)",
+      title: "Listrik",
       merchant: "PLN Pembayaran Listrik",
       method: "QRIS",
       date: "12 Mei 2026",
@@ -28,7 +28,7 @@ export const ReceiptScannerDemo = () => {
     },
     {
       id: "streaming",
-      title: "Streaming (Keinginan)",
+      title: "Streaming",
       merchant: "Netflix Indonesia",
       method: "Bank Transfer",
       date: "11 Mei 2026",
@@ -42,7 +42,7 @@ export const ReceiptScannerDemo = () => {
     },
     {
       id: "tabungan",
-      title: "Tabungan (Alokasi Dana)",
+      title: "Tabungan",
       merchant: "Transfer Rekening Tabungan",
       method: "Bank Transfer",
       date: "10 Mei 2026",
@@ -76,8 +76,8 @@ export const ReceiptScannerDemo = () => {
     <div className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-xs dark:border-slate-800 dark:bg-slate-900">
       {/* Header Tabs with Framer Motion layoutId */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shadow-xs">
+        <div className="flex items-start gap-2.5">
+          <div className="p-2 rounded-lg bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-400 shadow-xs -mt-1">
             <ScanLine className="w-4 h-4" />
           </div>
           <div>

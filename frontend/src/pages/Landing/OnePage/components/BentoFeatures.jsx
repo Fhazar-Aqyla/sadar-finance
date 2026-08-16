@@ -386,6 +386,10 @@ export const BentoFeatures = () => {
             {/* Subcard A: Predictive Overspending Alert */}
             <SpotlightCard className="flex-1 flex flex-col justify-between p-6 sm:p-7 border-slate-200/90 dark:border-slate-800 shadow-md">
               <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#1E3A8A] text-xs font-bold dark:bg-blue-950/60 dark:text-sky-300 border border-blue-100 dark:border-blue-900/30 mb-2.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#1E3A8A] dark:text-sky-400" />
+                  Behavioral Finance Insight
+                </div>
                 <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Deteksi Dini Sebelum Anggaran Bocor
                 </h4>
@@ -469,7 +473,7 @@ export const BentoFeatures = () => {
                         <p className="text-xs font-bold text-slate-900 dark:text-white leading-none">
                           Bank DBS Indonesia
                         </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium">
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium leading-none">
                           Rekening Tabungan Utama
                         </p>
                       </div>
@@ -493,7 +497,7 @@ export const BentoFeatures = () => {
                         <p className="text-xs font-bold text-slate-900 dark:text-white leading-none">
                           GoPay, OVO & DANA
                         </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium">
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium leading-none">
                           E-Wallet Operasional
                         </p>
                       </div>
