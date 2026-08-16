@@ -56,19 +56,19 @@ export const ComparisonSection = () => {
         className="relative z-10 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg shadow-slate-900/5"
       >
         {/* Header */}
-        <div className="hidden sm:grid grid-cols-[1.6fr_0.7fr_0.7fr] items-stretch border-b border-slate-200/80 dark:border-slate-800">
-          <div className="flex items-center px-8 lg:px-10 py-6 bg-[#F8FAFC] dark:bg-slate-800/60">
-            <span className="text-[15px] font-bold uppercase tracking-wider text-[#0F172A] dark:text-slate-100">
+        <div className="grid grid-cols-[1.5fr_0.75fr_0.75fr] sm:grid-cols-[1.6fr_0.7fr_0.7fr] items-stretch border-b border-slate-200/80 dark:border-slate-800">
+          <div className="flex items-center px-[14px] lg:px-10 py-[10px] lg:py-6 bg-[#F8FAFC] dark:bg-slate-800/60">
+            <span className="text-[11px] lg:text-[15px] font-bold uppercase tracking-wide lg:tracking-wider text-[#0F172A] dark:text-slate-100">
               Fitur / Aspek
             </span>
           </div>
-          <div className="flex items-center justify-center px-4 py-6 border-l border-[#F1D5D8] dark:border-rose-900/40 bg-[#FFF1F2] dark:bg-rose-950/40">
-            <span className="text-[15px] font-bold uppercase tracking-wider text-[#9F1239] dark:text-rose-300">
+          <div className="flex items-center justify-center px-[10px] lg:px-4 py-[10px] lg:py-6 border-l border-[#F1D5D8] dark:border-rose-900/40 bg-[#FFF1F2] dark:bg-rose-950/40">
+            <span className="text-[11px] lg:text-[15px] font-bold uppercase tracking-wide lg:tracking-wider text-[#9F1239] dark:text-rose-300">
               Platform Lain
             </span>
           </div>
-          <div className="flex items-center justify-center px-4 py-6 border-l border-[#23408F] bg-[#23408F] dark:bg-[#23408F]">
-            <span className="text-[15px] font-extrabold uppercase tracking-wider text-white">
+          <div className="flex items-center justify-center px-[10px] lg:px-4 py-[10px] lg:py-6 border-l border-[#23408F] bg-[#23408F] dark:bg-[#23408F]">
+            <span className="text-[11px] lg:text-[15px] font-extrabold uppercase tracking-wide lg:tracking-wider text-white">
               SADAR Finance
             </span>
           </div>
@@ -79,32 +79,26 @@ export const ComparisonSection = () => {
           {checklistRows.map((feature, idx) => (
             <div
               key={idx}
-              className="grid grid-cols-1 sm:grid-cols-[1.6fr_0.7fr_0.7fr] items-stretch"
+              className="grid grid-cols-[1.5fr_0.75fr_0.75fr] sm:grid-cols-[1.6fr_0.7fr_0.7fr] items-stretch"
             >
               {/* Feature */}
-              <div className="flex items-center px-5 sm:px-8 lg:px-10 py-[12px] sm:py-7 bg-white dark:bg-slate-900">
-                <span className="text-[17px] sm:text-[18px] font-semibold text-[#0F172A] dark:text-white leading-snug">
+              <div className="flex items-center px-[14px] lg:px-10 py-[12px] lg:py-7 bg-white dark:bg-slate-900">
+                <span className="text-[15px] lg:text-[18px] font-semibold text-[#0F172A] dark:text-white leading-snug">
                   {feature}
                 </span>
               </div>
 
               {/* Platform Lain */}
-              <div className="flex items-center justify-between sm:justify-center gap-3 px-4 sm:px-4 py-2.5 sm:py-7 border-t sm:border-t-0 border-slate-100/80 dark:border-slate-800/60 sm:border-l sm:border-[#F1D5D8] dark:sm:border-rose-900/40 bg-[#FFFAFA] dark:bg-rose-950/20">
-                <span className="sm:hidden text-xs font-semibold uppercase tracking-wider text-[#9F1239]">
-                  Platform Lain
-                </span>
-                <span className="w-10 h-10 shrink-0 rounded-full bg-[#FFF1F2] dark:bg-rose-950/50 border border-[#F1D5D8] dark:border-rose-900/50 flex items-center justify-center">
-                  <X className="w-6 h-6 text-[#FF4D6D] dark:text-rose-400" strokeWidth={2.5} />
+              <div className="flex items-center justify-center px-[10px] lg:px-4 py-[12px] lg:py-7 border-l border-[#F1D5D8] dark:border-rose-900/40 bg-[#FFFAFA] dark:bg-rose-950/20">
+                <span className="w-8 h-8 lg:w-10 lg:h-10 shrink-0 rounded-full bg-[#FFF1F2] dark:bg-rose-950/50 border border-[#F1D5D8] dark:border-rose-900/50 flex items-center justify-center">
+                  <X className="w-5 h-5 lg:w-6 lg:h-6 text-[#FF4D6D] dark:text-rose-400" strokeWidth={2.5} />
                 </span>
               </div>
 
               {/* SADAR Finance */}
-              <div className="flex items-center justify-between sm:justify-center gap-3 px-4 sm:px-4 py-2.5 sm:py-7 border-t sm:border-t-0 sm:border-l border-slate-100/80 dark:border-slate-800/60 sm:border-blue-200 dark:sm:border-blue-900/50 bg-[#F2F7FF] dark:bg-blue-950/40">
-                <span className="sm:hidden text-xs font-semibold uppercase tracking-wider text-[#23408F] dark:text-sky-300">
-                  SADAR Finance
-                </span>
-                <span className="w-10 h-10 shrink-0 rounded-full bg-[#ECFDF5] dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center">
-                  <Check className="w-6 h-6 text-[#00A878] dark:text-emerald-400" strokeWidth={2.5} />
+              <div className="flex items-center justify-center px-[10px] lg:px-4 py-[12px] lg:py-7 border-l border-blue-200 dark:border-blue-900/50 bg-[#F2F7FF] dark:bg-blue-950/40">
+                <span className="w-8 h-8 lg:w-10 lg:h-10 shrink-0 rounded-full bg-[#ECFDF5] dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center">
+                  <Check className="w-5 h-5 lg:w-6 lg:h-6 text-[#00A878] dark:text-emerald-400" strokeWidth={2.5} />
                 </span>
               </div>
             </div>
