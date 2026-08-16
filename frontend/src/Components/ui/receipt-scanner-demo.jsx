@@ -92,7 +92,7 @@ export const ReceiptScannerDemo = () => {
         </div>
 
         {/* Receipt Switcher Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-xl dark:bg-slate-800 self-start sm:self-auto border border-slate-200/60 dark:border-slate-700/60">
           {receipts.map((r) => {
             const isSelected = activeReceipt.id === r.id;
             return (
@@ -168,12 +168,12 @@ export const ReceiptScannerDemo = () => {
                   transition={{ delay: idx * 0.08 }}
                   className="flex justify-between py-0.5 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 px-1 rounded transition-colors"
                 >
-                  <span className="truncate pr-2">{item.name}</span>
+                  <span className="min-w-0 pr-2 break-words">{item.name}</span>
                   <span className="font-medium shrink-0">{item.price}</span>
                 </motion.div>
               ))}
             </div>
-            <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex justify-between font-bold text-slate-900 dark:text-white text-xs">
+            <div className="border-t border-dashed border-slate-300 dark:border-slate-700 pt-2 mt-2 flex items-center justify-between gap-x-2 flex-wrap font-bold text-slate-900 dark:text-white text-xs">
               <span>TOTAL TRANSAKSI</span>
               <span className="text-[#1E3A8A] dark:text-sky-400 font-extrabold">
                 {activeReceipt.total}
@@ -215,7 +215,7 @@ export const ReceiptScannerDemo = () => {
               transition={{ duration: 0.25 }}
               className="space-y-2.5 text-xs"
             >
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
+              <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Store className="w-3.5 h-3.5 text-slate-400" /> Merchant
                 </span>
@@ -224,7 +224,7 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
+              <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal
                   Transaksi
@@ -234,7 +234,7 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
+              <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors">
                 <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Tag className="w-3.5 h-3.5 text-slate-400" /> Kategori
                 </span>
@@ -243,7 +243,7 @@ export const ReceiptScannerDemo = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg bg-[#1E3A8A] text-white shadow-sm font-medium">
+              <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-[#1E3A8A] text-white shadow-sm font-medium">
                 <span className="text-white/90 flex items-center gap-1.5">
                   <CheckCircle className="w-4 h-4 text-emerald-400" /> Total
                   Terverifikasi

@@ -61,7 +61,7 @@ export function Footer({
           </motion.div>
 
           {/* Middle — site map */}
-          <motion.nav {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }} aria-label="Site Map" className="text-right md:mr-8">
+          <motion.nav {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }} aria-label="Site Map" className="text-left md:text-right md:mr-8">
             <h3 className="text-xs font-bold uppercase tracking-wider text-white mb-3">
               Site Map
             </h3>
@@ -80,7 +80,7 @@ export function Footer({
           </motion.nav>
 
           {/* Right — legal */}
-          <motion.div {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }} className="text-right">
+          <motion.div {...fadeUp} transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }} className="text-left md:text-right">
             <h3 className="text-xs font-bold uppercase tracking-wider text-white mb-3">
               Legal
             </h3>

@@ -56,7 +56,7 @@ export const InteractiveBudgetSlider = () => {
           </div>
 
           {/* Quick Preset Pills — sejajar kanan bawah header */}
-          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 self-start sm:self-end shrink-0">
+          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 self-start sm:self-end shrink-0">
             {presets.map((preset) => {
               const isSelected = income === preset.value;
               return (
@@ -125,12 +125,12 @@ export const InteractiveBudgetSlider = () => {
       </div>
 
       {/* ── Allocation Result Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Needs Card */}
         <motion.div
           whileHover={{ y: -3 }}
           transition={{ duration: 0.18 }}
-          className="rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/30 dark:to-slate-900 p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="alloc-card rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/30 dark:to-slate-900 p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
@@ -171,7 +171,7 @@ export const InteractiveBudgetSlider = () => {
         <motion.div
           whileHover={{ y: -3 }}
           transition={{ duration: 0.18 }}
-          className="rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900 p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="alloc-card rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900 p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
@@ -212,7 +212,7 @@ export const InteractiveBudgetSlider = () => {
         <motion.div
           whileHover={{ y: -3 }}
           transition={{ duration: 0.18 }}
-          className="rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-slate-900 p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="alloc-card rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-slate-900 p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">

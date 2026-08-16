@@ -268,12 +268,12 @@ export const BentoFeatures = () => {
                 </p>
 
                 {/* Official Score Range Reference Legend Bar */}
-                <div className="mt-4 w-full max-w-md p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                <div className="mt-4 w-full max-w-md p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
                   <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
                     <Info className="w-3 h-3 text-[#1E3A8A] dark:text-sky-400" />
                     Rentang Skor:
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       80–100 (Sehat)
@@ -292,7 +292,7 @@ export const BentoFeatures = () => {
 
               {/* Slider & Preset Switcher */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400 mb-2 font-semibold">
                   <span>Simulasi level skor kesehatan:</span>
                   <span className={`font-bold ${scoreData.textColor}`}>
                     {activeScore} Poin ({scoreData.label})
@@ -311,7 +311,7 @@ export const BentoFeatures = () => {
                 />
 
                 {/* Score Preset Pills with Sliding Selector */}
-                <div className="grid grid-cols-4 gap-1.5 mt-3 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1.5 mt-3 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
                   {scorePresets.map((preset) => {
                     const isSelected = activeScore === preset.score;
                     return (
@@ -349,7 +349,7 @@ export const BentoFeatures = () => {
             </div>
 
             {/* 4 Dynamic Assessment Factors Matrix */}
-            <div className="grid grid-cols-2 gap-2.5 pt-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-5">
               {scoreData.factors.map((f, i) => (
                 <div
                   key={i}

@@ -95,7 +95,7 @@ export const ScrollShowcase = () => {
               <span className="w-3 h-3 rounded-full bg-amber-500/90 inline-block shadow-xs" />
               <span className="w-3 h-3 rounded-full bg-emerald-500/90 inline-block shadow-xs" />
             </div>
-            <div className="text-[11px] font-mono text-slate-400 bg-slate-800/70 border border-slate-700/50 px-4 py-0.5 rounded-full flex items-center gap-2 shadow-inner">
+            <div className="text-[11px] font-mono text-slate-400 bg-slate-800/70 border border-slate-700/50 px-4 py-0.5 rounded-full hidden sm:flex items-center gap-2 shadow-inner">
               <span>https://sadar.app/dashboard</span>
             </div>
             <div className="w-12 text-right" />
@@ -106,12 +106,12 @@ export const ScrollShowcase = () => {
             <img
               src={dashboardPreview}
               alt="SADAR Finance Dashboard Desktop"
-              className="hidden sm:block w-full h-full object-cover object-top hover:scale-[1.01] transition-transform duration-700"
+              className="hidden lg:block w-full h-full object-cover object-top hover:scale-[1.01] transition-transform duration-700"
             />
             <img
               src={dashboardMobilePreview}
               alt="SADAR Finance Dashboard Mobile"
-              className="block sm:hidden w-full h-full object-fill object-top"
+              className="block lg:hidden w-full h-full object-contain object-top"
             />
           </div>
 

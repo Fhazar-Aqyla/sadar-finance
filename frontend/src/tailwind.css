@@ -143,6 +143,49 @@ html[data-bs-theme="dark"] .hero-title {
   margin-top: 2px !important;
 }
 
+/* Velzon/Bootstrap (unlayered, !important) also redefines .p-4 (1.5rem) and
+   .p-5 (3rem), overriding Tailwind's 1rem / 1.25rem padding utilities. On
+   small screens this inflates card/nav/section padding and squeezes content
+   (e.g. the receipt scanner demo, allocation cards, FAQ rows). Pin them to
+   Tailwind values below the sm breakpoint only — desktop (>=640px) keeps the
+   existing baseline. */
+@media (max-width: 639px) {
+  .p-4[class] { padding: 1rem !important; }
+  .px-4[class] { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-4[class] { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+  .pt-4[class] { padding-top: 1rem !important; }
+  .pr-4[class] { padding-right: 1rem !important; }
+  .pb-4[class] { padding-bottom: 1rem !important; }
+  .pl-4[class] { padding-left: 1rem !important; }
+
+  .p-5[class] { padding: 1.25rem !important; }
+  .px-5[class] { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+  .py-5[class] { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+  .pt-5[class] { padding-top: 1.25rem !important; }
+  .pr-5[class] { padding-right: 1.25rem !important; }
+  .pb-5[class] { padding-bottom: 1.25rem !important; }
+  .pl-5[class] { padding-left: 1.25rem !important; }
+}
+
+/* Hero headline: slightly smaller on phones so it wraps to 3 lines instead
+   of 4-5 at 320px, scaling smoothly into the 36px desktop minimum at the sm
+   breakpoint (6vw hits 2.25rem at exactly 640px, so there is no jump). */
+@media (max-width: 639px) {
+  .hero-title {
+    font-size: clamp(1.75rem, 6vw, 2.25rem) !important;
+  }
+}
+
+/* Tablet (768-1023px): the 50/30/20 allocation cards keep Bootstrap .p-5
+   (3rem) above the sm breakpoint, which squeezes the 3-column card grid and
+   clips the nominal amounts. Pin them to 1.25rem in this tablet range only;
+   >=1024px (and >=1280px desktop baseline) keeps the existing padding. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .alloc-card[class] {
+    padding: 1.25rem !important;
+  }
+}
+
 @keyframes moveAurora2 {
   from {
     transform: translate(0, 0);

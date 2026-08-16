@@ -79,7 +79,7 @@ export const HowItWorksSection = () => {
       {/* Steps Container with Connecting Neon Conduit Line */}
       <div className="relative z-10">
         {/* Desktop Conduit Line — always lit, with traveling light pulse */}
-        <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] -translate-y-14 h-[3px] pointer-events-none">
+        <div className="hidden lg:block absolute top-1/2 left-[10%] right-[10%] -translate-y-14 h-[3px] pointer-events-none">
           {/* Base glow track */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#1E3A8A]/40 via-sky-400/40 to-emerald-500/40 shadow-[0_0_18px_rgba(56,189,248,0.35)]" />
           {/* Bright moving pulse */}
@@ -91,7 +91,7 @@ export const HowItWorksSection = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 relative z-10">
           {steps.map((step, idx) => {
             const Icon = step.icon;
             return (
