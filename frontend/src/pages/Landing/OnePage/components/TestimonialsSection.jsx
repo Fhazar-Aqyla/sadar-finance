@@ -133,7 +133,7 @@ const TestimonialCard = ({ position, testimonial, handleMove, cardSize }) => {
         <p className="text-base sm:text-lg font-semibold leading-relaxed line-clamp-5 text-slate-700 dark:text-slate-300">
           “{testimonial.text}”
         </p>
-        <footer className="flex items-center gap-2.5 mt-auto pt-5">
+        <footer className="flex items-center gap-2.5 mt-auto pt-8">
           <img
             width={40}
             height={40}
@@ -142,7 +142,7 @@ const TestimonialCard = ({ position, testimonial, handleMove, cardSize }) => {
             loading="lazy"
             className="h-10 w-10 rounded-full object-cover ring-2 ring-[#1E3A8A]/15 dark:ring-sky-500/30"
           />
-          <div className="min-w-0">
+          <div className="min-w-0 flex flex-col justify-center gap-1">
             <p className="text-sm font-bold leading-tight truncate text-slate-900 dark:text-white">
               {testimonial.name}
             </p>

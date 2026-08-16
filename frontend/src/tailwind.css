@@ -61,6 +61,12 @@ html[data-bs-theme="dark"] .hero-title {
   color: #ffffff !important;
 }
 
+/* Neutralize admin theme unlayered p margin (Velzon) inside testimonial
+   footers so the avatar and name/role block center on the same axis. */
+#testimonials footer p {
+  margin: 0 !important;
+}
+
 .hero-subtitle {
   margin: 0 !important;
   margin-top: 2.5rem !important;
