@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   Layers,
   Activity,
-  ArrowUpRight,
 } from "lucide-react";
 import dashboardPreview from "@/assets/images/landing/dashboard-preview.png";
 import dashboardMobilePreview from "@/assets/images/landing/dashboard-mobile-preview.webp";
@@ -126,14 +125,11 @@ export const ScrollShowcase = () => {
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-1">
-                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                  Pemasukan Rutin
-                </p>
-                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
-              </div>
+              <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                Pemasukan Rutin
+              </p>
               <p className="text-sm font-black text-slate-900 dark:text-white">
-                +Rp 8.000.000
+                +Rp 12.500.000
               </p>
             </div>
           </motion.div>
@@ -150,8 +146,8 @@ export const ScrollShowcase = () => {
               <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                 Skor Finansial
               </p>
-              <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300 flex items-center gap-1.5">
-                <span>84 / 100</span>
+              <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300">
+                71 / 100
               </p>
             </div>
           </motion.div>
@@ -169,7 +165,7 @@ export const ScrollShowcase = () => {
                 Peringatan Anggaran
               </p>
               <p className="text-sm font-black text-amber-700 dark:text-amber-400">
-                Kuota Keinginan Capai 82%
+                Anggaran Tabungan Capai 80%
               </p>
             </div>
           </motion.div>
