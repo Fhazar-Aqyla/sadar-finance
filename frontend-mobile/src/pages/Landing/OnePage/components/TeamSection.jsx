@@ -1,7 +1,7 @@
-﻿import React, { useRef } from "react";
+import React, { useRef } from "react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { Users, Sparkles } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import diahAvatar from "@/assets/images/users/diah.png";
 import marselaAvatar from "@/assets/images/users/marsela.png";
 import dzakyAvatar from "@/assets/images/users/dzaky.png";

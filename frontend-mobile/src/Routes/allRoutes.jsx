@@ -34,8 +34,6 @@ const authProtectedRoutes = [
   { path: "/profile-account/edit", component: <SadarProfileEdit /> },
   { path: "/index", component: <SadarDashboard /> },
   { path: "/transactions/input", component: <TransactionInput /> },
-  { path: "/privancy-policy", component: <PrivancyPolicy /> },
-  { path: "/term-conditions", component: <TermAndConditions /> },
   { path: "/profile", component: <UserProfile /> },
 
   // this route should be at the end of all other routes
@@ -43,13 +41,17 @@ const authProtectedRoutes = [
 ];
 
 const publicRoutes = [
-  // Authentication Page
+  // Authentication & Landing Pages
   { path: "/", component: <OnePage /> },
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login />, guestOnly: true },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
   { path: "/register", component: <Register />, guestOnly: true },
   { path: "/landing", component: <OnePage /> },
+  { path: "/privancy-policy", component: <PrivancyPolicy /> },
+  { path: "/privacy-policy", component: <PrivancyPolicy /> },
+  { path: "/term-conditions", component: <TermAndConditions /> },
+  { path: "/terms-conditions", component: <TermAndConditions /> },
 ];
 
 export { authProtectedRoutes, publicRoutes };

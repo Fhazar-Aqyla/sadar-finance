@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Alert,
@@ -25,6 +25,7 @@ import {
 import { useDispatch } from "react-redux";
 import { profileSuccess } from "../../slices/auth/profile/reducer";
 import { authApi } from "../../Components/services/api";
+import { api } from "../../config";
 import "../SadarShared/sadar-pages.css";
 
 const updateSessionUser = (updatedUser) => {
@@ -65,8 +66,8 @@ const defaultProfile = {
 const resolveAvatarUrl = (url) => {
   if (!url) return "";
   if (/^(https?:|data:)/i.test(url)) return url;
-  const serverUrl = "http://localhost:3000";
-  return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  const baseUrl = (api?.API_URL || "").replace(/\/api\/v1\/?$/, "");
+  return baseUrl ? `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}` : url;
 };
 
 const normalizeProfile = (user) => {

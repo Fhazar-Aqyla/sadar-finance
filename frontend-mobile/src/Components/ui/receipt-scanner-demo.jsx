@@ -59,17 +59,14 @@ export const ReceiptScannerDemo = () => {
 
   const [activeReceipt, setActiveReceipt] = useState(receipts[0]);
   const [isScanning, setIsScanning] = useState(false);
-  const [scannedStep, setScannedStep] = useState(3);
 
   const handleSelect = (r) => {
     if (r.id === activeReceipt.id) return;
     setIsScanning(true);
-    setScannedStep(0);
 
     setTimeout(() => {
       setActiveReceipt(r);
       setIsScanning(false);
-      setScannedStep(3);
     }, 450);
   };
 

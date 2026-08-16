@@ -30,7 +30,7 @@ export default defineConfig([
       'no-unused-vars': ['error', {
         argsIgnorePattern: '^[A-Z_]',
         caughtErrors: 'none',
-        varsIgnorePattern: '^[A-Z_]',
+        varsIgnorePattern: '^[A-Z_]|motion',
       }],
       'react-refresh/only-export-components': ['error', {
         allowConstantExport: true,

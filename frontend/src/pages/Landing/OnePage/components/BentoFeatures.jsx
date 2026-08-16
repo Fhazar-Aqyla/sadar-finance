@@ -15,7 +15,7 @@ import {
   TrendingUp,
   Info,
 } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 
 export const BentoFeatures = () => {
   const containerRef = useRef(null);

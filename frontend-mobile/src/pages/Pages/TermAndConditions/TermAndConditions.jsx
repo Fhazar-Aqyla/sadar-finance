@@ -40,7 +40,7 @@ const TermAndConditions = () => {
                                 <div className="mb-4">
                                     <h5 className="fw-semibold text-primary">3. Privasi & Data Finansial</h5>
                                     <p className="text-muted">Kami sangat menghormati privasi data finansial Anda. Seluruh catatan transaksi dan data pribadi disimpan dengan enkripsi standar industri dan tidak akan diperjualbelikan kepada pihak ketiga tanpa persetujuan Anda.</p>
-                                    <p className="text-muted">Ketentuan lengkap mengenai pengelolaan data pengguna dapat dibaca pada halaman <Link to="/pages-privacy-policy" className="text-primary text-decoration-underline">Kebijakan Privasi</Link>.</p>
+                                    <p className="text-muted">Ketentuan lengkap mengenai pengelolaan data pengguna dapat dibaca pada halaman <Link to="/privancy-policy" className="text-primary text-decoration-underline">Kebijakan Privasi</Link>.</p>
                                 </div>
 
                                 <div className="mb-4">

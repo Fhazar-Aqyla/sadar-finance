@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { X, Check, ArrowLeftRight } from "lucide-react";
 
 const checklistRows = [
