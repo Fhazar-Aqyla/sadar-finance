@@ -28,15 +28,16 @@
   min-height: 38px;
   border: 0;
   border-radius: 8px !important;
-  color: #475569;
+  color: #64748b;
   background: transparent;
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: none;
+  transition: all 0.2s ease-in-out;
 }
 
 .sadar-entry-tabs .btn:hover {
-  color: #25a0e2;
-  background: #eef5ff;
+  color: #1e293b;
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .sadar-entry-tabs .btn.active {
@@ -78,15 +79,16 @@
   min-height: 38px;
   border: 0;
   border-radius: 8px !important;
-  color: #475569;
+  color: #64748b;
   background: transparent;
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: none;
+  transition: all 0.2s ease-in-out;
 }
 
 .sadar-mode-toggle .btn:hover {
-  color: #25a0e2;
-  background: #eef5ff;
+  color: #1e293b;
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .sadar-mode-toggle .btn.active {
@@ -296,13 +298,15 @@ html[data-bs-theme="dark"] .sadar-mode-toggle {
 
 html[data-bs-theme="dark"] .sadar-entry-tabs .btn,
 html[data-bs-theme="dark"] .sadar-mode-toggle .btn {
-  color: #cbd5e1;
+  color: #94a3b8;
+  background: transparent;
+  font-weight: 600;
 }
 
 html[data-bs-theme="dark"] .sadar-entry-tabs .btn:hover,
 html[data-bs-theme="dark"] .sadar-mode-toggle .btn:hover {
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.1);
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 html[data-bs-theme="dark"] .sadar-entry-tabs .btn.active,
@@ -423,8 +427,9 @@ html[data-bs-theme="dark"] .sadar-reset-button:hover {
 
   .sadar-transaction-page .sadar-entry-tabs .btn,
   .sadar-transaction-page .sadar-mode-toggle .btn {
-    color: var(--sadar-glass-copy);
+    color: #64748b;
     background: transparent !important;
+    font-weight: 600;
   }
 
   .sadar-transaction-page .sadar-entry-tabs .btn.active,
@@ -565,6 +570,9 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     min-height: 42px;
     border-radius: 13px !important;
     font-size: 0.86rem;
+    color: #64748b;
+    background: transparent !important;
+    font-weight: 600;
   }
 
   .sadar-transaction-page .sadar-entry-tabs .btn.active {
@@ -628,6 +636,9 @@ html[data-bs-theme="dark"] .sadar-transaction-page .sadar-detail-card :where(.fo
     min-height: 38px;
     border-radius: 11px !important;
     font-size: 0.8rem;
+    color: #64748b;
+    background: transparent !important;
+    font-weight: 600;
   }
 
   .sadar-transaction-page .sadar-mode-toggle .btn.active {

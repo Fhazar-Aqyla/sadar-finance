@@ -763,6 +763,7 @@ const FinancialScoreWithData = () => {
                       color={
                         selectedPeriod === option.key ? "primary" : "light"
                       }
+                      className={selectedPeriod === option.key ? "active" : ""}
                       key={option.key}
                       onClick={() => setSelectedPeriod(option.key)}
                     >

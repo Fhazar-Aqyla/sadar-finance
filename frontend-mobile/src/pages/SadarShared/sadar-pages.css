@@ -1323,22 +1323,24 @@
   min-height: 32px;
   border: 0 !important;
   border-radius: 8px !important;
-  color: #536179;
+  color: #64748b !important;
   background: transparent !important;
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: none !important;
+  transition: all 0.2s ease-in-out;
 }
 
 .sadar-period-toggle .btn:hover,
 .sadar-period-toggle .btn:focus {
-  color: #1e3a8a;
-  background: #e8f1ff !important;
+  color: #1e293b !important;
+  background: rgba(255, 255, 255, 0.5) !important;
 }
 
 .sadar-period-toggle .btn.btn-primary,
 .sadar-period-toggle .btn.active {
   color: #ffffff !important;
   background: #25a0e2 !important;
+  font-weight: 700;
 }
 
 html[data-bs-theme="dark"] {
@@ -1851,19 +1853,22 @@ html[data-bs-theme="dark"] .sadar-period-toggle {
 }
 
 html[data-bs-theme="dark"] .sadar-period-toggle .btn {
-  color: #9fb0c7;
+  color: #94a3b8 !important;
+  background: transparent !important;
+  font-weight: 600;
 }
 
 html[data-bs-theme="dark"] .sadar-period-toggle .btn:hover,
 html[data-bs-theme="dark"] .sadar-period-toggle .btn:focus {
-  color: #e0f2fe;
-  background: rgba(56, 189, 248, 0.12) !important;
+  color: #f1f5f9 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 
 html[data-bs-theme="dark"] .sadar-period-toggle .btn.btn-primary,
 html[data-bs-theme="dark"] .sadar-period-toggle .btn.active {
   color: #ffffff !important;
   background: #0ea5e9 !important;
+  font-weight: 700;
 }
 
 @media (max-width: 991.98px) {
@@ -2215,23 +2220,25 @@ html[data-bs-theme="dark"] .profile-photo-dropdown-divider {
 
 .sadar-mode-toggle .btn {
   min-height: 38px;
-  border: 0;
+  border: 0 !important;
   border-radius: 8px !important;
-  color: #475569;
-  background: transparent;
-  font-weight: 700;
-  box-shadow: none;
+  color: #64748b !important;
+  background: transparent !important;
+  font-weight: 600;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out;
 }
 
 .sadar-mode-toggle .btn:hover {
-  color: #25a0e2;
-  background: #eef5ff;
+  color: #1e293b !important;
+  background: rgba(255, 255, 255, 0.5) !important;
 }
 
 .sadar-mode-toggle .btn.active {
-  color: #25a0e2;
-  background: #ffffff;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  color: #25a0e2 !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08) !important;
+  font-weight: 700;
 }
 
 html[data-bs-theme="dark"] .sadar-mode-toggle {
@@ -2240,18 +2247,21 @@ html[data-bs-theme="dark"] .sadar-mode-toggle {
 }
 
 html[data-bs-theme="dark"] .sadar-mode-toggle .btn {
-  color: #cbd5e1;
+  color: #94a3b8 !important;
+  background: transparent !important;
+  font-weight: 600;
 }
 
 html[data-bs-theme="dark"] .sadar-mode-toggle .btn:hover {
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.1);
+  color: #f1f5f9 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 
 html[data-bs-theme="dark"] .sadar-mode-toggle .btn.active {
-  color: #7dd3fc;
-  background: #243041;
-  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22);
+  color: #7dd3fc !important;
+  background: #243041 !important;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
+  font-weight: 700;
 }
 
 .sadar-table-filter-btn {
@@ -5113,6 +5123,19 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     -webkit-backdrop-filter: blur(18px) saturate(155%);
   }
 
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+    border: 0 !important;
+    color: #64748b !important;
+    background: transparent !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+  }
+
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary):hover {
+    color: #1e293b !important;
+    background: rgba(255, 255, 255, 0.45) !important;
+  }
+
   .sadar-entry-tabs .btn.active,
   .sadar-mode-toggle .btn.active,
   .sadar-period-toggle .btn.active,
@@ -5120,6 +5143,7 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     color: #075985 !important;
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(186, 230, 253, 0.66)) !important;
     box-shadow: 0 7px 18px rgba(14, 116, 179, 0.14), inset 0 1px 0 #ffffff !important;
+    font-weight: 700 !important;
   }
 
   .sadar-table-wrap {
@@ -5628,8 +5652,17 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.07), 0 9px 22px rgba(0, 5, 18, 0.2);
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn {
-    color: #a9bed4 !important;
+  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+    border: 0 !important;
+    color: #94a3b8 !important;
+    background: transparent !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+  }
+
+  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary):hover {
+    color: #f1f5f9 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
   }
 
   html[data-bs-theme="dark"] .sadar-entry-tabs .btn.active,
@@ -5639,6 +5672,7 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     color: #e0f2fe !important;
     background: linear-gradient(145deg, rgba(30, 101, 139, 0.58), rgba(30, 58, 138, 0.4)) !important;
     box-shadow: 0 8px 20px rgba(0, 5, 18, 0.24), inset 0 1px 0 rgba(224, 242, 254, 0.13) !important;
+    font-weight: 700 !important;
   }
 
   html[data-bs-theme="dark"] .sadar-table-wrap {
@@ -6146,12 +6180,21 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     box-shadow: none !important;
   }
 
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+    border: 0 !important;
+    color: #64748b !important;
+    background: transparent !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+  }
+
   :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn.active,
   .sadar-period-toggle .btn.btn-primary {
     border-color: transparent !important;
     color: var(--sadar-action) !important;
     background: rgba(255, 255, 255, 0.94) !important;
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08) !important;
+    font-weight: 700 !important;
   }
 
   .sadar-empty-state-center,
@@ -6534,8 +6577,12 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     background: #18212c !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn {
-    color: #cbd5e1 !important;
+  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+    border: 0 !important;
+    color: #94a3b8 !important;
+    background: transparent !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
   }
 
   html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn.active,
@@ -6543,6 +6590,7 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     color: #7dd3fc !important;
     background: #243041 !important;
     box-shadow: 0 8px 18px rgba(2, 6, 23, 0.22) !important;
+    font-weight: 700 !important;
   }
 
   html[data-bs-theme="dark"] .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row),
