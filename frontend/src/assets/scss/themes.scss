@@ -217,6 +217,44 @@ $value in $theme-colors {
   font-size: 0.92rem;
 }
 
+.sadar-footer-partners {
+  display: flex;
+  align-items: center;
+}
+
+.sadar-footer-partner-label {
+  color: #8a94a6;
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-right: 2px;
+}
+
+.sadar-partner-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.09);
+    background: #ffffff;
+  }
+
+  img {
+    height: 16px;
+    width: auto;
+    max-width: 110px;
+    object-fit: contain;
+  }
+}
+
 .sadar-logo-dark-mode {
   display: none;
 }
@@ -382,6 +420,21 @@ $value in $theme-colors {
   .sadar-footer-brand,
   .sadar-footer-note {
     color: var(--sadar-shell-muted);
+  }
+
+  .sadar-footer-partner-label {
+    color: var(--sadar-shell-muted);
+  }
+
+  .sadar-partner-badge {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
   }
 
   .sadar-logo-light-mode {

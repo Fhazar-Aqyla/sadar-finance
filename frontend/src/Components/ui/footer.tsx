@@ -1,10 +1,18 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 
+export interface PartnerItem {
+  name: string;
+  logo: string;
+  href?: string;
+}
+
 export interface FooterProps {
   logo: React.ReactNode;
   brandName: string;
   description?: string;
+  partners?: PartnerItem[];
+  partnersLabel?: string;
   mainLinks: Array<{
     href: string;
     label: string;
@@ -30,6 +38,8 @@ export function Footer({
   logo,
   brandName,
   description,
+  partners,
+  partnersLabel = "Didukung Oleh",
   mainLinks,
   legalLinks,
   copyright,
@@ -48,7 +58,7 @@ export function Footer({
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-10">
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_auto] gap-8 md:gap-8 lg:gap-8 items-start">
-          {/* Left — brand */}
+          {/* Left — brand & partners */}
           <motion.div {...fadeUp}>
             <a href="/" className="inline-flex items-center no-underline" aria-label={brandName}>
               {logo}
@@ -57,6 +67,44 @@ export function Footer({
               <p className="mt-4 text-sm leading-relaxed text-blue-200/70 max-w-xs">
                 {description}
               </p>
+            )}
+
+            {partners && partners.length > 0 && (
+              <div className="mt-6">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-blue-200/60 mb-2.5">
+                  {partnersLabel}
+                </span>
+                <div className="flex flex-wrap items-center gap-3">
+                  {partners.map((partner, idx) => {
+                    const badge = (
+                      <div className="bg-white/95 hover:bg-white transition-all px-3 py-1.5 rounded-lg border border-white/20 shadow-sm flex items-center justify-center hover:scale-[1.02] duration-200">
+                        <img
+                          src={partner.logo}
+                          alt={partner.name}
+                          className="h-6 sm:h-7 w-auto object-contain max-w-[140px]"
+                        />
+                      </div>
+                    );
+
+                    return partner.href ? (
+                      <a
+                        key={idx}
+                        href={partner.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block no-underline"
+                        aria-label={partner.name}
+                      >
+                        {badge}
+                      </a>
+                    ) : (
+                      <div key={idx} className="inline-block">
+                        {badge}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </motion.div>
 

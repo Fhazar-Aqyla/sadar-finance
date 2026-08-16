@@ -3147,7 +3147,8 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     margin-left: 6px;
   }
 
-  html:not([data-bs-theme="dark"]) .sadar-footer-note {
+  html:not([data-bs-theme="dark"]) .sadar-footer-note,
+  html:not([data-bs-theme="dark"]) .sadar-footer-partner-label {
     color: #6f839b;
   }
 
