@@ -106,6 +106,13 @@ html[data-bs-theme="dark"] .hero-title {
   margin-top: 2.5rem !important;
 }
 
+/* Neutralize Velzon/Bootstrap unlayered p { margin-bottom } inside FAQ
+   question rows so the question icon centers on the text line, not the
+   inflated row height. */
+#faq .flex.items-center p {
+  margin-bottom: 0 !important;
+}
+
 .hero-actions {
   margin-top: 3.75rem !important;
 }

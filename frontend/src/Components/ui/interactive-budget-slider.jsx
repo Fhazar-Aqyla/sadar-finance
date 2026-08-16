@@ -100,7 +100,7 @@ export const InteractiveBudgetSlider = () => {
             initial={{ scale: 1.08, opacity: 0.7 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.2 }}
-            className="text-2xl sm:text-3xl font-black text-[#1E3A8A] dark:text-sky-400 tracking-tight"
+            className="text-2xl sm:text-3xl font-bold text-[#1E3A8A] dark:text-sky-400 tracking-tight"
           >
             {formatRupiah(income)}
           </motion.span>
@@ -151,7 +151,7 @@ export const InteractiveBudgetSlider = () => {
             initial={{ opacity: 0.6, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="text-2xl font-black text-[#1E3A8A] dark:text-sky-300 mb-2 tracking-tight"
+            className="text-2xl font-bold text-[#1E3A8A] dark:text-sky-300 mb-2 tracking-tight"
           >
             {formatRupiah(needs)}
           </motion.div>
@@ -192,7 +192,7 @@ export const InteractiveBudgetSlider = () => {
             initial={{ opacity: 0.6, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="text-2xl font-black text-amber-600 dark:text-amber-400 mb-2 tracking-tight"
+            className="text-2xl font-bold text-amber-600 dark:text-amber-400 mb-2 tracking-tight"
           >
             {formatRupiah(wants)}
           </motion.div>
@@ -233,7 +233,7 @@ export const InteractiveBudgetSlider = () => {
             initial={{ opacity: 0.6, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="text-2xl font-black text-emerald-700 dark:text-emerald-400 mb-2 tracking-tight"
+            className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mb-2 tracking-tight"
           >
             {formatRupiah(savings)}
           </motion.div>
