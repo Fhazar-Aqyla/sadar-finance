@@ -217,6 +217,45 @@ $value in $theme-colors {
   font-size: 0.92rem;
 }
 
+.sadar-footer-partners {
+  display: flex;
+  align-items: center;
+}
+
+.sadar-footer-partner-label {
+  color: #8a94a6;
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-right: 2px;
+}
+
+.sadar-partner-item {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.82;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  img {
+    height: 18px;
+    width: auto;
+    max-width: 120px;
+    object-fit: contain;
+  }
+}
+
+.sadar-partner-dark-mode {
+  display: none;
+}
+
+.sadar-partner-light-mode {
+  display: inline-block;
+}
+
 .sadar-logo-dark-mode {
   display: none;
 }
@@ -492,6 +531,18 @@ $value in $theme-colors {
   .sadar-footer-brand,
   .sadar-footer-note {
     color: var(--sadar-shell-muted);
+  }
+
+  .sadar-footer-partner-label {
+    color: var(--sadar-shell-muted);
+  }
+
+  .sadar-partner-light-mode {
+    display: none !important;
+  }
+
+  .sadar-partner-dark-mode {
+    display: inline-block !important;
   }
 
   .sadar-logo-light-mode {

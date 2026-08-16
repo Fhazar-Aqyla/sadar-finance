@@ -1,10 +1,18 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 
+export interface PartnerItem {
+  name: string;
+  logo: string;
+  href?: string;
+}
+
 export interface FooterProps {
   logo: React.ReactNode;
   brandName: string;
   description?: string;
+  partners?: PartnerItem[];
+  partnersLabel?: string;
   mainLinks: Array<{
     href: string;
     label: string;
@@ -30,6 +38,8 @@ export function Footer({
   logo,
   brandName,
   description,
+  partners,
+  partnersLabel = "DIDUKUNG OLEH:",
   mainLinks,
   legalLinks,
   copyright,
@@ -47,16 +57,54 @@ export function Footer({
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/40 to-transparent" />
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-10">
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_auto] gap-8 md:gap-8 lg:gap-8 items-start">
-          {/* Left — brand */}
-          <motion.div {...fadeUp}>
-            <a href="/" className="inline-flex items-center no-underline" aria-label={brandName}>
-              {logo}
-            </a>
-            {description && (
-              <p className="mt-4 text-sm leading-relaxed text-blue-200/70 max-w-xs">
-                {description}
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_auto] gap-8 md:gap-8 lg:gap-8 items-stretch">
+          {/* Left — brand & partners */}
+          <motion.div {...fadeUp} className="flex flex-col justify-between h-full">
+            <div>
+              <a href="/" className="inline-flex items-center no-underline" aria-label={brandName}>
+                {logo}
+              </a>
+              {description && (
+                <p className="mt-4 text-sm leading-relaxed text-blue-200/70 max-w-xs">
+                  {description}
+                </p>
+              )}
+            </div>
+
+            {partners && partners.length > 0 && (
+              <div className="mt-auto pt-6 sm:pt-8">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-blue-200/50 mb-2">
+                  {partnersLabel}
+                </span>
+                <div className="flex flex-wrap items-center gap-6 sm:gap-7">
+                  {partners.map((partner, idx) => {
+                    const imgElement = (
+                      <img
+                        src={partner.logo}
+                        alt={partner.name}
+                        className="h-6 sm:h-7 w-auto object-contain opacity-85 hover:opacity-100 transition-opacity duration-200"
+                      />
+                    );
+
+                    return partner.href ? (
+                      <a
+                        key={idx}
+                        href={partner.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center no-underline"
+                        aria-label={partner.name}
+                      >
+                        {imgElement}
+                      </a>
+                    ) : (
+                      <div key={idx} className="inline-flex items-center">
+                        {imgElement}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </motion.div>
 
@@ -100,7 +148,7 @@ export function Footer({
         </div>
 
         {/* Accent bar + copyright */}
-        <div className="mt-8 lg:mt-9">
+        <div className="mt-6 sm:mt-7">
           <div className="h-0.5 bg-gradient-to-r from-white/20 via-white/10 to-transparent" />
           <div className="pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
             <p className="text-xs text-blue-200/60">{copyright.text}</p>
