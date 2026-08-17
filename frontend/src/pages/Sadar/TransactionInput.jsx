@@ -817,7 +817,7 @@ const TransactionInput = () => {
                         )}
                         {accounts.map((account) => (
                           <option key={account.id} value={account.id}>
-                            {account.name} {account.number ? `(${account.number})` : ""} • {currencyFormatter.format(account.balance || 0)}
+                            {account.name} • {currencyFormatter.format(account.balance || 0)}
                           </option>
                         ))}
                       </Input>
@@ -949,7 +949,7 @@ const TransactionInput = () => {
                         )}
                         {accounts.map((account) => (
                           <option key={account.id} value={account.id}>
-                            {account.name} {account.number ? `(${account.number})` : ""} • {currencyFormatter.format(account.balance || 0)}
+                            {account.name} • {currencyFormatter.format(account.balance || 0)}
                           </option>
                         ))}
                       </Input>
