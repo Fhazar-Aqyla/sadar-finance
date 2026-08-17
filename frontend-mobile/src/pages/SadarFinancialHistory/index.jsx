@@ -85,6 +85,8 @@ const normalizeIncome = (income) => ({
   source: income.source || "Pemasukan",
   amount: Number(income.amount || 0),
   date: String(income.income_date || income.incomeDate || income.date || "").slice(0, 10),
+  rawDate: income.created_at || income.income_date || income.incomeDate || income.date || "",
+  createdAt: income.created_at || "",
   receiptUrl: getReceiptUrl(income),
 });
 
@@ -133,6 +135,8 @@ const normalizeTransaction = (transaction) => ({
   categoryGroup: getTransactionBudgetGroup(transaction),
   amount: Number(transaction.amount || 0),
   date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
+  rawDate: transaction.created_at || transaction.transaction_date || transaction.transactionDate || transaction.date || "",
+  createdAt: transaction.created_at || "",
   status: "Tercatat",
   receiptUrl: getReceiptUrl(transaction),
 });
@@ -287,6 +291,8 @@ const SadarFinancialHistory = () => {
       categoryGroup: transaction.categoryGroup,
       account_id: transaction.account_id,
       date: transaction.date,
+      rawDate: transaction.rawDate,
+      createdAt: transaction.createdAt,
       amount: transaction.amount,
       status: transaction.status,
       receiptUrl: transaction.receiptUrl,
@@ -299,17 +305,31 @@ const SadarFinancialHistory = () => {
       category: "Pemasukan",
       account_id: income.account_id,
       date: income.date,
+      rawDate: income.rawDate,
+      createdAt: income.createdAt,
       amount: income.amount,
       status: "Masuk",
       receiptUrl: income.receiptUrl,
     }));
 
-    return [...expenseRows, ...incomeRows].map((transaction) => ({
-      ...transaction,
-      receipt: receiptMap[transactionKey(transaction)] || ocrReceiptMap[transactionKey(transaction)] || null,
-    })).sort(
-      (a, b) => new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`),
-    );
+    const getSortTimestamp = (item) => {
+      const raw = item.createdAt || item.rawDate || item.date;
+      if (!raw) return 0;
+      const time = new Date(raw).getTime();
+      return Number.isNaN(time) ? new Date(`${item.date}T00:00:00`).getTime() || 0 : time;
+    };
+
+    return [...incomeRows, ...expenseRows]
+      .map((transaction) => ({
+        ...transaction,
+        receipt: receiptMap[transactionKey(transaction)] || ocrReceiptMap[transactionKey(transaction)] || null,
+      }))
+      .sort((a, b) => {
+        const timeA = getSortTimestamp(a);
+        const timeB = getSortTimestamp(b);
+        if (timeB !== timeA) return timeB - timeA;
+        return String(b.id || "").localeCompare(String(a.id || ""), undefined, { numeric: true });
+      });
   }, [incomesRows, ocrReceiptMap, receiptMap, transactionRows]);
 
   const filteredTransactions = useMemo(() => {

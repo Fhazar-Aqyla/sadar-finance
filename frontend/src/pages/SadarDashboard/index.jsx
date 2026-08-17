@@ -172,6 +172,8 @@ const normalizeIncome = (income) => ({
   source: income.source || "Pemasukan",
   amount: Number(income.amount || 0),
   date: String(income.income_date || income.incomeDate || income.date || "").slice(0, 10),
+  rawDate: income.created_at || income.income_date || income.incomeDate || income.date || "",
+  createdAt: income.created_at || "",
 });
 
 const toBudgetGroup = (category) => {
@@ -189,6 +191,8 @@ const normalizeTransaction = (transaction) => ({
   budget_group: toBudgetGroup(getTransactionCategory(transaction)),
   amount: Number(transaction.amount || 0),
   date: String(transaction.transaction_date || transaction.transactionDate || transaction.date || "").slice(0, 10),
+  rawDate: transaction.created_at || transaction.transaction_date || transaction.transactionDate || transaction.date || "",
+  createdAt: transaction.created_at || "",
   status: "Tercatat",
 });
 
@@ -1119,6 +1123,8 @@ const DashboardWithData = () => {
       category: "Pemasukan",
       account: userAccounts.find((account) => account.id === income.account_id)?.name || "-",
       date: income.date,
+      rawDate: income.rawDate,
+      createdAt: income.createdAt,
       amount: income.amount,
       status: "Masuk",
     }));
@@ -1128,12 +1134,26 @@ const DashboardWithData = () => {
       category: transaction.category,
       account: userAccounts.find((account) => account.id === transaction.account_id)?.name || "-",
       date: transaction.date,
+      rawDate: transaction.rawDate,
+      createdAt: transaction.createdAt,
       amount: -transaction.amount,
       status: transaction.status,
     }));
 
+    const getSortTimestamp = (item) => {
+      const raw = item.createdAt || item.rawDate || item.date;
+      if (!raw) return 0;
+      const time = new Date(raw).getTime();
+      return Number.isNaN(time) ? new Date(`${item.date}T00:00:00`).getTime() || 0 : time;
+    };
+
     const recentRows = [...incomeRows, ...expenseRows]
-      .sort((a, b) => new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`))
+      .sort((a, b) => {
+        const timeA = getSortTimestamp(a);
+        const timeB = getSortTimestamp(b);
+        if (timeB !== timeA) return timeB - timeA;
+        return String(b.id || "").localeCompare(String(a.id || ""), undefined, { numeric: true });
+      })
       .slice(0, 5)
       .map((item) => ({
         ...item,
