@@ -68,82 +68,52 @@ const chartBase = {
 const getTopEntry = (object) =>
   Object.entries(object).sort((a, b) => b[1] - a[1])[0] || ["-", 0];
 
-const dashboardCategoryLabels = [
-  "Makanan",
-  "Transportasi",
-  "Belanja",
-  "Hiburan",
-  "Lainnya",
-];
-const dashboardCategoryColors = [
-  "#1E3A8A",
-  "#14B8A6",
-  "#F59E0B",
-  "#22C55E",
-  "#94a3b8",
-];
+const dashboardCategoryLabels = ["Kebutuhan", "Keinginan", "Tabungan"];
+const dashboardCategoryColors = ["#2563EB", "#8B5CF6", "#10B981"];
 
 const normalizeCategoryToDashboard = (category) => {
   const text = String(category || "").toLowerCase();
-  if (
-    /makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(
-      text,
-    )
-  )
-    return "Makanan";
-  if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text))
-    return "Transportasi";
-  if (
-    /belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(
-      text,
-    )
-  )
-    return "Belanja";
-  if (
-    /hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(
-      text,
-    )
-  )
-    return "Hiburan";
-  return "Lainnya";
+  if (/tabungan|savings|saving|invest|dana darurat/.test(text)) return "Tabungan";
+  if (/keinginan|wants|want|hiburan|entertainment|belanja|shopping|game|nonton|bioskop|liburan|travel|cafe|kopi|nongkrong/.test(text)) return "Keinginan";
+  if (/kebutuhan|needs|need|makan|food|beverage|groceries|sembako|transport|tagihan|utilit|kesehatan|health|pendidikan|education|bills/.test(text)) return "Kebutuhan";
+  return "Kebutuhan";
 };
 
-const isBudgetBucketCategory = (category) =>
-  ["needs", "wants", "savings", "investment"].includes(
-    String(category || "").toLowerCase(),
-  );
-
-const inferCategoryFromTransaction = (row) =>
-  normalizeCategoryToDashboard(
-    [
-      row.description,
-      row.name,
-      row.merchant,
-      row.source,
-      row.category,
-      row.category_name,
-      row.categoryName,
-    ]
-      .filter(Boolean)
-      .join(" "),
-  );
+const mapCategoryToLabel = (value) => {
+  const text = String(value || "").trim().toLowerCase();
+  if (["needs", "kebutuhan", "need"].includes(text)) return "Kebutuhan";
+  if (["wants", "keinginan", "want"].includes(text)) return "Keinginan";
+  if (["savings", "tabungan", "saving", "investment", "investasi"].includes(text)) return "Tabungan";
+  if (["other", "lainnya"].includes(text)) return "Lainnya";
+  return normalizeCategoryToDashboard(value);
+};
 
 const getTransactionCategory = (row) => {
-  const explicitCategory =
+  const rawGroup =
+    row.category_group ||
+    row.categoryGroup ||
+    row.budget_group ||
+    row.budgetGroup;
+
+  const rawDetail =
     row.category_detail ||
     row.categoryDetail ||
     row.category_name ||
-    row.categoryName ||
-    row.category_group ||
-    row.categoryGroup ||
-    row.category ||
-    "";
+    row.categoryName;
 
-  if (!explicitCategory || isBudgetBucketCategory(explicitCategory)) {
-    return inferCategoryFromTransaction(row);
+  if (rawGroup) {
+    return mapCategoryToLabel(rawGroup);
   }
 
-  return explicitCategory;
+  if (rawDetail) {
+    return mapCategoryToLabel(rawDetail);
+  }
+
+  if (row.category) {
+    return mapCategoryToLabel(row.category);
+  }
+
+  return "Kebutuhan";
 };
 
 const getRiskTone = (riskLevel) => {

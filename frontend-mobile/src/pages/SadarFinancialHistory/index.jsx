@@ -88,44 +88,41 @@ const normalizeIncome = (income) => ({
   receiptUrl: getReceiptUrl(income),
 });
 
-const isBudgetBucketCategory = (category) =>
-  ["needs", "wants", "savings", "investment"].includes(String(category || "").toLowerCase());
-
-const normalizeCategoryToHistory = (category) => {
-  const text = String(category || "").toLowerCase();
-  if (/makan|food|dining|beverage|restaurant|warung|cafe|kopi|gacoan|starbucks/.test(text)) return "Makanan";
-  if (/transport|ojol|grab|gojek|bensin|fuel|taxi/.test(text)) return "Transportasi";
-  if (/belanja|shop|shopping|groceries|minimarket|supermarket|retail|marketplace|mall|uniqlo/.test(text)) return "Belanja";
-  if (/hiburan|entertainment|movie|bioskop|netflix|spotify|game|recreation/.test(text)) return "Hiburan";
-  return "Lainnya";
+const mapCategoryToLabel = (value) => {
+  const text = String(value || "").trim().toLowerCase();
+  if (["needs", "kebutuhan", "need"].includes(text)) return "Kebutuhan";
+  if (["wants", "keinginan", "want"].includes(text)) return "Keinginan";
+  if (["savings", "tabungan", "saving", "investment", "investasi"].includes(text)) return "Tabungan";
+  if (["other", "lainnya"].includes(text)) return "Lainnya";
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : "Kebutuhan";
 };
 
-const inferCategoryFromTransaction = (transaction) =>
-  normalizeCategoryToHistory(
-    [
-      transaction.description || transaction.merchant || "",
-      transaction.category,
-      transaction.category_name,
-      transaction.categoryName,
-    ].filter(Boolean).join(" "),
-  );
-
 const getTransactionCategory = (transaction) => {
-  const explicitCategory =
+  const rawGroup =
+    transaction.category_group ||
+    transaction.categoryGroup ||
+    transaction.budget_group ||
+    transaction.budgetGroup;
+
+  const rawDetail =
     transaction.category_detail ||
     transaction.categoryDetail ||
     transaction.category_name ||
-    transaction.categoryName ||
-    transaction.category_group ||
-    transaction.categoryGroup ||
-    transaction.category ||
-    "";
+    transaction.categoryName;
 
-  if (!explicitCategory || isBudgetBucketCategory(explicitCategory)) {
-    return inferCategoryFromTransaction(transaction);
+  if (rawGroup) {
+    return mapCategoryToLabel(rawGroup);
   }
 
-  return explicitCategory;
+  if (rawDetail) {
+    return mapCategoryToLabel(rawDetail);
+  }
+
+  if (transaction.category) {
+    return mapCategoryToLabel(transaction.category);
+  }
+
+  return "Kebutuhan";
 };
 
 const normalizeTransaction = (transaction) => ({
