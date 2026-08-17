@@ -897,7 +897,7 @@ const ProfileAccountWithData = () => {
     );
   };
 
-  const applyBudgetTarget = () => {
+  const _applyBudgetTarget = () => {
     setBudgetNotice("");
     setIsBudgetSaved(false);
     const baseIncome =
@@ -1139,14 +1139,13 @@ const ProfileAccountWithData = () => {
                     ini.
                   </p>
                 </div>
-                <Button
-                  color="light"
-                  onClick={applyBudgetTarget}
+                <div
                   className="sadar-apply-rule-btn"
+                  style={{ cursor: "default" }}
                 >
                   <i className="ri-magic-line me-1"></i>
                   Terapkan 50/30/20
-                </Button>
+                </div>
               </CardHeader>
               <CardBody>
                 {budgetNotice && (

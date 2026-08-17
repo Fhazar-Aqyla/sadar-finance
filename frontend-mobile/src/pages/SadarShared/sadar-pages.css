@@ -7550,6 +7550,8 @@ html[data-bs-theme="dark"] .sadar-budget-clean-input:focus {
 }
 
 .sadar-apply-rule-btn {
+  display: inline-flex;
+  align-items: center;
   background: #ffffff !important;
   color: #2563eb !important;
   border: 1px solid #dbe3ee !important;
@@ -7558,24 +7560,14 @@ html[data-bs-theme="dark"] .sadar-budget-clean-input:focus {
   padding: 0.42rem 0.85rem !important;
   border-radius: 8px !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-  transition: all 0.2s ease !important;
-}
-
-.sadar-apply-rule-btn:hover {
-  background: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  color: #1d4ed8 !important;
-  transform: translateY(-1px);
+  cursor: default !important;
+  user-select: none !important;
+  pointer-events: none !important;
 }
 
 html[data-bs-theme="dark"] .sadar-apply-rule-btn {
   background: rgba(30, 41, 59, 0.8) !important;
   color: #93c5fd !important;
   border-color: rgba(148, 163, 184, 0.25) !important;
-}
-
-html[data-bs-theme="dark"] .sadar-apply-rule-btn:hover {
-  background: rgba(59, 130, 246, 0.15) !important;
-  border-color: rgba(96, 165, 250, 0.4) !important;
-  color: #bfdbfe !important;
+  cursor: default !important;
 }
