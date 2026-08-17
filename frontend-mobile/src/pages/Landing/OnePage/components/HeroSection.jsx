@@ -12,6 +12,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { getStoredAuthUser } from "../../../../helpers/auth-storage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -74,14 +75,7 @@ export const HeroSection = () => {
         },
       });
 
-      tl.from(".hero-badge", {
-        opacity: 0,
-        y: -20,
-        scale: 0.9,
-        duration: 0.8,
-        ease: "back.out(1.4)",
-      })
-        .from(
+      tl.from(
           ".hero-title",
           {
             opacity: 0,
@@ -89,8 +83,7 @@ export const HeroSection = () => {
             rotateX: 40,
             duration: 0.9,
             ease: "power3.out",
-          },
-          "-=0.5"
+          }
         )
         .from(
           ".hero-subtitle",
@@ -176,13 +169,7 @@ export const HeroSection = () => {
     { scope: containerRef }
   );
 
-  const hasAuthToken = () => {
-    try {
-      return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
-    } catch {
-      return false;
-    }
-  };
+  const hasAuthToken = () => Boolean(getStoredAuthUser()?.token);
   const isAuthenticated = hasAuthToken();
 
   return (

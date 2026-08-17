@@ -1391,6 +1391,33 @@
     }
 }
 
+// Keep the compact sidebar brand independent from Bootstrap's similarly named
+// spacing utilities.
+.sadar-sidebar-brand-collapsed {
+    width: 100%;
+    min-width: 0;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    box-sizing: border-box;
+}
+
+.sadar-sidebar-collapsed-logo-link {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    flex: 0 0 40px;
+    border-radius: 10px;
+}
+
+.sadar-sidebar-collapsed-logo {
+    display: block;
+    width: 28px !important;
+    height: 30px !important;
+    min-width: 28px;
+    max-width: none;
+    object-fit: contain;
+}
+
 .min-width-0 {
     min-width: 0;
 }

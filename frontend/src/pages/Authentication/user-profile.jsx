@@ -26,6 +26,7 @@ import avatar from "../../assets/images/users/avatar-1.jpg";
 // actions
 import { editProfile, resetProfileFlag } from "../../slices/thunks";
 import { createSelector } from "reselect";
+import { getStoredAuthUser, updateStoredAuthUser } from "../../helpers/auth-storage";
 
 const UserProfile = () => {
   const dispatch = useDispatch();
@@ -49,20 +50,6 @@ const UserProfile = () => {
     user, success, error 
   } = useSelector(userprofileData);
 
-  const getStoredAuthUser = () => {
-    const storedUser = localStorage.getItem("authUser");
-
-    if (!storedUser) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(storedUser);
-    } catch {
-      return null;
-    }
-  };
-
   useEffect(() => {
     const authUser = getStoredAuthUser();
     const storedProfile = authUser?.data ?? authUser;
@@ -73,7 +60,7 @@ const UserProfile = () => {
           ? { ...authUser, data: { ...authUser.data, first_name: user.first_name } }
           : { ...authUser, first_name: user.first_name };
 
-        localStorage.setItem("authUser", JSON.stringify(updatedAuthUser));
+        updateStoredAuthUser(() => updatedAuthUser);
       }
 
       setUserName(user?.first_name || storedProfile.first_name || storedProfile.username || "Admin");

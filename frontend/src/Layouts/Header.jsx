@@ -14,13 +14,10 @@ import dummyAvatar from '../assets/images/users/user-dummy-img.jpg';
 import { changeSidebarVisibility } from '../slices/thunks';
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from 'reselect';
+import { getStoredAuthUser } from '../helpers/auth-storage';
 
 const getStoredUser = () => {
-    try {
-        return JSON.parse(localStorage.getItem("authUser") || "null");
-    } catch {
-        return null;
-    }
+    return getStoredAuthUser();
 };
 
 const normalizeAccountName = (value) => {
@@ -183,7 +180,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass, onLogoutClick
                                 </DropdownToggle>
                                 <DropdownMenu className="dropdown-menu-lg dropdown-menu-end p-0">
                                     <div className="p-3">
-                                        <SearchOption className="sadar-app-search-mobile" autoFocus onNavigate={toogleSearch} />
+                                        <SearchOption className="sadar-app-search-mobile" autoFocus inputId="search-options-mobile" onNavigate={toogleSearch} />
                                     </div>
                                 </DropdownMenu>
                             </Dropdown>

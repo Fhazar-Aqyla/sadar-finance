@@ -28,26 +28,24 @@ import { profileSuccess } from "../../slices/auth/profile/reducer";
 import { authApi } from "../../Components/services/api";
 import { api } from "../../config";
 import "../SadarShared/sadar-pages.css";
+import { updateStoredAuthUser } from "../../helpers/auth-storage";
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = localStorage.getItem("authUser");
-    if (!rawAuth) return;
-    const authData = JSON.parse(rawAuth);
-
-    if (authData.user) {
-      authData.user = { ...authData.user, ...updatedUser };
-    } else if (authData.data && authData.data.user) {
-      authData.data.user = { ...authData.data.user, ...updatedUser };
-    } else if (authData.data) {
-      authData.data = { ...authData.data, ...updatedUser };
-    } else {
-      Object.assign(authData, updatedUser);
-    }
-
-    localStorage.setItem("authUser", JSON.stringify(authData));
+    updateStoredAuthUser((authData) => {
+      if (authData.user) {
+        authData.user = { ...authData.user, ...updatedUser };
+      } else if (authData.data && authData.data.user) {
+        authData.data.user = { ...authData.data.user, ...updatedUser };
+      } else if (authData.data) {
+        authData.data = { ...authData.data, ...updatedUser };
+      } else {
+        Object.assign(authData, updatedUser);
+      }
+      return authData;
+    });
   } catch (e) {
-    console.error("Failed to update localStorage user", e);
+    console.error("Failed to update stored user session", e);
   }
 };
 
@@ -257,7 +255,7 @@ const ProfileEdit = () => {
       });
       setAvatarFile(null);
 
-      // Update localStorage and Redux state to sync header avatar instantly
+      // Update stored session and Redux state to sync header avatar instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {
@@ -453,7 +451,7 @@ const ProfileEdit = () => {
         message: "Identitas pribadi berhasil disimpan.",
       });
 
-      // Update localStorage and Redux state to sync header user details instantly
+      // Update stored session and Redux state to sync header user details instantly
       updateSessionUser(updatedUser);
       dispatch(profileSuccess({ data: updatedUser, status: "success" }));
     } catch (error) {

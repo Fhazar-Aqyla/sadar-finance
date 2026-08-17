@@ -89,7 +89,7 @@ class AuthService {
     return {
       email,
       resetAvailable: false,
-      message: 'If the email is registered, reset instructions will be sent when email delivery is configured.',
+      message: 'Reset password melalui email belum tersedia. Silakan hubungi administrator.',
     };
   }
 

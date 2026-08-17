@@ -76,7 +76,7 @@ const ForgetPasswordPage = props => {
                       </Link>
                       <div>
                         <h5 className="text-primary">Lupa password?</h5>
-                        <p className="text-muted">Masukkan email akun untuk menerima instruksi reset.</p>
+                        <p className="text-muted">Masukkan email akun untuk memeriksa ketersediaan reset password.</p>
 
                         <div className="text-center my-2">
                           <lord-icon
@@ -91,7 +91,7 @@ const ForgetPasswordPage = props => {
                       </div>
 
                       <Alert className="border-0 alert-warning text-center mb-2" role="alert">
-                        Link reset akan dikirim ke email yang terhubung dengan akun SADAR.
+                        Sistem akan memberi tahu jika reset melalui email sudah tersedia.
                       </Alert>
                       <div className="mt-2">
                         {forgetError && forgetError ? (
@@ -131,7 +131,7 @@ const ForgetPasswordPage = props => {
                           </div>
 
                           <div className="text-center mt-3">
-                            <button className="btn btn-success w-100" type="submit">Kirim Link Reset</button>
+                            <button className="btn btn-success w-100" type="submit">Periksa Reset Password</button>
                           </div>
                         </Form>
                       </div>

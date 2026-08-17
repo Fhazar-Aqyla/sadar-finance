@@ -25,6 +25,7 @@ import { accountApi, analyticsApi, authApi, incomeApi, transactionApi } from "..
 import "./sadar-dashboard.css";
 import "../SadarShared/sadar-pages.css";
 import { DashboardSkeleton } from "../../Components/Skeleton";
+import { getStoredAuthUser, updateStoredAuthUser } from "../../helpers/auth-storage";
 
 const rupiah = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -254,7 +255,7 @@ const buildBudgetRows = (budget, transactions = []) => {
 
 const getStoredProfile = () => {
   try {
-    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
+    const authUser = getStoredAuthUser();
     const user = authUser?.user || authUser?.data || authUser || {};
     const name = user?.first_name || user?.username || user?.name || user?.email || "SADAR";
 
@@ -268,23 +269,20 @@ const getStoredProfile = () => {
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = localStorage.getItem("authUser");
-    if (!rawAuth) return;
-    const authData = JSON.parse(rawAuth);
-
-    if (authData.user) {
-      authData.user = { ...authData.user, ...updatedUser };
-    } else if (authData.data && authData.data.user) {
-      authData.data.user = { ...authData.data.user, ...updatedUser };
-    } else if (authData.data) {
-      authData.data = { ...authData.data, ...updatedUser };
-    } else {
-      Object.assign(authData, updatedUser);
-    }
-
-    localStorage.setItem("authUser", JSON.stringify(authData));
+    updateStoredAuthUser((authData) => {
+      if (authData.user) {
+        authData.user = { ...authData.user, ...updatedUser };
+      } else if (authData.data && authData.data.user) {
+        authData.data.user = { ...authData.data.user, ...updatedUser };
+      } else if (authData.data) {
+        authData.data = { ...authData.data, ...updatedUser };
+      } else {
+        Object.assign(authData, updatedUser);
+      }
+      return authData;
+    });
   } catch (e) {
-    console.error("Failed to update localStorage user", e);
+    console.error("Failed to update stored user session", e);
   }
 };
 
@@ -373,7 +371,7 @@ const getSetupWizardStorageKey = () => {
   if (typeof window === "undefined") return "sadar_setup_wizard_api";
 
   try {
-    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
+    const authUser = getStoredAuthUser();
     const user = authUser?.user || authUser?.data?.user || authUser?.data || authUser || {};
     const userId = user?.id || user?.user_id || user?.email || user?.username || "guest";
     return `sadar_setup_wizard_api_${userId}`;

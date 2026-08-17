@@ -6,6 +6,7 @@ import {
 } from "../../../helpers/fakebackend_helper";
 import { setAuthorization } from "../../../helpers/api_helper";
 import { authApi } from "../../../Components/services/api";
+import { removeStoredAuthUser, setStoredAuthUser } from "../../../helpers/auth-storage";
 
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 
@@ -34,7 +35,7 @@ export const loginUser = (user, history) => async (dispatch) => {
         throw new Error("Login gagal.");
       }
 
-      localStorage.setItem("authUser", JSON.stringify(data));
+      setStoredAuthUser(data, user.rememberMe);
       setAuthorization(data.token);
       dispatch(loginSuccess(data.user));
       history('/dashboard');
@@ -63,16 +64,16 @@ export const loginUser = (user, history) => async (dispatch) => {
     var data = await response;
 
     if (data) {
-      localStorage.setItem("authUser", JSON.stringify(data));
+      setStoredAuthUser(data, user.rememberMe);
       if (defaultAuth === "fake") {
         var finallogin = JSON.stringify(data);
         finallogin = JSON.parse(finallogin)
         data = finallogin.data;
         if (finallogin.status === "success") {
-          localStorage.setItem("authUser", JSON.stringify({
+          setStoredAuthUser({
             token: finallogin.data?.accessToken,
             user: finallogin.data,
-          }));
+          }, user.rememberMe);
           dispatch(loginSuccess(data));
           history('/dashboard')
         } else {
@@ -90,7 +91,7 @@ export const loginUser = (user, history) => async (dispatch) => {
 
 export const logoutUser = () => async (dispatch) => {
   try {
-    localStorage.removeItem("authUser");
+    removeStoredAuthUser();
     let fireBaseBackend = getFirebaseBackend();
     if (defaultAuth === "firebase") {
       const response = fireBaseBackend.logout;
@@ -118,7 +119,7 @@ export const socialLogin = (type, history) => async (dispatch) => {
       
       const socialdata = await response;
     if (socialdata) {
-      localStorage.setItem("authUser", JSON.stringify(response));
+      setStoredAuthUser(response, true);
       dispatch(loginSuccess(response));
       history('/dashboard')
     }

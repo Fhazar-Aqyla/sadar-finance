@@ -7121,7 +7121,34 @@ html[data-bs-theme="dark"]
   }
 
   .main-content > .footer {
-    display: none !important;
+    display: block !important;
+    min-height: 0;
+    padding: 0.8rem 0.75rem;
+    text-align: center;
+  }
+
+  .main-content > .footer .container-fluid {
+    padding: 0;
+  }
+
+  .main-content > .footer .row {
+    gap: 0.65rem;
+  }
+
+  .main-content > .footer .sadar-footer-brand,
+  .main-content > .footer .sadar-footer-partners {
+    justify-content: center !important;
+    width: 100%;
+  }
+
+  .main-content > .footer .sadar-footer-partners {
+    flex-wrap: wrap;
+    gap: 0.75rem !important;
+  }
+
+  .main-content > .footer .sadar-partner-item img {
+    height: 16px;
+    max-width: 106px;
   }
 }
 

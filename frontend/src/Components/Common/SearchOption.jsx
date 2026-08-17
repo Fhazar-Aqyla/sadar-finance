@@ -132,7 +132,7 @@ const buildSearchItems = () => {
   ];
 };
 
-const SearchOption = ({ className = "d-none d-md-block", autoFocus = false, onNavigate }) => {
+const SearchOption = ({ className = "d-none d-md-block", autoFocus = false, inputId = "search-options", onNavigate, placeholder = "Cari transaksi, kategori, atau account..." }) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -182,8 +182,11 @@ const SearchOption = ({ className = "d-none d-md-block", autoFocus = false, onNa
         <Input
           type="text"
           className="form-control"
-          placeholder="Cari transaksi, kategori, atau account..."
-          id="search-options"
+          placeholder={placeholder}
+          id={inputId}
+          aria-label={placeholder}
+          aria-expanded={isOpen}
+          aria-controls={`${inputId}-dropdown`}
           autoFocus={autoFocus}
           value={query}
           onChange={(event) => {
@@ -198,7 +201,7 @@ const SearchOption = ({ className = "d-none d-md-block", autoFocus = false, onNa
         />
         <span className="mdi mdi-magnify search-widget-icon"></span>
       </div>
-      <div className={`dropdown-menu dropdown-menu-lg sadar-search-menu ${isOpen ? "show" : ""}`} id="search-dropdown">
+      <div className={`dropdown-menu dropdown-menu-lg sadar-search-menu ${isOpen ? "show" : ""}`} id={`${inputId}-dropdown`}>
         <div className="p-3">
           <h6 className="text-muted text-uppercase fs-12 mb-3">
             {trimmedQuery ? "Hasil Pencarian" : "Akses Cepat"}

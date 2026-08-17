@@ -114,7 +114,11 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
         } ${className}`}
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
-        <div className="sadar-sidebar-brand relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
+        <div
+          className={`sadar-sidebar-brand relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 ${
+            isCollapsed ? "sadar-sidebar-brand-collapsed" : "px-5"
+          }`}
+        >
           {!isCollapsed && (
             <Link to="/dashboard" className="flex min-w-0 items-center no-underline">
               <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[104px] object-contain" />
@@ -125,11 +129,14 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
           {isCollapsed && (
             <Link
               to="/dashboard"
-              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm"
+              className="sadar-sidebar-collapsed-logo-link flex items-center justify-center overflow-hidden bg-white shadow-sm"
               aria-label="SADAR Finance"
             >
-              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-6 w-6 object-cover object-left" />
-              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-6 w-6 object-cover object-left" />
+              <img
+                src="/browser-tab-icon.png?v=2"
+                alt="SADAR Finance"
+                className="sadar-sidebar-collapsed-logo"
+              />
             </Link>
           )}
 

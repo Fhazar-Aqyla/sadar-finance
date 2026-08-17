@@ -8,6 +8,7 @@ import {
 } from "../../pages/SadarShared/mockData";
 import { isSadarMockDataScenario } from "./sadarScenario";
 import { compressOcrFormData } from "./receiptImage";
+import { getStoredAuthUser } from "../../helpers/auth-storage";
 
 const apiClient = axios.create({
   baseURL: api.API_URL,
@@ -16,15 +17,7 @@ const apiClient = axios.create({
   },
 });
 
-const getAuthUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem("authUser") || "null");
-  } catch {
-    return null;
-  }
-};
-
-export const getAuthToken = () => getAuthUser()?.token || null;
+export const getAuthToken = () => getStoredAuthUser()?.token || null;
 
 apiClient.interceptors.request.use((config) => {
   const token = getAuthToken();
@@ -249,10 +242,7 @@ export const authApi = {
   updateMe: (payload) =>
     isSadarMockDataScenario
       ? mockApi.auth.updateMe(payload)
-      : apiClient
-          .put("/auth/me", payload)
-          .then(unwrapData)
-          .catch(() => mockApi.auth.updateMe(payload)),
+      : apiClient.put("/auth/me", payload).then(unwrapData),
   updateAvatar: (formData) =>
     isSadarMockDataScenario
       ? Promise.resolve({ profile_picture: "" })

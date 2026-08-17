@@ -1,15 +1,11 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
+import { getStoredAuthUser } from "../helpers/auth-storage";
+
 const GuestProtected = (props) => {
-  const hasToken = (() => {
-    try {
-      const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
-      return Boolean(authUser?.token || authUser?.data?.token);
-    } catch {
-      return false;
-    }
-  })();
+  const authUser = getStoredAuthUser();
+  const hasToken = Boolean(authUser?.token || authUser?.data?.token);
 
   if (hasToken) {
     return <Navigate to="/dashboard" replace />;

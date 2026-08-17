@@ -17,7 +17,10 @@ export const userForgetPassword = (user) => async (dispatch) => {
       let response;
       if (defaultAuth === "sadar") {
           const res = await authApi.forgotPassword({ email: user.email });
-          dispatch(userForgetPasswordSuccess(res?.message || "Permintaan reset password diterima. Cek email jika layanan email sudah aktif."));
+          const message = res?.resetAvailable === false
+            ? "Reset password melalui email belum tersedia. Silakan hubungi administrator."
+            : res?.message || "Permintaan reset password diterima.";
+          dispatch(userForgetPasswordSuccess(message));
           return;
       }
 

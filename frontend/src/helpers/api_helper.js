@@ -1,5 +1,6 @@
 ﻿import axios from "axios";
 import { api } from "../config";
+import { getStoredAuthUser } from "./auth-storage";
 
 // default
 axios.defaults.baseURL = api.API_URL;
@@ -7,7 +8,7 @@ axios.defaults.baseURL = api.API_URL;
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // content type
-const token = JSON.parse(localStorage.getItem("authUser")) ? JSON.parse(localStorage.getItem("authUser")).token : null;
+const token = getStoredAuthUser()?.token || null;
 if(token)
 axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 
@@ -94,12 +95,7 @@ class APIClient {
   };
 }
 const getLoggedinUser = () => {
-  const user = localStorage.getItem("authUser");
-  if (!user) {
-    return null;
-  } else {
-    return JSON.parse(user);
-  }
+  return getStoredAuthUser();
 };
 
 export { APIClient, setAuthorization, getLoggedinUser };

@@ -16,6 +16,7 @@ import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import sadarLogo from "../assets/images/landing/sadar-logo.png";
 import sadarLogoLight from "../assets/images/landing/logo-sadar-light.png";
 import dummyAvatar from "../assets/images/users/user-dummy-img.jpg";
+import { getStoredAuthUser } from "../helpers/auth-storage";
 
 const navigationItems = [
   { id: "dashboard", name: "Dashboard", icon: Home, href: "/dashboard" },
@@ -31,11 +32,7 @@ const sidebarWidths = {
 };
 
 const getStoredUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem("authUser") || "null");
-  } catch {
-    return null;
-  }
+  return getStoredAuthUser();
 };
 
 const normalizeAccountName = (value) => {
@@ -190,7 +187,11 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
         } ${className}`}
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
-        <div className="sadar-sidebar-brand relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 px-5">
+        <div
+          className={`sadar-sidebar-brand relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 ${
+            isCollapsed ? "sadar-sidebar-brand-collapsed" : "px-5"
+          }`}
+        >
           {!isCollapsed && (
             <Link to="/dashboard" className="flex min-w-0 items-center no-underline">
               <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[104px] object-contain" />
@@ -201,11 +202,14 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
           {isCollapsed && (
             <Link
               to="/dashboard"
-              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm"
+              className="sadar-sidebar-collapsed-logo-link flex items-center justify-center overflow-hidden bg-white shadow-sm"
               aria-label="SADAR Finance"
             >
-              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-6 w-6 object-cover object-left" />
-              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-6 w-6 object-cover object-left" />
+              <img
+                src="/browser-tab-icon.png?v=2"
+                alt="SADAR Finance"
+                className="sadar-sidebar-collapsed-logo"
+              />
             </Link>
           )}
 
@@ -301,13 +305,13 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
               <DropdownToggle
                 tag="button"
                 type="button"
-                className="btn w-full d-flex justify-content-center rounded-lg border-0 bg-transparent p-2 no-underline"
+                className="sadar-sidebar-profile-toggle btn d-flex align-items-center justify-content-center border-0 bg-transparent no-underline"
                 aria-label="Menu profil"
               >
                 <img
                   src={userAvatar}
                   alt={userName}
-                  className="h-9 w-9 rounded-full object-cover"
+                  className="sadar-sidebar-profile-avatar"
                   onError={(e) => {
                     e.currentTarget.src = dummyAvatar;
                   }}

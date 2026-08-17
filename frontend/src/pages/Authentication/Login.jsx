@@ -41,6 +41,7 @@ const Login = () => {
     const loginInitialValues = {
         email: defaultAuth === "firebase" ? user?.multiFactor?.user?.email || "" : user?.user?.email || "",
         password: defaultAuth === "firebase" ? "" : user?.user?.confirm_password || "",
+        rememberMe: true,
     };
 
     const validation = useFormik({
@@ -104,10 +105,12 @@ const Login = () => {
                                                         <div className="mb-3">
                                                             <Label htmlFor="email" className="form-label">Email</Label>
                                                             <Input
+                                                                id="email"
                                                                 name="email"
                                                                 className="form-control"
                                                                 placeholder="nama@email.com"
                                                                 type="email"
+                                                                autoComplete="email"
                                                                 onChange={validation.handleChange}
                                                                 onBlur={validation.handleBlur}
                                                                 value={validation.values.email || ""}
@@ -124,9 +127,11 @@ const Login = () => {
                                                             <Label className="form-label" htmlFor="password-input">Password</Label>
                                                             <div className="position-relative auth-pass-inputgroup">
                                                                 <Input
+                                                                    id="password-input"
                                                                     name="password"
                                                                     value={validation.values.password || ""}
                                                                     type={passwordShow ? "text" : "password"}
+                                                                    autoComplete="current-password"
                                                                     className="form-control pe-5"
                                                                     placeholder="Masukkan password"
                                                                     onChange={validation.handleChange}
@@ -146,7 +151,14 @@ const Login = () => {
 
                                                         <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
                                                             <div className="form-check mb-0">
-                                                                <Input className="form-check-input" type="checkbox" value="" id="auth-remember-check" />
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="auth-remember-check"
+                                                                    name="rememberMe"
+                                                                    checked={validation.values.rememberMe}
+                                                                    onChange={validation.handleChange}
+                                                                />
                                                                 <Label className="form-check-label" htmlFor="auth-remember-check">Ingat saya</Label>
                                                             </div>
                                                             <Link to="/forgot-password" className="text-muted fs-13">Lupa password?</Link>

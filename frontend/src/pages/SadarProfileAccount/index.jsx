@@ -33,6 +33,7 @@ import {
   incomeApi,
 } from "../../Components/services/api";
 import AccountFormModal from "../../Components/AccountModal/AccountFormModal";
+import { getStoredAuthUser, updateStoredAuthUser } from "../../helpers/auth-storage";
 import {
   findInstitutionByName,
   inferAccountType,
@@ -89,7 +90,7 @@ const showAccountAlert = ({ icon, title, text }) =>
 
 const getStoredUserProfile = () => {
   try {
-    const authUser = JSON.parse(localStorage.getItem("authUser") || "null");
+    const authUser = getStoredAuthUser();
     const user = authUser?.user || authUser?.data?.user || {};
     const firstName = user.first_name || user.firstName || "";
     const lastName = user.last_name || user.lastName || "";
@@ -131,23 +132,20 @@ const normalizeProfile = (user) => {
 
 const updateSessionUser = (updatedUser) => {
   try {
-    const rawAuth = localStorage.getItem("authUser");
-    if (!rawAuth) return;
-    const authData = JSON.parse(rawAuth);
-
-    if (authData.user) {
-      authData.user = { ...authData.user, ...updatedUser };
-    } else if (authData.data && authData.data.user) {
-      authData.data.user = { ...authData.data.user, ...updatedUser };
-    } else if (authData.data) {
-      authData.data = { ...authData.data, ...updatedUser };
-    } else {
-      Object.assign(authData, updatedUser);
-    }
-
-    localStorage.setItem("authUser", JSON.stringify(authData));
+    updateStoredAuthUser((authData) => {
+      if (authData.user) {
+        authData.user = { ...authData.user, ...updatedUser };
+      } else if (authData.data && authData.data.user) {
+        authData.data.user = { ...authData.data.user, ...updatedUser };
+      } else if (authData.data) {
+        authData.data = { ...authData.data, ...updatedUser };
+      } else {
+        Object.assign(authData, updatedUser);
+      }
+      return authData;
+    });
   } catch (e) {
-    console.error("Failed to update localStorage user", e);
+    console.error("Failed to update stored user session", e);
   }
 };
 

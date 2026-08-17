@@ -50,6 +50,7 @@ const Login = () => {
         : user?.user?.email || "",
     password:
       defaultAuth === "firebase" ? "" : user?.user?.confirm_password || "",
+    rememberMe: true,
   };
 
   const validation = useFormik({
@@ -127,10 +128,12 @@ const Login = () => {
                                 Email
                               </Label>
                               <Input
+                                id="email"
                                 name="email"
                                 className="form-control"
                                 placeholder="nama@email.com"
                                 type="email"
+                                autoComplete="email"
                                 onChange={validation.handleChange}
                                 onBlur={validation.handleBlur}
                                 value={validation.values.email || ""}
@@ -158,9 +161,11 @@ const Login = () => {
                               </Label>
                               <div className="position-relative auth-pass-inputgroup mb-3">
                                 <Input
+                                  id="password-input"
                                   name="password"
                                   value={validation.values.password || ""}
                                   type={passwordShow ? "text" : "password"}
+                                  autoComplete="current-password"
                                   className="form-control pe-5"
                                   placeholder="Masukkan password"
                                   onChange={validation.handleChange}
@@ -201,8 +206,10 @@ const Login = () => {
                                 <Input
                                   className="form-check-input"
                                   type="checkbox"
-                                  value=""
                                   id="auth-remember-check"
+                                  name="rememberMe"
+                                  checked={validation.values.rememberMe}
+                                  onChange={validation.handleChange}
                                 />
                                 <Label
                                   className="form-check-label"

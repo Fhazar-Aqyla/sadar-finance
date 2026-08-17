@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 
 //import images
 import dummyAvatar from "../../assets/images/users/user-dummy-img.jpg";
+import { getStoredAuthUserRaw } from "../../helpers/auth-storage";
 
 const resolveAvatarUrl = (url) => {
   if (!url) return dummyAvatar;
@@ -30,7 +31,7 @@ const ProfileDropdown = () => {
     const fallbackName = normalizeAccountName(
       user?.first_name || user?.username || "Aqyla",
     );
-    const storedUser = localStorage.getItem("authUser");
+    const storedUser = getStoredAuthUserRaw();
 
     if (!storedUser) {
       return fallbackName;
@@ -61,7 +62,7 @@ const ProfileDropdown = () => {
       user?.profile_picture || user?.profilePicture || user?.avatar;
     if (rawAvatar) return resolveAvatarUrl(rawAvatar);
 
-    const storedUser = localStorage.getItem("authUser");
+    const storedUser = getStoredAuthUserRaw();
     if (storedUser) {
       try {
         const authUser = JSON.parse(storedUser);

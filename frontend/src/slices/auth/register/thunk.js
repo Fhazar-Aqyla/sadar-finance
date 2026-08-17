@@ -5,6 +5,7 @@ import {
   postJwtRegister,
 } from "../../../helpers/fakebackend_helper";
 import { authApi } from "../../../Components/services/api";
+import { setStoredAuthUser } from "../../../helpers/auth-storage";
 import { setAuthorization } from "../../../helpers/api_helper";
 
 // action
@@ -63,7 +64,7 @@ export const registerUser = (user, history) => async (dispatch) => {
         throw new Error("Registrasi berhasil, tetapi sesi login tidak tersedia.");
       }
 
-      localStorage.setItem("authUser", JSON.stringify(data));
+      setStoredAuthUser(data, true);
       setAuthorization(data.token);
       dispatch(registerUserSuccessful(data.user));
       history("/dashboard", { replace: true });

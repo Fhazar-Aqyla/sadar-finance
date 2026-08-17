@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
+import { getStoredAuthUser } from "../../../../helpers/auth-storage";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -72,13 +73,7 @@ export const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const hasAuthToken = () => {
-    try {
-      return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
-    } catch {
-      return false;
-    }
-  };
+  const hasAuthToken = () => Boolean(getStoredAuthUser()?.token);
   const isAuthenticated = hasAuthToken();
 
   return (

@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { Link } from "react-router-dom";
+import { getStoredAuthUser } from "../../../../helpers/auth-storage";
 import { ArrowRight, Sparkles, CheckCircle2, Shield, Smartphone, Zap, Lock } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
@@ -15,13 +16,7 @@ export const CtaSection = () => {
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.92, 1, 0.96]);
   const yCard = useTransform(scrollYProgress, [0, 1], [40, -30]);
 
-  const hasAuthToken = () => {
-    try {
-      return Boolean(JSON.parse(localStorage.getItem("authUser") || "null")?.token);
-    } catch {
-      return false;
-    }
-  };
+  const hasAuthToken = () => Boolean(getStoredAuthUser()?.token);
   const isAuthenticated = hasAuthToken();
 
   return (
