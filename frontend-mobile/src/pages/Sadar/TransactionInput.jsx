@@ -64,6 +64,7 @@ const normalizeBackendAccount = (account) => ({
   id: account.account_id || account.id,
   name: account.account_name || account.accountName || account.name || "Akun",
   number: account.account_number || account.accountNumber || "",
+  balance: Number(account.balance ?? 0),
 });
 
 const findAccountForHint = (accounts, hint) => {
@@ -256,6 +257,27 @@ const TransactionInput = () => {
     };
   }, []);
 
+  const reloadAccounts = async () => {
+    try {
+      const rows = await accountApi.list();
+      const normalizedAccounts = rows.map(normalizeBackendAccount);
+      setAccounts(normalizedAccounts);
+      return normalizedAccounts;
+    } catch {
+      // ignore
+    }
+  };
+
+  const selectedAccount = useMemo(() => {
+    return accounts.find((account) => String(account.id) === String(form.accountId)) || null;
+  }, [accounts, form.accountId]);
+
+  const isInsufficientBalance = useMemo(() => {
+    if (!selectedAccount || !form.amount) return false;
+    const amountNum = Number(form.amount);
+    return Number.isFinite(amountNum) && amountNum > (selectedAccount.balance ?? 0);
+  }, [selectedAccount, form.amount]);
+
   const updateForm = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
@@ -412,6 +434,14 @@ const TransactionInput = () => {
       return;
     }
 
+    if (selectedAccount && Number(form.amount) > (selectedAccount.balance ?? 0)) {
+      setNotice({
+        color: "danger",
+        message: `Saldo akun "${selectedAccount.name}" tidak mencukupi untuk melakukan transaksi pengeluaran ini. Saldo saat ini: ${currencyFormatter.format(selectedAccount.balance || 0)}, nominal pengeluaran: ${currencyFormatter.format(Number(form.amount))}.`,
+      });
+      return;
+    }
+
     const transactionDate = toIsoDate(form.transactionDate);
     if (!transactionDate) {
       setNotice({ color: "warning", message: "Tanggal pengeluaran belum valid." });
@@ -437,6 +467,8 @@ const TransactionInput = () => {
       } else {
         await transactionApi.create(payload);
       }
+
+      await reloadAccounts();
 
       setNotice({
         color: "success",
@@ -493,6 +525,8 @@ const TransactionInput = () => {
         amount: Number(incomeForm.amount),
         incomeDate,
       });
+
+      await reloadAccounts();
 
       setNotice({
         color: "success",
@@ -778,7 +812,7 @@ const TransactionInput = () => {
                         )}
                         {accounts.map((account) => (
                           <option key={account.id} value={account.id}>
-                            {account.name}
+                            {account.name} {account.number ? `(${account.number})` : ""} — Saldo: {currencyFormatter.format(account.balance || 0)}
                           </option>
                         ))}
                       </Input>
@@ -837,8 +871,15 @@ const TransactionInput = () => {
                         value={formatNumberInput(form.amount)}
                         onChange={(event) => updateForm("amount", onlyDigits(event.target.value))}
                         placeholder="Contoh: 93.000"
+                        invalid={isInsufficientBalance}
                         required
                       />
+                      {isInsufficientBalance && (
+                        <div className="mt-1 text-danger small d-flex align-items-center">
+                          <i className="ri-error-warning-fill me-1" />
+                          <span>Saldo akun tidak mencukupi (Tersedia: {currencyFormatter.format(selectedAccount?.balance || 0)})</span>
+                        </div>
+                      )}
                     </Col>
 
                     <Col xs={12}>
@@ -877,7 +918,7 @@ const TransactionInput = () => {
                         <i className="ri-refresh-line align-bottom me-1" />
                         Atur Ulang
                       </Button>
-                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length || isUploadingManual || (mode === "ocr" && parsedResult?.isExpense === false)}>
+                      <Button type="submit" className="sadar-save-button" disabled={isSaving || isLoadingAccounts || !accounts.length || isUploadingManual || isInsufficientBalance || (mode === "ocr" && parsedResult?.isExpense === false)}>
                         {isSaving ? <Spinner size="sm" className="me-2" /> : <i className="ri-save-3-line align-bottom me-1" />}
                         Simpan Pengeluaran
                       </Button>
@@ -903,7 +944,7 @@ const TransactionInput = () => {
                         )}
                         {accounts.map((account) => (
                           <option key={account.id} value={account.id}>
-                            {account.name}
+                            {account.name} {account.number ? `(${account.number})` : ""} — Saldo: {currencyFormatter.format(account.balance || 0)}
                           </option>
                         ))}
                       </Input>

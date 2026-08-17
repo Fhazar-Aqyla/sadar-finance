@@ -34,7 +34,12 @@ class TransactionService {
     const client = await getClient();
     try {
       await client.query('BEGIN');
-      await this._ensureAccountBelongsToUser(normalized.accountId, userId, client, true);
+      const account = await this._ensureAccountBelongsToUser(normalized.accountId, userId, client, true);
+      if (account && Number(account.balance) < Number(normalized.amount)) {
+        throw new BadRequestError(
+          `Saldo akun "${account.account_name || 'terpilih'}" tidak mencukupi untuk melakukan transaksi pengeluaran ini. Saldo saat ini: Rp ${Number(account.balance).toLocaleString('id-ID')}, nominal pengeluaran: Rp ${Number(normalized.amount).toLocaleString('id-ID')}.`
+        );
+      }
       if (input.ocrScanId) await this._ensureLinkableOcrScan(input.ocrScanId, userId, client);
       const transaction = await transactionRepository.create(userId, normalized, client);
       if (normalized.accountId) {
@@ -80,7 +85,17 @@ class TransactionService {
         amount: this._provided(data, ['amount']) ? input.amount : Number(previous.amount),
       };
       this._validateAmount(merged.amount);
-      await this._ensureAccountBelongsToUser(merged.accountId, userId, client, true);
+      const account = await this._ensureAccountBelongsToUser(merged.accountId, userId, client, true);
+      if (account) {
+        const currentBalance = Number(account.balance);
+        const previousAmount = (previous.account_id === merged.accountId) ? Number(previous.amount) : 0;
+        const availableBalance = currentBalance + previousAmount;
+        if (availableBalance < Number(merged.amount)) {
+          throw new BadRequestError(
+            `Saldo akun "${account.account_name || 'terpilih'}" tidak mencukupi untuk memperbarui transaksi pengeluaran ini. Saldo tersedia: Rp ${availableBalance.toLocaleString('id-ID')}, nominal pengeluaran baru: Rp ${Number(merged.amount).toLocaleString('id-ID')}.`
+          );
+        }
+      }
       if (previous.account_id) await accountRepository.adjustBalance(previous.account_id, userId, Number(previous.amount), client);
       const updated = await transactionRepository.update(transactionId, userId, this._normalizeCategoryData(merged), client);
       if (merged.accountId) await accountRepository.adjustBalance(merged.accountId, userId, -Number(merged.amount), client);
@@ -138,12 +153,13 @@ class TransactionService {
   }
 
   async _ensureAccountBelongsToUser(accountId, userId, db, forUpdate = false) {
-    if (!accountId) return;
+    if (!accountId) return null;
 
     const account = await accountRepository.findById(accountId, userId, db, { forUpdate });
     if (!account) {
       throw new BadRequestError('Account does not exist or does not belong to the current user');
     }
+    return account;
   }
 
   async _ensureLinkableOcrScan(ocrScanId, userId, db) {
