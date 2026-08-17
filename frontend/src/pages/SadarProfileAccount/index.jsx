@@ -33,7 +33,10 @@ import {
   incomeApi,
 } from "../../Components/services/api";
 import AccountFormModal from "../../Components/AccountModal/AccountFormModal";
-import { findInstitutionByName, inferAccountType } from "../../constants/bankData";
+import {
+  findInstitutionByName,
+  inferAccountType,
+} from "../../constants/bankData";
 import { formatAccountNumberInput } from "../../utils/accountValidation";
 
 import "../SadarShared/sadar-pages.css";
@@ -149,8 +152,10 @@ const updateSessionUser = (updatedUser) => {
 };
 
 const normalizeAccount = (account) => {
-  const name = account.account_name || account.accountName || account.name || "Akun";
-  const inferredType = account.account_type || account.type || inferAccountType(name);
+  const name =
+    account.account_name || account.accountName || account.name || "Akun";
+  const inferredType =
+    account.account_type || account.type || inferAccountType(name);
   return {
     id: account.account_id || account.id,
     name,
@@ -686,12 +691,18 @@ const ProfileAccountWithData = () => {
 
           const nowMonth = new Date().toISOString().slice(0, 7);
           const currentMonthIncomes = (incomeList || []).filter((inc) => {
-            const incDate = String(inc.income_date || inc.incomeDate || inc.date || "").slice(0, 7);
+            const incDate = String(
+              inc.income_date || inc.incomeDate || inc.date || "",
+            ).slice(0, 7);
             return incDate === nowMonth;
           });
           const totalMonthlyInc = currentMonthIncomes.length
             ? sumBy(currentMonthIncomes, (item) => Number(item.amount || 0))
-            : (incomeList && incomeList.length ? sumBy(incomeList.slice(0, 5), (item) => Number(item.amount || 0)) : 0);
+            : incomeList && incomeList.length
+              ? sumBy(incomeList.slice(0, 5), (item) =>
+                  Number(item.amount || 0),
+                )
+              : 0;
           setMonthlyIncome(totalMonthlyInc);
 
           setProfile(normalizeProfile(profileResponse));
@@ -889,7 +900,12 @@ const ProfileAccountWithData = () => {
   const applyBudgetTarget = () => {
     setBudgetNotice("");
     setIsBudgetSaved(false);
-    const baseIncome = monthlyIncome > 0 ? monthlyIncome : (totalIncome > 0 ? totalIncome : 10000000);
+    const baseIncome =
+      monthlyIncome > 0
+        ? monthlyIncome
+        : totalIncome > 0
+          ? totalIncome
+          : 10000000;
     setBudgetRows((items) =>
       items.map((budget) => {
         const target = budgetTargets.find(
@@ -1029,7 +1045,11 @@ const ProfileAccountWithData = () => {
                 <div className="sadar-insight-list sadar-account-list">
                   {accounts.map((account) => {
                     const inst = findInstitutionByName(account.name);
-                    const icon = inst ? inst.icon : (account.type === "Bank" ? "🏦" : "💳");
+                    const icon = inst
+                      ? inst.icon
+                      : account.type === "Bank"
+                        ? "🏦"
+                        : "💳";
                     return (
                       <div
                         className="sadar-insight-item sadar-account-item d-flex align-items-center justify-content-between gap-3 p-3 mb-2 rounded-3 border"
@@ -1041,7 +1061,9 @@ const ProfileAccountWithData = () => {
                           </span>
                           <div>
                             <div className="d-flex align-items-center gap-2">
-                              <h6 className="mb-0 fw-semibold text-dark">{account.name}</h6>
+                              <h6 className="mb-0 fw-semibold text-dark">
+                                {account.name}
+                              </h6>
                               <span className="sadar-account-type-badge">
                                 {account.type}
                               </span>
@@ -1056,14 +1078,20 @@ const ProfileAccountWithData = () => {
 
                         <div className="d-flex align-items-center gap-3">
                           <div className="text-end">
-                            <span className="text-muted fs-11 d-block">Saldo Berjalan</span>
-                            <strong className="fs-14 text-dark">{rupiah(account.balance)}</strong>
+                            <span className="text-muted fs-11 d-block">
+                              Saldo Berjalan
+                            </span>
+                            <strong className="fs-14 text-dark">
+                              {rupiah(account.balance)}
+                            </strong>
                           </div>
                           <Dropdown
                             isOpen={openActionAccountId === account.id}
                             toggle={() =>
                               setOpenActionAccountId(
-                                openActionAccountId === account.id ? "" : account.id
+                                openActionAccountId === account.id
+                                  ? ""
+                                  : account.id,
                               )
                             }
                           >
@@ -1075,7 +1103,9 @@ const ProfileAccountWithData = () => {
                               <i className="ri-more-fill align-bottom"></i>
                             </DropdownToggle>
                             <DropdownMenu end className="sadar-row-action-menu">
-                              <DropdownItem onClick={() => openEditAccountModal(account)}>
+                              <DropdownItem
+                                onClick={() => openEditAccountModal(account)}
+                              >
                                 <i className="ri-pencil-line align-bottom me-2"></i>
                                 Ubah
                               </DropdownItem>
@@ -1105,10 +1135,16 @@ const ProfileAccountWithData = () => {
                 <div>
                   <h4 className="card-title mb-1">Atur Anggaran</h4>
                   <p className="text-muted mb-0">
-                    Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan ini.
+                    Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan
+                    ini.
                   </p>
                 </div>
-                <Button color="primary" onClick={applyBudgetTarget} className="sadar-apply-rule-btn">
+                <Button
+                  color="light"
+                  onClick={applyBudgetTarget}
+                  className="sadar-apply-rule-btn"
+                >
+                  <i className="ri-magic-line me-1"></i>
                   Terapkan 50/30/20
                 </Button>
               </CardHeader>
@@ -1133,15 +1169,21 @@ const ProfileAccountWithData = () => {
                       >
                         <div className="d-flex align-items-start justify-content-between gap-3 mb-3">
                           <div>
-                            <strong className="fs-14 text-dark">{target?.label || budget.label}</strong>
-                            <p className="text-muted fs-12 mb-0 mt-1">{target?.helper}</p>
+                            <strong className="fs-14 text-dark">
+                              {target?.label || budget.label}
+                            </strong>
+                            <p className="text-muted fs-12 mb-0 mt-1">
+                              {target?.helper}
+                            </p>
                           </div>
                           <span className="sadar-score-status badge bg-primary-subtle text-primary fw-bold fs-12">
                             {target?.percent}%
                           </span>
                         </div>
 
-                        <Label className="sadar-modal-field-label">Batas Anggaran</Label>
+                        <Label className="sadar-modal-field-label">
+                          Batas Anggaran
+                        </Label>
                         <Input
                           type="text"
                           inputMode="numeric"
@@ -1159,7 +1201,9 @@ const ProfileAccountWithData = () => {
 
                         <div className="d-flex justify-content-between align-items-center mt-3">
                           <span className="text-muted fs-12">Terpakai</span>
-                          <strong className="fs-13 text-dark">{rupiah(budget.used)}</strong>
+                          <strong className="fs-13 text-dark">
+                            {rupiah(budget.used)}
+                          </strong>
                         </div>
                         <Progress
                           value={Math.min(usage, 100)}
@@ -1174,7 +1218,11 @@ const ProfileAccountWithData = () => {
                   })}
                 </div>
                 <div className="d-flex flex-wrap align-items-center gap-3 mt-4">
-                  <Button color="primary" onClick={saveBudget} className="px-4 py-2 fw-semibold">
+                  <Button
+                    color="primary"
+                    onClick={saveBudget}
+                    className="px-4 py-2 fw-semibold"
+                  >
                     Simpan Anggaran
                   </Button>
                   {isBudgetSaved && (

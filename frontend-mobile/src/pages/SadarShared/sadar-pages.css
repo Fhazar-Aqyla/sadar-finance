@@ -1827,7 +1827,9 @@ html[data-bs-theme="dark"] .sadar-history-modal label {
 }
 
 html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control::placeholder,
-html[data-bs-theme="dark"] .sadar-history-edit-grid .sadar-modal-input::placeholder {
+html[data-bs-theme="dark"]
+  .sadar-history-edit-grid
+  .sadar-modal-input::placeholder {
   color: #94a3b8;
 }
 
@@ -2790,7 +2792,10 @@ html[data-bs-theme="dark"] .modal .form-control::placeholder {
   opacity: 1 !important;
 }
 
-html[data-bs-theme="dark"] .sadar-account-form-grid .input-group .input-group-text,
+html[data-bs-theme="dark"]
+  .sadar-account-form-grid
+  .input-group
+  .input-group-text,
 html[data-bs-theme="dark"] .modal .input-group-text {
   border-color: rgba(148, 163, 184, 0.3) !important;
   background-color: #24344d !important;
@@ -3476,7 +3481,10 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     justify-self: end;
   }
 
-  .sadar-history-page .sadar-table tbody td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(6)) {
+  .sadar-history-page
+    .sadar-table
+    tbody
+    td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(6)) {
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: 70px minmax(0, 1fr);
@@ -3484,7 +3492,10 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     gap: 0.65rem;
   }
 
-  .sadar-history-page .sadar-table tbody td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(6))::before {
+  .sadar-history-page
+    .sadar-table
+    tbody
+    td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(6))::before {
     color: #94a3b8;
     content: attr(data-label);
     font-size: 0.66rem;
@@ -3506,13 +3517,21 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   }
 
   html[data-bs-theme="dark"] .sadar-history-page .sadar-pagination-status,
-  html[data-bs-theme="dark"] .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row) {
+  html[data-bs-theme="dark"]
+    .sadar-history-page
+    .sadar-table
+    tbody
+    tr:not(.sadar-table-empty-row) {
     border-color: rgba(148, 163, 184, 0.18);
     color: #cbd5e1;
     background: #111827;
   }
 
-  html[data-bs-theme="dark"] .sadar-history-page .sadar-table tbody td:first-child {
+  html[data-bs-theme="dark"]
+    .sadar-history-page
+    .sadar-table
+    tbody
+    td:first-child {
     color: #f8fafc;
   }
 }
@@ -3680,9 +3699,15 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   border-radius: 26px !important;
   color: #172033 !important;
   background:
-    radial-gradient(circle at 88% -20%, rgba(30, 58, 138, 0.08), transparent 42%),
+    radial-gradient(
+      circle at 88% -20%,
+      rgba(30, 58, 138, 0.08),
+      transparent 42%
+    ),
     rgba(255, 255, 255, 0.97) !important;
-  box-shadow: 0 34px 90px rgba(15, 23, 42, 0.28), inset 0 1.5px 0 #ffffff !important;
+  box-shadow:
+    0 34px 90px rgba(15, 23, 42, 0.28),
+    inset 0 1.5px 0 #ffffff !important;
   backdrop-filter: blur(34px) saturate(135%);
   -webkit-backdrop-filter: blur(34px) saturate(135%);
 }
@@ -3723,7 +3748,9 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   border-radius: 19px;
   color: #dc2626;
   background: rgba(254, 242, 242, 0.96);
-  box-shadow: 0 12px 26px rgba(220, 38, 38, 0.12), inset 0 1px 0 #ffffff;
+  box-shadow:
+    0 12px 26px rgba(220, 38, 38, 0.12),
+    inset 0 1px 0 #ffffff;
   font-size: 1.45rem;
 }
 
@@ -3772,7 +3799,9 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   border-color: rgba(30, 58, 138, 0.14) !important;
   color: #1e3a8a !important;
   background: #ffffff !important;
-  box-shadow: inset 0 1px 0 #ffffff, 0 6px 16px rgba(30, 58, 138, 0.06);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 6px 16px rgba(30, 58, 138, 0.06);
 }
 
 .sadar-logout-modal-layer .sadar-logout-confirm-button {
@@ -3782,10 +3811,16 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   box-shadow: 0 10px 24px rgba(220, 38, 38, 0.2);
 }
 
-html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content {
+html[data-bs-theme="dark"]
+  .sadar-logout-modal-layer
+  .sadar-logout-modal-content {
   color: #172033 !important;
   background:
-    radial-gradient(circle at 88% -20%, rgba(30, 58, 138, 0.08), transparent 42%),
+    radial-gradient(
+      circle at 88% -20%,
+      rgba(30, 58, 138, 0.08),
+      transparent 42%
+    ),
     rgba(255, 255, 255, 0.98) !important;
 }
 
@@ -3827,7 +3862,9 @@ body.sadar-photo-actions-open {
   border-radius: 50%;
   color: #1e3a8a;
   background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 10px 24px rgba(30, 58, 138, 0.2), inset 0 1px 0 #ffffff;
+  box-shadow:
+    0 10px 24px rgba(30, 58, 138, 0.2),
+    inset 0 1px 0 #ffffff;
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -3886,9 +3923,15 @@ body.sadar-photo-actions-open {
   border-radius: 26px;
   color: #172033;
   background:
-    radial-gradient(circle at 86% -15%, rgba(30, 58, 138, 0.08), transparent 42%),
+    radial-gradient(
+      circle at 86% -15%,
+      rgba(30, 58, 138, 0.08),
+      transparent 42%
+    ),
     rgba(255, 255, 255, 0.97);
-  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.3), inset 0 1.5px 0 #ffffff;
+  box-shadow:
+    0 34px 84px rgba(15, 23, 42, 0.3),
+    inset 0 1.5px 0 #ffffff;
   backdrop-filter: blur(34px) saturate(135%);
   -webkit-backdrop-filter: blur(34px) saturate(135%);
   animation: sadar-liquid-sheet-up 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -3969,7 +4012,9 @@ body.sadar-photo-actions-open {
   color: #172033;
   text-align: left;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 7px 18px rgba(30, 58, 138, 0.06), inset 0 1px 0 #ffffff;
+  box-shadow:
+    0 7px 18px rgba(30, 58, 138, 0.06),
+    inset 0 1px 0 #ffffff;
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -4069,9 +4114,15 @@ html[data-bs-theme="dark"] .sadar-photo-action-sheet {
   outline-color: rgba(2, 8, 23, 0.42);
   color: #e5f2fb;
   background:
-    radial-gradient(circle at 86% -15%, rgba(30, 58, 138, 0.26), transparent 42%),
+    radial-gradient(
+      circle at 86% -15%,
+      rgba(30, 58, 138, 0.26),
+      transparent 42%
+    ),
     rgba(9, 25, 43, 0.97);
-  box-shadow: 0 34px 90px rgba(0, 3, 13, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 34px 90px rgba(0, 3, 13, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 html[data-bs-theme="dark"] .sadar-photo-action-heading {
@@ -4207,9 +4258,15 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-radius: 26px !important;
     color: #152d45 !important;
     background:
-      radial-gradient(circle at 88% -8%, rgba(56, 189, 248, 0.19), transparent 36%),
+      radial-gradient(
+        circle at 88% -8%,
+        rgba(56, 189, 248, 0.19),
+        transparent 36%
+      ),
       linear-gradient(160deg, #fafdff 0%, #eff8ff 58%, #e8f5fd 100%) !important;
-    box-shadow: 0 34px 90px rgba(7, 37, 66, 0.38), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 34px 90px rgba(7, 37, 66, 0.38),
+      inset 0 1px 0 #ffffff !important;
     animation: sadarAccountSheetUp 0.34s cubic-bezier(0.2, 0.95, 0.3, 1);
   }
 
@@ -4275,7 +4332,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-radius: 13px;
     color: #057cae;
     background: linear-gradient(145deg, #ffffff, #d9f2ff);
-    box-shadow: 0 8px 18px rgba(14, 116, 179, 0.13), inset 0 1px 0 #ffffff;
+    box-shadow:
+      0 8px 18px rgba(14, 116, 179, 0.13),
+      inset 0 1px 0 #ffffff;
     font-size: 1.12rem;
     line-height: 1;
   }
@@ -4291,7 +4350,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-radius: 50%;
     background-color: #ffffff;
     background-image: none !important;
-    box-shadow: 0 7px 17px rgba(27, 59, 94, 0.1), inset 0 1px 0 #ffffff;
+    box-shadow:
+      0 7px 17px rgba(27, 59, 94, 0.1),
+      inset 0 1px 0 #ffffff;
     opacity: 1;
   }
 
@@ -4347,16 +4408,20 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     font-weight: 750;
   }
 
-  .sadar-account-modal :where(.form-control, .sadar-searchable-select-trigger, .input-group-text) {
+  .sadar-account-modal
+    :where(.form-control, .sadar-searchable-select-trigger, .input-group-text) {
     min-height: 50px;
     border-color: #c9dce9 !important;
     color: #172f47 !important;
     background: #ffffff !important;
-    box-shadow: inset 0 1px 0 #ffffff, 0 5px 14px rgba(37, 76, 119, 0.06) !important;
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 5px 14px rgba(37, 76, 119, 0.06) !important;
     opacity: 1 !important;
   }
 
-  .sadar-account-modal :where(.form-control, .sadar-select-search-input)::placeholder {
+  .sadar-account-modal
+    :where(.form-control, .sadar-select-search-input)::placeholder {
     color: #71879b !important;
     opacity: 1;
   }
@@ -4474,8 +4539,15 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-account-modal .modal-footer .btn-primary {
     border-color: #0787bd !important;
     color: #ffffff !important;
-    background: linear-gradient(145deg, #24b6e7, #087fac 55%, #2563eb) !important;
-    box-shadow: 0 10px 22px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+    background: linear-gradient(
+      145deg,
+      #24b6e7,
+      #087fac 55%,
+      #2563eb
+    ) !important;
+    box-shadow:
+      0 10px 22px rgba(2, 132, 199, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
   }
 
   .sadar-account-modal .modal-footer .btn > i {
@@ -4483,7 +4555,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     line-height: 1;
   }
 
-  html[data-bs-theme="dark"] body:has(.modal-dialog.sadar-account-modal) .modal-backdrop.show {
+  html[data-bs-theme="dark"]
+    body:has(.modal-dialog.sadar-account-modal)
+    .modal-backdrop.show {
     background: #010712 !important;
     opacity: 0.78 !important;
   }
@@ -4493,9 +4567,15 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     outline-color: rgba(1, 7, 18, 0.62);
     color: #e4f1fb !important;
     background:
-      radial-gradient(circle at 88% -8%, rgba(14, 165, 233, 0.16), transparent 36%),
+      radial-gradient(
+        circle at 88% -8%,
+        rgba(14, 165, 233, 0.16),
+        transparent 36%
+      ),
       linear-gradient(160deg, #10263c 0%, #0b1b2d 58%, #081523 100%) !important;
-    box-shadow: 0 36px 94px rgba(0, 3, 12, 0.76), inset 0 1px 0 rgba(224, 242, 254, 0.1) !important;
+    box-shadow:
+      0 36px 94px rgba(0, 3, 12, 0.76),
+      inset 0 1px 0 rgba(224, 242, 254, 0.1) !important;
   }
 
   html[data-bs-theme="dark"] .sadar-account-sheet-handle {
@@ -4520,7 +4600,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-color: rgba(56, 189, 248, 0.26);
     color: #7dd3fc;
     background: #173652;
-    box-shadow: 0 9px 20px rgba(0, 5, 18, 0.3), inset 0 1px 0 rgba(224, 242, 254, 0.1);
+    box-shadow:
+      0 9px 20px rgba(0, 5, 18, 0.3),
+      inset 0 1px 0 rgba(224, 242, 254, 0.1);
   }
 
   html[data-bs-theme="dark"] .sadar-account-modal .modal-header .btn-close {
@@ -4530,8 +4612,14 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     filter: none;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal .modal-header .btn-close::before,
-  html[data-bs-theme="dark"] .sadar-account-modal .modal-header .btn-close::after {
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    .modal-header
+    .btn-close::before,
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    .modal-header
+    .btn-close::after {
     background: #dcefff;
   }
 
@@ -4544,15 +4632,24 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     color: #c8dceb !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal :where(.form-control, .sadar-searchable-select-trigger, .input-group-text) {
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    :where(.form-control, .sadar-searchable-select-trigger, .input-group-text) {
     border-color: rgba(155, 196, 226, 0.23) !important;
     color: #e7f4fc !important;
     background: #132b42 !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.07), 0 6px 16px rgba(0, 5, 18, 0.2) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(224, 242, 254, 0.07),
+      0 6px 16px rgba(0, 5, 18, 0.2) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal :where(.form-control, .sadar-select-search-input)::placeholder,
-  html[data-bs-theme="dark"] .sadar-account-modal .sadar-searchable-select-trigger .text-muted {
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    :where(.form-control, .sadar-select-search-input)::placeholder,
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    .sadar-searchable-select-trigger
+    .text-muted {
     color: #8ca6bc !important;
   }
 
@@ -4561,19 +4658,29 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     background: #17334d !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal :where(.sadar-institution-icon, .sadar-select-group-icon, .sadar-select-option-icon) {
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    :where(
+      .sadar-institution-icon,
+      .sadar-select-group-icon,
+      .sadar-select-option-icon
+    ) {
     color: #7dd3fc;
     background: #173a55;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal .sadar-searchable-select-menu {
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    .sadar-searchable-select-menu {
     border-color: rgba(163, 204, 235, 0.24) !important;
     color: #e3f0f9 !important;
     background: #10273d !important;
     box-shadow: 0 24px 54px rgba(0, 3, 12, 0.64) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal :where(.sadar-select-search-header, .sadar-select-group-header) {
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    :where(.sadar-select-search-header, .sadar-select-group-header) {
     border-color: rgba(163, 204, 235, 0.12) !important;
     background: #142e46 !important;
   }
@@ -4587,7 +4694,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     color: #c9deed;
   }
 
-  html[data-bs-theme="dark"] .sadar-account-modal .sadar-select-option:is(.selected, .highlighted),
+  html[data-bs-theme="dark"]
+    .sadar-account-modal
+    .sadar-select-option:is(.selected, .highlighted),
   html[data-bs-theme="dark"] .sadar-account-modal .sadar-select-option:hover {
     color: #e0f7ff !important;
     background: #173b56 !important;
@@ -4811,12 +4920,25 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
 @media (max-width: 767.98px) {
   html[data-bs-theme="dark"] .sadar-page,
   html[data-bs-theme="dark"] .sadar-dashboard {
-    --sadar-mobile-surface: linear-gradient(145deg, rgba(22, 40, 62, 0.92), rgba(8, 20, 36, 0.9));
-    --sadar-mobile-surface-strong: linear-gradient(145deg, rgba(29, 48, 72, 0.78), rgba(10, 24, 42, 0.8));
+    --sadar-mobile-surface: linear-gradient(
+      145deg,
+      rgba(22, 40, 62, 0.92),
+      rgba(8, 20, 36, 0.9)
+    );
+    --sadar-mobile-surface-strong: linear-gradient(
+      145deg,
+      rgba(29, 48, 72, 0.78),
+      rgba(10, 24, 42, 0.8)
+    );
     --sadar-mobile-border: rgba(162, 199, 235, 0.17);
-    --sadar-mobile-shadow: 0 16px 38px rgba(0, 4, 15, 0.34), inset 0 1px 0 rgba(224, 242, 254, 0.07);
+    --sadar-mobile-shadow:
+      0 16px 38px rgba(0, 4, 15, 0.34), inset 0 1px 0 rgba(224, 242, 254, 0.07);
     background:
-      radial-gradient(circle at 88% 2%, rgba(14, 165, 233, 0.1), transparent 28rem),
+      radial-gradient(
+        circle at 88% 2%,
+        rgba(14, 165, 233, 0.1),
+        transparent 28rem
+      ),
       linear-gradient(180deg, #07101e, #091525 48%, #070e1a) !important;
   }
 
@@ -4889,8 +5011,16 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border: 1px solid rgba(255, 255, 255, 0.82);
     border-radius: 15px;
     background:
-      radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.16), transparent 62%),
-      linear-gradient(145deg, rgba(239, 246, 255, 0.96), rgba(240, 253, 250, 0.86));
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(56, 189, 248, 0.16),
+        transparent 62%
+      ),
+      linear-gradient(
+        145deg,
+        rgba(239, 246, 255, 0.96),
+        rgba(240, 253, 250, 0.86)
+      );
     text-align: center;
   }
 
@@ -4974,7 +5104,10 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     gap: 0.75rem !important;
   }
 
-  .sadar-profile-page .sadar-account-item > .d-flex:first-child .sadar-card-icon {
+  .sadar-profile-page
+    .sadar-account-item
+    > .d-flex:first-child
+    .sadar-card-icon {
     width: 40px;
     height: 40px;
     flex: 0 0 40px;
@@ -4982,7 +5115,10 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     font-size: 1rem !important;
   }
 
-  .sadar-profile-page .sadar-account-item > .d-flex:first-child > div:last-child {
+  .sadar-profile-page
+    .sadar-account-item
+    > .d-flex:first-child
+    > div:last-child {
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -5078,15 +5214,25 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   html[data-bs-theme="dark"] .sadar-profile-page .sadar-profile-photo-row {
     border-color: rgba(148, 163, 184, 0.18);
     background:
-      radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.16), transparent 64%),
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(14, 165, 233, 0.16),
+        transparent 64%
+      ),
       linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(15, 41, 48, 0.84));
   }
 
-  html[data-bs-theme="dark"] .sadar-profile-page .sadar-account-item > .d-flex:last-child {
+  html[data-bs-theme="dark"]
+    .sadar-profile-page
+    .sadar-account-item
+    > .d-flex:last-child {
     border-top-color: rgba(148, 163, 184, 0.16);
   }
 
-  html[data-bs-theme="dark"] .sadar-profile-page .sadar-profile-panel .sadar-table-action {
+  html[data-bs-theme="dark"]
+    .sadar-profile-page
+    .sadar-profile-panel
+    .sadar-table-action {
     border-color: rgba(96, 165, 250, 0.22);
     color: #7dd3fc;
     background: rgba(30, 58, 138, 0.28);
@@ -5122,15 +5268,32 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     --sadar-glass-ink: #10233d;
     --sadar-glass-copy: #405672;
     --sadar-glass-muted: #6f839b;
-    --sadar-glass-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(236, 246, 255, 0.6));
-    --sadar-glass-surface-raised: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(239, 248, 255, 0.72));
-    --sadar-glass-surface-soft: linear-gradient(145deg, rgba(255, 255, 255, 0.64), rgba(225, 241, 255, 0.46));
+    --sadar-glass-surface: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.8),
+      rgba(236, 246, 255, 0.6)
+    );
+    --sadar-glass-surface-raised: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(239, 248, 255, 0.72)
+    );
+    --sadar-glass-surface-soft: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.64),
+      rgba(225, 241, 255, 0.46)
+    );
     --sadar-glass-control: rgba(255, 255, 255, 0.66);
     --sadar-glass-border: rgba(255, 255, 255, 0.8);
     --sadar-glass-stroke: rgba(91, 134, 171, 0.2);
     --sadar-glass-highlight: rgba(255, 255, 255, 0.95);
-    --sadar-glass-shadow: 0 18px 44px rgba(37, 76, 119, 0.13), 0 3px 10px rgba(37, 99, 235, 0.055), inset 0 1px 0 var(--sadar-glass-highlight), inset 0 -1px 0 rgba(82, 124, 163, 0.1);
-    --sadar-glass-shadow-soft: 0 9px 24px rgba(37, 76, 119, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    --sadar-glass-shadow:
+      0 18px 44px rgba(37, 76, 119, 0.13), 0 3px 10px rgba(37, 99, 235, 0.055),
+      inset 0 1px 0 var(--sadar-glass-highlight),
+      inset 0 -1px 0 rgba(82, 124, 163, 0.1);
+    --sadar-glass-shadow-soft:
+      0 9px 24px rgba(37, 76, 119, 0.09),
+      inset 0 1px 0 rgba(255, 255, 255, 0.78);
     --sadar-glass-blue: #1677d2;
     --sadar-glass-cyan: #0891b2;
     position: relative;
@@ -5138,8 +5301,16 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     isolation: isolate;
     color: var(--sadar-glass-ink);
     background:
-      radial-gradient(circle at 92% 3%, rgba(56, 189, 248, 0.24), transparent 25rem),
-      radial-gradient(circle at -8% 34%, rgba(45, 212, 191, 0.18), transparent 22rem),
+      radial-gradient(
+        circle at 92% 3%,
+        rgba(56, 189, 248, 0.24),
+        transparent 25rem
+      ),
+      radial-gradient(
+        circle at -8% 34%,
+        rgba(45, 212, 191, 0.18),
+        transparent 22rem
+      ),
       linear-gradient(160deg, #f5faff 0%, #eaf4ff 48%, #eefbf9 100%) !important;
   }
 
@@ -5200,8 +5371,16 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-page-header,
   .sadar-overview {
     background:
-      radial-gradient(circle at 92% -20%, rgba(14, 165, 233, 0.23), transparent 45%),
-      radial-gradient(circle at 2% 120%, rgba(45, 212, 191, 0.16), transparent 45%),
+      radial-gradient(
+        circle at 92% -20%,
+        rgba(14, 165, 233, 0.23),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 2% 120%,
+        rgba(45, 212, 191, 0.16),
+        transparent 45%
+      ),
       var(--sadar-glass-surface-raised) !important;
   }
 
@@ -5258,7 +5437,11 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     width: 108px;
     height: 108px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.18), transparent 66%);
+    background: radial-gradient(
+      circle,
+      rgba(56, 189, 248, 0.18),
+      transparent 66%
+    );
     pointer-events: none;
   }
 
@@ -5292,7 +5475,10 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-recommend-card,
   .sadar-account-item,
   .sadar-step-card {
-    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    transition:
+      transform 0.22s ease,
+      border-color 0.22s ease,
+      box-shadow 0.22s ease;
   }
 
   .sadar-insight-item:active,
@@ -5313,8 +5499,14 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-note-icon,
   .sadar-setup-number {
     border: 1px solid rgba(255, 255, 255, 0.68);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(186, 230, 253, 0.52));
-    box-shadow: 0 8px 18px rgba(14, 116, 179, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.7),
+      rgba(186, 230, 253, 0.52)
+    );
+    box-shadow:
+      0 8px 18px rgba(14, 116, 179, 0.13),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92);
   }
 
   .sadar-page :where(.form-control, .form-select, .form-check-input),
@@ -5324,7 +5516,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border: 1px solid rgba(91, 134, 171, 0.25) !important;
     color: var(--sadar-glass-ink) !important;
     background-color: var(--sadar-glass-control) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 5px 14px rgba(37, 76, 119, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 5px 14px rgba(37, 76, 119, 0.06);
     backdrop-filter: blur(16px) saturate(150%);
     -webkit-backdrop-filter: blur(16px) saturate(150%);
   }
@@ -5335,7 +5529,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-select-search-input:focus {
     border-color: rgba(14, 165, 233, 0.58) !important;
     background-color: rgba(255, 255, 255, 0.82) !important;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 0 0 4px rgba(14, 165, 233, 0.12),
+      inset 0 1px 0 #ffffff !important;
   }
 
   .sadar-page :where(.form-control, .form-select)::placeholder,
@@ -5343,20 +5539,62 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     color: #8293a8 !important;
   }
 
-  .sadar-page :where(.btn-primary, .sadar-save-button, .sadar-ocr-button, .sadar-add-account-btn),
-  .sadar-dashboard :where(.btn-primary, .sadar-save-button, .sadar-ocr-button, .sadar-add-account-btn) {
+  .sadar-page
+    :where(
+      .btn-primary,
+      .sadar-save-button,
+      .sadar-ocr-button,
+      .sadar-add-account-btn
+    ),
+  .sadar-dashboard
+    :where(
+      .btn-primary,
+      .sadar-save-button,
+      .sadar-ocr-button,
+      .sadar-add-account-btn
+    ) {
     border-color: rgba(14, 116, 179, 0.32) !important;
     color: #ffffff !important;
-    background: linear-gradient(145deg, #38bdf8, #0789c2 55%, #2563eb) !important;
-    box-shadow: 0 10px 22px rgba(2, 132, 199, 0.25), inset 0 1.5px 0 rgba(255, 255, 255, 0.42), inset 0 -2px 4px rgba(30, 64, 175, 0.18) !important;
+    background: linear-gradient(
+      145deg,
+      #38bdf8,
+      #0789c2 55%,
+      #2563eb
+    ) !important;
+    box-shadow:
+      0 10px 22px rgba(2, 132, 199, 0.25),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.42),
+      inset 0 -2px 4px rgba(30, 64, 175, 0.18) !important;
   }
 
-  .sadar-page :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle),
-  .sadar-dashboard :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle) {
+  .sadar-page
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ),
+  .sadar-dashboard
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ) {
     border-color: rgba(91, 134, 171, 0.22) !important;
     color: #274661 !important;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(225, 241, 255, 0.56)) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 7px 16px rgba(37, 76, 119, 0.08) !important;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(225, 241, 255, 0.56)
+    ) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 7px 16px rgba(37, 76, 119, 0.08) !important;
   }
 
   .sadar-page :where(.btn, button):active,
@@ -5370,12 +5608,15 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border: 1px solid rgba(91, 134, 171, 0.2) !important;
     border-radius: 15px !important;
     background: var(--sadar-glass-surface-soft) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 7px 18px rgba(37, 76, 119, 0.07);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 7px 18px rgba(37, 76, 119, 0.07);
     backdrop-filter: blur(18px) saturate(155%);
     -webkit-backdrop-filter: blur(18px) saturate(155%);
   }
 
-  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn:not(.active):not(.btn-primary) {
     border: 0 !important;
     color: #64748b !important;
     background: transparent !important;
@@ -5383,7 +5624,8 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     box-shadow: none !important;
   }
 
-  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary):hover {
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn:not(.active):not(.btn-primary):hover {
     color: #1e293b !important;
     background: rgba(255, 255, 255, 0.45) !important;
   }
@@ -5393,8 +5635,14 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-period-toggle .btn.active,
   .sadar-period-toggle .btn.btn-primary {
     color: #075985 !important;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(186, 230, 253, 0.66)) !important;
-    box-shadow: 0 7px 18px rgba(14, 116, 179, 0.14), inset 0 1px 0 #ffffff !important;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.94),
+      rgba(186, 230, 253, 0.66)
+    ) !important;
+    box-shadow:
+      0 7px 18px rgba(14, 116, 179, 0.14),
+      inset 0 1px 0 #ffffff !important;
     font-weight: 700 !important;
   }
 
@@ -5451,7 +5699,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     overflow: hidden;
     color: var(--sadar-glass-ink);
     background: var(--sadar-glass-surface-raised) !important;
-    box-shadow: 0 22px 54px rgba(37, 76, 119, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    box-shadow:
+      0 22px 54px rgba(37, 76, 119, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
     backdrop-filter: blur(30px) saturate(175%);
     -webkit-backdrop-filter: blur(30px) saturate(175%);
   }
@@ -5474,7 +5724,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-dashboard :where(.alert, .sadar-notice) {
     border: 1px solid rgba(255, 255, 255, 0.7) !important;
     border-radius: 16px !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 7px 18px rgba(37, 76, 119, 0.07);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      0 7px 18px rgba(37, 76, 119, 0.07);
     backdrop-filter: blur(16px) saturate(145%);
     -webkit-backdrop-filter: blur(16px) saturate(145%);
   }
@@ -5490,8 +5742,16 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-radius: 18px !important;
     overflow: hidden;
     background:
-      radial-gradient(circle at 50% -15%, rgba(56, 189, 248, 0.25), transparent 58%),
-      radial-gradient(circle at 8% 110%, rgba(45, 212, 191, 0.18), transparent 50%),
+      radial-gradient(
+        circle at 50% -15%,
+        rgba(56, 189, 248, 0.25),
+        transparent 58%
+      ),
+      radial-gradient(
+        circle at 8% 110%,
+        rgba(45, 212, 191, 0.18),
+        transparent 50%
+      ),
       var(--sadar-glass-surface-raised) !important;
     box-shadow: var(--sadar-glass-shadow) !important;
     backdrop-filter: blur(24px) saturate(170%);
@@ -5502,7 +5762,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border: 1px dashed rgba(14, 165, 233, 0.4) !important;
     border-radius: 18px !important;
     background: rgba(255, 255, 255, 0.38) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 8px 22px rgba(37, 76, 119, 0.07);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 8px 22px rgba(37, 76, 119, 0.07);
     backdrop-filter: blur(16px) saturate(145%);
     -webkit-backdrop-filter: blur(16px) saturate(145%);
   }
@@ -5511,7 +5773,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   .sadar-receipt-dropzone:focus-within {
     border-color: rgba(2, 132, 199, 0.68) !important;
     background: rgba(240, 249, 255, 0.68) !important;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1), inset 0 1px 0 #ffffff;
+    box-shadow:
+      0 0 0 4px rgba(14, 165, 233, 0.1),
+      inset 0 1px 0 #ffffff;
   }
 
   .sadar-confirm-modal .modal-content,
@@ -5522,9 +5786,15 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border: 1px solid rgba(255, 255, 255, 0.82) !important;
     color: var(--sadar-glass-ink);
     background:
-      radial-gradient(circle at 88% -12%, rgba(56, 189, 248, 0.22), transparent 42%),
+      radial-gradient(
+        circle at 88% -12%,
+        rgba(56, 189, 248, 0.22),
+        transparent 42%
+      ),
       var(--sadar-glass-surface-raised) !important;
-    box-shadow: 0 32px 80px rgba(27, 59, 94, 0.27), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 32px 80px rgba(27, 59, 94, 0.27),
+      inset 0 1px 0 #ffffff !important;
     backdrop-filter: blur(36px) saturate(180%);
     -webkit-backdrop-filter: blur(36px) saturate(180%);
   }
@@ -5550,7 +5820,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-radius: 18px !important;
     color: var(--sadar-glass-ink) !important;
     background: var(--sadar-glass-surface-raised) !important;
-    box-shadow: 0 22px 58px rgba(27, 59, 94, 0.24), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 22px 58px rgba(27, 59, 94, 0.24),
+      inset 0 1px 0 #ffffff !important;
     backdrop-filter: blur(28px) saturate(170%);
     -webkit-backdrop-filter: blur(28px) saturate(170%);
   }
@@ -5597,7 +5869,19 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     flex: 0 0 auto;
   }
 
-  .sadar-page :where(h1, h2, h3, h4, h5, h6, p, .card-title, .sadar-step-title, .sadar-step-desc),
+  .sadar-page
+    :where(
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      p,
+      .card-title,
+      .sadar-step-title,
+      .sadar-step-desc
+    ),
   .sadar-dashboard :where(h1, h2, h3, h4, h5, h6, p, .card-title) {
     overflow-wrap: anywhere;
   }
@@ -5667,7 +5951,11 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     font-size: 0.95rem !important;
   }
 
-  .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td[data-label]::before {
+  .sadar-dashboard
+    .sadar-dashboard-history
+    .sadar-table
+    tbody
+    td[data-label]::before {
     color: #94a3b8;
     content: attr(data-label);
     font-size: 0.66rem;
@@ -5676,12 +5964,22 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     text-transform: uppercase;
   }
 
-  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody tr {
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    .sadar-dashboard-history
+    .sadar-table
+    tbody
+    tr {
     border-color: rgba(148, 163, 184, 0.18);
     background: #111827;
   }
 
-  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody td:first-child {
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    .sadar-dashboard-history
+    .sadar-table
+    tbody
+    td:first-child {
     color: #f8fafc;
   }
 }
@@ -5768,19 +6066,43 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     --sadar-glass-ink: #eef8ff;
     --sadar-glass-copy: #c3d4e5;
     --sadar-glass-muted: #9fb5cb;
-    --sadar-glass-surface: linear-gradient(145deg, rgba(26, 47, 72, 0.76), rgba(7, 20, 37, 0.69));
-    --sadar-glass-surface-raised: linear-gradient(145deg, rgba(34, 57, 83, 0.88), rgba(8, 22, 40, 0.84));
-    --sadar-glass-surface-soft: linear-gradient(145deg, rgba(38, 61, 88, 0.58), rgba(10, 26, 45, 0.52));
+    --sadar-glass-surface: linear-gradient(
+      145deg,
+      rgba(26, 47, 72, 0.76),
+      rgba(7, 20, 37, 0.69)
+    );
+    --sadar-glass-surface-raised: linear-gradient(
+      145deg,
+      rgba(34, 57, 83, 0.88),
+      rgba(8, 22, 40, 0.84)
+    );
+    --sadar-glass-surface-soft: linear-gradient(
+      145deg,
+      rgba(38, 61, 88, 0.58),
+      rgba(10, 26, 45, 0.52)
+    );
     --sadar-glass-control: rgba(8, 23, 41, 0.64);
     --sadar-glass-border: rgba(179, 213, 240, 0.18);
     --sadar-glass-stroke: rgba(2, 8, 23, 0.34);
     --sadar-glass-highlight: rgba(224, 242, 254, 0.13);
-    --sadar-glass-shadow: 0 22px 52px rgba(0, 3, 13, 0.46), 0 4px 14px rgba(2, 132, 199, 0.07), inset 0 1px 0 var(--sadar-glass-highlight), inset 0 -1px 0 rgba(2, 8, 23, 0.55);
-    --sadar-glass-shadow-soft: 0 12px 28px rgba(0, 3, 13, 0.3), inset 0 1px 0 rgba(224, 242, 254, 0.08);
+    --sadar-glass-shadow:
+      0 22px 52px rgba(0, 3, 13, 0.46), 0 4px 14px rgba(2, 132, 199, 0.07),
+      inset 0 1px 0 var(--sadar-glass-highlight),
+      inset 0 -1px 0 rgba(2, 8, 23, 0.55);
+    --sadar-glass-shadow-soft:
+      0 12px 28px rgba(0, 3, 13, 0.3), inset 0 1px 0 rgba(224, 242, 254, 0.08);
     color: var(--sadar-glass-ink);
     background:
-      radial-gradient(circle at 92% 3%, rgba(14, 165, 233, 0.16), transparent 25rem),
-      radial-gradient(circle at -8% 34%, rgba(20, 184, 166, 0.11), transparent 22rem),
+      radial-gradient(
+        circle at 92% 3%,
+        rgba(14, 165, 233, 0.16),
+        transparent 25rem
+      ),
+      radial-gradient(
+        circle at -8% 34%,
+        rgba(20, 184, 166, 0.11),
+        transparent 22rem
+      ),
       linear-gradient(160deg, #06101e 0%, #09182a 50%, #071a23 100%) !important;
   }
 
@@ -5813,19 +6135,35 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   html[data-bs-theme="dark"] .sadar-page-header,
   html[data-bs-theme="dark"] .sadar-overview {
     background:
-      radial-gradient(circle at 92% -20%, rgba(14, 165, 233, 0.19), transparent 45%),
-      radial-gradient(circle at 2% 120%, rgba(20, 184, 166, 0.13), transparent 45%),
+      radial-gradient(
+        circle at 92% -20%,
+        rgba(14, 165, 233, 0.19),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 2% 120%,
+        rgba(20, 184, 166, 0.13),
+        transparent 45%
+      ),
       var(--sadar-glass-surface-raised) !important;
   }
 
   html[data-bs-theme="dark"] .sadar-page .card-header,
   html[data-bs-theme="dark"] .sadar-dashboard .card-header {
     border-bottom-color: rgba(179, 213, 240, 0.1) !important;
-    background: linear-gradient(180deg, rgba(224, 242, 254, 0.045), transparent) !important;
+    background: linear-gradient(
+      180deg,
+      rgba(224, 242, 254, 0.045),
+      transparent
+    ) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.card-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label),
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.card-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label) {
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(.card-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label),
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(.card-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label) {
     color: var(--sadar-glass-ink) !important;
   }
 
@@ -5834,24 +6172,25 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     color: var(--sadar-glass-muted) !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-insight-item,
-    .sadar-factor-item,
-    .sadar-recommend-card,
-    .sadar-account-item,
-    .sadar-profile-summary-item,
-    .sadar-step-card,
-    .sadar-budget-helper,
-    .sadar-password-rules,
-    .sadar-empty-state,
-    .sadar-empty-state-note,
-    .sadar-receipt-preview,
-    .sadar-receipt-viewer,
-    .sadar-file-meta,
-    .sadar-manual-state,
-    .sadar-step-status-list span,
-    .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row)
-  ) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-insight-item,
+      .sadar-factor-item,
+      .sadar-recommend-card,
+      .sadar-account-item,
+      .sadar-profile-summary-item,
+      .sadar-step-card,
+      .sadar-budget-helper,
+      .sadar-password-rules,
+      .sadar-empty-state,
+      .sadar-empty-state-note,
+      .sadar-receipt-preview,
+      .sadar-receipt-viewer,
+      .sadar-file-meta,
+      .sadar-manual-state,
+      .sadar-step-status-list span,
+      .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row)
+    ) {
     border-color: var(--sadar-glass-border) !important;
     outline-color: rgba(2, 8, 23, 0.32);
     color: var(--sadar-glass-ink);
@@ -5859,62 +6198,114 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     box-shadow: var(--sadar-glass-shadow-soft) !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-card-icon,
-    .sadar-header-icon,
-    .metric-icon,
-    .sadar-recommend-icon,
-    .sadar-factor-icon-wrapper,
-    .sadar-empty-state-icon,
-    .sadar-dropzone-icon,
-    .sadar-note-icon,
-    .sadar-setup-number
-  ) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-card-icon,
+      .sadar-header-icon,
+      .metric-icon,
+      .sadar-recommend-icon,
+      .sadar-factor-icon-wrapper,
+      .sadar-empty-state-icon,
+      .sadar-dropzone-icon,
+      .sadar-note-icon,
+      .sadar-setup-number
+    ) {
     border-color: rgba(179, 213, 240, 0.15);
-    background: linear-gradient(145deg, rgba(38, 77, 108, 0.68), rgba(12, 33, 55, 0.58));
-    box-shadow: 0 9px 20px rgba(0, 5, 18, 0.26), inset 0 1px 0 rgba(224, 242, 254, 0.1);
+    background: linear-gradient(
+      145deg,
+      rgba(38, 77, 108, 0.68),
+      rgba(12, 33, 55, 0.58)
+    );
+    box-shadow:
+      0 9px 20px rgba(0, 5, 18, 0.26),
+      inset 0 1px 0 rgba(224, 242, 254, 0.1);
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.form-control, .form-select, .form-check-input),
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.form-control, .form-select, .form-check-input),
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(.form-control, .form-select, .form-check-input),
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(.form-control, .form-select, .form-check-input),
   html[data-bs-theme="dark"] .sadar-searchable-select-trigger,
   html[data-bs-theme="dark"] .sadar-select-search-input {
     border-color: rgba(179, 213, 240, 0.2) !important;
     color: #eef8ff !important;
     background-color: var(--sadar-glass-control) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.06), 0 7px 18px rgba(0, 5, 18, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(224, 242, 254, 0.06),
+      0 7px 18px rgba(0, 5, 18, 0.18);
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.form-control, .form-select):focus,
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.form-control, .form-select):focus,
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(.form-control, .form-select):focus,
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(.form-control, .form-select):focus,
   html[data-bs-theme="dark"] .sadar-searchable-select-trigger:focus,
   html[data-bs-theme="dark"] .sadar-select-search-input:focus {
     border-color: rgba(56, 189, 248, 0.62) !important;
     background-color: rgba(10, 29, 49, 0.82) !important;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.13), inset 0 1px 0 rgba(224, 242, 254, 0.08) !important;
+    box-shadow:
+      0 0 0 4px rgba(14, 165, 233, 0.13),
+      inset 0 1px 0 rgba(224, 242, 254, 0.08) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.form-control, .form-select)::placeholder,
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.form-control, .form-select)::placeholder {
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(.form-control, .form-select)::placeholder,
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(.form-control, .form-select)::placeholder {
     color: #7990a8 !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle),
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle) {
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ),
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ) {
     border-color: rgba(179, 213, 240, 0.18) !important;
     color: #dcefff !important;
-    background: linear-gradient(145deg, rgba(42, 65, 91, 0.68), rgba(11, 28, 48, 0.58)) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.08), 0 8px 18px rgba(0, 5, 18, 0.22) !important;
+    background: linear-gradient(
+      145deg,
+      rgba(42, 65, 91, 0.68),
+      rgba(11, 28, 48, 0.58)
+    ) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(224, 242, 254, 0.08),
+      0 8px 18px rgba(0, 5, 18, 0.22) !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) {
     border-color: var(--sadar-glass-border) !important;
     outline-color: rgba(2, 8, 23, 0.34);
     background: var(--sadar-glass-surface-soft) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.07), 0 9px 22px rgba(0, 5, 18, 0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(224, 242, 254, 0.07),
+      0 9px 22px rgba(0, 5, 18, 0.2);
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn:not(.active):not(.btn-primary) {
     border: 0 !important;
     color: #94a3b8 !important;
     background: transparent !important;
@@ -5922,7 +6313,9 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     box-shadow: none !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary):hover {
+  html[data-bs-theme="dark"]
+    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn:not(.active):not(.btn-primary):hover {
     color: #f1f5f9 !important;
     background: rgba(255, 255, 255, 0.06) !important;
   }
@@ -5932,8 +6325,14 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   html[data-bs-theme="dark"] .sadar-period-toggle .btn.active,
   html[data-bs-theme="dark"] .sadar-period-toggle .btn.btn-primary {
     color: #e0f2fe !important;
-    background: linear-gradient(145deg, rgba(30, 101, 139, 0.58), rgba(30, 58, 138, 0.4)) !important;
-    box-shadow: 0 8px 20px rgba(0, 5, 18, 0.24), inset 0 1px 0 rgba(224, 242, 254, 0.13) !important;
+    background: linear-gradient(
+      145deg,
+      rgba(30, 101, 139, 0.58),
+      rgba(30, 58, 138, 0.4)
+    ) !important;
+    box-shadow:
+      0 8px 20px rgba(0, 5, 18, 0.24),
+      inset 0 1px 0 rgba(224, 242, 254, 0.13) !important;
     font-weight: 700 !important;
   }
 
@@ -5955,22 +6354,35 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-color: rgba(179, 213, 240, 0.09);
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-table-filter-btn, .sadar-table-pagination .page-link, .sadar-pagination-status) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-table-filter-btn,
+      .sadar-table-pagination .page-link,
+      .sadar-pagination-status
+    ) {
     border-color: rgba(179, 213, 240, 0.17) !important;
     color: #c9dced !important;
     background: rgba(24, 47, 72, 0.62) !important;
     box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.06);
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-searchable-select-menu, .sadar-row-action-menu, .profile-photo-dropdown) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-searchable-select-menu,
+      .sadar-row-action-menu,
+      .profile-photo-dropdown
+    ) {
     border-color: var(--sadar-glass-border) !important;
     outline-color: rgba(2, 8, 23, 0.38);
     color: var(--sadar-glass-ink);
     background: var(--sadar-glass-surface-raised) !important;
-    box-shadow: 0 26px 64px rgba(0, 3, 13, 0.56), inset 0 1px 0 rgba(224, 242, 254, 0.1) !important;
+    box-shadow:
+      0 26px 64px rgba(0, 3, 13, 0.56),
+      inset 0 1px 0 rgba(224, 242, 254, 0.1) !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-select-search-header, .sadar-select-group-header) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-select-search-header, .sadar-select-group-header) {
     border-color: rgba(179, 213, 240, 0.1) !important;
     background: rgba(9, 27, 47, 0.54) !important;
   }
@@ -5979,8 +6391,16 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     border-color: var(--sadar-glass-border) !important;
     outline-color: rgba(2, 8, 23, 0.38);
     background:
-      radial-gradient(circle at 50% -15%, rgba(14, 165, 233, 0.2), transparent 58%),
-      radial-gradient(circle at 8% 110%, rgba(20, 184, 166, 0.13), transparent 50%),
+      radial-gradient(
+        circle at 50% -15%,
+        rgba(14, 165, 233, 0.2),
+        transparent 58%
+      ),
+      radial-gradient(
+        circle at 8% 110%,
+        rgba(20, 184, 166, 0.13),
+        transparent 50%
+      ),
       var(--sadar-glass-surface-raised) !important;
     box-shadow: var(--sadar-glass-shadow) !important;
   }
@@ -5988,31 +6408,42 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
   html[data-bs-theme="dark"] .sadar-receipt-dropzone {
     border-color: rgba(56, 189, 248, 0.36) !important;
     background: rgba(8, 23, 41, 0.45) !important;
-    box-shadow: inset 0 1px 0 rgba(224, 242, 254, 0.06), 0 10px 26px rgba(0, 5, 18, 0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(224, 242, 254, 0.06),
+      0 10px 26px rgba(0, 5, 18, 0.2);
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-confirm-modal .modal-content,
-    .sadar-history-modal .modal-content,
-    .sadar-account-modal .modal-content,
-    .sadar-photo-lightbox-modal .modal-content,
-    .sadar-setup-modal .modal-content
-  ) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-confirm-modal .modal-content,
+      .sadar-history-modal .modal-content,
+      .sadar-account-modal .modal-content,
+      .sadar-photo-lightbox-modal .modal-content,
+      .sadar-setup-modal .modal-content
+    ) {
     border-color: var(--sadar-glass-border) !important;
     outline-color: rgba(2, 8, 23, 0.42);
     color: var(--sadar-glass-ink);
     background:
-      radial-gradient(circle at 88% -12%, rgba(14, 165, 233, 0.18), transparent 42%),
+      radial-gradient(
+        circle at 88% -12%,
+        rgba(14, 165, 233, 0.18),
+        transparent 42%
+      ),
       var(--sadar-glass-surface-raised) !important;
-    box-shadow: 0 34px 86px rgba(0, 3, 13, 0.7), inset 0 1px 0 rgba(224, 242, 254, 0.11) !important;
+    box-shadow:
+      0 34px 86px rgba(0, 3, 13, 0.7),
+      inset 0 1px 0 rgba(224, 242, 254, 0.11) !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-confirm-modal,
-    .sadar-history-modal,
-    .sadar-account-modal,
-    .sadar-setup-modal
-  ) :where(.modal-header, .modal-body, .modal-footer) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-confirm-modal,
+      .sadar-history-modal,
+      .sadar-account-modal,
+      .sadar-setup-modal
+    )
+    :where(.modal-header, .modal-body, .modal-footer) {
     border-color: rgba(179, 213, 240, 0.1) !important;
     background: transparent !important;
   }
@@ -6027,10 +6458,12 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     outline-color: rgba(2, 8, 23, 0.38);
     color: var(--sadar-glass-ink) !important;
     background: var(--sadar-glass-surface-raised) !important;
-    box-shadow: 0 26px 68px rgba(0, 3, 13, 0.62), inset 0 1px 0 rgba(224, 242, 254, 0.1) !important;
+    box-shadow:
+      0 26px 68px rgba(0, 3, 13, 0.62),
+      inset 0 1px 0 rgba(224, 242, 254, 0.1) !important;
   }
 
-html[data-bs-theme="dark"] .main-content > .footer {
+  html[data-bs-theme="dark"] .main-content > .footer {
     border-top-color: rgba(179, 213, 240, 0.1) !important;
     color: var(--sadar-glass-muted) !important;
     background: rgba(6, 17, 31, 0.58) !important;
@@ -6089,9 +6522,15 @@ body.sadar-account-actions-open {
   border-radius: 24px;
   color: #17314a;
   background:
-    radial-gradient(circle at 84% -16%, rgba(56, 189, 248, 0.2), transparent 42%),
+    radial-gradient(
+      circle at 84% -16%,
+      rgba(56, 189, 248, 0.2),
+      transparent 42%
+    ),
     linear-gradient(155deg, #fbfdff 0%, #edf7fd 100%);
-  box-shadow: 0 30px 76px rgba(9, 40, 69, 0.36), inset 0 1px 0 #ffffff;
+  box-shadow:
+    0 30px 76px rgba(9, 40, 69, 0.36),
+    inset 0 1px 0 #ffffff;
   animation: sadarAccountSheetUp 0.32s cubic-bezier(0.2, 0.95, 0.3, 1) both;
 }
 
@@ -6172,7 +6611,9 @@ body.sadar-account-actions-open {
   border-radius: 16px;
   color: #244159;
   background: #ffffff;
-  box-shadow: 0 8px 20px rgba(37, 76, 119, 0.07), inset 0 1px 0 #ffffff;
+  box-shadow:
+    0 8px 20px rgba(37, 76, 119, 0.07),
+    inset 0 1px 0 #ffffff;
   text-align: left;
 }
 
@@ -6242,9 +6683,15 @@ html[data-bs-theme="dark"] .sadar-account-action-sheet {
   outline-color: rgba(1, 7, 18, 0.58);
   color: #e5f2fb;
   background:
-    radial-gradient(circle at 84% -16%, rgba(14, 165, 233, 0.17), transparent 42%),
+    radial-gradient(
+      circle at 84% -16%,
+      rgba(14, 165, 233, 0.17),
+      transparent 42%
+    ),
     linear-gradient(155deg, #122a41 0%, #091a2c 100%);
-  box-shadow: 0 34px 82px rgba(0, 3, 12, 0.76), inset 0 1px 0 rgba(224, 242, 254, 0.1);
+  box-shadow:
+    0 34px 82px rgba(0, 3, 12, 0.76),
+    inset 0 1px 0 rgba(224, 242, 254, 0.1);
 }
 
 html[data-bs-theme="dark"] .sadar-account-action-handle {
@@ -6275,10 +6722,14 @@ html[data-bs-theme="dark"] .sadar-account-action-button {
   border-color: rgba(165, 204, 234, 0.17);
   color: #d7e8f4;
   background: #122a40;
-  box-shadow: 0 9px 22px rgba(0, 5, 18, 0.25), inset 0 1px 0 rgba(224, 242, 254, 0.07);
+  box-shadow:
+    0 9px 22px rgba(0, 5, 18, 0.25),
+    inset 0 1px 0 rgba(224, 242, 254, 0.07);
 }
 
-html[data-bs-theme="dark"] .sadar-account-action-button.is-edit > span:first-child {
+html[data-bs-theme="dark"]
+  .sadar-account-action-button.is-edit
+  > span:first-child {
   color: #7dd3fc;
   background: #173c58;
 }
@@ -6289,7 +6740,9 @@ html[data-bs-theme="dark"] .sadar-account-action-button.is-delete {
   background: #2a1d29;
 }
 
-html[data-bs-theme="dark"] .sadar-account-action-button.is-delete > span:first-child {
+html[data-bs-theme="dark"]
+  .sadar-account-action-button.is-delete
+  > span:first-child {
   color: #fda4af;
   background: rgba(190, 24, 93, 0.2);
 }
@@ -6310,34 +6763,64 @@ html[data-bs-theme="dark"] .sadar-account-action-button.is-delete > span:first-c
 
 /* Keep the logout decision surface white after all generic modal and dark-mode
    rules above have been applied. */
-.sadar-logout-modal-layer .modal-dialog.sadar-logout-confirm-modal .modal-content.sadar-logout-modal-content,
-html[data-bs-theme="dark"] .sadar-logout-modal-layer .modal-dialog.sadar-logout-confirm-modal .modal-content.sadar-logout-modal-content {
+.sadar-logout-modal-layer
+  .modal-dialog.sadar-logout-confirm-modal
+  .modal-content.sadar-logout-modal-content,
+html[data-bs-theme="dark"]
+  .sadar-logout-modal-layer
+  .modal-dialog.sadar-logout-confirm-modal
+  .modal-content.sadar-logout-modal-content {
   border: 1px solid rgba(255, 255, 255, 0.96) !important;
   outline: 1px solid rgba(30, 58, 138, 0.12) !important;
   outline-offset: -1px;
   border-radius: 26px !important;
   color: #172033 !important;
   background:
-    radial-gradient(circle at 88% -20%, rgba(30, 58, 138, 0.08), transparent 42%),
+    radial-gradient(
+      circle at 88% -20%,
+      rgba(30, 58, 138, 0.08),
+      transparent 42%
+    ),
     rgba(255, 255, 255, 0.98) !important;
-  box-shadow: 0 34px 90px rgba(15, 23, 42, 0.28), inset 0 1.5px 0 #ffffff !important;
+  box-shadow:
+    0 34px 90px rgba(15, 23, 42, 0.28),
+    inset 0 1.5px 0 #ffffff !important;
   backdrop-filter: blur(34px) saturate(135%);
   -webkit-backdrop-filter: blur(34px) saturate(135%);
 }
 
-.sadar-logout-modal-layer .sadar-logout-modal-content :where(.modal-body, .modal-footer),
-html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content :where(.modal-body, .modal-footer) {
+.sadar-logout-modal-layer
+  .sadar-logout-modal-content
+  :where(.modal-body, .modal-footer),
+html[data-bs-theme="dark"]
+  .sadar-logout-modal-layer
+  .sadar-logout-modal-content
+  :where(.modal-body, .modal-footer) {
   border-color: rgba(30, 58, 138, 0.1) !important;
   background: transparent !important;
 }
 
-.sadar-logout-modal-layer .sadar-logout-modal-content .sadar-logout-modal-body h4,
-html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content .sadar-logout-modal-body h4 {
+.sadar-logout-modal-layer
+  .sadar-logout-modal-content
+  .sadar-logout-modal-body
+  h4,
+html[data-bs-theme="dark"]
+  .sadar-logout-modal-layer
+  .sadar-logout-modal-content
+  .sadar-logout-modal-body
+  h4 {
   color: #172033 !important;
 }
 
-.sadar-logout-modal-layer .sadar-logout-modal-content .sadar-logout-modal-body p,
-html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content .sadar-logout-modal-body p {
+.sadar-logout-modal-layer
+  .sadar-logout-modal-content
+  .sadar-logout-modal-body
+  p,
+html[data-bs-theme="dark"]
+  .sadar-logout-modal-layer
+  .sadar-logout-modal-content
+  .sadar-logout-modal-body
+  p {
   color: #64748b !important;
 }
 
@@ -6355,8 +6838,16 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     --sadar-glass-muted: #64748b;
     padding-bottom: calc(6.75rem + env(safe-area-inset-bottom)) !important;
     background:
-      radial-gradient(circle at 100% 0%, rgba(30, 58, 138, 0.12), transparent 22rem),
-      radial-gradient(circle at 0% 72%, rgba(30, 58, 138, 0.07), transparent 20rem),
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(30, 58, 138, 0.12),
+        transparent 22rem
+      ),
+      radial-gradient(
+        circle at 0% 72%,
+        rgba(30, 58, 138, 0.07),
+        transparent 20rem
+      ),
       linear-gradient(165deg, #f8fbff 0%, #eef4ff 55%, #f7faff 100%) !important;
   }
 
@@ -6378,40 +6869,50 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   .sadar-detail-card {
     border-color: rgba(255, 255, 255, 0.92) !important;
     outline-color: rgba(30, 58, 138, 0.1) !important;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.93), rgba(242, 247, 255, 0.86)) !important;
-    box-shadow: 0 10px 28px rgba(30, 58, 138, 0.09), inset 0 1px 0 #ffffff !important;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.93),
+      rgba(242, 247, 255, 0.86)
+    ) !important;
+    box-shadow:
+      0 10px 28px rgba(30, 58, 138, 0.09),
+      inset 0 1px 0 #ffffff !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     animation-duration: 0.26s !important;
     animation-delay: 0s !important;
   }
 
-  .sadar-page :where(
-    .sadar-insight-item,
-    .sadar-factor-item,
-    .sadar-recommend-card,
-    .sadar-account-item,
-    .sadar-profile-summary-item,
-    .sadar-step-card,
-    .sadar-budget-helper,
-    .sadar-password-rules,
-    .sadar-empty-state,
-    .sadar-empty-state-note,
-    .sadar-receipt-preview,
-    .sadar-receipt-viewer,
-    .sadar-file-meta,
-    .sadar-manual-state
-  ),
-  .sadar-dashboard :where(
-    .sadar-insight-item,
-    .sadar-factor-item,
-    .sadar-recommend-card,
-    .sadar-step-card,
-    .sadar-empty-state,
-    .sadar-empty-card
-  ) {
+  .sadar-page
+    :where(
+      .sadar-insight-item,
+      .sadar-factor-item,
+      .sadar-recommend-card,
+      .sadar-account-item,
+      .sadar-profile-summary-item,
+      .sadar-step-card,
+      .sadar-budget-helper,
+      .sadar-password-rules,
+      .sadar-empty-state,
+      .sadar-empty-state-note,
+      .sadar-receipt-preview,
+      .sadar-receipt-viewer,
+      .sadar-file-meta,
+      .sadar-manual-state
+    ),
+  .sadar-dashboard
+    :where(
+      .sadar-insight-item,
+      .sadar-factor-item,
+      .sadar-recommend-card,
+      .sadar-step-card,
+      .sadar-empty-state,
+      .sadar-empty-card
+    ) {
     background: rgba(255, 255, 255, 0.7) !important;
-    box-shadow: 0 5px 16px rgba(30, 58, 138, 0.055), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 5px 16px rgba(30, 58, 138, 0.055),
+      inset 0 1px 0 #ffffff !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -6427,22 +6928,40 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   }
 
   .sadar-page :where(.btn-primary, .btn-success):is(:hover, :focus-visible),
-  .sadar-dashboard :where(.btn-primary, .btn-success):is(:hover, :focus-visible),
+  .sadar-dashboard
+    :where(.btn-primary, .btn-success):is(:hover, :focus-visible),
   .sadar-history-modal .btn-primary:is(:hover, :focus-visible),
   .sadar-setup-modal .btn-primary:is(:hover, :focus-visible) {
     border-color: var(--sadar-action-hover, #168fd0) !important;
     background: var(--sadar-action-hover, #168fd0) !important;
   }
 
-  .sadar-page :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle),
-  .sadar-dashboard :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle) {
+  .sadar-page
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ),
+  .sadar-dashboard
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ) {
     border-color: #e2e8f0 !important;
     color: #334155 !important;
     background: rgba(248, 250, 252, 0.92) !important;
     box-shadow: none !important;
   }
 
-  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn:not(.active):not(.btn-primary) {
     border: 0 !important;
     color: #64748b !important;
     background: transparent !important;
@@ -6450,7 +6969,8 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     box-shadow: none !important;
   }
 
-  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn.active,
+  :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn.active,
   .sadar-period-toggle .btn.btn-primary {
     border-color: transparent !important;
     color: var(--sadar-action) !important;
@@ -6493,7 +7013,9 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   .sadar-row-action-menu,
   .profile-photo-dropdown {
     background: rgba(255, 255, 255, 0.97) !important;
-    box-shadow: 0 18px 42px rgba(30, 58, 138, 0.16), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 18px 42px rgba(30, 58, 138, 0.16),
+      inset 0 1px 0 #ffffff !important;
     backdrop-filter: blur(14px) saturate(130%) !important;
     -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
   }
@@ -6507,9 +7029,15 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     outline: 1px solid rgba(30, 58, 138, 0.12) !important;
     color: #172033 !important;
     background:
-      radial-gradient(circle at 92% -18%, rgba(30, 58, 138, 0.075), transparent 42%),
+      radial-gradient(
+        circle at 92% -18%,
+        rgba(30, 58, 138, 0.075),
+        transparent 42%
+      ),
       rgba(255, 255, 255, 0.98) !important;
-    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.23), inset 0 1px 0 #ffffff !important;
+    box-shadow:
+      0 24px 64px rgba(15, 23, 42, 0.23),
+      inset 0 1px 0 #ffffff !important;
     backdrop-filter: blur(16px) saturate(125%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(125%) !important;
   }
@@ -6693,7 +7221,11 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     --sadar-glass-copy: #cbd5e1;
     --sadar-glass-muted: #94a3b8;
     background:
-      radial-gradient(circle at 100% 0%, rgba(30, 58, 138, 0.26), transparent 24rem),
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(30, 58, 138, 0.26),
+        transparent 24rem
+      ),
       linear-gradient(165deg, #111827 0%, #151e2b 55%, #111827 100%) !important;
   }
 
@@ -6707,36 +7239,46 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     border-color: rgba(165, 180, 202, 0.17) !important;
     outline-color: rgba(2, 6, 23, 0.42) !important;
     color: #f8fafc !important;
-    background: linear-gradient(145deg, rgba(31, 42, 55, 0.96), rgba(24, 33, 44, 0.96)) !important;
-    box-shadow: 0 12px 30px rgba(0, 4, 15, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+    background: linear-gradient(
+      145deg,
+      rgba(31, 42, 55, 0.96),
+      rgba(24, 33, 44, 0.96)
+    ) !important;
+    box-shadow:
+      0 12px 30px rgba(0, 4, 15, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(
-    .sadar-insight-item,
-    .sadar-factor-item,
-    .sadar-recommend-card,
-    .sadar-account-item,
-    .sadar-profile-summary-item,
-    .sadar-step-card,
-    .sadar-budget-helper,
-    .sadar-password-rules,
-    .sadar-empty-state,
-    .sadar-empty-state-note,
-    .sadar-receipt-preview,
-    .sadar-receipt-viewer,
-    .sadar-file-meta,
-    .sadar-manual-state
-  ),
-  html[data-bs-theme="dark"] .sadar-dashboard :where(
-    .sadar-insight-item,
-    .sadar-factor-item,
-    .sadar-recommend-card,
-    .sadar-step-card,
-    .sadar-empty-state,
-    .sadar-empty-card
-  ) {
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(
+      .sadar-insight-item,
+      .sadar-factor-item,
+      .sadar-recommend-card,
+      .sadar-account-item,
+      .sadar-profile-summary-item,
+      .sadar-step-card,
+      .sadar-budget-helper,
+      .sadar-password-rules,
+      .sadar-empty-state,
+      .sadar-empty-state-note,
+      .sadar-receipt-preview,
+      .sadar-receipt-viewer,
+      .sadar-file-meta,
+      .sadar-manual-state
+    ),
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(
+      .sadar-insight-item,
+      .sadar-factor-item,
+      .sadar-recommend-card,
+      .sadar-step-card,
+      .sadar-empty-state,
+      .sadar-empty-card
+    ) {
     border-color: rgba(165, 180, 202, 0.14) !important;
     color: #f8fafc !important;
     background: rgba(31, 42, 55, 0.9) !important;
@@ -6744,7 +7286,9 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
   }
 
   html[data-bs-theme="dark"] .sadar-page :where(.form-control, .form-select),
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.form-control, .form-select) {
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(.form-control, .form-select) {
     border-color: rgba(165, 180, 202, 0.2) !important;
     color: #f8fafc !important;
     background: #1f2a37 !important;
@@ -6753,8 +7297,12 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     -webkit-backdrop-filter: none !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.form-control, .form-select):focus,
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.form-control, .form-select):focus {
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(.form-control, .form-select):focus,
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(.form-control, .form-select):focus {
     border-color: #93a7d8 !important;
     box-shadow: 0 0 0 3px rgba(147, 167, 216, 0.12) !important;
   }
@@ -6765,7 +7313,9 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     border-color: rgba(165, 180, 202, 0.18) !important;
     color: #f8fafc !important;
     background: rgba(31, 42, 55, 0.98) !important;
-    box-shadow: 0 20px 48px rgba(0, 4, 15, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+    box-shadow:
+      0 20px 48px rgba(0, 4, 15, 0.48),
+      inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
   }
 
   html[data-bs-theme="dark"] .modal-backdrop.show {
@@ -6773,50 +7323,57 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     opacity: 0.64 !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-confirm-modal .modal-content,
-    .sadar-history-modal .modal-content,
-    .sadar-account-modal .modal-content,
-    .sadar-photo-lightbox-modal .modal-content,
-    .sadar-setup-modal .modal-content
-  ) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-confirm-modal .modal-content,
+      .sadar-history-modal .modal-content,
+      .sadar-account-modal .modal-content,
+      .sadar-photo-lightbox-modal .modal-content,
+      .sadar-setup-modal .modal-content
+    ) {
     border-color: rgba(165, 180, 202, 0.18) !important;
     outline-color: rgba(2, 6, 23, 0.46) !important;
     color: #f8fafc !important;
     background:
-      radial-gradient(circle at 92% -18%, rgba(30, 58, 138, 0.28), transparent 42%),
+      radial-gradient(
+        circle at 92% -18%,
+        rgba(30, 58, 138, 0.28),
+        transparent 42%
+      ),
       rgba(24, 33, 44, 0.99) !important;
-    box-shadow: 0 28px 72px rgba(0, 4, 15, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+    box-shadow:
+      0 28px 72px rgba(0, 4, 15, 0.62),
+      inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-confirm-modal,
-    .sadar-history-modal,
-    .sadar-account-modal,
-    .sadar-setup-modal
-  ) :where(.modal-header, .modal-body, .modal-footer) {
+  html[data-bs-theme="dark"]
+    :where(
+      .sadar-confirm-modal,
+      .sadar-history-modal,
+      .sadar-account-modal,
+      .sadar-setup-modal
+    )
+    :where(.modal-header, .modal-body, .modal-footer) {
     border-color: rgba(165, 180, 202, 0.14) !important;
     color: #f8fafc !important;
     background: transparent !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-history-modal,
-    .sadar-account-modal,
-    .sadar-setup-modal
-  ) :where(.modal-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-history-modal, .sadar-account-modal, .sadar-setup-modal)
+    :where(.modal-title, h1, h2, h3, h4, h5, h6, strong, label, .form-label) {
     color: #f8fafc !important;
   }
 
-  html[data-bs-theme="dark"] :where(
-    .sadar-history-modal,
-    .sadar-account-modal,
-    .sadar-setup-modal
-  ) :where(p, small, .text-muted) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-history-modal, .sadar-account-modal, .sadar-setup-modal)
+    :where(p, small, .text-muted) {
     color: #a9b8ca !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-history-modal, .sadar-account-modal) :where(.form-control, .form-select) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-history-modal, .sadar-account-modal)
+    :where(.form-control, .form-select) {
     border-color: rgba(165, 180, 202, 0.2) !important;
     color: #f8fafc !important;
     background: #1f2a37 !important;
@@ -6826,20 +7383,41 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     background: rgba(24, 33, 44, 0.99) !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-page :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle),
-  html[data-bs-theme="dark"] .sadar-dashboard :where(.btn-light, .btn-secondary, .sadar-reset-button, .sadar-ghost-btn, .sadar-table-action, .sadar-row-action-toggle) {
+  html[data-bs-theme="dark"]
+    .sadar-page
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ),
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    :where(
+      .btn-light,
+      .btn-secondary,
+      .sadar-reset-button,
+      .sadar-ghost-btn,
+      .sadar-table-action,
+      .sadar-row-action-toggle
+    ) {
     border-color: rgba(148, 163, 184, 0.28) !important;
     color: #f8fafc !important;
     background: #243041 !important;
     box-shadow: none !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) {
     border-color: rgba(148, 163, 184, 0.2) !important;
     background: #18212c !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
+  html[data-bs-theme="dark"]
+    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn:not(.active):not(.btn-primary) {
     border: 0 !important;
     color: #94a3b8 !important;
     background: transparent !important;
@@ -6847,7 +7425,9 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     box-shadow: none !important;
   }
 
-  html[data-bs-theme="dark"] :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn.active,
+  html[data-bs-theme="dark"]
+    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
+    .btn.active,
   html[data-bs-theme="dark"] .sadar-period-toggle .btn.btn-primary {
     color: #7dd3fc !important;
     background: #243041 !important;
@@ -6855,8 +7435,17 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
     font-weight: 700 !important;
   }
 
-  html[data-bs-theme="dark"] .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row),
-  html[data-bs-theme="dark"] .sadar-dashboard .sadar-dashboard-history .sadar-table tbody tr {
+  html[data-bs-theme="dark"]
+    .sadar-history-page
+    .sadar-table
+    tbody
+    tr:not(.sadar-table-empty-row),
+  html[data-bs-theme="dark"]
+    .sadar-dashboard
+    .sadar-dashboard-history
+    .sadar-table
+    tbody
+    tr {
     border-color: rgba(148, 163, 184, 0.2) !important;
     outline-color: rgba(2, 6, 23, 0.42) !important;
     color: #f8fafc !important;
@@ -6905,7 +7494,7 @@ html[data-bs-theme="dark"] .sadar-logout-modal-layer .sadar-logout-modal-content
 }
 
 @media (max-width: 991.98px) and (pointer: coarse),
-       (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
+  (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
   .sadar-page .card,
   .sadar-dashboard .card,
   .sadar-page-header,
@@ -6958,4 +7547,35 @@ html[data-bs-theme="dark"] .sadar-budget-clean-input {
 html[data-bs-theme="dark"] .sadar-budget-clean-input:focus {
   border-color: #60a5fa !important;
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+}
+
+.sadar-apply-rule-btn {
+  background: #ffffff !important;
+  color: #2563eb !important;
+  border: 1px solid #dbe3ee !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  padding: 0.42rem 0.85rem !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.2s ease !important;
+}
+
+.sadar-apply-rule-btn:hover {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+  transform: translateY(-1px);
+}
+
+html[data-bs-theme="dark"] .sadar-apply-rule-btn {
+  background: rgba(30, 41, 59, 0.8) !important;
+  color: #93c5fd !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+html[data-bs-theme="dark"] .sadar-apply-rule-btn:hover {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(96, 165, 250, 0.4) !important;
+  color: #bfdbfe !important;
 }
