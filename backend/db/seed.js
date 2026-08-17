@@ -257,7 +257,7 @@ const seed = async () => {
     await client.query(
       `INSERT INTO alerts (user_id, message, alert_type)
        VALUES
-         ($1, 'Pengeluaran Agustus berjalan sebesar Rp 4.435.000 dari alokasi Rp 6.800.000 (65% terpakai).', 'budget_warning')`,
+         ($1, 'Pengeluaran Agustus berjalan sebesar Rp 4.435.000 dari alokasi Rp 6.800.000 (65% terpakai).', 'reminder')`,
       [userId]
     );
 
