@@ -30,6 +30,7 @@ import {
   accountApi,
   analyticsApi,
   authApi,
+  incomeApi,
 } from "../../Components/services/api";
 import AccountFormModal from "../../Components/AccountModal/AccountFormModal";
 import { findInstitutionByName, inferAccountType } from "../../constants/bankData";
@@ -653,6 +654,7 @@ const ProfileAccountWithData = () => {
   const [budgetRows, setBudgetRows] = useState([]);
   const [budgetNotice, setBudgetNotice] = useState("");
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
+  const [monthlyIncome, setMonthlyIncome] = useState(0);
 
   const dispatch = useDispatch();
   const [profile, setProfile] = useState(getStoredUserProfile);
@@ -670,16 +672,27 @@ const ProfileAccountWithData = () => {
 
     const loadProfileAccount = async () => {
       try {
-        const [profileResponse, accountRows, budgetResponse] =
+        const [profileResponse, accountRows, budgetResponse, incomeList] =
           await Promise.all([
             authApi.me(),
             accountApi.list(),
             analyticsApi.latestBudget().catch(() => null),
+            incomeApi.list({ limit: 100 }).catch(() => []),
           ]);
 
         if (isMounted) {
           const normalizedAccounts = (accountRows || []).map(normalizeAccount);
           const apiBudgetRows = buildBudgetRows(budgetResponse);
+
+          const nowMonth = new Date().toISOString().slice(0, 7);
+          const currentMonthIncomes = (incomeList || []).filter((inc) => {
+            const incDate = String(inc.income_date || inc.incomeDate || inc.date || "").slice(0, 7);
+            return incDate === nowMonth;
+          });
+          const totalMonthlyInc = currentMonthIncomes.length
+            ? sumBy(currentMonthIncomes, (item) => Number(item.amount || 0))
+            : (incomeList && incomeList.length ? sumBy(incomeList.slice(0, 5), (item) => Number(item.amount || 0)) : 0);
+          setMonthlyIncome(totalMonthlyInc);
 
           setProfile(normalizeProfile(profileResponse));
           updateSessionUser(profileResponse);
@@ -876,6 +889,7 @@ const ProfileAccountWithData = () => {
   const applyBudgetTarget = () => {
     setBudgetNotice("");
     setIsBudgetSaved(false);
+    const baseIncome = monthlyIncome > 0 ? monthlyIncome : (totalIncome > 0 ? totalIncome : 10000000);
     setBudgetRows((items) =>
       items.map((budget) => {
         const target = budgetTargets.find(
@@ -884,7 +898,7 @@ const ProfileAccountWithData = () => {
         return {
           ...budget,
           limit: target
-            ? Math.round((totalIncome * target.percent) / 100)
+            ? Math.round((baseIncome * target.percent) / 100)
             : budget.limit,
         };
       }),
@@ -1086,16 +1100,15 @@ const ProfileAccountWithData = () => {
 
         <Row className="g-3 mt-1">
           <Col xl={12}>
-            <Card className="sadar-panel">
-              <CardHeader className="d-flex align-items-center justify-content-between">
+            <Card className="sadar-panel" id="atur-budget">
+              <CardHeader className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div>
                   <h4 className="card-title mb-1">Atur Anggaran</h4>
                   <p className="text-muted mb-0">
-                    Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan
-                    ini.
+                    Alokasi berdasarkan prinsip 50/30/20 dari pemasukan bulan ini.
                   </p>
                 </div>
-                <Button color="light" onClick={applyBudgetTarget}>
+                <Button color="primary" onClick={applyBudgetTarget} className="sadar-apply-rule-btn">
                   Terapkan 50/30/20
                 </Button>
               </CardHeader>
@@ -1120,18 +1133,20 @@ const ProfileAccountWithData = () => {
                       >
                         <div className="d-flex align-items-start justify-content-between gap-3 mb-3">
                           <div>
-                            <strong>{target?.label || budget.label}</strong>
-                            <p>{target?.helper}</p>
+                            <strong className="fs-14 text-dark">{target?.label || budget.label}</strong>
+                            <p className="text-muted fs-12 mb-0 mt-1">{target?.helper}</p>
                           </div>
-                          <span className="sadar-score-status">
+                          <span className="sadar-score-status badge bg-primary-subtle text-primary fw-bold fs-12">
                             {target?.percent}%
                           </span>
                         </div>
-                        <Label>Batas Anggaran</Label>
+
+                        <Label className="sadar-modal-field-label">Batas Anggaran</Label>
                         <Input
                           type="text"
                           inputMode="numeric"
                           pattern="[0-9.]*"
+                          className="form-control sadar-budget-clean-input"
                           value={formatNumberInput(budget.limit)}
                           onChange={(event) =>
                             updateBudget(
@@ -1139,17 +1154,19 @@ const ProfileAccountWithData = () => {
                               onlyDigits(event.target.value),
                             )
                           }
+                          placeholder="0"
                         />
-                        <div className="d-flex justify-content-between mt-3">
-                          <span className="text-muted">Terpakai</span>
-                          <strong>{rupiah(budget.used)}</strong>
+
+                        <div className="d-flex justify-content-between align-items-center mt-3">
+                          <span className="text-muted fs-12">Terpakai</span>
+                          <strong className="fs-13 text-dark">{rupiah(budget.used)}</strong>
                         </div>
                         <Progress
                           value={Math.min(usage, 100)}
                           color={getBudgetProgressColor(usage)}
                           className="sadar-progress mt-2"
                         />
-                        <p className="text-muted mt-2 mb-0">
+                        <p className="text-muted mt-2 mb-0 fs-12">
                           {usage.toFixed(1)}% dari {rupiah(budget.limit)}
                         </p>
                       </div>
@@ -1157,11 +1174,12 @@ const ProfileAccountWithData = () => {
                   })}
                 </div>
                 <div className="d-flex flex-wrap align-items-center gap-3 mt-4">
-                  <Button color="primary" onClick={saveBudget}>
+                  <Button color="primary" onClick={saveBudget} className="px-4 py-2 fw-semibold">
                     Simpan Anggaran
                   </Button>
                   {isBudgetSaved && (
-                    <span className="text-success fw-semibold">
+                    <span className="text-success fw-semibold fs-13 d-flex align-items-center gap-1">
+                      <i className="ri-checkbox-circle-fill"></i>
                       Anggaran berhasil disimpan.
                     </span>
                   )}
