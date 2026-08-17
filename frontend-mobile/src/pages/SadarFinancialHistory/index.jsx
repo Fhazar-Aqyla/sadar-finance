@@ -856,80 +856,142 @@ const SadarFinancialHistory = () => {
             {actionNotice && <div className="sadar-empty-state mb-3">{actionNotice}</div>}
             <div className="sadar-history-edit-grid">
               <div>
-                <Label htmlFor="history-name">
+                <Label htmlFor="history-name" className="sadar-modal-field-label">
+                  <i className="ri-file-text-line text-primary me-1"></i>
                   {editModal.transaction?.type === "income" ? "Sumber Pemasukan" : "Nama Pengeluaran"}
                 </Label>
-                <Input
-                  id="history-name"
-                  value={editForm.name}
-                  onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))}
-                  placeholder={editModal.transaction?.type === "income" ? "Contoh: Gaji bulanan" : "Contoh: Belanja harian"}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="history-account">Akun</Label>
-                <Input
-                  id="history-account"
-                  type="select"
-                  value={String(editForm.accountId)}
-                  onChange={(event) => setEditForm((current) => ({ ...current, accountId: event.target.value }))}
-                  required
-                >
-                  {accounts.map((account) => (
-                    <option value={String(account.id)} key={account.id}>{account.name}</option>
-                  ))}
-                </Input>
-              </div>
-              {editModal.transaction?.type !== "income" && (
-                <div>
-                  <Label htmlFor="history-category">Kategori</Label>
+                <div className="sadar-input-icon-wrapper">
+                  <i className="ri-edit-line input-leading-icon"></i>
                   <Input
-                    id="history-category"
+                    id="history-name"
+                    className="sadar-modal-input ps-5"
+                    value={editForm.name}
+                    onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))}
+                    placeholder={editModal.transaction?.type === "income" ? "Contoh: Gaji bulanan" : "Contoh: Belanja harian"}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="history-account" className="sadar-modal-field-label">
+                  <i className="ri-bank-card-line text-primary me-1"></i>
+                  Akun
+                </Label>
+                <div className="sadar-input-icon-wrapper sadar-select-wrapper">
+                  <i className="ri-wallet-3-line input-leading-icon"></i>
+                  <Input
+                    id="history-account"
                     type="select"
-                    value={editForm.category}
-                    onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))}
+                    className="sadar-modal-select ps-5 pe-5"
+                    value={String(editForm.accountId)}
+                    onChange={(event) => setEditForm((current) => ({ ...current, accountId: event.target.value }))}
+                    required
                   >
-                    {categoryOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
+                    {accounts.map((account) => (
+                      <option value={String(account.id)} key={account.id}>{account.name}</option>
                     ))}
                   </Input>
+                  <i className="ri-arrow-down-s-line select-trailing-icon"></i>
                 </div>
-              )}
-              <div>
-                <Label htmlFor="history-date">Tanggal</Label>
-                <Input
-                  id="history-date"
-                  type="date"
-                  value={editForm.date}
-                  onChange={(event) => setEditForm((current) => ({ ...current, date: event.target.value }))}
-                  required
-                />
               </div>
-              <div>
-                <Label htmlFor="history-amount">Nominal</Label>
-                <Input
-                  id="history-amount"
-                  type="number"
-                  min="1"
-                  value={editForm.amount}
-                  onChange={(event) => setEditForm((current) => ({ ...current, amount: event.target.value }))}
-                  placeholder="Contoh: 93000"
-                  required
-                />
-              </div>
+
               {editModal.transaction?.type !== "income" && (
                 <div>
-                  <Label htmlFor="history-receipt">Upload Struk</Label>
+                  <Label htmlFor="history-category" className="sadar-modal-field-label">
+                    <i className="ri-price-tag-3-line text-primary me-1"></i>
+                    Kategori
+                  </Label>
+                  <div className="sadar-input-icon-wrapper sadar-select-wrapper">
+                    <i className="ri-apps-2-line input-leading-icon"></i>
+                    <Input
+                      id="history-category"
+                      type="select"
+                      className="sadar-modal-select ps-5 pe-5"
+                      value={editForm.category}
+                      onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))}
+                    >
+                      {categoryOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </Input>
+                    <i className="ri-arrow-down-s-line select-trailing-icon"></i>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="history-date" className="sadar-modal-field-label">
+                  <i className="ri-calendar-line text-primary me-1"></i>
+                  Tanggal
+                </Label>
+                <div className="sadar-input-icon-wrapper">
+                  <i className="ri-calendar-event-line input-leading-icon"></i>
                   <Input
+                    id="history-date"
+                    type="date"
+                    className="sadar-modal-input ps-5"
+                    value={editForm.date}
+                    onChange={(event) => setEditForm((current) => ({ ...current, date: event.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="history-amount" className="sadar-modal-field-label">
+                  <i className="ri-money-dollar-circle-line text-primary me-1"></i>
+                  Nominal
+                </Label>
+                <div className="sadar-input-icon-wrapper">
+                  <span className="input-leading-badge">Rp</span>
+                  <Input
+                    id="history-amount"
+                    type="number"
+                    min="1"
+                    className="sadar-modal-input ps-5"
+                    value={editForm.amount}
+                    onChange={(event) => setEditForm((current) => ({ ...current, amount: event.target.value }))}
+                    placeholder="Contoh: 93000"
+                    required
+                  />
+                </div>
+              </div>
+
+              {editModal.transaction?.type !== "income" && (
+                <div className="sadar-upload-struk-field">
+                  <Label className="sadar-modal-field-label">
+                    <i className="ri-attachment-2 text-primary me-1"></i>
+                    Upload Struk (Opsional)
+                  </Label>
+                  <input
                     id="history-receipt"
                     type="file"
+                    className="d-none"
                     accept="image/png,image/jpeg,image/webp,image/heic"
                     onChange={handleReceiptFileChange}
                   />
-                  <small className="text-muted d-block mt-2">Upload manual saja. OCR dan NLP tidak aktif di edit ini.</small>
+                  <label htmlFor="history-receipt" className="sadar-custom-file-dropzone d-flex align-items-center justify-content-between p-2 px-3 rounded-3 border w-100 mb-0">
+                    <div className="d-flex align-items-center gap-2 overflow-hidden">
+                      <span className="sadar-upload-icon-box d-flex align-items-center justify-content-center rounded-2">
+                        <i className="ri-upload-cloud-2-line text-primary fs-18"></i>
+                      </span>
+                      <div className="text-truncate">
+                        <span className="d-block fs-13 fw-semibold text-dark text-truncate">
+                          {editForm.receiptName || "Pilih File Gambar Struk"}
+                        </span>
+                        <span className="text-muted fs-11">
+                          {editForm.receiptName ? "Klik untuk mengganti struk" : "Format JPG, PNG, WEBP"}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="btn btn-sm btn-soft-primary px-3 py-1 fs-12 fw-semibold flex-shrink-0 ms-2">
+                      {editForm.receiptName ? "Ubah" : "Pilih File"}
+                    </span>
+                  </label>
+                  <small className="text-muted d-block mt-1 fs-11">Upload manual saja. OCR dan NLP tidak aktif di edit ini.</small>
                 </div>
               )}
             </div>

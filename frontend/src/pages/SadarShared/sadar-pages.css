@@ -640,29 +640,132 @@
   gap: 1.15rem 1.25rem;
 }
 
-.sadar-history-edit-grid .form-control,
-.sadar-history-edit-grid .form-select {
-  min-height: 52px;
-  border-color: #d6deeb;
-  border-radius: 8px;
-  color: #172033;
-  background: #ffffff;
-}
-
-.sadar-history-edit-grid .form-control[type="file"] {
-  padding: 0;
-  overflow: hidden;
-}
-
-.sadar-history-edit-grid .form-control[type="file"]::file-selector-button {
-  height: 52px;
-  margin-right: 1rem;
-  padding: 0 1rem;
-  border: 0;
-  border-right: 1px solid #d6deeb;
+.sadar-modal-field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
   color: #334155;
-  background: #f1f5f9;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+}
+
+.sadar-input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.sadar-input-icon-wrapper .input-leading-icon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1.1rem;
+  color: #94a3b8;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sadar-input-icon-wrapper .input-leading-badge {
+  position: absolute;
+  left: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
+  color: #64748b;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sadar-input-icon-wrapper .select-trailing-icon {
+  position: absolute;
+  right: 1rem;
+  font-size: 1.25rem;
+  color: #64748b;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sadar-input-icon-wrapper .sadar-modal-input,
+.sadar-input-icon-wrapper .sadar-modal-select {
+  height: 48px;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.sadar-input-icon-wrapper .sadar-modal-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+.sadar-input-icon-wrapper .sadar-modal-input:focus,
+.sadar-input-icon-wrapper .sadar-modal-select:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  outline: none;
+}
+
+/* Custom File Upload Dropzone */
+.sadar-upload-struk-field {
+  grid-column: span 1;
+}
+
+.sadar-custom-file-dropzone {
+  height: 48px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sadar-custom-file-dropzone:hover {
+  background: #f1f5f9;
+  border-color: #0284c7 !important;
+}
+
+.sadar-upload-icon-box {
+  width: 32px;
+  height: 32px;
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+/* Dark Mode Modal Form Styles */
+html[data-bs-theme="dark"] .sadar-modal-field-label {
+  color: #f1f5f9 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-input-icon-wrapper .sadar-modal-input,
+html[data-bs-theme="dark"] .sadar-input-icon-wrapper .sadar-modal-select {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .sadar-input-icon-wrapper .input-leading-icon,
+html[data-bs-theme="dark"] .sadar-input-icon-wrapper .select-trailing-icon,
+html[data-bs-theme="dark"] .sadar-input-icon-wrapper .input-leading-badge {
+  color: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .sadar-custom-file-dropzone {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-custom-file-dropzone:hover {
+  border-color: #38bdf8 !important;
+  background: #24344d !important;
+}
+
+html[data-bs-theme="dark"] .sadar-custom-file-dropzone .text-dark {
+  color: #f8fafc !important;
 }
 
 .sadar-receipt-preview,
@@ -1709,24 +1812,14 @@ html[data-bs-theme="dark"] .sadar-row-action-menu .dropdown-item:focus {
   background: var(--sadar-dark-surface-soft);
 }
 
-html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control,
-html[data-bs-theme="dark"] .sadar-history-edit-grid .form-select {
-  border-color: rgba(148, 163, 184, 0.42);
-  color: var(--sadar-dark-heading);
-  background: #111827 !important;
-  background-color: #111827 !important;
+html[data-bs-theme="dark"] .sadar-history-edit-grid label,
+html[data-bs-theme="dark"] .sadar-history-modal label {
+  color: #f1f5f9 !important;
 }
 
-html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control::placeholder {
-  color: #8a97aa;
-}
-
-html[data-bs-theme="dark"]
-  .sadar-history-edit-grid
-  .form-control[type="file"]::file-selector-button {
-  border-right-color: rgba(148, 163, 184, 0.42);
-  color: var(--sadar-dark-heading);
-  background: #2b3442;
+html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control::placeholder,
+html[data-bs-theme="dark"] .sadar-history-edit-grid .sadar-modal-input::placeholder {
+  color: #94a3b8;
 }
 
 html[data-bs-theme="dark"] .sadar-receipt-preview,
