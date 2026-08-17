@@ -611,9 +611,7 @@ const BehaviorInsightWithData = () => {
   });
 
   const data = useMemo(() => {
-    const expenseTransactions = backendTransactions.filter(
-      (item) => item.budget_group !== "Savings",
-    );
+    const expenseTransactions = backendTransactions;
     const userIncomes = backendIncomes;
 
     const now = new Date();

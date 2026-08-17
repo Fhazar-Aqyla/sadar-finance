@@ -1072,7 +1072,7 @@ const DashboardWithData = () => {
     const userIncomes = apiRows.incomes;
     const userBudgets = apiRows.budgets;
     const healthScore = apiRows.healthScore;
-    const expenseTransactions = userTransactions.filter((item) => item.budget_group !== "Savings");
+    const expenseTransactions = userTransactions;
 
     const now = new Date();
     const currentYear = now.getFullYear();
