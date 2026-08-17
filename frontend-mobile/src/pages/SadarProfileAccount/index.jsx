@@ -1067,9 +1067,9 @@ const ProfileAccountWithData = () => {
                           <div>
                             <div className="d-flex align-items-center gap-2">
                               <h6 className="mb-0 fw-semibold text-dark">{account.name}</h6>
-                              <Badge color={account.type === "Bank" ? "primary" : "info"} className="badge-soft">
+                              <span className="sadar-account-type-badge">
                                 {account.type}
-                              </Badge>
+                              </span>
                             </div>
                             <p className="text-muted fs-12 mb-0 mt-1">
                               {account.accountNumber

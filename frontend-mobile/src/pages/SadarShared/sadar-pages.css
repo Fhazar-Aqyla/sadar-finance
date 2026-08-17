@@ -858,6 +858,42 @@
   min-width: 0;
 }
 
+.sadar-account-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  line-height: 1.2;
+}
+
+.sadar-account-item .sadar-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  flex-shrink: 0;
+}
+
+html[data-bs-theme="dark"] .sadar-account-type-badge {
+  background: rgba(148, 163, 184, 0.12);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  color: #e2e8f0;
+}
+
 .sadar-account-fields {
   min-width: 0;
   flex: 1 1 auto;
@@ -5181,7 +5217,17 @@ html[data-bs-theme="dark"] .sadar-photo-action-item.is-danger {
     box-shadow: 0 7px 16px rgba(37, 99, 235, 0.2);
   }
 
-  .sadar-searchable-select-menu,
+  .sadar-searchable-select-menu {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+    color: #1e293b !important;
+    background: #ffffff !important;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
   .sadar-row-action-menu,
   .profile-photo-dropdown {
     border: 1px solid rgba(91, 134, 171, 0.2) !important;
