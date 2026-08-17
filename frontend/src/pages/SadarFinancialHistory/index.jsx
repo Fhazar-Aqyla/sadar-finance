@@ -265,7 +265,10 @@ const SadarFinancialHistory = () => {
     };
   }, []);
 
-  const resolveAccountName = useCallback((accountId) => accounts.find((account) => account.id === accountId)?.name || "-", [accounts]);
+  const resolveAccountName = useCallback((accountId) => {
+    if (!accountId) return "-";
+    return accounts.find((account) => String(account.id) === String(accountId))?.name || "-";
+  }, [accounts]);
 
   const userTransactions = useMemo(() => {
     const expenseRows = transactionRows.map((transaction) => ({
@@ -398,9 +401,16 @@ const SadarFinancialHistory = () => {
   const openEditTransaction = (transaction) => {
     setOpenActionKey("");
     setActionNotice("");
+    const matchedAccount = accounts.find(
+      (a) => String(a.id) === String(transaction.account_id || transaction.accountId)
+    );
+    const resolvedAccountId = matchedAccount
+      ? String(matchedAccount.id)
+      : (accounts[0] ? String(accounts[0].id) : "");
+
     setEditForm({
       name: transaction.name,
-      accountId: transaction.account_id || "",
+      accountId: resolvedAccountId,
       category: transaction.categoryGroup || getTransactionBudgetGroup(transaction),
       date: transaction.date,
       amount: String(transaction.amount || ""),
@@ -453,12 +463,18 @@ const SadarFinancialHistory = () => {
       return;
     }
 
+    const selectedAccountId = editForm.accountId || (accounts[0] ? String(accounts[0].id) : null);
+    if (!selectedAccountId) {
+      setActionNotice("Silakan pilih akun transaksi.");
+      return;
+    }
+
     setIsSubmittingAction(true);
     setActionNotice("");
 
     try {
       const basePayload = {
-        accountId: editForm.accountId || null,
+        accountId: selectedAccountId,
         amount,
       };
 
@@ -473,7 +489,7 @@ const SadarFinancialHistory = () => {
             income.id === editModal.transaction.id
               ? {
                   ...income,
-                  account_id: editForm.accountId || null,
+                  account_id: selectedAccountId,
                   source: editForm.name.trim(),
                   amount,
                   date: editForm.date,
@@ -494,7 +510,7 @@ const SadarFinancialHistory = () => {
             transaction.id === editModal.transaction.id
               ? {
                   ...transaction,
-                  account_id: editForm.accountId || null,
+                  account_id: selectedAccountId,
                   name: editForm.name.trim(),
                   category: getCategoryLabel(editForm.category),
                   categoryGroup: editForm.category,
@@ -842,12 +858,12 @@ const SadarFinancialHistory = () => {
                 <Input
                   id="history-account"
                   type="select"
-                  value={editForm.accountId}
+                  value={String(editForm.accountId)}
                   onChange={(event) => setEditForm((current) => ({ ...current, accountId: event.target.value }))}
+                  required
                 >
-                  <option value="">Tanpa akun</option>
                   {accounts.map((account) => (
-                    <option value={account.id} key={account.id}>{account.name}</option>
+                    <option value={String(account.id)} key={account.id}>{account.name}</option>
                   ))}
                 </Input>
               </div>

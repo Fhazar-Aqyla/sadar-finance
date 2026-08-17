@@ -14,10 +14,20 @@ import {
   sidebarVisibilitytypes
 } from "../../Components/constants/layout";
 
+const getSavedLayoutMode = () => {
+  try {
+    const saved = localStorage.getItem("sadar_theme_mode") || localStorage.getItem("layoutMode");
+    if (saved === "dark" || saved === "light") return saved;
+  } catch (error) {
+    void error;
+  }
+  return layoutModeTypes.LIGHTMODE;
+};
+
 export const initialState = {
   layoutType: layoutTypes.VERTICAL,
   leftSidebarType: leftSidebarTypes.LIGHT,
-  layoutModeType: layoutModeTypes.LIGHTMODE,
+  layoutModeType: getSavedLayoutMode(),
   layoutWidthType: layoutWidthTypes.FLUID,
   layoutPositionType: layoutPositionTypes.FIXED,
   topbarThemeType: topbarThemeTypes.LIGHT,
@@ -37,6 +47,12 @@ const LayoutSlice = createSlice({
     },
     changeLayoutModeAction(state, action) {
       state.layoutModeType = action.payload;
+      try {
+        localStorage.setItem("sadar_theme_mode", action.payload);
+        localStorage.setItem("layoutMode", action.payload);
+      } catch (error) {
+        void error;
+      }
     },
     changeSidebarThemeAction(state, action) {
       state.leftSidebarType = action.payload;

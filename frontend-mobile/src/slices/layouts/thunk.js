@@ -41,6 +41,12 @@ export const changeLayout = (layout) => async (dispatch) => {
 export const changeLayoutMode = (layoutMode) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-bs-theme", layoutMode);
+        try {
+            localStorage.setItem("sadar_theme_mode", layoutMode);
+            localStorage.setItem("layoutMode", layoutMode);
+        } catch (error) {
+            void error;
+        }
         dispatch(changeLayoutModeAction(layoutMode));
     } catch {
         // Layout changes are best-effort and must not interrupt navigation.

@@ -5,6 +5,18 @@
     <link rel="icon" type="image/png" href="/browser-tab-icon.png?v=2" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SADAR Finance</title>
+    <script>
+      (function() {
+        try {
+          var mode = localStorage.getItem('sadar_theme_mode') || localStorage.getItem('layoutMode');
+          if (mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+          } else if (mode === 'light') {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

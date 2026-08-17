@@ -13,6 +13,18 @@
     <link rel="apple-touch-icon" href="/pwa-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>SADAR Finance</title>
+    <script>
+      (function() {
+        try {
+          var mode = localStorage.getItem('sadar_theme_mode') || localStorage.getItem('layoutMode');
+          if (mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+          } else if (mode === 'light') {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

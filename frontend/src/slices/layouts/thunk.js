@@ -1,4 +1,4 @@
-﻿import { changeHTMLAttribute } from './utils';
+import { changeHTMLAttribute } from './utils';
 import {
     changeLayoutAction,
     changeLayoutModeAction,
@@ -39,6 +39,10 @@ export const changeLayout = (layout) => async (dispatch) => {
 export const changeLayoutMode = (layoutMode) => async (dispatch) => {
     try {
         changeHTMLAttribute("data-bs-theme", layoutMode);
+        try {
+            localStorage.setItem("sadar_theme_mode", layoutMode);
+            localStorage.setItem("layoutMode", layoutMode);
+        } catch {}
         dispatch(changeLayoutModeAction(layoutMode));
     } catch {}
 };
