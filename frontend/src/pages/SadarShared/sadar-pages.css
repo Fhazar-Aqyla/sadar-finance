@@ -697,9 +697,10 @@
 }
 
 .sadar-input-icon-wrapper .sadar-modal-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: none !important;
   cursor: pointer;
 }
 
@@ -2743,6 +2744,121 @@ html[data-bs-theme="dark"] .sadar-select-option.selected {
   background-color: #0c4a6e;
   color: #38bdf8;
   font-weight: 650;
+}
+
+/* Dark Mode Styles for Account Form Grid & All Modals */
+html[data-bs-theme="dark"] .sadar-account-form-grid .form-label,
+html[data-bs-theme="dark"] .sadar-form-field .form-label,
+html[data-bs-theme="dark"] .modal .form-label,
+html[data-bs-theme="dark"] .modal label {
+  color: #f1f5f9 !important;
+  font-weight: 600;
+}
+
+html[data-bs-theme="dark"] .sadar-account-form-grid .form-control,
+html[data-bs-theme="dark"] .sadar-account-form-grid .form-select,
+html[data-bs-theme="dark"] .sadar-form-field .form-control,
+html[data-bs-theme="dark"] .modal .form-control,
+html[data-bs-theme="dark"] .modal .form-select {
+  border-color: rgba(148, 163, 184, 0.3) !important;
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .sadar-account-form-grid .form-control:focus,
+html[data-bs-theme="dark"] .sadar-account-form-grid .form-select:focus,
+html[data-bs-theme="dark"] .modal .form-control:focus,
+html[data-bs-theme="dark"] .modal .form-select:focus {
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  background-color: #1e293b !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+html[data-bs-theme="dark"] .sadar-account-form-grid .form-control::placeholder,
+html[data-bs-theme="dark"] .sadar-form-field .form-control::placeholder,
+html[data-bs-theme="dark"] .modal .form-control::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-account-form-grid .input-group .input-group-text,
+html[data-bs-theme="dark"] .modal .input-group-text {
+  border-color: rgba(148, 163, 184, 0.3) !important;
+  background-color: #24344d !important;
+  color: #cbd5e1 !important;
+}
+
+html[data-bs-theme="dark"] .modal-content {
+  background-color: #0f172a !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .modal-header {
+  border-bottom-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-bs-theme="dark"] .modal-header .modal-title,
+html[data-bs-theme="dark"] .modal-title,
+html[data-bs-theme="dark"] .sadar-account-modal-heading strong {
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .modal-footer {
+  border-top-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-bs-theme="dark"] .modal p.text-muted,
+html[data-bs-theme="dark"] .modal .text-muted,
+html[data-bs-theme="dark"] .sadar-account-modal-heading span {
+  color: #94a3b8 !important;
+}
+
+html[data-bs-theme="dark"] .modal strong {
+  color: #f8fafc !important;
+}
+
+/* Dark Mode Top Search Bar in Navbar */
+html[data-bs-theme="dark"] .sadar-app-search .form-control,
+html[data-bs-theme="dark"] .app-search .form-control {
+  background-color: #1e293b !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .sadar-app-search .form-control::placeholder,
+html[data-bs-theme="dark"] .app-search .form-control::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-app-search .search-widget-icon,
+html[data-bs-theme="dark"] .app-search .search-widget-icon {
+  color: #94a3b8 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-search-menu {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-bs-theme="dark"] .sadar-search-result {
+  color: #e2e8f0 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-search-result:hover {
+  background-color: #24344d !important;
+  color: #38bdf8 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-search-title {
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .sadar-search-desc {
+  color: #94a3b8 !important;
 }
 
 /* Onboarding Empty State Skor Finansial */

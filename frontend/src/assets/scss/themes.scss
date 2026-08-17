@@ -349,14 +349,20 @@ $value in $theme-colors {
 
   .sadar-app-search .form-control,
   .app-search .form-control {
-    border-color: var(--sadar-shell-border) !important;
-    background: #111827 !important;
-    color: var(--sadar-shell-text) !important;
+    border-color: rgba(148, 163, 184, 0.3) !important;
+    background: #1e293b !important;
+    color: #f8fafc !important;
   }
 
   .sadar-app-search .form-control::placeholder,
   .app-search .form-control::placeholder {
-    color: var(--sadar-shell-muted) !important;
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+  }
+
+  .sadar-app-search .search-widget-icon,
+  .app-search .search-widget-icon {
+    color: #94a3b8 !important;
   }
 
   .sadar-profile.topbar-user {
