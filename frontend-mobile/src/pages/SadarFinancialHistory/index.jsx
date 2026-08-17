@@ -991,7 +991,6 @@ const SadarFinancialHistory = () => {
                       {editForm.receiptName ? "Ubah" : "Pilih File"}
                     </span>
                   </label>
-                  <small className="text-muted d-block mt-1 fs-11">Upload manual saja. OCR dan NLP tidak aktif di edit ini.</small>
                 </div>
               )}
             </div>
