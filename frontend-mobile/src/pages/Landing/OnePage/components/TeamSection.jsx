@@ -2,12 +2,12 @@ import React, { useRef } from "react";
 import { SpotlightCard } from "@/Components/ui/spotlight-card";
 import { Users, Sparkles } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import diahAvatar from "@/assets/images/users/diah.png";
-import marselaAvatar from "@/assets/images/users/marsela.png";
-import dzakyAvatar from "@/assets/images/users/dzaky.png";
-import farrelAvatar from "@/assets/images/users/farrel.png";
-import fhazarAvatar from "@/assets/images/users/fhazar.jpg";
-import habibAvatar from "@/assets/images/users/habib.png";
+import diahAvatar from "@/assets/images/users/team-diah.jpg";
+import marselaAvatar from "@/assets/images/users/team-marsela.jpg";
+import dzakyAvatar from "@/assets/images/users/team-dzaky.jpg";
+import farrelAvatar from "@/assets/images/users/team-farrel.jpg";
+import fhazarAvatar from "@/assets/images/users/team-fhazar.jpg";
+import habibAvatar from "@/assets/images/users/team-habib.jpg";
 
 // Clean SVG Icons for GitHub, LinkedIn, and Instagram
 const GithubIcon = ({ className = "w-4 h-4" }) => (
