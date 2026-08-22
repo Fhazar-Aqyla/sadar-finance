@@ -1,138 +1,190 @@
 # SADAR Finance (Smart AI-Driven Automated Receipt & Finance Management)
 
-SADAR Finance adalah aplikasi personal finance berbasis kecerdasan buatan (*AI-driven*) yang dirancang khusus untuk membantu individu memantau, menganalisis, dan mengendalikan keuangan pribadi secara sadar (*mindful*). 
+<p align="center">
+  <img src="frontend/public/sadar-logo.png" alt="SADAR Finance Logo" width="120" />
+</p>
 
-Aplikasi ini mengintegrasikan pemrosesan citra struk digital otomatis menggunakan **Optical Character Recognition (OCR)** dan **Natural Language Processing (NLP)**, pemodelan perilaku belanja tak wajar dengan **Deep & Cross Network (DCN)**, serta proyeksi pembengkakan alokasi anggaran bulanan dengan **Multi-task Multi-Layer Perceptron (MLP)**.
+<p align="center">
+  <strong>Solusi Manajemen Keuangan Pribadi Cerdas Berbasis Kecerdasan Buatan (AI-Driven) untuk Membangun Pola Finansial yang Sadar, Terukur, dan Bertanggung Jawab.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Production--Ready-success?style=for-the-badge" alt="Status Production-Ready" />
+  <img src="https://img.shields.io/badge/Architecture-Decoupled%20Multi--Service-blue?style=for-the-badge" alt="Architecture" />
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
+  <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/TensorFlow-2.18-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow" />
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
 
 ---
 
-## 🌟 Status Aplikasi
+## 📖 Tentang SADAR Finance
 
-**SADAR Finance kini telah rampung 100% (Production-Ready).** Proyek ini menerapkan pendekatan arsitektur *Decoupled Full-Stack* yang terdiri atas tiga layanan mandiri:
-1. **Frontend Web App**: Aplikasi SPA modern berbasis React 18, Vite 6, Redux Toolkit, dan Tailwind CSS v4 untuk antarmuka pengguna yang responsif.
-2. **Backend RESTful API**: Layanan server tangguh berbasis Node.js, Express, dan database relasional PostgreSQL untuk autentikasi terenkripsi, pencatatan transaksi, histori OCR, dan agregasi data analitik.
-3. **AI Microservice**: Engine analitik prediktif berbasis Python Flask, PyTesseract OCR, Pillow, dan TensorFlow Keras untuk mengeksekusi ekstraksi struk belanja dan model deep learning.
+**SADAR Finance** adalah platform manajemen keuangan pribadi (*personal finance*) cerdas generasi baru yang dirancang khusus untuk memandu individu mengelola uang secara bijak dan berkesadaran penuh (*mindful spending*).
+
+Aplikasi ini menggabungkan pencatatan otomatis tanpa repot (*effortless logging*), analitik perilaku berbasis pembelajaran mendalam (*deep learning*), serta sistem peringatan dini prediktif (*predictive early-warning*).
+
+### 🌟 Pilar Keunggulan SADAR Finance:
+1. **Otomatisasi OCR & NLP Multi-Tier**: Pengguna cukup mengunggah foto struk belanja; sistem akan mengekstrak nama *merchant*, tanggal, daftar barang, subtotal, dan total belanja secara akurat dengan integrasi *Hugging Face OCR*, *Groq AI Reasoning LLM*, serta *Local Tesseract Fallback*.
+2. **AI Merchant & Category Classifier**: Mengelompokkan transaksi secara otomatis ke dalam kategori standar (*Food & Dining*, *Transportation*, *Shopping*, dll.) dan kelompok anggaran (*Needs*, *Wants*, *Savings*, *Other*).
+3. **Behavior Spike Modeling (DCN)**: Memodelkan pola belanja menggunakan arsitektur **Deep & Cross Network (DCN)** untuk mendeteksi transaksi anomali atau lonjakan belanja konsumtif, dipadukan dengan saran taktis berbasis **Google Gemini Generative AI**.
+4. **End-of-Month Overspending Forecast (Multitask MLP)**: Memproyeksikan potensi pembengkakan anggaran sebelum penutupan bulan menggunakan jaringan saraf tiruan **Multi-task Multi-Layer Perceptron (MLP)**.
+5. **Skor Kesehatan Keuangan (0–100) & Formula 50/30/20**: Menghitung indeks kesehatan finansial komprehensif berdasarkan rasio tabungan, kepatuhan alokasi ideal (50% Kebutuhan, 30% Keinginan, 20% Tabungan/Investasi), dan stabilitas arus kas.
+6. **Dukungan Multi-Device & Mobile PWA**: Menghadirkan pengalaman desktop web yang lengkap sekaligus aplikasi *Progressive Web App (PWA)* mobile yang responsif, dapat diinstal (*Add to Home Screen*), dan mendukung mode *offline*.
 
 ---
 
-## 🗺️ Arsitektur Sistem
+## 🏛️ Arsitektur Sistem & Ekosistem Multi-Service
 
-Berikut adalah visualisasi alur data dan interaksi antarsistem di SADAR Finance:
+SADAR Finance dibangun menggunakan arsitektur **Decoupled Multi-Service** yang modular, tangguh, dan siap untuk lingkungan produksi:
 
 ```mermaid
 flowchart TD
-    subgraph Frontend [React Single Page Application]
-        UI[User Interface - React 18 & Vite]
-        Store[State Management - Redux Toolkit]
-        Chart[Visualisasi Data - ApexCharts & ECharts]
+    subgraph Clients [Klien Pengguna]
+        DesktopUser["💻 Browser Desktop (Chrome, Firefox, Safari)"]
+        MobileUser["📱 Smartphone / PWA Mobile (iOS & Android)"]
     end
 
-    subgraph Backend [Express.js Engine]
-        API[RESTful API Router]
-        Auth[JWT Authentication & Bcrypt]
-        Uploads[Multer Static File Server]
-        DB_Layer[Data Access Layer - pg Client]
+    subgraph GatewayLayer [Gateway & Routing Layer]
+        Gateway["🌐 Nginx Reverse Proxy (Gateway :80)\n- Auto User-Agent Detection\n- Cookie Switcher (sadar_mobile_ui)\n- PWA Asset Router & Static Cache"]
     end
 
-    subgraph Database [PostgreSQL Relational DB]
-        Tables[(9 Tables: users, accounts, transactions, ...)]
+    subgraph PresentationLayer [Frontend Presentation Layer]
+        DesktopApp["🖥️ Frontend Desktop (React 18 + Vite 6 + Tailwind v4)\n- Redux Toolkit State Management\n- ApexCharts & ECharts Visualization\n- Framer Motion UI Transitions"]
+        MobileApp["📱 Frontend Mobile PWA (React 18 + Vite 6)\n- Service Worker (sw.js) & Web Manifest\n- Offline Caching (offline.html)\n- Touch & Mobile-First Component Design"]
     end
 
-    subgraph AIService [Python Flask AI Microservice]
-        Flask[Flask REST Server]
-        OCR[Receipt OCR & NLP Parser]
-        DCN[Behavior Spike Model - Deep & Cross Network]
-        MLP[Overspending Forecast Model - Multitask MLP]
-        GenAI[Generative AI Recommendation - Gemini API]
+    subgraph BackendLayer [Backend API Layer]
+        ExpressAPI["⚡ Express.js RESTful API (:3000 / :5000)\n- JWT Authentication & Bcryptjs (Cost 12)\n- Dual Rate Limiter (Auth & General API)\n- Multer Uploads & Static Image Server\n- Swagger OpenAPI Docs (/api-docs)"]
+        ReceiptPipeline["🧠 Hybrid OCR & Receipt Decision Pipeline\n- Primary & Secondary HF OCR Endpoints\n- Groq AI LLM Interpreter (openai/gpt-oss-20b)\n- Deterministic Decision Engine\n- Local Tesseract.js Fallback Engine"]
     end
 
-    %% Alur Kerja
-    UI -->|1. Kirim Aksi / Request| Store
-    Store -->|2. Ambil / Tulis Data| API
-    API -->|3. Validasi Token JWT| Auth
-    API -->|4. Kueri SQL Teroptimasi| DB_Layer
-    DB_Layer <==>|5. Baca / Tulis Fisik| Tables
-    
-    %% Alur AI
-    API -->|6. Integrasi AI / Upload Struk| Flask
-    Flask -->|7. Prapemrosesan & Pytesseract| OCR
-    Flask -->|8. Evaluasi Model Deep Learning| DCN
-    Flask -->|9. Proyeksi Anggaran Akhir Bulan| MLP
-    Flask -.->|10. Buat Rekomendasi Teks| GenAI
-    Flask -->|11. Kirim Hasil Analisis| API
-    
-    %% Fallback OCR
-    API -->|12. Fallback Local OCR Tesseract.js| API
+    subgraph DatabaseLayer [Persistence Layer]
+        PostgreSQL[("🐘 PostgreSQL 15 Relational Database\n- 9 Indexed Tables\n- BYTEA Image Persistence for Cloud Ephemeral\n- Foreign Key Cascades & Strict Enums")]
+    end
+
+    subgraph AIServiceLayer [AI & Machine Learning Engine]
+        AIService["🐍 Python Flask Microservice (:5000 / HF Space)\n- PyTesseract & PIL Image Preprocessing\n- Merchant Classifier Engine\n- DCN Behavior Spike Model (.keras)\n- Multitask MLP Overspending Model (.keras)\n- Google Gemini AI Generative Insights"]
+    end
+
+    %% Routing
+    DesktopUser -->|Koneksi HTTP| Gateway
+    MobileUser -->|Koneksi HTTP / PWA| Gateway
+    Gateway -->|User-Agent Desktop / UI Default| DesktopApp
+    Gateway -->|User-Agent Mobile / PWA Assets| MobileApp
+    Gateway -->|Proxy /api/* & /uploads/*| ExpressAPI
+
+    %% Backend Flow
+    DesktopApp -->|REST API Request + Bearer JWT| ExpressAPI
+    MobileApp -->|REST API Request + Bearer JWT| ExpressAPI
+    ExpressAPI <-->|SQL Queries via pg Pool| PostgreSQL
+    ExpressAPI -->|Upload Struk / Interpretasi| ReceiptPipeline
+
+    %% Pipeline Integrations
+    ReceiptPipeline -->|1. Request OCR Eksternal| AIService
+    ReceiptPipeline -->|2. Reasoning Parser| GroqLLM["🤖 Groq AI API (LLM Parser)"]
+    ExpressAPI -->|3. Inferensi Model & Rekomendasi| AIService
+    AIService -->|Narrative Generation| GeminiAPI["✨ Google Gemini API"]
 ```
 
 ---
 
-## 💎 Fitur Utama & Struktur Menu
+## 💎 Fitur Utama & Struktur Menu Aplikasi
 
-SADAR Finance didesain dengan antarmuka bertema profesional dan elegan yang terdiri atas 5 menu navigasi utama pada sidebar:
+Antarmuka SADAR Finance dirancang dengan visual modern, elegan, dan ramah pengguna yang terbagi dalam menu-menu utama:
 
-### 1. Dashboard (`/dashboard`)
-*   **Greeting Personal**: Sapaan dinamis berdasarkan profil pengguna aktif.
-*   **Summary Cards (5 Metrik Utama)**: Menampilkan total saldo gabungan, akumulasi pemasukan bulan ini, akumulasi pengeluaran bulan ini, sisa anggaran saat ini, dan jumlah riwayat catatan keuangan.
-*   **Cashflow Chart**: Visualisasi perbandingan pemasukan vs pengeluaran bulanan menggunakan diagram batang (ApexCharts).
-*   **Expense Trend**: Tren perkembangan pengeluaran harian/mingguan untuk melacak puncak konsumsi.
-*   **Spending Category**: Distribusi pembagian pengeluaran berdasarkan kategori utama dalam bentuk diagram donat (*donut chart*).
-*   **Smart Insight & Predictive Spending Alert**: Rekomendasi AI dan peringatan dini apabila terdeteksi potensi pembengkakan anggaran.
-*   **Recent Transactions**: Tabel berisi 5-10 transaksi pengeluaran terbaru.
+### 1. Landing Page (`/`, `/landing`)
+*   **Hero Showcase**: Pengenalan nilai produk dengan animasi interaktif modern dan responsif berbasis Tailwind CSS v4.
+*   **Feature Breakdown**: Sorotan fitur unggulan (Pencatatan AI, Scanner Struk, Skor Finansial, Analisis 50/30/20).
+*   **Quick Action**: Navigasi langsung menuju halaman Pendaftaran (*Register*) atau Masuk (*Login*).
 
-### 2. Catat Keuangan (`/catat-keuangan`)
-Memfasilitasi pencatatan data keuangan ke dalam dua tab terpisah:
+### 2. Dashboard Keuangan (`/dashboard`)
+*   **Greeting Personal**: Sapaan dinamis berdasarkan data profil pengguna.
+*   **5 Metrik Finansial Utama**: Menampilkan Saldo Gabungan, Pemasukan Bulan Ini, Pengeluaran Bulan Ini, Sisa Anggaran, dan Total Catatan Keuangan.
+*   **Cashflow Chart**: Visualisasi interaktif perbandingan arus kas pemasukan vs pengeluaran bulanan.
+*   **Expense Trend**: Grafik tren laju pengeluaran harian/mingguan untuk memantau waktu konsumsi puncak.
+*   **Spending Category (Donut Chart)**: Pembagian porsi pengeluaran berdasarkan kategori utama.
+*   **Smart Insight & Predictive Spending Alert**: Rekomendasi AI dan peringatan dini apabila terdeteksi anomali atau potensi *overspending*.
+*   **Recent Transactions**: Tabel 5–10 transaksi belanja terbaru dengan status kategori.
+
+### 3. Catat Keuangan (`/catat-keuangan` / `/transactions/input`)
 *   **Tab Transaksi (Pengeluaran)**:
-    *   *Metode Input Manual*: Pengguna mengisi manual nominal, tanggal, kategori, akun pembayaran, dan catatan.
-    *   *Metode Upload Struk (OCR)*: Pengguna mengunggah gambar nota belanja. AI memproses gambar, mengekstrak data otomatis (merchant, tanggal, nominal, item), menampilkan pratinjau hasil, dan memicu *autofill* pada formulir transaksi yang dapat disunting kembali sebelum disimpan ke database `/transactions`.
+    *   *Input Manual*: Pengisian nominal, tanggal, kategori belanja, kategori detail, akun dompet/bank, dan catatan deskripsi.
+    *   *Upload Struk (OCR & AI Parsing)*: Unggah foto struk/nota. Sistem mengekstrak nama toko/merchant, tanggal, rincian barang, dan total belanja secara otomatis, menyediakan pratinjau hasil ekstraksi, dan melakukan *autofill* formulir yang dapat disunting sebelum disimpan.
 *   **Tab Income (Pemasukan)**:
-    *   Penginputan manual pemasukan uang berdasarkan sumber pemasukan (misal: Gaji, Freelance, Bonus) yang langsung dialokasikan ke salah satu akun keuangan pengguna untuk menambah saldo.
+    *   Pencatatan pemasukan dana (Gaji, Freelance, Investasi, Bonus) yang langsung dialokasikan ke akun keuangan tujuan untuk menambah saldo secara otomatis.
 
-### 3. Behavior Insight (`/behavior-insight`)
-Halaman analitik bersifat *read-only* untuk memberikan edukasi kebiasaan berbelanja pengguna:
-*   **Weekend vs Weekday Behavior**: Membandingkan intensitas dan nominal pengeluaran di hari kerja melawan akhir pekan.
-*   **Kategori Dominan**: Penilaian mendalam terhadap sektor pengeluaran terbesar yang menyerap porsi anggaran tertinggi.
-*   **Rekomendasi Kebiasaan**: Saran taktis berbasis pola belanja historis agar pengguna dapat menghemat pengeluaran tidak produktif.
+### 4. Behavior Insight (`/behavior-insight`)
+*   **Weekend vs Weekday Behavior**: Komparasi mendalam intensitas transaksi dan nominal belanja antara hari kerja vs akhir pekan.
+*   **Kategori Dominan**: Analisis sektor belanja yang paling banyak menyerap anggaran.
+*   **Rekomendasi Kebiasaan AI**: Masukan taktis berbasis kebiasaan historis untuk menekan pengeluaran konsumtif yang tidak esensial.
 
-### 4. Financial Score (`/financial-score`)
-*   **Skor Kesehatan (0-100)**: Indeks numerik kesehatan keuangan pengguna.
-    *   `71 - 100`: **Sehat** (Warna Hijau)
-    *   `41 - 70`: **Cukup Sehat** (Warna Jingga)
-    *   `0 - 40`: **Perlu Perhatian** (Warna Merah)
-*   **Faktor Pembentuk**: Evaluasi rasio tabungan, laju belanja, kepatuhan budget, konsistensi pencatatan, dan deviasi alokasi anggaran.
-*   **Analisis Alokasi Budget 50/30/20**: Membandingkan pengeluaran riil terhadap formula manajemen keuangan ideal (50% Kebutuhan/Needs, 30% Keinginan/Wants, dan 20% Tabungan/Savings).
+### 5. Skor Kesehatan Keuangan (`/financial-score`)
+*   **Skor Finansial (0–100)**:
+    *   `71 - 100`: **Sehat** (Hijau)
+    *   `41 - 70`: **Cukup Sehat** (Jingga)
+    *   `0 - 40`: **Perlu Perhatian** (Merah)
+*   **Evaluasi Formula 50/30/20**: Membandingkan realisasi belanja terhadap standar keuangan ideal:
+    *   **50% Kebutuhan (Needs)**: Makan pokok, transportasi, tagihan/utilitas, kesehatan, pendidikan.
+    *   **30% Keinginan (Wants)**: Hiburan, belanja sekunder, rekreasi, gaya hidup.
+    *   **20% Tabungan & Investasi (Savings)**: Dana darurat, tabungan, investasi reksadana/saham.
+*   **Faktor Pembentuk Skor**: Evaluasi rasio tabungan, kepatuhan budget, konsistensi pencatatan, dan deviasi pengeluaran.
 
-### 5. Profile & Account (`/profile-account` & `/profile-account/edit`)
-*   **Profil Pengguna**: Manajemen informasi dasar (Nama, Kredensial Email, Pekerjaan, Alamat, dan Unggah Foto Profil).
-*   **Kelola Akun Keuangan**: CRUD akun penyimpanan uang pengguna (Cash/Tunai, Bank, E-wallet) beserta nomor rekening/ponselnya.
-*   **Atur Budget Bulanan**: Menetapkan pagu anggaran spesifik untuk kelompok alokasi *Needs*, *Wants*, dan *Savings/Investment*.
-*   **Riwayat Transaksi Lengkap**: Rekapitulasi komprehensif seluruh histori transaksi belanja dan pemasukan dalam bentuk tabel tabular interaktif.
+### 6. Riwayat Keuangan Lengkap (`/financial-history`)
+*   Halaman rekapitulasi data keuangan terdedikasi yang memuat seluruh riwayat transaksi pengeluaran dan pemasukan.
+*   Mendukung pencarian teks cepat, filter rentang tanggal, filter jenis transaksi, pengurutan kolom, dan paginasi interaktif.
+
+### 7. Profil & Akun Pengguna (`/profile-account` & `/profile-account/edit`)
+*   **Manajemen Profil**: Pembaruan nama, email, nomor ponsel, pekerjaan, alamat, dan foto profil.
+*   **Kelola Akun Keuangan**: CRUD rekening bank, e-wallet, atau kas fisik beserta nomor akun dan saldo awal.
+*   **Atur Target Budget Bulanan**: Menetapkan pagu anggaran spesifik untuk pos *Needs*, *Wants*, dan *Savings/Investment*.
+
+### 8. Fitur Mobile Progressive Web App (PWA)
+*   **Instalasi Mandiri (*Add to Home Screen*)**: Dapat diinstal layaknya aplikasi native pada perangkat Android dan iOS.
+*   **Dukungan Offline**: Layanan service worker (`sw.js`) dan halaman cadangan (`offline.html`) saat koneksi terputus.
+*   **Navigasi Mobile-First**: Bottom navigation bar, bottom sheets, dan tata letak responsif yang nyaman digunakan dengan satu tangan.
+
+### 9. Halaman Kebijakan & Legalitas
+*   `Privacy Policy` (`/privacy-policy` / `/privancy-policy`)
+*   `Terms & Conditions` (`/terms-conditions` / `/term-conditions`)
 
 ---
 
 ## 🧠 Modul AI & Machine Learning Deep Dive
 
-Bagian krusial yang menggerakkan kecerdasan di SADAR Finance mencakup tiga model analitis canggih di AI Microservice:
+Kecerdasan buatan di SADAR Finance digerakkan oleh kombinasi model analitik terstruktur dan pemodelan bahasa:
 
-### A. Receipt OCR & NLP Extraction
-*   **Prapemrosesan Citra (Pillow)**: Konversi citra ke skala abu-abu (*grayscale*), peningkatan kontras dinamis sebesar `1.8x`, manipulasi filter penajaman (*sharpening*), serta penskalaan resolusi ke lebar target `600px` dan tinggi maksimum `1800px` untuk mengoptimalkan kejelasan teks.
-*   **Ekstraksi Teks (pytesseract)**: Memanfaatkan Tesseract Engine dengan konfigurasi `--psm 6` (asumsi blok teks seragam) menggunakan multi-bahasa `ind+eng`.
-*   **NLP Parser**: Algoritma pencocokan pola regex dan penandaan berbasis token untuk mengurai nama merchant, tanggal transaksi berformat ISO, daftar detail nama item dan harga masing-masing, serta nominal kalkulasi total belanja.
+### 1. Hybrid OCR & Receipt Decision Pipeline
+*   **Prapemrosesan Gambar**: Penyesuaian kontras dinamis, penajaman (*sharpening*), konversi skala abu-abu (*grayscale*), dan normalisasi resolusi (lebar target `600px`, batas tinggi `1800px`).
+*   **Multi-Provider Recognition**:
+    *   *Primary & Secondary HF OCR Endpoints*: Mengirim berkas gambar ke microservice AI untuk ekstraksi baris teks berbasis Tesseract Engine (`ind+eng`, `--psm 6`).
+    *   *Local Tesseract.js Fallback*: Backend mengeksekusi OCR internal jika seluruh endpoint eksternal gagal.
+*   **Groq AI LLM Reasoning Parser**: Menggunakan model `openai/gpt-oss-20b` via Groq Cloud API untuk mengubah teks mentah menjadi entitas terstruktur (nama merchant, tanggal transaksi berformat ISO, rincian item, dan total nominal belanja).
+*   **Deterministic Validation Engine**: Memastikan kepatuhan tipe data, memeriksa konsistensi jumlah subtotal item terhadap total belanja, serta memberikan skor keyakinan (*confidence score*).
 
-### B. Behavior Spike Prediction
-*   **Pemodelan Deep & Cross Network (DCN)**: Model tabular deep learning berbasis TensorFlow Keras untuk memetakan hubungan non-linear yang rumit dari data pengeluaran (nominal, bulan, tanggal, minggu, status akhir pekan, rolling spending 7 hari terakhir, merchant, metode pembayaran, media pembayaran, hari, dan waktu).
-*   **Lapisan Khusus (Cross-Feature Layer)**: Mengimplementasikan kalkulasi perkalian silang fitur numerik dan kategorikal tersemat (*embedded feature vectors*) pada setiap iterasi pelatihan untuk mendeteksi korelasi pola konsumsi anomali secara mendalam.
-*   **Rekomendasi Generatif (Gemini API Integration)**: Apabila kunci API `GEMINI_API_KEY` dikonfigurasi, AI secara dinamis merangkum hasil prediksi probabilitas spike menjadi 1-2 kalimat saran keuangan taktis dalam Bahasa Indonesia menggunakan model LLM Gemini. Jika kunci kosong, sistem beralih otomatis ke *rule-based fallback* terstruktur.
+### 2. Merchant & Category Classifier
+*   Mengklasifikasikan nama toko/merchant dan deskripsi belanja ke dalam kategori pengeluaran standar.
+*   Menerapkan model klasifikasi machine learning berbasis representasi teks tersemat (*text embeddings*) dengan *rule-based fallback pattern* untuk menjamin kecepatan dan keandalan respons API.
 
-### C. Overspending Forecast
-*   **Multitask MLP dengan Residual Dense Blocks**: Jaringan saraf tiruan multi-tugas yang mengevaluasi input vektor numerik ukuran `61` untuk menghasilkan dua output sekaligus: probabilitas terjadinya overspending sebelum penutupan bulan dan estimasi nominal kelebihan belanja (*overspending amount*).
-*   **Sigmoid Fallback**: Jika data kueri masukan untuk model tidak lengkap, sistem mengaktifkan model fallback berbasis aturan logika bisnis. Model ini memproyeksikan rata-rata belanja harian ke akhir bulan dan memetakan rasionya terhadap batas anggaran melalui fungsi logistik sigmoid (`1.0 / (1.0 + exp(-5.0 * (ratio - 1.0)))`) untuk menjamin kalkulasi probabilitas yang mulus dan konsisten.
+### 3. Behavior Spike Prediction (DCN)
+*   **Arsitektur Deep & Cross Network (DCN)**: Menggabungkan lapisan *Cross Network* (untuk menangkap interaksi fitur non-linear berulang secara eksplisit) dan lapisan *Deep Feed-Forward Neural Network* (untuk generalisasi representasi fitur mendalam).
+*   **Fitur Input**: Nominal transaksi, hari dalam minggu, status akhir pekan (*is_weekend*), jam transaksi, merchant, metode pembayaran, dan *rolling 7-day spending*.
+*   **Generative Narrative (Google Gemini API)**: Mengonversi hasil skor prediksi anomali menjadi kalimat saran finansial persuasif dalam Bahasa Indonesia menggunakan model Gemini (`gemini-3.1-flash-lite` / `gemini-1.5-flash`).
+
+### 4. Overspending Forecast (Multitask MLP)
+*   **Multitask MLP dengan Residual Dense Blocks**: Menerima vektor fitur numerik berdimensi `61` untuk mengevaluasi status pengeluaran berjalan pengguna.
+*   **Dual-Head Output**: Menghasilkan estimasi probabilitas terjadinya pembengkakan anggaran sebelum akhir bulan (*classification output*) sekaligus prediksi nominal kelebihan belanja (*regression output*).
+*   **Sigmoid Logistic Fallback**: Jika data historis pengguna belum mencukupi untuk inferensi model neural, sistem mengaktifkan model moving-average harian dengan fungsi pemetaan logistik sigmoid:
+    $$\text{Probability} = \frac{1}{1 + e^{-5.0 \times (\text{ratio} - 1.0)}}$$
 
 ---
 
-## 🗄️ Skema Database
+## 🗄️ Skema Database PostgreSQL
 
-SADAR Finance menggunakan database PostgreSQL dengan 9 tabel terelasi yang dioptimasi menggunakan indeks pencarian pada kolom kunci tamu (*foreign keys*) dan penanda waktu (*timestamps*):
+Database SADAR Finance menggunakan PostgreSQL 15 dengan 9 tabel terelasi yang telah dioptimasi dengan indeks performa, aturan *cascading delete*, dan tipe data biner untuk persistensi aset di cloud:
 
 ```
                                  +------------------+
@@ -182,236 +234,183 @@ SADAR Finance menggunakan database PostgreSQL dengan 9 tabel terelasi yang diopt
 +------------------+
 ```
 
-### Detail Kolom & Spesifikasi Tabel
+### Kamus Data & Spesifikasi Kolom:
 
-#### 1. Tabel `users`
-Menyimpan data akun utama pengguna. Kredensial sandi dienkripsi menggunakan *salt* bcrypt putaran `12`.
-*   `users_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `first_name`: `VARCHAR(100)` (Not Null)
-*   `last_name`: `VARCHAR(100)` (Not Null)
-*   `gender`: `VARCHAR(20)`
-*   `email`: `VARCHAR(255)` (Unique, Not Null)
-*   `password_hash`: `VARCHAR(255)` (Not Null)
-*   `phone_number`: `VARCHAR(20)`
-*   `date_of_birth`: `DATE`
-*   `address`: `TEXT`
-*   `profile_picture`: `TEXT`
-*   `occupation`: `VARCHAR(100)`
-*   `status`: `user_status` (Enum: `'active'`, `'inactive'`, `'suspended'`, Default: `'active'`)
-*   `created_at` / `updated_at`: `TIMESTAMPTZ`
-
-#### 2. Tabel `accounts`
-Dompet digital atau rekening bank milik pengguna.
-*   `account_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `account_name`: `VARCHAR(100)` (Not Null)
-*   `account_number`: `VARCHAR(50)`
-*   `balance`: `DECIMAL(15, 2)` (Default: `0.00`)
-*   `created_at` / `updated_at`: `TIMESTAMPTZ`
-
-#### 3. Tabel `transactions`
-Menyimpan detail pengeluaran harian pengguna.
-*   `transaction_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `account_id`: `UUID` (Foreign Key -> `accounts(account_id)` ON DELETE SET NULL)
-*   `category_group`: `VARCHAR(100)` (Pengelompokan anggaran: `'Needs'`, `'Wants'`, `'Savings'`, `'Other'`)
-*   `category_detail`: `VARCHAR(100)` (Kategori spesifik belanja, misal: `'Food & Dining'`, `'Transportation'`)
-*   `transaction_date`: `TIMESTAMPTZ` (Default: `NOW()`, Not Null)
-*   `description`: `TEXT`
-*   `source`: `VARCHAR(100)` (Sumber input, misal: `'manual'`, `'ocr'`)
-*   `amount`: `DECIMAL(15, 2)` (Check: `amount > 0`, Not Null)
-*   `created_at`: `TIMESTAMPTZ`
-
-#### 4. Tabel `incomes`
-Riwayat pemasukan finansial pengguna.
-*   `income_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `account_id`: `UUID` (Foreign Key -> `accounts(account_id)` ON DELETE SET NULL)
-*   `amount`: `DECIMAL(15, 2)` (Check: `amount > 0`, Not Null)
-*   `income_date`: `TIMESTAMPTZ` (Default: `NOW()`, Not Null)
-*   `source`: `VARCHAR(100)` (Nama pemasukan, misal: `'Gaji'`, `'Freelance'`)
-*   `created_at`: `TIMESTAMPTZ`
-
-#### 5. Tabel `budgets`
-Alokasi pembagian limit keuangan bulanan.
-*   `budget_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `income_id`: `UUID` (Foreign Key -> `incomes(income_id)` ON DELETE SET NULL)
-*   `needs_budget` / `needs_amount`: `DECIMAL(15, 2)` (Alokasi Kebutuhan)
-*   `wants_budget` / `wants_amount`: `DECIMAL(15, 2)` (Alokasi Keinginan)
-*   `investment_budget` / `investment_amount` / `savings_amount`: `DECIMAL(15, 2)` (Alokasi Tabungan)
-*   `income_amount` / `budget_limit` / `limit_amount`: `DECIMAL(15, 2)` (Limit Anggaran Gabungan)
-*   `percentage`: `DECIMAL(5, 2)`
-*   `source`: `VARCHAR(100)`
-*   `income_date`: `TIMESTAMPTZ`
-*   `created_at`: `TIMESTAMPTZ`
-
-#### 6. Tabel `insights`
-Hasil kalkulasi engine AI mengenai pola pengeluaran belanja pengguna.
-*   `insight_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `title`: `VARCHAR(255)` (Not Null)
-*   `description`: `TEXT`
-*   `created_at`: `TIMESTAMPTZ`
-
-#### 7. Tabel `alerts`
-Riwayat alert pembengkakan anggaran (*overspending warning*).
-*   `alert_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `message`: `TEXT` (Not Null)
-*   `alert_type`: `alert_type` (Enum: `'overspending'`, `'budget_exceeded'`, `'anomaly'`, `'reminder'`, `'info'`, Default: `'info'`)
-*   `created_at`: `TIMESTAMPTZ`
-
-#### 8. Tabel `scores`
-Log pencatatan skor kesehatan finansial pengguna dari waktu ke waktu.
-*   `score_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `score`: `INTEGER` (Check: `score BETWEEN 0 AND 100`)
-*   `created_at`: `TIMESTAMPTZ`
-
-#### 9. Tabel `ocr_scans`
-Tabel pencatatan audit pemrosesan gambar struk menggunakan OCR.
-*   `ocr_id`: `UUID` (Primary Key, Default: `uuid_generate_v4()`)
-*   `user_id`: `UUID` (Foreign Key -> `users(users_id)` ON DELETE CASCADE, Not Null)
-*   `image_url`: `TEXT` (Not Null)
-*   `image_data`: `BYTEA` (Menyimpan data biner gambar struk untuk menjamin persistensi gambar ketika di-deploy di cloud serverless seperti Railway yang bersifat ephemeral)
-*   `original_name`: `VARCHAR(255)`
-*   `mime_type`: `VARCHAR(50)`
-*   `file_size`: `INTEGER`
-*   `status`: `ocr_status` (Enum: `'pending'`, `'processing'`, `'completed'`, `'failed'`, Default: `'pending'`)
-*   `raw_text`: `TEXT` (Hasil ekstraksi OCR mentah)
-*   `parsed_data`: `JSONB` (Data terstruktur hasil parsing NLP)
-*   `confidence`: `DECIMAL(5, 4)`
-*   `transaction_id`: `UUID` (Foreign Key -> `transactions(transaction_id)` ON DELETE SET NULL)
-*   `error_message`: `TEXT`
-*   `processed_at` / `created_at`: `TIMESTAMPTZ`
+1. **`users`**: Informasi akun pengguna, kredensial sandi (bcrypt cost 12), dan status keanggotaan.
+   * `users_id` (UUID PK), `first_name`, `last_name`, `email` (Unique), `password_hash`, `phone_number`, `gender`, `date_of_birth`, `address`, `occupation`, `profile_picture`, `status` (`user_status`: `'active'`, `'inactive'`, `'suspended'`), `created_at`, `updated_at`.
+2. **`accounts`**: Rekening bank, e-wallet, atau dompet tunai milik pengguna.
+   * `account_id` (UUID PK), `user_id` (UUID FK), `account_name`, `account_number`, `balance` (DECIMAL 15,2), `created_at`, `updated_at`.
+3. **`transactions`**: Riwayat pengeluaran dana harian.
+   * `transaction_id` (UUID PK), `user_id` (UUID FK), `account_id` (UUID FK), `category_group` (`Needs`, `Wants`, `Savings`, `Other`), `category_detail` (Kategori spesifik), `transaction_date` (TIMESTAMPTZ), `description`, `source` (`manual`, `ocr`), `amount` (DECIMAL 15,2 > 0), `created_at`.
+4. **`incomes`**: Riwayat pemasukan uang.
+   * `income_id` (UUID PK), `user_id` (UUID FK), `account_id` (UUID FK), `amount` (DECIMAL 15,2 > 0), `income_date` (TIMESTAMPTZ), `source`, `created_at`.
+5. **`budgets`**: Penetapan pagu anggaran bulanan dan alokasi formula 50/30/20.
+   * `budget_id` (UUID PK), `user_id` (UUID FK), `income_id` (UUID FK), `needs_budget` / `needs_amount`, `wants_budget` / `wants_amount`, `investment_budget` / `investment_amount` / `savings_amount`, `income_amount`, `budget_limit` / `limit_amount`, `percentage`, `source`, `income_date`, `created_at`.
+6. **`insights`**: Rekomendasi dan evaluasi analitik perilaku belanja yang dihasilkan AI.
+   * `insight_id` (UUID PK), `user_id` (UUID FK), `title`, `description`, `created_at`.
+7. **`alerts`**: Log notifikasi risiko keuangan dan peringatan *overspending*.
+   * `alert_id` (UUID PK), `user_id` (UUID FK), `message`, `alert_type` (`'overspending'`, `'budget_exceeded'`, `'anomaly'`, `'reminder'`, `'info'`), `created_at`.
+8. **`scores`**: Histori kalkulasi skor kesehatan finansial (0–100).
+   * `score_id` (UUID PK), `user_id` (UUID FK), `score` (INTEGER 0–100), `created_at`.
+9. **`ocr_scans`**: Log audit pemrosesan gambar struk belanja.
+   * `ocr_id` (UUID PK), `user_id` (UUID FK), `transaction_id` (UUID FK), `image_url`, `image_data` (BYTEA — persistensi biner gambar agar tidak hilang pada lingkungan hosting *ephemeral* seperti Railway), `original_name`, `mime_type`, `file_size`, `status` (`'pending'`, `'processing'`, `'completed'`, `'failed'`), `raw_text`, `parsed_data` (JSONB), `confidence`, `error_message`, `processed_at`, `created_at`.
 
 ---
 
-## ⚙️ Skenario Integrasi Data & Autentikasi
+## ⚙️ Skenario Integrasi Data & Autentikasi Frontend
 
-Aplikasi web memiliki konfigurasi tingkat lanjut yang fleksibel untuk mempermudah transisi fase pengembangan, peninjauan demo, dan produksi melalui tiga opsi skenario data di file `.env` frontend:
+Frontend SADAR Finance dilengkapi sakelar konfigurasi lingkungan yang fleksibel di berkas `.env` untuk mendukung mode demonstrasi cepat, peninjauan juri/penguji, maupun integrasi penuh:
 
-```env
-# Konfigurasi Skenario Integrasi di frontend/.env
-VITE_SADAR_DATA_SCENARIO="mock-with-backend-auth" # Opsi: mock-with-backend-auth, backend-with-backend-auth, backend-only
-VITE_DEFAULTAUTH="sadar" # Opsi: sadar, fake
-```
+| Skenario (`VITE_SADAR_DATA_SCENARIO`) | Autentikasi | Sumber Data Finansial | Deskripsi Penggunaan |
+|---|---|---|---|
+| `backend-only` *(Default Production)* | Backend JWT Auth | PostgreSQL via Express API | Mode produksi ketat; seluruh autentikasi dan data berasal murni dari database. |
+| `backend-with-backend-auth` | Backend JWT Auth | PostgreSQL via Express API | Mode pengujian End-to-End penuh dengan akun pengguna aktif di database. |
+| `mock-with-backend-auth` | Backend JWT Auth | Mock Local Datasets | Mode demo cepat: Login diverifikasi ke server backend, namun tampilan dashboard memuat data sampel visual yang kaya. |
 
-### 1. Skenario `mock-with-backend-auth`
-Skenario ideal untuk demonstrasi antarmuka yang cepat tanpa perlu mengisi database pengguna.
-*   **Autentikasi**: *Real Backend Auth* (proses Login/Register diarahkan langsung ke REST API backend untuk verifikasi JWT asli dan pemuatan sesi `authUser`).
-*   **Data Finansial**: *Mock Data* (data Dashboard, Grafik, Catat Keuangan, Behavior Insight, dan Financial Score dimuat dari berkas mockup lokal `frontend/src/pages/SadarShared/mockData.js`).
-*   **Kredensial Login Bawaan**: `demo@sadarfinance.com` / `Demo@12345`.
-
-### 2. Skenario `backend-with-backend-auth`
-Skenario pengujian terintegrasi penuh (*End-to-End*).
-*   **Autentikasi**: *Real Backend Auth* via JWT.
-*   **Data Finansial**: *Real Database Data* (seluruh data transaksi, akun, anggaran, skor, dan insight bersumber langsung dari PostgreSQL via kueri Express REST API).
-
-### 3. Skenario `backend-only`
-Skenario mode produksi ketat (*Strict Production Mode*).
-*   Mewajibkan koneksi murni ke server backend tanpa ada toleransi pembacaan skenario simulasi ataupun fallback fake-auth.
-
-### Kredensial Tambahan untuk Mode Pengembang (Fake Auth)
-Jika `VITE_DEFAULTAUTH=fake` diaktifkan, frontend akan mensimulasikan login secara independen di sisi klien:
-*   **Email**: `aqyla@example.com`
-*   **Password**: `123456`
+*   **Kredensial Login Demo (Backend Auth)**:
+    *   *Email*: `demo@sadarfinance.com`
+    *   *Password*: `Demo@12345`
+*   **Mode Pengembang Mandiri (Fake Auth)**:
+    Jika `VITE_DEFAULTAUTH=fake` diaktifkan, login disimulasikan di klien menggunakan `aqyla@example.com` / `123456`.
 
 ---
 
 ## 🛠️ Spesifikasi Tech Stack
 
-| Komponen | Pustaka & Teknologi | Deskripsi |
+| Lapisan / Komponen | Teknologi & Pustaka | Peran & Deskripsi |
 | :--- | :--- | :--- |
-| **Frontend Core** | React 18, Vite 6, Redux Toolkit, React Router v7 | Pembangunan SPA interaktif, state global, dan perutean cepat. |
-| **UI & Styling** | Tailwind CSS v4, Bootstrap 5, Reactstrap, Sass | Sistem tata letak modern, responsivitas grid, dan visualisasi premium. |
-| **Charts** | ApexCharts, ECharts, Chart.js, react-apexcharts | Mesin perender grafik garis, donat, batang, dan radar secara interaktif. |
-| **Backend Core** | Node.js (>=18), Express.js | Kerangka kerja web server RESTful API modular. |
-| **Database Engine**| PostgreSQL 15+, pg (node-postgres) | Database relasional tangguh untuk persistensi data ACID. |
-| **Security Layer** | JWT, bcryptjs, Helmet, Express Rate Limit, CORS | Proteksi endpoint, enkripsi searah, pencegahan DDoS, & kontrol akses origin. |
-| **OCR Fallback** | tesseract.js | Pemrosesan citra struk lokal di backend jika AI microservice padam. |
-| **AI Microservice** | Python 3.8+, Flask, PyTesseract, Pillow | Server mikro pengeksekusi OCR dan NLP ekstraksi teks struk belanja. |
-| **ML Engine** | TensorFlow 2.18, NumPy, Pandas | Framework kompilasi, evaluasi, dan inferensi model DCN & MLP. |
-| **Generative AI** | Google Generative AI (Gemini SDK) | Pembuat narasi teks rekomendasi finansial kontekstual otomatis. |
+| **Gateway Layer** | Nginx Alpine, Docker | Smart reverse proxy, deteksi perangkat User-Agent, cookie routing, dan proxy API. |
+| **Frontend Desktop** | React 18, Vite 6, Redux Toolkit, React Router v7 | Single Page Application (SPA) desktop interaktif. |
+| **Frontend Mobile** | React 18, Vite 6, Service Worker, Web Manifest | Mobile Progressive Web App (PWA) dengan touch-first UI dan dukungan offline. |
+| **UI Styling & Animasi** | Tailwind CSS v4, Bootstrap 5, Sass, Framer Motion, GSAP | Desain visual modern, transisi halus, dan tata letak responsif. |
+| **Visualisasi Data** | ApexCharts, ECharts, Chart.js, react-apexcharts | Grafik batang arus kas, grafik donat kategori, dan diagram garis tren belanja. |
+| **Backend REST API** | Node.js (>=18), Express.js 4, Multer, Joi | Server API modular, validasi request ketat, dan penangan unggah berkas. |
+| **Database Engine** | PostgreSQL 15+, pg (`node-postgres`) | Database relasional ACID dengan indeks teroptimasi dan kolom biner BYTEA. |
+| **Keamanan Server** | JWT, bcryptjs, Helmet, Express Rate Limit, CORS | Proteksi endpoint, pembatasan laju permintaan, enkripsi sandi, dan keamanan HTTP. |
+| **Dokumentasi API** | Swagger UI Express, Swagger JSDoc (OpenAPI 3.0) | Dokumentasi interaktif REST API di `/api-docs`. |
+| **Hybrid OCR Engine** | Hugging Face OCR, tesseract.js, PyTesseract | Ekstraksi teks multi-tier dari gambar struk belanja. |
+| **AI LLM Reasoning** | Groq Cloud API (`openai/gpt-oss-20b`) | Parsing teks struk OCR menjadi data transaksi terstruktur berkecepatan tinggi. |
+| **Generative AI** | Google Generative AI (Gemini SDK) | Pembuatan teks rekomendasi finansial kontekstual dalam Bahasa Indonesia. |
+| **Machine Learning** | TensorFlow 2.18, Keras, NumPy, Pandas, Scikit-learn | Inferensi model Deep & Cross Network (DCN) dan Multitask MLP Overspending. |
+| **AI Microservice** | Python 3.8+, Flask, Flask-CORS, Pillow | Server inferensi AI prediktif dan prapemrosesan citra struk. |
 
 ---
 
-## 📂 Struktur Proyek
+## 📂 Struktur Direktori Repositori
 
 ```
 sadar-finance/
-├── ai/                         # Python AI Microservice
-│   ├── inference/              # Logika inferensi model (OCR, Behavior, Overspending)
-│   ├── models/                 # Berkas biner model TensorFlow (.keras) & Metadata JSON
-│   ├── preprocessing/          # Modul ekstraksi NLP struk belanja
-│   ├── tmp_uploads/            # Folder penyimpanan struk sementara
-│   ├── app.py                  # Entrypoint Flask Server
-│   ├── behavior_model.py       # Kelas arsitektur DCN ter-registrasi
-│   ├── requirements.txt        # Daftar dependensi Python
-│   └── train_behavior.py       # Skrip pelatihan model perilaku belanja
-├── backend/                    # Node.js Express Backend
-│   ├── config/                 # Kunci DB, CORS, JWT, dan skema Swagger OpenAPI
-│   ├── controllers/            # Modul logika penangan request API (CRUD & Auth)
-│   ├── db/                     # Berkas inisialisasi migrasi tabel & seed data demo
-│   ├── middlewares/            # Validator skema Joi, filter autentikasi, & error handler
-│   ├── repositories/           # Akses langsung kueri SQL PostgreSQL
-│   ├── routes/                 # Deklarasi router endpoints Express
-│   ├── services/               # Logika bisnis inti & pemanggil API AI Microservice
-│   ├── utils/                  # Helper response format & penangan error DB
-│   ├── validators/             # Skema validasi request input body Joi
-│   ├── uploads/                # Direktori penyimpanan fisik berkas struk
-│   └── server.js               # Entrypoint Utama Backend Server
-├── frontend/                   # React Vite Frontend SPA
-│   ├── public/                 # Aset ikon dan media statis publik
+├── ai/                                 # Python AI Microservice (Flask & TensorFlow)
+│   ├── dataset/                        # Dataset pelatihan model
+│   ├── docs/                           # Dokumentasi spesifik modul AI
+│   ├── inference/                      # Skrip inferensi model runtime (OCR, Behavior, Overspending, Categorizer)
+│   ├── models/                         # Bobot model biner (.keras) & Metadata JSON
+│   ├── preprocessing/                  # Modul pemrosesan teks NLP struk belanja
+│   ├── tmp_uploads/                    # Direktori penyimpanan sementara citra struk
+│   ├── app.py                          # Entrypoint Flask Server AI
+│   ├── behavior_model.py               # Definisi custom layer & arsitektur model DCN
+│   ├── Dockerfile                      # Spesifikasi build container AI
+│   └── requirements.txt                # Daftar pustaka dependensi Python
+│
+├── backend/                            # Node.js Express RESTful API Server
+│   ├── config/                         # Konfigurasi Database, CORS, Rate Limit, JWT, & Swagger
+│   ├── controllers/                    # Penangan alur request/response API (Auth, Transaksi, OCR, dll.)
+│   ├── db/                             # Skrip migrasi skema tabel (migrate.js) & data seed (seed.js)
+│   ├── middlewares/                    # Middleware autentikasi JWT, validasi Joi, & error handler
+│   ├── repositories/                   # Layer akses kueri langsung SQL PostgreSQL
+│   ├── routes/                         # Deklarasi rute endpoint RESTful API v1
+│   ├── services/                       # Logika bisnis inti (OCR pipeline, Groq AI, Analytics, Transaksi)
+│   ├── utils/                          # Helper respon JSON terstandarisasi & penangan error DB
+│   ├── validators/                     # Skema validasi skema input Joi
+│   ├── uploads/                        # Direktori penyimpanan fisik berkas struk
+│   ├── Dockerfile                      # Spesifikasi build container backend
+│   ├── package.json                    # Dependensi & skrip backend Node.js
+│   └── server.js                       # Entrypoint utama server Express
+│
+├── frontend/                           # React 18 SPA Desktop Web Client
+│   ├── public/                         # Aset statis publik, logo, dan favicon
 │   ├── src/
-│   │   ├── Components/         # Komponen UI global & berkas API client (`api.js`)
-│   │   ├── Layouts/            # Tata letak global (Sidebar, Topbar, Footer)
-│   │   ├── pages/              # Halaman SPA (SadarDashboard, SadarBehavior, dll)
-│   │   ├── Routes/             # Konfigurasi perutean publik/terproteksi
-│   │   ├── slices/             # Redux Slice autentikasi dan layout
-│   │   ├── index.css           # Styling dasar global
-│   │   ├── tailwind.css        # Konfigurasi direktif Tailwind v4
-│   │   └── main.jsx            # Rendering root React klien
-│   ├── tsconfig.json           # Setelan kompilasi TypeScript
-│   └── vite.config.js          # Konfigurasi bundle Vite
-├── data/                       # Dataset latih model & file uji coba (.png)
-└── sadar-finance.md            # Dokumentasi rancangan sistem asli
+│   │   ├── Components/                 # Komponen UI modular & client API axios
+│   │   ├── Layouts/                    # Layout global (Sidebar, Header, Footer)
+│   │   ├── pages/                      # Halaman aplikasi (Dashboard, Catat, Score, History, dll.)
+│   │   ├── Routes/                     # Konfigurasi perutean React Router v7
+│   │   ├── slices/                     # Redux slices untuk auth dan tata letak
+│   │   ├── tailwind.css                # Konfigurasi Tailwind CSS v4
+│   │   └── main.jsx                    # Root render React klien
+│   ├── Dockerfile                      # Spesifikasi build container frontend desktop
+│   ├── package.json                    # Dependensi frontend desktop
+│   └── vite.config.js                  # Konfigurasi bundler Vite
+│
+├── frontend-mobile/                    # React 18 Mobile Progressive Web App (PWA)
+│   ├── public/                         # Manifest PWA (manifest.webmanifest), Service Worker (sw.js), & Icon
+│   ├── src/                            # Komponen & halaman aplikasi yang dioptimasi untuk mobile
+│   ├── Dockerfile                      # Spesifikasi build container frontend mobile
+│   ├── package.json                    # Dependensi frontend mobile
+│   └── vite.config.js                  # Konfigurasi bundler Vite mobile
+│
+├── gateway/                            # Nginx Smart Reverse Proxy & Gateway Layer
+│   ├── Dockerfile                      # Spesifikasi build Nginx gateway
+│   ├── mobile-ui-choice.js             # Skrip injeksi pemilih UI mobile/desktop
+│   └── nginx.conf                      # Konfigurasi routing User-Agent & Reverse Proxy
+│
+├── docs/                               # Panduan integrasi, AI deployment, dan handoff teknis
+├── documentation/                      # Dokumentasi komprehensif (PRD, Arsitektur, DB, API, Desain)
+├── scripts/                            # Skrip utilitas pengujian dan kompresi
+├── docker-compose.yml                  # Orkestrasi multi-container produksi lokal
+├── sadar-finance.md                    # Ringkasan rancangan awal sistem
+└── vercel.json                         # Konfigurasi routing deploy Vercel
 ```
 
 ---
 
 ## ⚡ Panduan Konfigurasi Variabel Lingkungan (.env)
 
-Untuk menjalankan sistem secara lengkap, salin berkas contoh `.env.example` ke `.env` pada masing-masing subdirektori dan lengkapi nilainya:
+Salin berkas template `.env.example` menjadi `.env` pada masing-masing subfolder service:
 
 ### 1. Backend (`backend/.env`)
 ```env
 NODE_ENV=development
 PORT=3000
+CORS_ORIGINS=http://localhost:5173,http://localhost:5174,https://*.vercel.app
 
-# PostgreSQL Configuration
+# Konfigurasi PostgreSQL
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=sadar_finance
 DB_USER=postgres
-DB_PASSWORD=your_local_postgres_password  # Isi dengan kata sandi PostgreSQL lokal Anda
+DB_PASSWORD=your_local_postgres_password
 DB_SSL=false
 
-# JWT Configuration
+# Autentikasi JWT
 JWT_SECRET=your_super_secret_jwt_key_change_in_production
 JWT_EXPIRES_IN=7d
 
-# AI Microservice URL
-AI_SERVICE_URL=http://localhost:5000
-AI_SERVICE_TIMEOUT_MS=10000
-AI_MOCK_MODE=false # Set true untuk mensimulasikan hasil model tanpa memicu Flask server
+# Microservice AI (Hugging Face / Lokal)
+AI_SERVICE_URL=https://sadar-finance-sadar-finance-ai.hf.space
+AI_API_KEY=
+AI_SERVICE_TIMEOUT_MS=15000
+AI_MOCK_MODE=false
 
-# Rate Limiting
+# Multi-Endpoint OCR
+HF_OCR_PRIMARY_URL=https://sadar-finance-sadar-finance-ai.hf.space
+HF_OCR_PRIMARY_TOKEN=
+HF_OCR_SECONDARY_URL=
+HF_OCR_SECONDARY_TOKEN=
+HF_OCR_TIMEOUT_MS=20000
+HF_OCR_MIN_QUALITY=0.65
+OCR_LOCAL_FALLBACK=true
+
+# Groq AI Receipt Interpretation (Server-side LLM)
+GROQ_API_KEY=your_groq_cloud_api_key_here
+GROQ_MODEL=openai/gpt-oss-20b
+GROQ_TIMEOUT_MS=15000
+GROQ_REASONING_EFFORT=low
+
+# Rate Limiter & Unggah Berkas
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX=600
-
-# File Upload Configuration
+AUTH_RATE_LIMIT_WINDOW_MS=900000
+AUTH_RATE_LIMIT_MAX=50
 MAX_FILE_SIZE_MB=10
 UPLOAD_DIR=uploads
 ```
@@ -419,140 +418,140 @@ UPLOAD_DIR=uploads
 ### 2. AI Microservice (`ai/.env`)
 ```env
 PORT=5000
-GOOGLE_API_KEY=your_gemini_api_key_here  # Opsional: Untuk membuat saran finansial Generative AI
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe  # Path binary Tesseract di Windows
 GENERATIVE_AI_MODEL=gemini-3.1-flash-lite
-OCR_TIMEOUT_SECONDS=15
-OCR_TARGET_WIDTH=600
-OCR_MAX_HEIGHT=1800
-
-# Lokasi Tesseract OCR Engine di Windows (Penting)
-TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+GEMINI_API_KEY=your_google_gemini_api_key_here             # Opsional: Untuk saran teks AI
 ```
 
-### 3. Frontend (`frontend/.env`)
+### 3. Frontend Desktop (`frontend/.env`)
 ```env
-VITE_DEFAULTAUTH=sadar # Pilihan: sadar (Backend), fake (Simulasi Klien)
+VITE_DEFAULTAUTH=sadar
 VITE_API_URL=http://localhost:3000/api/v1
 VITE_AI_URL=http://localhost:5000
+VITE_SADAR_DATA_SCENARIO=backend-only
+```
 
-# Skenario Data Utama
-VITE_SADAR_DATA_SCENARIO="mock-with-backend-auth" # Pilihan: mock-with-backend-auth, backend-with-backend-auth, backend-only
-VITE_SADAR_DEMO_MODE=true
-VITE_SADAR_NEW_USER_PREVIEW=false
+### 4. Frontend Mobile PWA (`frontend-mobile/.env`)
+```env
+VITE_DEFAULTAUTH=sadar
+VITE_API_URL=http://localhost:3000/api/v1
+VITE_AI_URL=http://localhost:5000
+VITE_SADAR_DATA_SCENARIO=backend-only
 ```
 
 ---
 
-## 🚀 Panduan Memulai Proyek
+## 🚀 Panduan Memulai & Menjalankan Aplikasi
 
-### Prasyarat Perangkat Keras & Lunak
-*   **Node.js** (Versi LTS >= 18) & npm.
-*   **PostgreSQL** (Versi >= 15) terpasang lokal.
-*   **Python** (Versi >= 3.8) beserta virtual environment (`venv`).
-*   **Tesseract OCR Engine** terpasang di sistem operasi Anda.
+Anda dapat menjalankan ekosistem SADAR Finance menggunakan **Docker Compose (Direkomendasikan)** atau **Secara Manual**.
 
-#### Pemasangan Tesseract OCR Engine:
-*   **Windows**:
-    Unduh dan jalankan installer resmi dari UB-Mannheim. Atau pasang via terminal:
-    ```powershell
-    winget install --id UB-Mannheim.TesseractOCR -e
-    ```
-    Secara default, engine akan terpasang di `C:\Program Files\Tesseract-OCR\tesseract.exe`. Pastikan jalur ini diisi pada variabel `TESSERACT_CMD` di file `ai/.env`.
-*   **macOS**:
-    ```bash
-    brew install tesseract tesseract-lang
-    ```
-*   **Linux (Ubuntu/Debian)**:
-    ```bash
-    sudo apt update
-    sudo apt install tesseract-ocr tesseract-ocr-ind
-    ```
+### Opsi A: Menjalankan via Docker Compose (Semua Layanan Otomatis)
+
+Pastikan [Docker Desktop](https://www.docker.com/products/docker-desktop/) telah terpasang dan berjalan:
+
+```bash
+# 1. Masuk ke direktori root proyek
+cd sadar-finance
+
+# 2. Bangun dan jalankan seluruh container secara simultan
+docker compose up --build
+```
+
+Setelah seluruh container siap:
+*   **Aplikasi Web (Gateway)**: `http://localhost` (Otomatis mendeteksi perangkat desktop atau smartphone).
+*   **RESTful API Backend**: `http://localhost:5000/api/v1`
+*   **Swagger API Docs**: `http://localhost:5000/api-docs`
+*   **Health Check**: `http://localhost/health`
 
 ---
 
-### Langkah Penyiapan & Menjalankan Aplikasi
+### Opsi B: Menjalankan Secara Manual (Multi-Terminal)
 
-Jalankan 3 terminal terpisah untuk menghidupkan ekosistem SADAR Finance secara simultan:
+#### Prasyarat Lingkungan Lokal:
+*   **Node.js** (Versi LTS >= 18) & npm.
+*   **PostgreSQL** (Versi >= 15) aktif di sistem lokal.
+*   **Python** (Versi >= 3.8) beserta virtual environment (`venv`).
+*   **Tesseract OCR Engine** terpasang di OS Anda:
+    *   *Windows*: Pasang via `winget install --id UB-Mannheim.TesseractOCR -e` (Lokasi default: `C:\Program Files\Tesseract-OCR\tesseract.exe`).
+    *   *macOS*: `brew install tesseract tesseract-lang`
+    *   *Linux (Ubuntu/Debian)*: `sudo apt update && sudo apt install tesseract-ocr tesseract-ocr-ind`
 
-#### Terminal 1: REST API Backend & Database
-1.  Masuk ke direktori backend dan pasang dependensi:
-    ```bash
-    cd backend
-    npm install
-    ```
-2.  Pastikan PostgreSQL Anda aktif, buat database kosong bernama `sadar_finance` via pgAdmin atau shell psql:
-    ```sql
-    CREATE DATABASE sadar_finance;
-    ```
-3.  Jalankan kueri pembuatan tabel (Migrasi) dan pengisian data uji coba awal (Seeding):
-    ```bash
-    npm run db:migrate
-    npm run db:seed
-    ```
-4.  Aktifkan server backend dalam mode pengembang:
-    ```bash
-    npm run dev
-    ```
-    *   **Server aktif di**: `http://localhost:3000`
-    *   **Swagger API Docs**: `http://localhost:3000/api-docs`
+#### Langkah Eksekusi Terminal:
 
-#### Terminal 2: AI Microservice
-1.  Masuk ke direktori AI dan buat virtual environment Python:
-    ```bash
-    cd ai
-    python -m venv venv
-    ```
-2.  Aktifkan lingkungan virtual:
-    *   *Windows (Command Prompt / PowerShell)*:
-        ```powershell
-        venv\Scripts\activate
-        ```
-    *   *macOS / Linux*:
-        ```bash
-        source venv/bin/activate
-        ```
-3.  Pasang dependensi pustaka Python:
-    ```bash
-    pip install -r requirements.txt
-    ```
-4.  Aktifkan server Flask AI:
-    ```bash
-    python app.py
-    ```
-    *   **Layanan aktif di**: `http://localhost:5000`
-    *   **Verifikasi Kesehatan Layanan**: `curl http://localhost:5000/health`
+##### 🟢 Terminal 1: Backend REST API & PostgreSQL
+```bash
+cd backend
+npm install
 
-#### Terminal 3: Frontend SPA
-1.  Masuk ke direktori frontend dan pasang dependensi Node modules:
-    ```bash
-    cd frontend
-    npm install
-    ```
-2.  Jalankan server Vite lokal:
-    ```bash
-    npm run dev
-    ```
-    *   **Layanan web aktif di**: `http://localhost:5173`
+# Buat database 'sadar_finance' via psql / pgAdmin terlebih dahulu jika belum ada
+npm run db:migrate   # Membuat struktur 9 tabel
+npm run db:seed      # Mengisi data awal uji coba
+npm run dev          # Menjalankan server Express di http://localhost:3000
+```
+
+##### 🟢 Terminal 2: AI Microservice (Python Flask)
+```bash
+cd ai
+python -m venv venv
+
+# Aktivasi Virtual Environment
+# Windows: venv\Scripts\activate
+# Linux/macOS: source venv/bin/activate
+
+pip install -r requirements.txt
+python app.py        # Menjalankan Flask di http://localhost:5000
+```
+
+##### 🟢 Terminal 3: Frontend Desktop (React Web)
+```bash
+cd frontend
+npm install
+npm run dev          # Menjalankan Vite Desktop di http://localhost:5173
+```
+
+##### 🟢 Terminal 4: Frontend Mobile PWA (Opsional untuk pengujian mobile)
+```bash
+cd frontend-mobile
+npm install
+npm run dev          # Menjalankan Vite Mobile PWA di http://localhost:5174
+```
 
 Buka peramban browser Anda ke `http://localhost:5173` untuk mulai menjelajahi SADAR Finance.
 
 ---
 
-## 🔎 Penanganan Kendala (Troubleshooting)
+## ☁️ Panduan Deployment Cloud
 
-*   **Error: "TesseractError" / "pytesseract.TesseractNotFoundError"**:
-    *   Penyebab: Python tidak dapat menemukan berkas biner Tesseract OCR.
-    *   Solusi: Pastikan Tesseract telah terpasang dengan benar di sistem Anda. Buka berkas `ai/.env` dan verifikasi kembali bahwa variabel `TESSERACT_CMD` menunjuk tepat ke berkas `tesseract.exe` (misalnya: `C:\Program Files\Tesseract-OCR\tesseract.exe` pada Windows). Setelah melakukan perubahan `.env`, restart terminal Flask AI.
+Aplikasi ini telah dirancang untuk siap di-deploy secara mudah ke infrastruktur cloud modern:
+
+1. **Frontend Desktop & Mobile (Vercel)**:
+   * Hubungkan repositori GitHub ke Vercel.
+   * Tetapkan Root Directory ke `frontend` (untuk versi desktop) atau `frontend-mobile` (untuk PWA).
+   * File `vercel.json` telah menyertakan aturan *URL rewrite* otomatis untuk merutekan panggilan `/api/v1/*` dan `/uploads/*` ke backend Railway.
+2. **Backend & Database PostgreSQL (Railway)**:
+   * Buat project baru di Railway, tambahkan layanan **PostgreSQL Database**.
+   * Tambahkan layanan web yang mengarah ke direktori `backend/`. Konfigurasikan variabel environment (`DATABASE_URL`, `JWT_SECRET`, `AI_SERVICE_URL`, `GROQ_API_KEY`, dll.).
+   * Jalankan migrasi dan seeding via Railway CLI atau interface terminal Railway: `npm run db:migrate && npm run db:seed`.
+3. **AI Microservice (Hugging Face Spaces)**:
+   * Buat Space baru dengan tipe **Docker Space**.
+   * Unggah seluruh isi direktori `ai/` beserta berkas `Dockerfile`, bobot model `.keras`, dan `requirements.txt`.
+
+---
+
+## 🔎 Penanganan Kendala (Troubleshooting & FAQ)
+
+*   **Error: "pytesseract.TesseractNotFoundError" pada Microservice AI**:
+    *   *Solusi*: Pastikan Tesseract OCR telah terpasang. Verifikasi berkas `ai/.env` agar variabel `TESSERACT_CMD` menunjuk tepat ke file executable `tesseract.exe`.
 *   **Koneksi Database PostgreSQL Gagal**:
-    *   Penyebab: Kredensial password atau port database di `backend/.env` tidak tepat.
-    *   Solusi: Jalankan skrip diagnostik mandiri dari backend untuk memverifikasi detail koneksi database:
+    *   *Solusi*: Jalankan skrip diagnostik mandiri untuk memeriksa koneksi:
         ```bash
         npm run db:check
         ```
-*   **Tombol "Proses OCR" Tidak Merespons / Mengalami Timeout**:
-    *   Solusi: 
-        1. Pastikan server Flask AI di terminal 2 menyala di port `5000`.
-        2. Pastikan Anda telah melakukan proses login (sesi aktif) sebelum memicu fallback lokal OCR backend, karena endpoint `/ocr/upload` backend memerlukan otorisasi token Bearer JWT yang valid.
+        Pastikan username, password, port (default `5432`), dan status service PostgreSQL lokal Anda telah aktif.
+*   **Gambar Struk Hilang Setelah Restart Server / Deploy di Cloud**:
+    *   *Solusi*: SADAR Finance secara otomatis menyimpan data biner struk ke dalam kolom `image_data BYTEA` pada tabel `ocr_scans`. Endpoint `/uploads/:filename` backend akan otomatis membaca data dari PostgreSQL jika file fisik pada disk tidak ditemukan.
+*   **Peringatan "Too Many Requests" (HTTP 429)**:
+    *   *Solusi*: Backend menerapkan rate limiter terpisah untuk menjaga keamanan. Batas auth default adalah 50 percobaan / 15 menit dan API reguler 600 request / 15 menit. Anda dapat menyesuaikannya melalui variabel `RATE_LIMIT_MAX` di `backend/.env`.
 
 ---
 
@@ -560,20 +559,22 @@ Buka peramban browser Anda ke `http://localhost:5173` untuk mulai menjelajahi SA
 
 Proyek sistem cerdas ini dikembangkan oleh kolaborasi lintas peran dari **SADAR Finance Team**:
 
-1.  **Diah Ayu Puspasari** (CDCC156D6X1244) - *Data Scientist*
-2.  **Marsela** (CDCC156D6X028) - *Data Scientist*
-3.  **Farrel Al Faqih Ekatama** (CACC295D6Y0695) - *AI Engineer*
-4.  **Dzaky Jaisy Al-Qorney** (CACC349D6Y1657) - *AI Engineer*
-5.  **Fhazar Raffiful Aqyla** (CFCC882D6Y0583) - *Full Stack Developer*
-6.  **Muhammad Habib Rafi** (CFCC220D6Y1309) - *Full Stack Developer*
+1. **Diah Ayu Puspasari** (CDCC156D6X1244) — *Data Scientist*
+2. **Marsela** (CDCC156D6X028) — *Data Scientist*
+3. **Farrel Al Faqih Ekatama** (CACC295D6Y0695) — *AI Engineer*
+4. **Dzaky Jaisy Al-Qorney** (CACC349D6Y1657) — *AI Engineer*
+5. **Fhazar Raffiful Aqyla** (CFCC882D6Y0583) — *Full Stack Developer*
+6. **Muhammad Habib Rafi** (CFCC220D6Y1309) — *Full Stack Developer*
 
 ---
 
 ## 📚 Tautan & Sumber Daya Referensi
-*   [Dokumentasi React 18](https://react.dev/)
-*   [Panduan Vite.js](https://vite.dev/)
-*   [Dokumentasi Express.js](https://expressjs.com/)
-*   [PostgreSQL 15 Manual](https://www.postgresql.org/docs/15/index.html)
-*   [TensorFlow Keras Guide](https://www.tensorflow.org/guide/keras)
-*   [Swagger OpenAPI Spec](https://swagger.io/docs/)
-*   [Pytesseract OCR Engine](https://github.com/madmaze/pytesseract)
+* [Dokumentasi React 18](https://react.dev/)
+* [Panduan Vite.js](https://vite.dev/)
+* [Dokumentasi Express.js](https://expressjs.com/)
+* [PostgreSQL 15 Manual](https://www.postgresql.org/docs/15/index.html)
+* [TensorFlow Keras Guide](https://www.tensorflow.org/guide/keras)
+* [Groq Cloud API Documentation](https://console.groq.com/docs/quickstart)
+* [Google Gemini API Docs](https://ai.google.dev/docs)
+* [Pytesseract OCR Engine](https://github.com/madmaze/pytesseract)
+* [Swagger OpenAPI Specification](https://swagger.io/docs/)
