@@ -27,10 +27,14 @@ const app = express();
 app.set('trust proxy', 1);
 app.set('etag', false);
 
-// ── Ensure upload directory exists ──────────────────────────
+// ── Ensure upload & downloads directories exist ─────────────
 const uploadDir = path.join(__dirname, config.upload.dir);
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+}
+const downloadsDir = path.join(__dirname, 'downloads');
+if (!fs.existsSync(downloadsDir)) {
+  fs.mkdirSync(downloadsDir, { recursive: true });
 }
 
 const rateLimitMessage = {
@@ -75,7 +79,10 @@ const setUploadResponseHeaders = (res) => {
 };
 
 // ── Global Middleware ───────────────────────────────────────
-app.use(helmet());                                      // Security headers
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));                                                    // Security headers
 app.use(cors({
   origin(origin, callback) {
     const allowedOrigins = config.cors.allowedOrigins;
@@ -127,6 +134,15 @@ app.use('/api/', rateLimit({
 app.use('/uploads', express.static(uploadDir, {
   setHeaders: setUploadResponseHeaders,
 }));
+app.use('/downloads', express.static(downloadsDir, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.apk')) {
+      res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+      res.setHeader('Content-Disposition', 'attachment; filename="SADAR-Finance-latest.apk"');
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  },
+}));
 app.get('/uploads/:filename', async (req, res, next) => {
   try {
     const image = await ocrRepository.findImageByUrl(`/uploads/${req.params.filename}`);
@@ -154,6 +170,31 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 app.get('/api-docs.json', (_req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
+});
+
+// ── Root & Health Check ─────────────────────────────────────
+const webDir = path.join(__dirname, 'public_web');
+const hasWebLanding = fs.existsSync(path.join(webDir, 'index.html'));
+
+if (hasWebLanding) {
+  app.use(express.static(webDir, { maxAge: '7d', index: false }));
+}
+
+app.get('/', (req, res) => {
+  if (hasWebLanding) {
+    return res.sendFile(path.join(webDir, 'index.html'));
+  }
+  return res.json({
+    success: true,
+    message: 'SADAR Finance API',
+    data: {
+      version: '1.0.0',
+      environment: config.env,
+      docs: '/api-docs',
+      health: '/health',
+      apiBase: '/api/v1',
+    },
+  });
 });
 
 // ── Health Check ────────────────────────────────────────────
@@ -194,8 +235,24 @@ app.get('/health/db', async (_req, res, next) => {
 // ── API Routes ──────────────────────────────────────────────
 app.use('/api/v1', routes);
 
+// ── SPA Fallback for Web Landing & Install Page ─────────────
+if (hasWebLanding) {
+  app.get('*', (req, res, next) => {
+    if (
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/uploads') ||
+      req.path.startsWith('/downloads') ||
+      req.path.startsWith('/health')
+    ) {
+      return next();
+    }
+    return res.sendFile(path.join(webDir, 'index.html'));
+  });
+}
+
 // ── 404 Handler ─────────────────────────────────────────────
 app.use((_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   res.status(404).json({
     success: false,
     error: {

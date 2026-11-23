@@ -1,0 +1,1068 @@
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/constants/bank_data.dart';
+import '../core/storage/local_finance_store.dart';
+import '../data/models/account_model.dart';
+import '../data/models/analytics_models.dart';
+import '../data/models/budget_model.dart';
+import '../data/models/income_model.dart';
+import '../data/models/transaction_model.dart';
+import '../data/services/sadar_api_service.dart';
+import 'auth_provider.dart';
+
+final localFinanceStoreProvider = Provider<LocalFinanceStore>(
+  (ref) => LocalFinanceStore(),
+);
+
+class FinanceState {
+  final bool isLoading;
+  final bool isOffline;
+  final bool isSyncing;
+  final int pendingSyncCount;
+  final DateTime? lastSyncedAt;
+  final String? error;
+  final List<AccountModel> accounts;
+  final List<TransactionModel> transactions;
+  final List<IncomeModel> incomes;
+  final BudgetModel? budget;
+  final HealthScoreResult? healthScore;
+  final List<ScoreHistoryItem> scoreHistory;
+  final List<InsightModel> insights;
+  final List<AlertModel> alerts;
+  final BehaviorPredictionModel? behaviorPrediction;
+  final OverspendingForecastModel? overspendingForecast;
+  final String scorePeriod;
+
+  const FinanceState({
+    this.isLoading = false,
+    this.isOffline = false,
+    this.isSyncing = false,
+    this.pendingSyncCount = 0,
+    this.lastSyncedAt,
+    this.error,
+    this.accounts = const [],
+    this.transactions = const [],
+    this.incomes = const [],
+    this.budget,
+    this.healthScore,
+    this.scoreHistory = const [],
+    this.insights = const [],
+    this.alerts = const [],
+    this.behaviorPrediction,
+    this.overspendingForecast,
+    this.scorePeriod = '3m',
+  });
+
+  double get totalBalance => accounts.fold(0, (sum, a) => sum + a.balance);
+
+  double get currentMonthIncome {
+    final now = DateTime.now();
+    return incomes
+        .where((i) =>
+            i.incomeDate.year == now.year && i.incomeDate.month == now.month)
+        .fold(0, (sum, i) => sum + i.amount);
+  }
+
+  double get currentMonthExpense {
+    final now = DateTime.now();
+    return transactions
+        .where((t) =>
+            t.transactionDate.year == now.year &&
+            t.transactionDate.month == now.month &&
+            t.categoryGroup != 'Savings')
+        .fold(0, (sum, t) => sum + t.amount);
+  }
+
+  double get currentMonthTotalOutflow {
+    final now = DateTime.now();
+    return transactions
+        .where((t) =>
+            t.transactionDate.year == now.year &&
+            t.transactionDate.month == now.month)
+        .fold(0, (sum, t) => sum + t.amount);
+  }
+
+  double get remainingBudget {
+    if (budget == null) return currentMonthIncome - currentMonthExpense;
+    return budget!.totalLimit - currentMonthTotalOutflow;
+  }
+
+  int get totalRecordsCount => transactions.length + incomes.length;
+
+  Map<String, double> get categoryTotalsCurrentMonth {
+    final now = DateTime.now();
+    final map = <String, double>{'Needs': 0, 'Wants': 0, 'Savings': 0};
+    for (final t in transactions) {
+      if (t.transactionDate.year == now.year &&
+          t.transactionDate.month == now.month) {
+        if (map.containsKey(t.categoryGroup)) {
+          map[t.categoryGroup] = (map[t.categoryGroup] ?? 0) + t.amount;
+        } else {
+          map['Needs'] = (map['Needs'] ?? 0) + t.amount;
+        }
+      }
+    }
+    return map;
+  }
+
+  String accountNameById(String? accountId) {
+    if (accountId == null || accountId.isEmpty) return '-';
+    for (final a in accounts) {
+      if (a.id == accountId) return a.name;
+    }
+    return '-';
+  }
+
+  FinanceState copyWith({
+    bool? isLoading,
+    bool? isOffline,
+    bool? isSyncing,
+    int? pendingSyncCount,
+    DateTime? lastSyncedAt,
+    String? error,
+    bool clearError = false,
+    List<AccountModel>? accounts,
+    List<TransactionModel>? transactions,
+    List<IncomeModel>? incomes,
+    BudgetModel? budget,
+    HealthScoreResult? healthScore,
+    List<ScoreHistoryItem>? scoreHistory,
+    List<InsightModel>? insights,
+    List<AlertModel>? alerts,
+    BehaviorPredictionModel? behaviorPrediction,
+    OverspendingForecastModel? overspendingForecast,
+    String? scorePeriod,
+  }) {
+    return FinanceState(
+      isLoading: isLoading ?? this.isLoading,
+      isOffline: isOffline ?? this.isOffline,
+      isSyncing: isSyncing ?? this.isSyncing,
+      pendingSyncCount: pendingSyncCount ?? this.pendingSyncCount,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      error: clearError ? null : (error ?? this.error),
+      accounts: accounts ?? this.accounts,
+      transactions: transactions ?? this.transactions,
+      incomes: incomes ?? this.incomes,
+      budget: budget ?? this.budget,
+      healthScore: healthScore ?? this.healthScore,
+      scoreHistory: scoreHistory ?? this.scoreHistory,
+      insights: insights ?? this.insights,
+      alerts: alerts ?? this.alerts,
+      behaviorPrediction: behaviorPrediction ?? this.behaviorPrediction,
+      overspendingForecast: overspendingForecast ?? this.overspendingForecast,
+      scorePeriod: scorePeriod ?? this.scorePeriod,
+    );
+  }
+}
+
+class FinanceNotifier extends StateNotifier<FinanceState> {
+  final SadarApiService _api;
+  final LocalFinanceStore _store;
+  final String? Function() _currentUserId;
+  StreamSubscription<List<ConnectivityResult>>? _connSub;
+  String? _activeUserId;
+
+  FinanceNotifier(this._api, this._store, this._currentUserId)
+      : super(const FinanceState()) {
+    _listenConnectivity();
+  }
+
+  String get _uid => _activeUserId ?? _currentUserId() ?? 'default';
+
+  void _listenConnectivity() {
+    try {
+      _connSub = Connectivity().onConnectivityChanged.listen((results) {
+        final hasNet = results.any((r) => r != ConnectivityResult.none);
+        if (!hasNet) {
+          if (mounted) state = state.copyWith(isOffline: true);
+        } else {
+          // Connection restored — auto-sync pending local changes & refresh!
+          if (mounted && (state.isOffline || state.pendingSyncCount > 0)) {
+            syncPendingAndRefresh();
+          }
+        }
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _connSub?.cancel();
+    super.dispose();
+  }
+
+  static bool _isNetworkError(Object e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('socketexception') ||
+        msg.contains('tidak dapat terhubung') ||
+        msg.contains('koneksi') ||
+        msg.contains('timeout') ||
+        msg.contains('failed host lookup') ||
+        msg.contains('network is unreachable') ||
+        msg.contains('connection');
+  }
+
+  Future<bool> _hasDeviceConnectivity() async {
+    try {
+      final results = await Connectivity().checkConnectivity();
+      return results.any((r) => r != ConnectivityResult.none);
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Future<void> _persistState({DateTime? syncedAt}) async {
+    await _store.saveSnapshot(
+      _uid,
+      accounts: state.accounts,
+      transactions: state.transactions,
+      incomes: state.incomes,
+      budget: state.budget,
+      healthScore: state.healthScore,
+      scoreHistory: state.scoreHistory,
+      insights: state.insights,
+      alerts: state.alerts,
+      behaviorPrediction: state.behaviorPrediction,
+      overspendingForecast: state.overspendingForecast,
+      lastSyncedAt: syncedAt ?? state.lastSyncedAt,
+    );
+  }
+
+  /// Loads local cached data immediately for instant Offline-First UI,
+  /// then pushes any queued offline mutations and refreshes live backend data.
+  Future<void> loadAll({String? userId}) async {
+    if (userId != null && userId.isNotEmpty) {
+      _activeUserId = userId;
+    }
+    final uid = _uid;
+
+    // 1. Hydrate immediately from local device storage
+    final cached = await _store.loadSnapshot(uid);
+    final pending = await _store.loadQueue(uid);
+    if (cached != null) {
+      state = state.copyWith(
+        accounts: cached.accounts,
+        transactions: cached.transactions,
+        incomes: cached.incomes,
+        budget: cached.budget,
+        healthScore: cached.healthScore,
+        scoreHistory: cached.scoreHistory,
+        insights: cached.insights,
+        alerts: cached.alerts,
+        behaviorPrediction: cached.behaviorPrediction,
+        overspendingForecast: cached.overspendingForecast,
+        lastSyncedAt: cached.lastSyncedAt,
+        pendingSyncCount: pending.length,
+        isLoading: false,
+      );
+    } else {
+      state = state.copyWith(
+        isLoading: true,
+        pendingSyncCount: pending.length,
+        clearError: true,
+      );
+    }
+
+    // 2. Check connectivity; if offline, stop cleanly with local data
+    final online = await _hasDeviceConnectivity();
+    if (!online) {
+      state = state.copyWith(isLoading: false, isOffline: true);
+      return;
+    }
+
+    // 3. Flush any pending offline queue first
+    if (pending.isNotEmpty) {
+      await _flushQueue(uid);
+    }
+
+    // 4. Fetch fresh data from live production backend
+    try {
+      final accounts = await _api.getAccounts();
+      final results = await Future.wait([
+        _api.getTransactions(limit: 100).catchError((_) => state.transactions),
+        _api.getIncomes(limit: 100).catchError((_) => state.incomes),
+        _api.getLatestBudget().catchError((_) => state.budget),
+        _api.getInsights().catchError((_) => state.insights),
+        _api.getAlerts().catchError((_) => state.alerts),
+        _api.getScoreHistory().catchError((_) => state.scoreHistory),
+      ]);
+
+      final now = DateTime.now();
+      final remainingQueue = await _store.loadQueue(uid);
+      state = state.copyWith(
+        isLoading: false,
+        isOffline: false,
+        pendingSyncCount: remainingQueue.length,
+        lastSyncedAt: now,
+        accounts: accounts,
+        transactions: results[0] as List<TransactionModel>,
+        incomes: results[1] as List<IncomeModel>,
+        budget: results[2] as BudgetModel?,
+        insights: results[3] as List<InsightModel>,
+        alerts: results[4] as List<AlertModel>,
+        scoreHistory: results[5] as List<ScoreHistoryItem>,
+        clearError: true,
+      );
+      await _persistState(syncedAt: now);
+
+      // Load AI analytics in parallel without blocking primary UI
+      await Future.wait([
+        refreshHealthScore(period: state.scorePeriod),
+        refreshBehaviorAndOverspending(),
+      ]);
+      await _persistState(syncedAt: now);
+    } catch (e) {
+      if (_isNetworkError(e)) {
+        state = state.copyWith(isLoading: false, isOffline: true);
+      } else {
+        state = state.copyWith(isLoading: false, error: e.toString());
+      }
+    }
+  }
+
+  /// Syncs all pending local operations to backend and refreshes fresh state.
+  Future<bool> syncPendingAndRefresh() async {
+    final online = await _hasDeviceConnectivity();
+    if (!online) {
+      state = state.copyWith(isOffline: true);
+      return false;
+    }
+    await _flushQueue(_uid);
+    await loadAll();
+    return !state.isOffline && state.pendingSyncCount == 0;
+  }
+
+  Future<void> _flushQueue(String uid) async {
+    final queue = await _store.loadQueue(uid);
+    if (queue.isEmpty) return;
+
+    state = state.copyWith(isSyncing: true);
+    final remaining = <PendingSyncOp>[];
+    final idMap = <String, String>{};
+    bool hitNetworkFailure = false;
+
+    String? resolveId(String? raw) {
+      if (raw == null || raw.isEmpty) return raw;
+      return idMap[raw] ?? raw;
+    }
+
+    for (final op in queue) {
+      if (hitNetworkFailure) {
+        remaining.add(op);
+        continue;
+      }
+      try {
+        final p = op.payload;
+        switch (op.type) {
+          case 'create_account':
+            final created = await _api.createAccount(
+              accountName: (p['accountName'] ?? '').toString(),
+              accountNumber: (p['accountNumber'] ?? '').toString(),
+              balance: (p['balance'] as num?)?.toDouble() ?? 0,
+            );
+            if (op.localId != null) idMap[op.localId!] = created.id;
+            break;
+          case 'update_account':
+            final id = resolveId(p['id']?.toString());
+            if (id != null && !id.startsWith('local_')) {
+              await _api.updateAccount(
+                id,
+                accountName: p['accountName']?.toString(),
+                accountNumber: p['accountNumber']?.toString(),
+                balance: (p['balance'] as num?)?.toDouble(),
+              );
+            }
+            break;
+          case 'delete_account':
+            final id = resolveId(p['id']?.toString());
+            if (id != null && !id.startsWith('local_')) {
+              await _api.deleteAccount(id);
+            }
+            break;
+          case 'create_transaction':
+            final created = await _api.createTransaction(
+              accountId: resolveId(p['accountId']?.toString()),
+              categoryGroup: (p['categoryGroup'] ?? 'Needs').toString(),
+              categoryDetail: p['categoryDetail']?.toString(),
+              transactionDate:
+                  DateTime.tryParse((p['transactionDate'] ?? '').toString()) ??
+                      DateTime.now(),
+              description: (p['description'] ?? '').toString(),
+              amount: (p['amount'] as num?)?.toDouble() ?? 0,
+              source: (p['source'] ?? 'manual').toString(),
+            );
+            if (op.localId != null) idMap[op.localId!] = created.id;
+            break;
+          case 'update_transaction':
+            final id = resolveId(p['id']?.toString());
+            if (id != null && !id.startsWith('local_')) {
+              await _api.updateTransaction(
+                id,
+                accountId: resolveId(p['accountId']?.toString()),
+                categoryGroup: (p['categoryGroup'] ?? 'Needs').toString(),
+                categoryDetail: p['categoryDetail']?.toString(),
+                transactionDate: DateTime.tryParse(
+                      (p['transactionDate'] ?? '').toString(),
+                    ) ??
+                    DateTime.now(),
+                description: (p['description'] ?? '').toString(),
+                amount: (p['amount'] as num?)?.toDouble() ?? 0,
+              );
+            }
+            break;
+          case 'delete_transaction':
+            final id = resolveId(p['id']?.toString());
+            if (id != null && !id.startsWith('local_')) {
+              await _api.deleteTransaction(id);
+            }
+            break;
+          case 'create_income':
+            final created = await _api.createIncome(
+              accountId: resolveId(p['accountId']?.toString()),
+              amount: (p['amount'] as num?)?.toDouble() ?? 0,
+              incomeDate:
+                  DateTime.tryParse((p['incomeDate'] ?? '').toString()) ??
+                      DateTime.now(),
+              source: (p['source'] ?? 'Pemasukan').toString(),
+            );
+            if (op.localId != null) idMap[op.localId!] = created.id;
+            break;
+          case 'update_income':
+            final id = resolveId(p['id']?.toString());
+            if (id != null && !id.startsWith('local_')) {
+              await _api.updateIncome(
+                id,
+                accountId: resolveId(p['accountId']?.toString()),
+                amount: (p['amount'] as num?)?.toDouble() ?? 0,
+                incomeDate:
+                    DateTime.tryParse((p['incomeDate'] ?? '').toString()) ??
+                        DateTime.now(),
+                source: (p['source'] ?? 'Pemasukan').toString(),
+              );
+            }
+            break;
+          case 'delete_income':
+            final id = resolveId(p['id']?.toString());
+            if (id != null && !id.startsWith('local_')) {
+              await _api.deleteIncome(id);
+            }
+            break;
+          case 'save_budget':
+            await _api.createBudget(
+              needsAmount: (p['needsAmount'] as num?)?.toDouble() ?? 0,
+              wantsAmount: (p['wantsAmount'] as num?)?.toDouble() ?? 0,
+              savingsAmount: (p['savingsAmount'] as num?)?.toDouble() ?? 0,
+            );
+            break;
+        }
+      } catch (e) {
+        if (_isNetworkError(e)) {
+          hitNetworkFailure = true;
+          remaining.add(op);
+        }
+        // Non-network validation errors drop the bad op so queue doesn't jam forever
+      }
+    }
+
+    await _store.saveQueue(uid, remaining);
+    state = state.copyWith(
+      isSyncing: false,
+      isOffline: hitNetworkFailure,
+      pendingSyncCount: remaining.length,
+    );
+  }
+
+  Future<void> refreshHealthScore({String? period}) async {
+    final targetPeriod = period ?? state.scorePeriod;
+    if (state.isOffline) {
+      state = state.copyWith(scorePeriod: targetPeriod);
+      return;
+    }
+    try {
+      final score = await _api.calculateHealthScore(period: targetPeriod);
+      final history =
+          await _api.getScoreHistory().catchError((_) => state.scoreHistory);
+      state = state.copyWith(
+        healthScore: score,
+        scoreHistory: history,
+        scorePeriod: targetPeriod,
+      );
+      await _persistState();
+    } catch (_) {}
+  }
+
+  Future<void> refreshBehaviorAndOverspending() async {
+    if (state.isOffline) return;
+    try {
+      final latestTrx =
+          state.transactions.isNotEmpty ? state.transactions.first : null;
+      final now = DateTime.now();
+      final rolling7d = state.transactions
+          .where((t) => now.difference(t.transactionDate).inDays <= 7)
+          .fold<double>(0, (s, t) => s + t.amount);
+
+      BehaviorPredictionModel? behavior;
+      try {
+        behavior = await _api.predictBehavior(
+          amount: latestTrx?.amount ?? 50000,
+          categoryGroup: latestTrx?.categoryGroup ?? 'Needs',
+          merchant: latestTrx?.description,
+          rolling7dSpending: rolling7d,
+        );
+      } catch (_) {}
+
+      OverspendingForecastModel? overspending;
+      try {
+        overspending = await _api.predictOverspending(
+          budgetLimit: state.budget?.totalLimit,
+        );
+      } catch (_) {}
+
+      state = state.copyWith(
+        behaviorPrediction: behavior ?? state.behaviorPrediction,
+        overspendingForecast: overspending ?? state.overspendingForecast,
+      );
+      await _persistState();
+    } catch (_) {}
+  }
+
+  Future<bool> addAccount({
+    required String name,
+    String accountNumber = '',
+    required double balance,
+  }) async {
+    try {
+      await _api.createAccount(
+        accountName: name,
+        accountNumber: accountNumber,
+        balance: balance,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final localId = 'local_acc_${DateTime.now().millisecondsSinceEpoch}';
+      final acc = AccountModel(
+        id: localId,
+        name: name.trim(),
+        accountNumber: accountNumber.trim(),
+        balance: balance,
+        type: BankData.inferAccountType(name),
+      );
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'create_account',
+          localId: localId,
+          payload: {
+            'accountName': name.trim(),
+            'accountNumber': accountNumber.trim(),
+            'balance': balance,
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: [...state.accounts, acc],
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> updateAccount(
+    String id, {
+    String? name,
+    String? accountNumber,
+    double? balance,
+  }) async {
+    try {
+      await _api.updateAccount(
+        id,
+        accountName: name,
+        accountNumber: accountNumber,
+        balance: balance,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final updated = state.accounts.map((a) {
+        if (a.id != id) return a;
+        return a.copyWith(
+          name: name?.trim(),
+          accountNumber: accountNumber?.trim(),
+          balance: balance,
+        );
+      }).toList();
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'update_account',
+          payload: {
+            'id': id,
+            if (name != null) 'accountName': name.trim(),
+            if (accountNumber != null) 'accountNumber': accountNumber.trim(),
+            'balance': ?balance,
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updated,
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> deleteAccount(String id) async {
+    try {
+      await _api.deleteAccount(id);
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'delete_account',
+          payload: {'id': id},
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: state.accounts.where((a) => a.id != id).toList(),
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  /// Returns `true` if synced online immediately, `false` if saved offline to queue.
+  Future<bool> addTransaction({
+    String? accountId,
+    required String categoryGroup,
+    String? categoryDetail,
+    required DateTime transactionDate,
+    required String description,
+    required double amount,
+    String source = 'manual',
+    String? ocrScanId,
+  }) async {
+    try {
+      if (ocrScanId != null && ocrScanId.isNotEmpty) {
+        await _api.confirmOcrTransaction(
+          ocrScanId,
+          accountId: accountId,
+          categoryGroup: categoryGroup,
+          categoryDetail: categoryDetail,
+          transactionDate: transactionDate,
+          description: description,
+          amount: amount,
+        );
+      } else {
+        await _api.createTransaction(
+          accountId: accountId,
+          categoryGroup: categoryGroup,
+          categoryDetail: categoryDetail,
+          transactionDate: transactionDate,
+          description: description,
+          amount: amount,
+          source: source,
+        );
+      }
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final localId = 'local_trx_${DateTime.now().millisecondsSinceEpoch}';
+      final accName = state.accountNameById(accountId);
+      final newTrx = TransactionModel(
+        id: localId,
+        accountId: accountId,
+        accountName: accName != '-' ? accName : null,
+        categoryGroup: categoryGroup,
+        categoryDetail: categoryDetail,
+        transactionDate: transactionDate,
+        description: description.trim(),
+        source: source,
+        amount: amount,
+      );
+      final updatedAccounts = state.accounts.map((a) {
+        if (a.id == accountId) {
+          return a.copyWith(balance: (a.balance - amount).clamp(0, double.infinity));
+        }
+        return a;
+      }).toList();
+
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'create_transaction',
+          localId: localId,
+          payload: {
+            'accountId': accountId,
+            'categoryGroup': categoryGroup,
+            'categoryDetail': categoryDetail,
+            'transactionDate': transactionDate.toUtc().toIso8601String(),
+            'description': description.trim(),
+            'amount': amount,
+            'source': source,
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        transactions: [newTrx, ...state.transactions],
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> updateTransaction(
+    String id, {
+    String? accountId,
+    required String categoryGroup,
+    String? categoryDetail,
+    required DateTime transactionDate,
+    required String description,
+    required double amount,
+  }) async {
+    try {
+      await _api.updateTransaction(
+        id,
+        accountId: accountId,
+        categoryGroup: categoryGroup,
+        categoryDetail: categoryDetail,
+        transactionDate: transactionDate,
+        description: description,
+        amount: amount,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final oldIdx = state.transactions.indexWhere((t) => t.id == id);
+      final old = oldIdx >= 0 ? state.transactions[oldIdx] : null;
+      final updatedAccounts = state.accounts.map((a) {
+        double bal = a.balance;
+        if (old != null && a.id == old.accountId) bal += old.amount;
+        if (a.id == accountId) bal = (bal - amount).clamp(0, double.infinity);
+        return a.copyWith(balance: bal);
+      }).toList();
+      final updatedTrx = state.transactions.map((t) {
+        if (t.id != id) return t;
+        return TransactionModel(
+          id: id,
+          accountId: accountId,
+          accountName: state.accountNameById(accountId),
+          categoryGroup: categoryGroup,
+          categoryDetail: categoryDetail,
+          transactionDate: transactionDate,
+          description: description.trim(),
+          source: t.source,
+          amount: amount,
+        );
+      }).toList();
+
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'update_transaction',
+          payload: {
+            'id': id,
+            'accountId': accountId,
+            'categoryGroup': categoryGroup,
+            'categoryDetail': categoryDetail,
+            'transactionDate': transactionDate.toUtc().toIso8601String(),
+            'description': description.trim(),
+            'amount': amount,
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        transactions: updatedTrx,
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> deleteTransaction(String id) async {
+    try {
+      await _api.deleteTransaction(id);
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final oldIdx = state.transactions.indexWhere((t) => t.id == id);
+      final old = oldIdx >= 0 ? state.transactions[oldIdx] : null;
+      final updatedAccounts = state.accounts.map((a) {
+        if (old != null && a.id == old.accountId) {
+          return a.copyWith(balance: a.balance + old.amount);
+        }
+        return a;
+      }).toList();
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'delete_transaction',
+          payload: {'id': id},
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        transactions: state.transactions.where((t) => t.id != id).toList(),
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> addIncome({
+    String? accountId,
+    required double amount,
+    required DateTime incomeDate,
+    required String source,
+  }) async {
+    try {
+      await _api.createIncome(
+        accountId: accountId,
+        amount: amount,
+        incomeDate: incomeDate,
+        source: source,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final localId = 'local_inc_${DateTime.now().millisecondsSinceEpoch}';
+      final accName = state.accountNameById(accountId);
+      final inc = IncomeModel(
+        id: localId,
+        accountId: accountId,
+        accountName: accName != '-' ? accName : null,
+        amount: amount,
+        incomeDate: incomeDate,
+        source: source.trim(),
+      );
+      final updatedAccounts = state.accounts.map((a) {
+        if (a.id == accountId) return a.copyWith(balance: a.balance + amount);
+        return a;
+      }).toList();
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'create_income',
+          localId: localId,
+          payload: {
+            'accountId': accountId,
+            'amount': amount,
+            'incomeDate': incomeDate.toUtc().toIso8601String(),
+            'source': source.trim(),
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        incomes: [inc, ...state.incomes],
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> updateIncome(
+    String id, {
+    String? accountId,
+    required double amount,
+    required DateTime incomeDate,
+    required String source,
+  }) async {
+    try {
+      await _api.updateIncome(
+        id,
+        accountId: accountId,
+        amount: amount,
+        incomeDate: incomeDate,
+        source: source,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final oldIdx = state.incomes.indexWhere((i) => i.id == id);
+      final old = oldIdx >= 0 ? state.incomes[oldIdx] : null;
+      final updatedAccounts = state.accounts.map((a) {
+        double bal = a.balance;
+        if (old != null && a.id == old.accountId) {
+          bal = (bal - old.amount).clamp(0, double.infinity);
+        }
+        if (a.id == accountId) bal += amount;
+        return a.copyWith(balance: bal);
+      }).toList();
+      final updatedIncomes = state.incomes.map((i) {
+        if (i.id != id) return i;
+        return IncomeModel(
+          id: id,
+          accountId: accountId,
+          accountName: state.accountNameById(accountId),
+          amount: amount,
+          incomeDate: incomeDate,
+          source: source.trim(),
+        );
+      }).toList();
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'update_income',
+          payload: {
+            'id': id,
+            'accountId': accountId,
+            'amount': amount,
+            'incomeDate': incomeDate.toUtc().toIso8601String(),
+            'source': source.trim(),
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        incomes: updatedIncomes,
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> deleteIncome(String id) async {
+    try {
+      await _api.deleteIncome(id);
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final oldIdx = state.incomes.indexWhere((i) => i.id == id);
+      final old = oldIdx >= 0 ? state.incomes[oldIdx] : null;
+      final updatedAccounts = state.accounts.map((a) {
+        if (old != null && a.id == old.accountId) {
+          return a.copyWith(
+            balance: (a.balance - old.amount).clamp(0, double.infinity),
+          );
+        }
+        return a;
+      }).toList();
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'delete_income',
+          payload: {'id': id},
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        incomes: state.incomes.where((i) => i.id != id).toList(),
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  Future<bool> saveBudget({
+    required double needsAmount,
+    required double wantsAmount,
+    required double savingsAmount,
+  }) async {
+    try {
+      await _api.createBudget(
+        needsAmount: needsAmount,
+        wantsAmount: wantsAmount,
+        savingsAmount: savingsAmount,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final total = needsAmount + wantsAmount + savingsAmount;
+      final localBudget = BudgetModel(
+        id: state.budget?.id ?? 'local_budget',
+        needsAmount: needsAmount,
+        wantsAmount: wantsAmount,
+        savingsAmount: savingsAmount,
+        needsUsed: state.budget?.needsUsed ?? 0,
+        wantsUsed: state.budget?.wantsUsed ?? 0,
+        savingsUsed: state.budget?.savingsUsed ?? 0,
+        limitAmount: total,
+      );
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'save_budget',
+          payload: {
+            'needsAmount': needsAmount,
+            'wantsAmount': wantsAmount,
+            'savingsAmount': savingsAmount,
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        budget: localBudget,
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
+  void clear() {
+    _activeUserId = null;
+    state = const FinanceState();
+  }
+}
+
+final financeProvider = StateNotifierProvider<FinanceNotifier, FinanceState>(
+  (ref) => FinanceNotifier(
+    ref.watch(sadarApiServiceProvider),
+    ref.watch(localFinanceStoreProvider),
+    () => ref.read(authProvider).user?.id,
+  ),
+);

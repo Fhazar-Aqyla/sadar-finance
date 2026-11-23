@@ -281,11 +281,73 @@ const migrate = async () => {
       );
     `);
 
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 10. Categories (category_groups & category_details)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS category_groups (
+        category_group_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        code              VARCHAR(50) UNIQUE NOT NULL,
+        name              VARCHAR(100) NOT NULL,
+        description       TEXT,
+        sort_order        INTEGER NOT NULL DEFAULT 0,
+        is_active         BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at        TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS category_details (
+        category_detail_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        category_group_id  UUID NOT NULL REFERENCES category_groups(category_group_id) ON DELETE CASCADE,
+        code               VARCHAR(50) UNIQUE NOT NULL,
+        name               VARCHAR(100) NOT NULL,
+        description        TEXT,
+        sort_order         INTEGER NOT NULL DEFAULT 0,
+        is_active          BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at         TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      INSERT INTO category_groups (code, name, description, sort_order)
+      VALUES
+        ('needs', 'Needs', 'Kebutuhan pokok dan pengeluaran esensial (50%)', 1),
+        ('wants', 'Wants', 'Keinginan, hiburan, dan gaya hidup (30%)', 2),
+        ('savings', 'Savings', 'Tabungan, dana darurat, dan investasi (20%)', 3),
+        ('other', 'Other', 'Pengeluaran lainnya', 4)
+      ON CONFLICT (code) DO NOTHING;
+    `);
+
+    await client.query(`
+      INSERT INTO category_details (category_group_id, code, name, description, sort_order)
+      SELECT cg.category_group_id, v.code, v.name, v.description, v.sort_order
+      FROM (VALUES
+        ('needs', 'groceries', 'Groceries', 'Belanja bulanan dan bahan pokok', 1),
+        ('needs', 'food', 'Food & Dining', 'Makanan dan minuman harian', 2),
+        ('needs', 'transport', 'Transportation', 'Transportasi, bensin, parkir, dan tol', 3),
+        ('needs', 'utilities', 'Bills & Utilities', 'Listrik, air, internet, dan tagihan rutin', 4),
+        ('needs', 'health', 'Healthcare', 'Kesehatan, obat, dokter, dan klinik', 5),
+        ('needs', 'education', 'Education', 'Pendidikan, buku, dan kursus', 6),
+        ('wants', 'shopping', 'Shopping', 'Belanja non-esensial dan fashion', 1),
+        ('wants', 'entertainment', 'Entertainment', 'Hiburan, bioskop, dan langganan streaming', 2),
+        ('wants', 'self_care', 'Self Care', 'Perawatan diri dan gaya hidup', 3),
+        ('wants', 'travel', 'Travel', 'Liburan dan perjalanan wisata', 4),
+        ('savings', 'savings', 'Savings', 'Tabungan dan dana darurat', 1),
+        ('savings', 'investment', 'Investment', 'Investasi reksadana, saham, emas, deposito', 2),
+        ('other', 'other', 'Other', 'Kategori lainnya', 1)
+      ) AS v(group_code, code, name, description, sort_order)
+      JOIN category_groups cg ON cg.code = v.group_code
+      ON CONFLICT (code) DO NOTHING;
+    `);
+
     // ── Indexes ─────────────────────────────────────────────
     await client.query(`
       ALTER TABLE ocr_scans
       ADD COLUMN IF NOT EXISTS image_data BYTEA;
     `);
+
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_category_details_group_id ON category_details(category_group_id);`);
 
     await client.query(`CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id);`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);`);

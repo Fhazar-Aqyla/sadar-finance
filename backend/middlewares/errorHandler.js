@@ -9,12 +9,13 @@ const { getDatabaseErrorResponse } = require('../utils/dbError');
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, _req, res, _next) => {
-  // Log the error in development
-  if (config.env === 'development') {
+  // Log unexpected errors in production and all errors in development
+  if (config.env === 'development' || !err.isOperational) {
     console.error('[ERROR]', {
       message: err.message,
-      stack: err.stack,
+      code: err.code,
       statusCode: err.statusCode,
+      ...(config.env === 'development' ? { stack: err.stack } : {}),
     });
   }
 
@@ -25,6 +26,15 @@ const errorHandler = (err, _req, res, _next) => {
       statusCode: err.statusCode,
       errorCode: err.errorCode,
       details: err.details || null,
+    });
+  }
+
+  // PostgreSQL invalid text representation (e.g. malformed UUID)
+  if (err.code === '22P02') {
+    return errorResponse(res, {
+      message: 'Invalid identifier or parameter format',
+      statusCode: 400,
+      errorCode: 'INVALID_INPUT',
     });
   }
 

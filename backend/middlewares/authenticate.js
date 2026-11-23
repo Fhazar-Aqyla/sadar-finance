@@ -22,7 +22,9 @@ const authenticate = (req, _res, next) => {
     req.user = {
       id: decoded.id,
       email: decoded.email,
-      fullName: decoded.fullName,
+      firstName: decoded.firstName,
+      lastName: decoded.lastName,
+      fullName: decoded.fullName || [decoded.firstName, decoded.lastName].filter(Boolean).join(' '),
     };
 
     next();

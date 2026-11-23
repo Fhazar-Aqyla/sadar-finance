@@ -1,0 +1,15 @@
+{
+  "short_name": "SADAR Finance",
+  "name": "SADAR Finance App",
+  "icons": [
+    {
+      "src": "sadar-logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#863bff",
+  "background_color": "#111E3F"
+}

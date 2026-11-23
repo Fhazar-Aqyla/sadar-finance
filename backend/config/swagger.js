@@ -12,7 +12,10 @@ const swaggerDefinition = {
     description: 'Smart AI-Driven Automated Receipt & Finance Management API.\n\nFeatures: Auth, Accounts, Transactions, Incomes, OCR, AI Categorization, Behavior Analysis, Overspending Prediction, Health Score, Budgets.',
     contact: { name: 'SADAR Finance Team' },
   },
-  servers: [{ url: `http://localhost:${config.port}/api/v1`, description: 'Development Server' }],
+  servers: [
+    { url: '/api/v1', description: 'Current Server' },
+    { url: `http://localhost:${config.port}/api/v1`, description: 'Local Development Server' },
+  ],
   components: {
     securitySchemes: {
       BearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },

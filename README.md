@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/Architecture-Decoupled%20Multi--Service-blue?style=for-the-badge" alt="Architecture" />
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
   <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
+  <img src="https://img.shields.io/badge/Flutter-Android%20%26%20iOS-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/TensorFlow-2.18-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow" />
@@ -34,6 +35,8 @@ Aplikasi ini menggabungkan pencatatan otomatis tanpa repot (*effortless logging*
 4. **End-of-Month Overspending Forecast (Multitask MLP)**: Memproyeksikan potensi pembengkakan anggaran sebelum penutupan bulan menggunakan jaringan saraf tiruan **Multi-task Multi-Layer Perceptron (MLP)**.
 5. **Skor Kesehatan Keuangan (0–100) & Formula 50/30/20**: Menghitung indeks kesehatan finansial komprehensif berdasarkan rasio tabungan, kepatuhan alokasi ideal (50% Kebutuhan, 30% Keinginan, 20% Tabungan/Investasi), dan stabilitas arus kas.
 6. **Dukungan Multi-Device & Mobile PWA**: Menghadirkan pengalaman desktop web yang lengkap sekaligus aplikasi *Progressive Web App (PWA)* mobile yang responsif, dapat diinstal (*Add to Home Screen*), dan mendukung mode *offline*.
+7. **Aplikasi Mobile Native Flutter (Offline-First & Auto-Update)**: Tersedia aplikasi Android/iOS native di direktori `mobile_flutter/` dengan penyimpanan lokal terenkripsi, *offline login*, antrean *auto-sync* otomatis saat kembali online, Dark/Light mode konsisten, *interactive tour guide*, dan dukungan pembaruan otomatis (Shorebird OTA & endpoint `/api/v1/app/version`).
+8. **Standalone Landing & Portal Instalasi**: Direktori `landing-page/` terpisah yang menyajikan halaman perkenalan produk dan portal instalasi APK resmi (`/install`) di produksi (`https://sadar-finance.web.id`).
 
 ---
 
@@ -282,6 +285,8 @@ Frontend SADAR Finance dilengkapi sakelar konfigurasi lingkungan yang fleksibel 
 | **Gateway Layer** | Nginx Alpine, Docker | Smart reverse proxy, deteksi perangkat User-Agent, cookie routing, dan proxy API. |
 | **Frontend Desktop** | React 18, Vite 6, Redux Toolkit, React Router v7 | Single Page Application (SPA) desktop interaktif. |
 | **Frontend Mobile** | React 18, Vite 6, Service Worker, Web Manifest | Mobile Progressive Web App (PWA) dengan touch-first UI dan dukungan offline. |
+| **Mobile Native App** | Flutter, Riverpod, GoRouter, Dio, Shorebird OTA | Aplikasi Android/iOS native (`mobile_flutter/`) dengan Offline-First cache, auto-sync, Dark/Light mode, dan update otomatis. |
+| **Landing & Install Web** | React 18, Vite 6, Tailwind CSS v4, Framer Motion | Portal landing page & halaman instalasi APK resmi terpisah (`landing-page/`). |
 | **UI Styling & Animasi** | Tailwind CSS v4, Bootstrap 5, Sass, Framer Motion, GSAP | Desain visual modern, transisi halus, dan tata letak responsif. |
 | **Visualisasi Data** | ApexCharts, ECharts, Chart.js, react-apexcharts | Grafik batang arus kas, grafik donat kategori, dan diagram garis tren belanja. |
 | **Backend REST API** | Node.js (>=18), Express.js 4, Multer, Joi | Server API modular, validasi request ketat, dan penangan unggah berkas. |
@@ -352,6 +357,27 @@ sadar-finance/
 │   ├── Dockerfile                      # Spesifikasi build Nginx gateway
 │   ├── mobile-ui-choice.js             # Skrip injeksi pemilih UI mobile/desktop
 │   └── nginx.conf                      # Konfigurasi routing User-Agent & Reverse Proxy
+│
+├── landing-page/                       # Standalone Production Landing Page & Portal Instalasi (/install)
+│   ├── public/                         # Aset publik, logo resmi, dan favicon
+│   ├── src/
+│   │   ├── pages/Landing/              # Landing Page OnePage & Halaman Instalasi APK (InstallPage.jsx)
+│   │   ├── pages/Pages/                # Kebijakan Privasi & Syarat Ketentuan
+│   │   └── Routes/                     # Routing terpisah khusus Landing & Instalasi
+│   ├── package.json                    # Dependensi ringan khusus Landing Page
+│   └── vite.config.js                  # Konfigurasi bundler Vite
+│
+├── mobile_flutter/                     # Aplikasi Mobile Native Android & iOS (Flutter)
+│   ├── android/                        # Konfigurasi Android & Adaptive Launcher Icon SADAR ("A")
+│   ├── assets/images/                  # Aset logo resmi SADAR Finance
+│   ├── lib/
+│   │   ├── core/                       # Theme Dark/Light, API Client, Secure & Local Offline Storage
+│   │   ├── data/                       # Models, API Service, & AppUpdateService (Shorebird OTA + Version API)
+│   │   ├── presentation/               # Onboarding, Auth, Dashboard, Catat/OCR, Insight, Skor, Profil, & Pengaturan
+│   │   ├── providers/                  # Riverpod State (Auth Offline-Ready, Finance Auto-Sync, UI Preferences)
+│   │   └── router/                     # GoRouter persistent dengan refreshListenable
+│   ├── test/                           # Unit & Widget tests Flutter
+│   └── pubspec.yaml                    # Dependensi Flutter & Shorebird Code Push
 │
 ├── docs/                               # Panduan integrasi, AI deployment, dan handoff teknis
 ├── documentation/                      # Dokumentasi komprehensif (PRD, Arsitektur, DB, API, Desain)
@@ -517,6 +543,37 @@ npm run dev          # Menjalankan Vite Mobile PWA di http://localhost:5174
 ```
 
 Buka peramban browser Anda ke `http://localhost:5173` untuk mulai menjelajahi SADAR Finance.
+
+---
+
+### Opsi C: Menjalankan Aplikasi Mobile Native (Flutter) & Standalone Landing Page
+
+##### 📱 Aplikasi Mobile Native (`mobile_flutter/`)
+```bash
+cd mobile_flutter
+flutter pub get
+flutter run                     # Menjalankan di emulator/perangkat Android/iOS
+flutter build apk --release     # Build APK rilis produksi
+```
+
+> Untuk pembaruan otomatis tanpa install ulang APK (OTA Code Push), gunakan Shorebird CLI (`shorebird login` → `shorebird init` → `shorebird release android`, lalu `shorebird patch android` untuk rilis patch selanjutnya).
+
+##### 🌐 Standalone Landing Page & Halaman Instalasi (`landing-page/`)
+```bash
+cd landing-page
+npm install
+npm run dev                     # Development server lokal
+npm run build                   # Build produksi statis (dist/)
+```
+
+---
+
+## 🌐 Layanan Produksi Aktif
+
+* **Landing Page & Portal Instalasi**: `https://sadar-finance.web.id` (`/install` untuk unduh APK Android resmi)
+* **REST API v1 & Health Check**: `https://sadar-finance.web.id/api/v1` · `https://sadar-finance.web.id/health`
+* **Swagger API Docs**: `https://sadar-finance.web.id/api-docs`
+* **Cek Versi Aplikasi Mobile**: `https://sadar-finance.web.id/api/v1/app/version`
 
 ---
 

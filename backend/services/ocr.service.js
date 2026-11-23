@@ -130,6 +130,11 @@ class OcrService {
       await ocrRepository.updateStatus(scanId, "processing");
 
       const parsedData = await this._extractReceipt(file);
+      try {
+        await this._attachCategory(userId, parsedData);
+      } catch (_catErr) {
+        // Keep OCR result even if AI categorization fails
+      }
 
       await ocrRepository.updateStatus(scanId, "completed", parsedData);
     } catch (err) {
