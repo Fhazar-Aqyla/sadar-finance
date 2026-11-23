@@ -273,6 +273,112 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> selectAvatar2DPreset(String presetId) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _api.updateProfile(profilePicture: presetId);
+      await _storage.saveUserMap(updated.toJson());
+      state = state.copyWith(user: updated, isLoading: false);
+      return true;
+    } catch (e) {
+      // Offline fallback: update local user avatar immediately
+      if (_isNetworkError(e) && state.user != null) {
+        final localUpdated = state.user!.copyWith(profilePicture: presetId);
+        await _storage.saveUserMap(localUpdated.toJson());
+        state = state.copyWith(user: localUpdated, isLoading: false);
+        return true;
+      }
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> signInWithGoogle({
+    required String email,
+    String? displayName,
+    String? googleId,
+    String? idToken,
+    String? photoUrl,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final result = await _api.authenticateWithGoogle(
+        email: email,
+        displayName: displayName,
+        googleId: googleId,
+        idToken: idToken,
+        photoUrl: photoUrl,
+      );
+      await _storage.saveToken(result.token);
+      await _storage.saveUserMap(result.user.toJson());
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: result.user,
+        isOfflineSession: false,
+        isLoading: false,
+        clearError: true,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> linkGoogleAccount({
+    required String email,
+    String? googleId,
+    String? photoUrl,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _api.linkGoogleAccount(
+        email: email,
+        googleId: googleId,
+        photoUrl: photoUrl,
+      );
+      await _storage.saveUserMap(updated.toJson());
+      state = state.copyWith(user: updated, isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> unlinkGoogleAccount() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _api.unlinkGoogleAccount();
+      await _storage.saveUserMap(updated.toJson());
+      state = state.copyWith(user: updated, isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> sendEmailOtp() async {
+    return _api.sendEmailOtp(email: state.user?.email);
+  }
+
+  Future<bool> verifyEmailWithOtp(String otp) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updated = await _api.verifyEmailOtp(
+        otp: otp,
+        email: state.user?.email,
+      );
+      await _storage.saveUserMap(updated.toJson());
+      state = state.copyWith(user: updated, isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
   Future<void> syncOfflinePasswordHash(String newPassword) async {
     final email = state.user?.email;
     if (email != null && email.isNotEmpty) {

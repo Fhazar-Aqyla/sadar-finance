@@ -57,9 +57,23 @@ const migrate = async () => {
         profile_picture  TEXT,
         occupation       VARCHAR(100),
         status           user_status DEFAULT 'active',
+        email_verified   BOOLEAN DEFAULT FALSE,
+        google_id        VARCHAR(255),
+        google_email     VARCHAR(255),
+        otp_code         VARCHAR(10),
+        otp_expires_at   TIMESTAMPTZ,
         created_at       TIMESTAMPTZ DEFAULT NOW(),
         updated_at       TIMESTAMPTZ DEFAULT NOW()
       );
+    `);
+
+    await client.query(`
+      ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE,
+        ADD COLUMN IF NOT EXISTS google_id VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS google_email VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS otp_code VARCHAR(10),
+        ADD COLUMN IF NOT EXISTS otp_expires_at TIMESTAMPTZ;
     `);
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

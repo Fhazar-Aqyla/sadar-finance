@@ -67,15 +67,119 @@ class SadarApiService {
     );
   }
 
-  Future<String> forgotPassword(String email) async {
+  Future<Map<String, dynamic>> forgotPasswordWithOtp(String email) async {
     final data = await _client.post(
       '/auth/forgot-password',
       data: {'email': email.trim()},
     );
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return {'message': 'Kode OTP pemulihan kata sandi telah dikirim.'};
+  }
+
+  Future<String> forgotPassword(String email) async {
+    final res = await forgotPasswordWithOtp(email);
+    return (res['message'] ?? 'Permintaan reset password telah diproses.')
+        .toString();
+  }
+
+  Future<Map<String, dynamic>> sendEmailOtp({
+    String? email,
+    String purpose = 'verify',
+  }) async {
+    final data = await _client.post(
+      '/auth/send-otp',
+      data: {
+        if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
+        'purpose': purpose,
+      },
+    );
+    return data is Map
+        ? Map<String, dynamic>.from(data)
+        : <String, dynamic>{'message': 'Kode OTP dikirim'};
+  }
+
+  Future<UserModel> verifyEmailOtp({
+    required String otp,
+    String? email,
+  }) async {
+    final data = await _client.post(
+      '/auth/verify-otp',
+      data: {
+        'otp': otp.trim(),
+        if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
+      },
+    );
+    if (data is Map && data['user'] is Map) {
+      return UserModel.fromJson(Map<String, dynamic>.from(data['user'] as Map));
+    }
+    return getProfile();
+  }
+
+  Future<String> resetPasswordWithOtp({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    final data = await _client.post(
+      '/auth/reset-password-otp',
+      data: {
+        'email': email.trim(),
+        'otp': otp.trim(),
+        'newPassword': newPassword,
+      },
+    );
     if (data is Map && data['message'] != null) {
       return data['message'].toString();
     }
-    return 'Permintaan reset password telah diproses.';
+    return 'Kata sandi berhasil diperbarui!';
+  }
+
+  Future<AuthResult> authenticateWithGoogle({
+    required String email,
+    String? displayName,
+    String? googleId,
+    String? idToken,
+    String? accessToken,
+    String? photoUrl,
+  }) async {
+    final payload = <String, dynamic>{'email': email.trim()};
+    if (displayName != null) payload['displayName'] = displayName.trim();
+    if (googleId != null) payload['googleId'] = googleId;
+    if (idToken != null) payload['idToken'] = idToken;
+    if (accessToken != null) payload['accessToken'] = accessToken;
+    if (photoUrl != null) payload['photoUrl'] = photoUrl;
+    final data = await _client.post('/auth/google', data: payload);
+    return AuthResult(
+      user: UserModel.fromJson(Map<String, dynamic>.from(data['user'] as Map)),
+      token: data['token'].toString(),
+    );
+  }
+
+  Future<UserModel> linkGoogleAccount({
+    required String email,
+    String? googleId,
+    String? idToken,
+    String? photoUrl,
+  }) async {
+    final payload = <String, dynamic>{'email': email.trim()};
+    if (googleId != null) payload['googleId'] = googleId;
+    if (idToken != null) payload['idToken'] = idToken;
+    if (photoUrl != null) payload['photoUrl'] = photoUrl;
+    final data = await _client.post('/auth/google/link', data: payload);
+    if (data is Map && data['user'] is Map) {
+      return UserModel.fromJson(Map<String, dynamic>.from(data['user'] as Map));
+    }
+    return getProfile();
+  }
+
+  Future<UserModel> unlinkGoogleAccount() async {
+    final data = await _client.delete('/auth/google/link');
+    if (data is Map && data['user'] is Map) {
+      return UserModel.fromJson(Map<String, dynamic>.from(data['user'] as Map));
+    }
+    return getProfile();
   }
 
   Future<UserModel> getProfile() async {
@@ -94,6 +198,7 @@ class SadarApiService {
     String? dateOfBirth,
     String? address,
     String? occupation,
+    String? profilePicture,
   }) async {
     final payload = <String, dynamic>{
       if (firstName != null && firstName.trim().isNotEmpty)
@@ -107,6 +212,8 @@ class SadarApiService {
         'dateOfBirth': dateOfBirth.trim(),
       if (address != null) 'address': address.trim(),
       if (occupation != null) 'occupation': occupation.trim(),
+      if (profilePicture != null && profilePicture.trim().isNotEmpty)
+        'profilePicture': profilePicture.trim(),
     };
     final data = await _client.put('/auth/me', data: payload);
     final map = (data is Map && data['user'] is Map)

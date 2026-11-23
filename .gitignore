@@ -17,20 +17,11 @@ build/
 # Uploads
 uploads/
 !uploads/.gitkeep
-# Flutter & Mobile Build Artifacts
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-**/android/.gradle/
-**/android/local.properties
-*.apk
-*.aab
 
-# Self-hosted web & download binaries
-backend/downloads/*.apk
-backend/public_web/
-
-# Android release signing secrets
+# Secrets & Android Signing / Firebase Config
+**/google-services.json
 *.jks
 *.keystore
-mobile_flutter/android/key.properties
+key.properties
+*.apk
+downloads/

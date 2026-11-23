@@ -69,10 +69,39 @@ const updateProfileSchema = Joi.object({
   phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{10,20}$/).optional().allow(null, ''),
   dateOfBirth: Joi.date().iso().optional().allow(null, ''),
   address: Joi.string().max(500).optional().allow(null, ''),
-  profilePicture: Joi.string().uri().max(1000).optional().allow(null, ''),
+  profilePicture: Joi.string().max(2000000).optional().allow(null, ''),
   occupation: Joi.string().max(100).optional().allow(null, ''),
   ...passwordAliasFields,
 }).min(1);
+
+const sendOtpSchema = Joi.object({
+  email: Joi.string().email().lowercase().trim().optional(),
+  purpose: Joi.string().valid('verify', 'reset').default('verify'),
+});
+
+const verifyOtpSchema = Joi.object({
+  email: Joi.string().email().lowercase().trim().optional(),
+  otp: Joi.string().pattern(/^\d{6}$/).required().messages({
+    'string.pattern.base': 'Kode OTP harus terdiri dari 6 angka',
+  }),
+});
+
+const resetPasswordOtpSchema = Joi.object({
+  email: Joi.string().email().lowercase().trim().required(),
+  otp: Joi.string().pattern(/^\d{6}$/).required().messages({
+    'string.pattern.base': 'Kode OTP harus terdiri dari 6 angka',
+  }),
+  newPassword: Joi.string().min(8).max(128).required(),
+});
+
+const googleAuthSchema = Joi.object({
+  idToken: Joi.string().optional().allow(''),
+  accessToken: Joi.string().optional().allow(''),
+  googleId: Joi.string().max(255).optional().allow(''),
+  email: Joi.string().email().lowercase().trim().required(),
+  displayName: Joi.string().max(200).optional().allow(''),
+  photoUrl: Joi.string().max(2000).optional().allow(null, ''),
+});
 
 module.exports = {
   registerSchema,
@@ -80,4 +109,8 @@ module.exports = {
   forgotPasswordSchema,
   updateProfileSchema,
   changePasswordSchema,
+  sendOtpSchema,
+  verifyOtpSchema,
+  resetPasswordOtpSchema,
+  googleAuthSchema,
 };

@@ -341,22 +341,64 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Halo, $userName 👋',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    'Yuk lihat kondisi keuanganmu hari ini.',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.78),
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Halo, $userName 👋',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'Yuk lihat kondisi keuanganmu hari ini.',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.78),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => context.go('/profile-account'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(99),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.22),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('🔥', style: TextStyle(fontSize: 13)),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${finance.streakDays}hr · Lv.${finance.financialLevel}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Container(
@@ -680,7 +722,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 Text(
                   offline
-                      ? 'Mode Offline — Fitur AI & OCR Dinonaktifkan'
+                      ? 'Mode Offline · Fitur AI & OCR Dinonaktifkan'
                       : 'Menyinkronkan Perubahan Lokal',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
@@ -723,34 +765,70 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildQuickActions() {
-    return Row(
+    return Column(
       children: [
-        _QuickActionTile(
-          icon: Icons.receipt_long_rounded,
-          label: 'Catat\nBelanja',
-          color: AppColors.primaryLight,
-          onTap: () => context.go('/catat-keuangan'),
+        Row(
+          children: [
+            _QuickActionTile(
+              icon: Icons.receipt_long_rounded,
+              label: 'Catat\nBelanja',
+              color: AppColors.primaryLight,
+              onTap: () => context.go('/catat-keuangan'),
+            ),
+            const SizedBox(width: 10),
+            _QuickActionTile(
+              icon: Icons.document_scanner_rounded,
+              label: 'Scan\nStruk AI',
+              color: AppColors.accent,
+              onTap: () => context.go('/catat-keuangan?scan=1'),
+            ),
+            const SizedBox(width: 10),
+            _QuickActionTile(
+              icon: Icons.bolt_rounded,
+              label: 'Auto\nE-Wallet',
+              color: const Color(0xFF0EA5E9),
+              onTap: () => context.push('/ewallet-connect'),
+            ),
+            const SizedBox(width: 10),
+            _QuickActionTile(
+              icon: Icons.groups_rounded,
+              label: 'Piutang &\nSplit Bill',
+              color: AppColors.purple,
+              onTap: () => context.push('/debt-split'),
+            ),
+          ],
         ),
-        const SizedBox(width: 10),
-        _QuickActionTile(
-          icon: Icons.document_scanner_rounded,
-          label: 'Scan\nStruk AI',
-          color: AppColors.accent,
-          onTap: () => context.go('/catat-keuangan?scan=1'),
-        ),
-        const SizedBox(width: 10),
-        _QuickActionTile(
-          icon: Icons.insights_rounded,
-          label: 'Insight\nPerilaku',
-          color: AppColors.purple,
-          onTap: () => context.go('/behavior-insight'),
-        ),
-        const SizedBox(width: 10),
-        _QuickActionTile(
-          icon: Icons.history_rounded,
-          label: 'Riwayat\nLengkap',
-          color: AppColors.success,
-          onTap: () => context.push('/financial-history'),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _QuickActionTile(
+              icon: Icons.health_and_safety_rounded,
+              label: 'Dana\nDarurat',
+              color: AppColors.success,
+              onTap: () => context.push('/financial-plans?tab=2'),
+            ),
+            const SizedBox(width: 10),
+            _QuickActionTile(
+              icon: Icons.face_retouching_natural_rounded,
+              label: 'Avatar\n2D & Level',
+              color: const Color(0xFFF59E0B),
+              onTap: () => context.push('/profile-account/edit'),
+            ),
+            const SizedBox(width: 10),
+            _QuickActionTile(
+              icon: Icons.insights_rounded,
+              label: 'Insight\nPerilaku',
+              color: const Color(0xFFEC4899),
+              onTap: () => context.go('/behavior-insight'),
+            ),
+            const SizedBox(width: 10),
+            _QuickActionTile(
+              icon: Icons.history_rounded,
+              label: 'Riwayat\nLengkap',
+              color: const Color(0xFF6366F1),
+              onTap: () => context.push('/financial-history'),
+            ),
+          ],
         ),
       ],
     );

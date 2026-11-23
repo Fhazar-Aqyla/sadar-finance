@@ -10,6 +10,9 @@ class UserModel {
   final String? occupation;
   final String? profilePicture;
   final String status;
+  final bool emailVerified;
+  final String? googleId;
+  final String? googleEmail;
 
   const UserModel({
     required this.id,
@@ -23,7 +26,14 @@ class UserModel {
     this.occupation,
     this.profilePicture,
     this.status = 'active',
+    this.emailVerified = false,
+    this.googleId,
+    this.googleEmail,
   });
+
+  bool get isGoogleLinked =>
+      (googleId != null && googleId!.trim().isNotEmpty) ||
+      (googleEmail != null && googleEmail!.trim().isNotEmpty);
 
   String get fullName {
     final cleanLast = (lastName.toLowerCase() == 'user') ? '' : lastName.trim();
@@ -31,10 +41,12 @@ class UserModel {
     return combined.isNotEmpty ? combined : email;
   }
 
-  String get displayName => firstName.trim().isNotEmpty ? firstName.trim() : fullName;
+  String get displayName =>
+      firstName.trim().isNotEmpty ? firstName.trim() : fullName;
 
   String get initials {
-    final parts = fullName.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts =
+        fullName.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
     if (parts.isEmpty) return 'S';
     if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
@@ -64,6 +76,10 @@ class UserModel {
           (json['profile_picture'] ?? json['profilePicture'] ?? json['avatar'])
               ?.toString(),
       status: (json['status'] ?? 'active').toString(),
+      emailVerified:
+          json['email_verified'] == true || json['emailVerified'] == true,
+      googleId: (json['google_id'] ?? json['googleId'])?.toString(),
+      googleEmail: (json['google_email'] ?? json['googleEmail'])?.toString(),
     );
   }
 
@@ -79,6 +95,9 @@ class UserModel {
         'occupation': occupation,
         'profile_picture': profilePicture,
         'status': status,
+        'email_verified': emailVerified,
+        'google_id': googleId,
+        'google_email': googleEmail,
       };
 
   UserModel copyWith({
@@ -91,6 +110,9 @@ class UserModel {
     String? address,
     String? occupation,
     String? profilePicture,
+    bool? emailVerified,
+    String? googleId,
+    String? googleEmail,
   }) {
     return UserModel(
       id: id,
@@ -104,6 +126,9 @@ class UserModel {
       occupation: occupation ?? this.occupation,
       profilePicture: profilePicture ?? this.profilePicture,
       status: status,
+      emailVerified: emailVerified ?? this.emailVerified,
+      googleId: googleId ?? this.googleId,
+      googleEmail: googleEmail ?? this.googleEmail,
     );
   }
 }

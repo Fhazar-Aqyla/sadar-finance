@@ -4,11 +4,13 @@
  */
 
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const fs = require('fs/promises');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const userRepository = require('../repositories/user.repository');
-const { UnauthorizedError, ConflictError, BadRequestError } = require('../utils/errors');
+const emailService = require('./email.service');
+const { UnauthorizedError, ConflictError, BadRequestError, NotFoundError } = require('../utils/errors');
 
 class AuthService {
   /**
@@ -84,13 +86,196 @@ class AuthService {
   }
 
   async forgotPassword(email) {
-    await userRepository.findByEmail(email);
+    return this.sendOtp({ email, purpose: 'reset' });
+  }
+
+  /**
+   * Generate and send 6-digit OTP code via Email (for email verification or password reset).
+   */
+  async sendOtp({ userId, email, purpose = 'verify' }) {
+    let user = null;
+    if (userId) {
+      user = await userRepository.findByIdWithPassword(userId);
+    } else if (email) {
+      user = await userRepository.findByEmail(email);
+    }
+
+    if (!user) {
+      throw new NotFoundError('Email akun tidak ditemukan di SADAR Finance.');
+    }
+
+    const otp = String(crypto.randomInt(100000, 999999));
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await userRepository.saveOtp(user.users_id, otp, expiresAt);
+
+    const delivery = await emailService.sendOtpEmail({
+      toEmail: user.email,
+      name: user.first_name,
+      otp,
+      purpose,
+    });
 
     return {
-      email,
-      resetAvailable: false,
-      message: 'Reset password melalui email belum tersedia. Silakan hubungi administrator.',
+      email: user.email,
+      resetAvailable: true,
+      expiresInSeconds: 600,
+      deliveryMode: delivery.provider,
+      ...(delivery.sent ? {} : { otpPreview: otp }),
+      message: delivery.sent
+        ? `Kode verifikasi 6 digit telah dikirim ke email ${user.email}.`
+        : `Kode OTP berhasil dibuat untuk ${user.email} (Mode Sandbox: ${otp}).`,
     };
+  }
+
+  /**
+   * Verify 6-digit OTP and mark user's email as verified.
+   */
+  async verifyOtp({ userId, email, otp }) {
+    let user = null;
+    if (userId) {
+      user = await userRepository.findByIdWithPassword(userId);
+    } else if (email) {
+      user = await userRepository.findByEmail(email);
+    }
+    if (!user) {
+      throw new NotFoundError('Akun tidak ditemukan.');
+    }
+    if (!user.otp_code || String(user.otp_code) !== String(otp).trim()) {
+      throw new BadRequestError('Kode verifikasi OTP tidak sesuai.');
+    }
+    if (user.otp_expires_at && new Date(user.otp_expires_at) < new Date()) {
+      throw new BadRequestError('Kode OTP sudah kedaluwarsa. Silakan kirim ulang kode baru.');
+    }
+
+    const updated = await userRepository.markEmailVerified(user.users_id);
+    return this._sanitizeUser(updated);
+  }
+
+  /**
+   * Reset password using 6-digit OTP sent to email.
+   */
+  async resetPasswordWithOtp({ email, otp, newPassword }) {
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundError('Email akun tidak ditemukan.');
+    }
+    if (!user.otp_code || String(user.otp_code) !== String(otp).trim()) {
+      throw new BadRequestError('Kode OTP tidak valid.');
+    }
+    if (user.otp_expires_at && new Date(user.otp_expires_at) < new Date()) {
+      throw new BadRequestError('Kode OTP sudah kedaluwarsa. Silakan minta kode baru.');
+    }
+    if (!newPassword || newPassword.length < 8) {
+      throw new BadRequestError('Kata sandi baru minimal 8 karakter.');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await userRepository.updatePassword(user.users_id, passwordHash);
+    const verifiedUser = await userRepository.markEmailVerified(user.users_id);
+    return {
+      user: this._sanitizeUser(verifiedUser),
+      message: 'Kata sandi berhasil diperbarui! Silakan masuk dengan kata sandi baru Anda.',
+    };
+  }
+
+  /**
+   * Login / Register / Link via Google Account.
+   */
+  async authenticateWithGoogle({ idToken, accessToken, googleId, email, displayName, photoUrl }) {
+    let verifiedEmail = (email || '').trim().toLowerCase();
+    let verifiedSub = googleId || '';
+
+    // Verify Google token if provided
+    if (idToken) {
+      try {
+        const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
+        if (res.ok) {
+          const info = await res.json();
+          if (info.email) verifiedEmail = info.email.toLowerCase();
+          if (info.sub) verifiedSub = info.sub;
+        }
+      } catch (_) {}
+    } else if (accessToken) {
+      try {
+        const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
+          const info = await res.json();
+          if (info.email) verifiedEmail = info.email.toLowerCase();
+          if (info.sub) verifiedSub = info.sub;
+        }
+      } catch (_) {}
+    }
+
+    if (!verifiedEmail) {
+      throw new BadRequestError('Email Google tidak valid.');
+    }
+    if (!verifiedSub) {
+      verifiedSub = `google_${crypto.createHash('sha256').update(verifiedEmail).digest('hex').slice(0, 20)}`;
+    }
+
+    let user = await userRepository.findByGoogleId(verifiedSub);
+    if (!user) {
+      user = await userRepository.findByEmail(verifiedEmail);
+    }
+
+    if (user) {
+      // Link Google ID & mark email verified if not already linked
+      user = await userRepository.updateProfile(user.users_id, {
+        googleId: verifiedSub,
+        googleEmail: verifiedEmail,
+        emailVerified: true,
+        ...(user.profile_picture ? {} : { profilePicture: photoUrl || 'avatar2d:boss_cuan' }),
+      });
+    } else {
+      const parts = (displayName || verifiedEmail.split('@')[0]).trim().split(/\s+/);
+      const firstName = parts[0] || 'Pengguna';
+      const lastName = parts.length > 1 ? parts.slice(1).join(' ') : 'SADAR';
+      const randomPassHash = await bcrypt.hash(crypto.randomBytes(24).toString('hex'), 10);
+
+      user = await userRepository.create({
+        firstName,
+        lastName,
+        email: verifiedEmail,
+        passwordHash: randomPassHash,
+        profilePicture: photoUrl || 'avatar2d:boss_cuan',
+        emailVerified: true,
+        googleId: verifiedSub,
+        googleEmail: verifiedEmail,
+      });
+    }
+
+    const token = this._generateToken(user);
+    return {
+      user: this._sanitizeUser(user),
+      token,
+    };
+  }
+
+  async linkGoogleAccount(userId, { googleId, email, idToken }) {
+    const current = await userRepository.findById(userId);
+    if (!current) throw new UnauthorizedError('User not found');
+
+    const googleEmail = (email || current.email).trim().toLowerCase();
+    const sub =
+      googleId ||
+      `google_${crypto.createHash('sha256').update(googleEmail).digest('hex').slice(0, 20)}`;
+
+    const updated = await userRepository.updateProfile(userId, {
+      googleId: sub,
+      googleEmail,
+      emailVerified: true,
+    });
+    return this._sanitizeUser(updated);
+  }
+
+  async unlinkGoogleAccount(userId) {
+    const updated = await userRepository.updateProfile(userId, {
+      googleId: null,
+      googleEmail: null,
+    });
+    return this._sanitizeUser(updated);
   }
 
   async updateProfile(userId, data) {
@@ -225,7 +410,7 @@ class AuthService {
    * Remove sensitive fields from user object.
    */
   _sanitizeUser(user) {
-    const { password_hash, ...sanitized } = user;
+    const { password_hash, otp_code, otp_expires_at, ...sanitized } = user;
     return sanitized;
   }
 

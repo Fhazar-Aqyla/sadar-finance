@@ -15,17 +15,24 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
+  final _otpCtrl = TextEditingController();
+  final _newPassCtrl = TextEditingController();
   bool _loading = false;
+  bool _otpSent = false;
+  bool _obscurePass = true;
   String? _responseMessage;
 
   @override
   void dispose() {
     _emailCtrl.dispose();
+    _otpCtrl.dispose();
+    _newPassCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    if (_emailCtrl.text.trim().isEmpty || !_emailCtrl.text.contains('@')) {
+  Future<void> _sendOtp() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Masukkan alamat email yang valid.')),
       );
@@ -36,12 +43,66 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       _responseMessage = null;
     });
     try {
-      final msg = await ref
-          .read(sadarApiServiceProvider)
-          .forgotPassword(_emailCtrl.text.trim());
-      if (mounted) setState(() => _responseMessage = msg);
+      final res =
+          await ref.read(sadarApiServiceProvider).forgotPasswordWithOtp(email);
+      final preview = res['otpPreview']?.toString();
+      if (mounted) {
+        setState(() {
+          _otpSent = true;
+          if (preview != null && preview.isNotEmpty) {
+            _otpCtrl.text = preview;
+          }
+          _responseMessage = (res['message'] ??
+                  'Kode OTP 6 digit telah dikirim ke email Anda.')
+              .toString();
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => _responseMessage = e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _verifyAndReset() async {
+    final email = _emailCtrl.text.trim();
+    final otp = _otpCtrl.text.trim();
+    final newPass = _newPassCtrl.text;
+    if (otp.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Masukkan 6 digit kode OTP.')),
+      );
+      return;
+    }
+    if (newPass.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kata sandi baru minimal 8 karakter.')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      final msg =
+          await ref.read(sadarApiServiceProvider).resetPasswordWithOtp(
+                email: email,
+                otp: otp,
+                newPassword: newPass,
+              );
+      if (!mounted) return;
+      await ref.read(authProvider.notifier).syncOfflinePasswordHash(newPass);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.success,
+          content: Text(msg),
+        ),
+      );
+      context.go('/login');
+    } catch (e) {
+      if (mounted) {
+        setState(() => _responseMessage = e.toString());
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -108,17 +169,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Lupa Kata Sandi',
+                              'Reset Kata Sandi via OTP',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 25,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.4,
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Masukkan email terdaftar di SADAR Finance untuk mengajukan pemulihan akun.',
+                              'Kami akan mengirimkan kode verifikasi 6 digit ke email terdaftar Anda untuk membuat kata sandi baru.',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 13.5,
@@ -165,6 +226,44 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           prefixIcon: Icon(Icons.email_outlined),
                         ),
                       ),
+                      if (_otpSent) ...[
+                        const SizedBox(height: 14),
+                        TextField(
+                          controller: _otpCtrl,
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 6,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Kode Verifikasi OTP (6 Digit)',
+                            hintText: '123456',
+                            counterText: '',
+                            prefixIcon: Icon(Icons.pin_outlined),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        TextField(
+                          controller: _newPassCtrl,
+                          obscureText: _obscurePass,
+                          decoration: InputDecoration(
+                            labelText: 'Kata Sandi Baru (Min. 8 Karakter)',
+                            prefixIcon: const Icon(Icons.lock_reset_rounded),
+                            suffixIcon: IconButton(
+                              onPressed: () => setState(
+                                () => _obscurePass = !_obscurePass,
+                              ),
+                              icon: Icon(
+                                _obscurePass
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                       if (_responseMessage != null) ...[
                         const SizedBox(height: 14),
                         Container(
@@ -189,7 +288,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       SizedBox(
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _loading ? null : _submit,
+                          onPressed: _loading
+                              ? null
+                              : (_otpSent ? _verifyAndReset : _sendOtp),
                           child: _loading
                               ? const SizedBox(
                                   width: 20,
@@ -199,9 +300,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('Kirim Permintaan'),
+                              : Text(
+                                  _otpSent
+                                      ? 'Verifikasi OTP & Simpan Kata Sandi'
+                                      : 'Kirim Kode OTP 6 Digit',
+                                ),
                         ),
                       ),
+                      if (_otpSent) ...[
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: _loading ? null : _sendOtp,
+                          child: const Text('Kirim Ulang Kode OTP'),
+                        ),
+                      ],
                     ],
                   ),
                 ),

@@ -34,6 +34,15 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <service
+            android:name=".SadarNotificationListener"
+            android:label="SADAR Finance Auto-Catat E-Wallet"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
     </application>
     <queries>
         <intent>

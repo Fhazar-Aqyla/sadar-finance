@@ -205,3 +205,184 @@ class TransferLogModel {
         'date': date.toIso8601String(),
       };
 }
+
+class DebtItemModel {
+  final String id;
+  final String personName;
+  final String phone;
+  final double amount;
+  final bool isReceivable; // true = Piutang (teman pinjam), false = Utang (saya pinjam)
+  final String note;
+  final DateTime? dueDate;
+  final bool isSettled;
+  final DateTime createdAt;
+
+  const DebtItemModel({
+    required this.id,
+    required this.personName,
+    this.phone = '',
+    required this.amount,
+    this.isReceivable = true,
+    this.note = '',
+    this.dueDate,
+    this.isSettled = false,
+    required this.createdAt,
+  });
+
+  DebtItemModel copyWith({
+    String? personName,
+    String? phone,
+    double? amount,
+    bool? isReceivable,
+    String? note,
+    DateTime? dueDate,
+    bool? isSettled,
+  }) {
+    return DebtItemModel(
+      id: id,
+      personName: personName ?? this.personName,
+      phone: phone ?? this.phone,
+      amount: amount ?? this.amount,
+      isReceivable: isReceivable ?? this.isReceivable,
+      note: note ?? this.note,
+      dueDate: dueDate ?? this.dueDate,
+      isSettled: isSettled ?? this.isSettled,
+      createdAt: createdAt,
+    );
+  }
+
+  factory DebtItemModel.fromJson(Map<String, dynamic> json) {
+    return DebtItemModel(
+      id: (json['id'] ?? '').toString(),
+      personName: (json['personName'] ?? 'Teman').toString(),
+      phone: (json['phone'] ?? '').toString(),
+      amount: (json['amount'] as num?)?.toDouble() ??
+          double.tryParse((json['amount'] ?? '0').toString()) ??
+          0,
+      isReceivable: json['isReceivable'] != false,
+      note: (json['note'] ?? '').toString(),
+      dueDate: json['dueDate'] != null
+          ? DateTime.tryParse(json['dueDate'].toString())
+          : null,
+      isSettled: json['isSettled'] == true,
+      createdAt: DateTime.tryParse((json['createdAt'] ?? '').toString()) ??
+          DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'personName': personName,
+        'phone': phone,
+        'amount': amount,
+        'isReceivable': isReceivable,
+        'note': note,
+        'dueDate': dueDate?.toIso8601String(),
+        'isSettled': isSettled,
+        'createdAt': createdAt.toIso8601String(),
+      };
+}
+
+class EWalletLinkModel {
+  final String providerId; // gopay | dana | ovo | shopeepay | mandiri | bca | bri | seabank
+  final String providerName;
+  final String packageName;
+  final String? linkedAccountId;
+  final bool autoRecordEnabled;
+  final int syncedCount;
+  final DateTime? lastDetectedAt;
+
+  const EWalletLinkModel({
+    required this.providerId,
+    required this.providerName,
+    required this.packageName,
+    this.linkedAccountId,
+    this.autoRecordEnabled = false,
+    this.syncedCount = 0,
+    this.lastDetectedAt,
+  });
+
+  static const List<EWalletLinkModel> defaultProviders = [
+    EWalletLinkModel(
+      providerId: 'gopay',
+      providerName: 'GoPay / Gojek',
+      packageName: 'com.gojek.app',
+    ),
+    EWalletLinkModel(
+      providerId: 'dana',
+      providerName: 'DANA Dompet Digital',
+      packageName: 'id.dana',
+    ),
+    EWalletLinkModel(
+      providerId: 'ovo',
+      providerName: 'OVO',
+      packageName: 'ovo.id',
+    ),
+    EWalletLinkModel(
+      providerId: 'shopeepay',
+      providerName: 'ShopeePay',
+      packageName: 'com.shopee.id',
+    ),
+    EWalletLinkModel(
+      providerId: 'mandiri',
+      providerName: "Livin' by Mandiri",
+      packageName: 'id.bmri.livin',
+    ),
+    EWalletLinkModel(
+      providerId: 'bca',
+      providerName: 'BCA mobile / myBCA',
+      packageName: 'com.bca',
+    ),
+    EWalletLinkModel(
+      providerId: 'seabank',
+      providerName: 'SeaBank',
+      packageName: 'id.co.seabank.app',
+    ),
+    EWalletLinkModel(
+      providerId: 'jago',
+      providerName: 'Bank Jago',
+      packageName: 'com.jago.digitalBanking',
+    ),
+  ];
+
+  EWalletLinkModel copyWith({
+    String? linkedAccountId,
+    bool? autoRecordEnabled,
+    int? syncedCount,
+    DateTime? lastDetectedAt,
+  }) {
+    return EWalletLinkModel(
+      providerId: providerId,
+      providerName: providerName,
+      packageName: packageName,
+      linkedAccountId: linkedAccountId ?? this.linkedAccountId,
+      autoRecordEnabled: autoRecordEnabled ?? this.autoRecordEnabled,
+      syncedCount: syncedCount ?? this.syncedCount,
+      lastDetectedAt: lastDetectedAt ?? this.lastDetectedAt,
+    );
+  }
+
+  factory EWalletLinkModel.fromJson(Map<String, dynamic> json) {
+    return EWalletLinkModel(
+      providerId: (json['providerId'] ?? 'gopay').toString(),
+      providerName: (json['providerName'] ?? 'GoPay').toString(),
+      packageName: (json['packageName'] ?? 'com.gojek.app').toString(),
+      linkedAccountId: json['linkedAccountId']?.toString(),
+      autoRecordEnabled: json['autoRecordEnabled'] == true,
+      syncedCount: int.tryParse((json['syncedCount'] ?? '0').toString()) ?? 0,
+      lastDetectedAt: json['lastDetectedAt'] != null
+          ? DateTime.tryParse(json['lastDetectedAt'].toString())
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'providerId': providerId,
+        'providerName': providerName,
+        'packageName': packageName,
+        'linkedAccountId': linkedAccountId,
+        'autoRecordEnabled': autoRecordEnabled,
+        'syncedCount': syncedCount,
+        'lastDetectedAt': lastDetectedAt?.toIso8601String(),
+      };
+}

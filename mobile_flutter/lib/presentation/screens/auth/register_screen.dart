@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/google_auth_helper.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
@@ -50,6 +51,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           email: _emailCtrl.text,
           password: _passwordCtrl.text,
           phoneNumber: _phoneCtrl.text,
+        );
+    if (ok && mounted) {
+      final user = ref.read(authProvider).user;
+      ref.read(financeProvider.notifier).loadAll(userId: user?.id);
+      context.go('/dashboard');
+    }
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    final picked = await GoogleAuthHelper.pickGoogleAccount(context);
+    if (picked == null || !mounted) return;
+    final ok = await ref.read(authProvider.notifier).signInWithGoogle(
+          googleId: picked.googleId,
+          email: picked.email,
+          displayName: picked.displayName,
+          photoUrl: picked.photoUrl,
         );
     if (ok && mounted) {
       final user = ref.read(authProvider).user;
@@ -408,6 +425,35 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         ),
                                       )
                                     : const Text('Daftar Sekarang'),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              height: 46,
+                              child: OutlinedButton.icon(
+                                onPressed:
+                                    auth.isLoading ? null : _signUpWithGoogle,
+                                icon: Container(
+                                  width: 20,
+                                  height: 20,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF4285F4),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Text(
+                                    'G',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                                label: const Text(
+                                  'Daftar Cepat dengan Google',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
                               ),
                             ),
                           ],

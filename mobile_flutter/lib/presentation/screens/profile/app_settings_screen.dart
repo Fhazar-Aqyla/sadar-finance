@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/services/google_auth_helper.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/services/app_update_service.dart';
@@ -259,8 +260,299 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
     );
   }
 
+  void _showEmailVerificationSheet() {
+    final otpCtrl = TextEditingController();
+    bool sending = false;
+    bool verifying = false;
+    bool codeSent = false;
+    String? infoMessage;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          final email = ref.read(authProvider).user?.email ?? '-';
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              20,
+              20,
+              MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.mark_email_read_rounded,
+                          color: AppColors.accent,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Verifikasi Email (Kode OTP)',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimaryOf(ctx),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Kirim kode verifikasi 6 digit ke $email untuk mengaktifkan lencana Email Terverifikasi.',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.textSecondaryOf(ctx),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  if (infoMessage != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.success.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Text(
+                        infoMessage!,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimaryOf(ctx),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  OutlinedButton.icon(
+                    onPressed: sending
+                        ? null
+                        : () async {
+                            setModalState(() => sending = true);
+                            try {
+                              final res = await ref
+                                  .read(authProvider.notifier)
+                                  .sendEmailOtp();
+                              final preview =
+                                  res['otpPreview']?.toString() ?? '';
+                              setModalState(() {
+                                sending = false;
+                                codeSent = true;
+                                infoMessage = preview.isNotEmpty
+                                    ? 'Kode OTP terkirim! (Kode Pratinjau: $preview)'
+                                    : (res['message']?.toString() ??
+                                        'Kode verifikasi 6 digit telah dikirim ke email Anda.');
+                                if (preview.isNotEmpty) {
+                                  otpCtrl.text = preview;
+                                }
+                              });
+                            } catch (e) {
+                              setModalState(() => sending = false);
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: AppColors.danger,
+                                    content: Text('$e'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                    icon: sending
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.send_rounded, size: 18),
+                    label: Text(
+                      codeSent
+                          ? 'Kirim Ulang Kode OTP ke Email'
+                          : 'Kirim Kode OTP 6 Digit Sekarang',
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: otpCtrl,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 6,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Masukkan Kode OTP 6 Digit',
+                      hintText: '123456',
+                      counterText: '',
+                      prefixIcon: Icon(Icons.pin_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: verifying
+                          ? null
+                          : () async {
+                              final code = otpCtrl.text.trim();
+                              if (code.length != 6) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Masukkan 6 digit kode OTP dari email Anda.',
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                              setModalState(() => verifying = true);
+                              try {
+                                await ref
+                                    .read(authProvider.notifier)
+                                    .verifyEmailWithOtp(code);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      backgroundColor: AppColors.success,
+                                      content: Text(
+                                        'Email berhasil diverifikasi!',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                setModalState(() => verifying = false);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: AppColors.danger,
+                                      content: Text('$e'),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                      child: verifying
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('Verifikasi Kode OTP'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleGoogleLinkToggle() async {
+    final user = ref.read(authProvider).user;
+    if (user == null) return;
+    if (user.isGoogleLinked) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Lepas Tautan Google?'),
+          content: Text(
+            'Tautan akun Google (${user.googleEmail ?? user.email}) akan dilepas. Anda tetap bisa masuk dengan email & kata sandi.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.danger,
+              ),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Lepas Tautan'),
+            ),
+          ],
+        ),
+      );
+      if (confirm != true || !mounted) return;
+      try {
+        await ref.read(authProvider.notifier).unlinkGoogleAccount();
+        await GoogleAuthHelper.signOutGoogle();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tautan akun Google berhasil dilepas.'),
+          ),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(backgroundColor: AppColors.danger, content: Text('$e')),
+        );
+      }
+      return;
+    }
+
+    final picked = await GoogleAuthHelper.pickGoogleAccount(
+      context,
+      prefillEmail: user.email,
+      prefillName: user.fullName,
+    );
+    if (picked == null || !mounted) return;
+    try {
+      await ref.read(authProvider.notifier).linkGoogleAccount(
+            googleId: picked.googleId,
+            email: picked.email,
+            photoUrl: picked.photoUrl,
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.success,
+          content: Text('Akun Google (${picked.email}) berhasil ditautkan!'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: AppColors.danger, content: Text('$e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    final user = auth.user;
     final uiPrefs = ref.watch(uiPreferencesProvider);
     final finance = ref.watch(financeProvider);
     final primaryColor = AppColors.primaryOf(context);
@@ -430,6 +722,109 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                           );
                         }
                       : _showChangePasswordSheet,
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    user?.emailVerified == true
+                        ? Icons.verified_rounded
+                        : Icons.mark_email_unread_outlined,
+                    color: user?.emailVerified == true
+                        ? AppColors.success
+                        : AppColors.warning,
+                  ),
+                  title: Text(
+                    'Verifikasi Email (Kode OTP 6 Digit)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    user?.emailVerified == true
+                        ? 'Email ${user?.email ?? ''} telah terverifikasi'
+                        : 'Kirim kode OTP 6 digit ke ${user?.email ?? 'email Anda'}',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  trailing: user?.emailVerified == true
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: const Text(
+                            'Terverifikasi',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.success,
+                            ),
+                          ),
+                        )
+                      : TextButton(
+                          onPressed: _showEmailVerificationSheet,
+                          child: const Text('Verifikasi'),
+                        ),
+                  onTap: user?.emailVerified == true
+                      ? null
+                      : _showEmailVerificationSheet,
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    width: 26,
+                    height: 26,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: (user?.isGoogleLinked == true
+                              ? const Color(0xFF4285F4)
+                              : secondaryColor)
+                          .withValues(alpha: 0.16),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      'G',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                        color: user?.isGoogleLinked == true
+                            ? const Color(0xFF4285F4)
+                            : secondaryColor,
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    'Tautkan Akun Google',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    user?.isGoogleLinked == true
+                        ? 'Tertaut ke ${user?.googleEmail ?? user?.email}'
+                        : 'Hubungkan akun Google untuk masuk 1-ketuk & verifikasi instan',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  trailing: TextButton(
+                    onPressed: _handleGoogleLinkToggle,
+                    child: Text(
+                      user?.isGoogleLinked == true ? 'Lepas' : 'Tautkan',
+                      style: TextStyle(
+                        color: user?.isGoogleLinked == true
+                            ? AppColors.danger
+                            : primaryColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  onTap: _handleGoogleLinkToggle,
                 ),
               ],
             ),

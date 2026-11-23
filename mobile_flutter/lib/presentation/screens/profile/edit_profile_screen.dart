@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/finance_provider.dart';
+import '../../widgets/avatar_2d_preset.dart';
 import '../../widgets/sadar_card.dart';
 import '../../widgets/user_avatar.dart';
 
@@ -47,6 +49,192 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _occupationCtrl.dispose();
     _addressCtrl.dispose();
     super.dispose();
+  }
+
+  void _showAvatar2DPickerSheet() {
+    final currentLevel = ref.read(financeProvider).financialLevel;
+    final currentPic = ref.read(authProvider).user?.profilePicture ?? '';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.76,
+        maxChildSize: 0.92,
+        minChildSize: 0.50,
+        builder: (ctx, scrollCtrl) => Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pilih Karakter Avatar 2D',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimaryOf(ctx),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Level Anda saat ini: Level $currentLevel · Naikkan level untuk membuka karakter eksklusif!',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondaryOf(ctx),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: GridView.builder(
+                  controller: scrollCtrl,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.78,
+                  ),
+                  itemCount: Avatar2DPreset.catalog.length,
+                  itemBuilder: (ctx, idx) {
+                    final preset = Avatar2DPreset.catalog[idx];
+                    final unlocked = currentLevel >= preset.requiredLevel;
+                    final selected = currentPic == preset.id;
+
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () async {
+                        if (!unlocked) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: AppColors.warning,
+                              content: Text(
+                                'Karakter "${preset.name}" terbuka di Level ${preset.requiredLevel}. Rajin catat transaksi untuk naik level!',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        Navigator.pop(ctx);
+                        setState(() => _uploadingAvatar = true);
+                        final ok = await ref
+                            .read(authProvider.notifier)
+                            .selectAvatar2DPreset(preset.id);
+                        if (!mounted) return;
+                        setState(() {
+                          _uploadingAvatar = false;
+                          _localAvatarPreview = null;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor:
+                                ok ? AppColors.success : AppColors.danger,
+                            content: Text(
+                              ok
+                                  ? 'Avatar 2D "${preset.name}" berhasil digunakan!'
+                                  : 'Gagal menyimpan avatar.',
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? AppColors.accent.withValues(alpha: 0.14)
+                              : AppColors.subtleOf(ctx),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: selected
+                                ? AppColors.accent
+                                : AppColors.borderOf(ctx),
+                            width: selected ? 2 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Opacity(
+                                  opacity: unlocked ? 1.0 : 0.38,
+                                  child: Avatar2DWidget(
+                                    preset: preset,
+                                    size: 58,
+                                  ),
+                                ),
+                                if (!unlocked)
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.65),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.lock_rounded,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              preset.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimaryOf(ctx),
+                              ),
+                            ),
+                            Text(
+                              unlocked
+                                  ? preset.roleTag
+                                  : 'Level ${preset.requiredLevel}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: unlocked
+                                    ? AppColors.textSecondaryOf(ctx)
+                                    : AppColors.warning,
+                                fontWeight: unlocked
+                                    ? FontWeight.w500
+                                    : FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _pickAvatar() async {
@@ -138,15 +326,43 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           isLoading: _uploadingAvatar,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      TextButton.icon(
-                        onPressed: _uploadingAvatar ? null : _pickAvatar,
-                        icon: const Icon(Icons.photo_camera_outlined, size: 18),
-                        label: Text(
-                          _uploadingAvatar
-                              ? 'Mengunggah Foto...'
-                              : 'Ganti Foto Profil',
-                        ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _uploadingAvatar
+                                ? null
+                                : _showAvatar2DPickerSheet,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accent,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                            ),
+                            icon: const Icon(Icons.face_retouching_natural_rounded, size: 18),
+                            label: const Text('Pilih Avatar 2D'),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _uploadingAvatar ? null : _pickAvatar,
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                            ),
+                            icon: const Icon(
+                              Icons.photo_camera_outlined,
+                              size: 18,
+                            ),
+                            label: Text(
+                              _uploadingAvatar ? 'Mengunggah...' : 'Upload Foto',
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

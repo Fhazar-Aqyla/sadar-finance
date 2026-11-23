@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../../core/config/app_config.dart';
 import '../../core/theme/app_theme.dart';
+import 'avatar_2d_preset.dart';
 
 /// Displays a user's avatar from:
 /// 1) Local File preview (while uploading),
@@ -65,6 +66,11 @@ class UserAvatar extends StatelessWidget {
 
     final raw = profilePicture?.trim() ?? '';
     if (raw.isEmpty) return _buildInitials(context);
+
+    if (raw.startsWith('avatar2d:')) {
+      final preset = Avatar2DPreset.fromId(raw) ?? Avatar2DPreset.catalog.first;
+      return Avatar2DWidget(preset: preset, size: radius * 2);
+    }
 
     if (raw.startsWith('data:')) {
       final bytes = _tryDecodeDataUri(raw);

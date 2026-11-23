@@ -353,54 +353,457 @@ class ProfileAccountScreen extends ConsumerWidget {
           children: [
             // User Profile Card
             SadarCard(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserAvatar(
-                    profilePicture: user?.profilePicture,
-                    apiBaseUrl: auth.apiBaseUrl,
-                    initials: user?.initials ?? 'S',
-                    radius: 30,
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user?.fullName ?? 'Pengguna SADAR',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          user?.email ?? '-',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: textSecondary,
-                          ),
-                        ),
-                        if (finance.isOffline)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4),
-                            child: Text(
-                              'Mode Offline · Data Tersimpan Lokal',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.warning,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => context.push('/profile-account/edit'),
+                        child: Stack(
+                          children: [
+                            UserAvatar(
+                              profilePicture: user?.profilePicture,
+                              apiBaseUrl: auth.apiBaseUrl,
+                              initials: user?.initials ?? 'S',
+                              radius: 32,
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accent,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.surfaceOf(context),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.face_retouching_natural_rounded,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    user?.fullName ?? 'Pengguna SADAR',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: textPrimary,
+                                    ),
+                                  ),
+                                ),
+                                if (user?.emailVerified == true) ...[
+                                  const SizedBox(width: 5),
+                                  const Tooltip(
+                                    message: 'Email Terverifikasi',
+                                    child: Icon(
+                                      Icons.verified_rounded,
+                                      color: AppColors.success,
+                                      size: 17,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              user?.email ?? '-',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: (user?.emailVerified == true
+                                            ? AppColors.success
+                                            : AppColors.warning)
+                                        .withValues(alpha: 0.14),
+                                    borderRadius: BorderRadius.circular(99),
+                                  ),
+                                  child: Text(
+                                    user?.emailVerified == true
+                                        ? 'Email Terverifikasi'
+                                        : 'Belum Verifikasi OTP',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: user?.emailVerified == true
+                                          ? AppColors.success
+                                          : AppColors.warning,
+                                    ),
+                                  ),
+                                ),
+                                if (user?.isGoogleLinked == true)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF4285F4)
+                                          .withValues(alpha: 0.14),
+                                      borderRadius: BorderRadius.circular(99),
+                                    ),
+                                    child: const Text(
+                                      'Google Tertaut',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF4285F4),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            if (finance.isOffline)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Text(
+                                  'Mode Offline · Data Tersimpan Lokal',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.warning,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Edit Profil & Avatar 2D',
+                        onPressed: () => context.push('/profile-account/edit'),
+                        icon: Icon(Icons.edit_outlined, color: primaryColor),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () =>
+                              context.push('/profile-account/edit'),
+                          icon: const Icon(
+                            Icons.face_retouching_natural_rounded,
+                            size: 17,
                           ),
-                      ],
+                          label: const Text(
+                            'Pilih Avatar 2D',
+                            style: TextStyle(fontSize: 12.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push('/settings'),
+                          icon: const Icon(
+                            Icons.verified_user_outlined,
+                            size: 17,
+                          ),
+                          label: Text(
+                            user?.emailVerified == true &&
+                                    user?.isGoogleLinked == true
+                                ? 'Keamanan Akun'
+                                : 'Tautkan Google / OTP',
+                            style: const TextStyle(fontSize: 12.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Gamification: Level, Streak & Achievement Badges
+            SadarCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.primary, AppColors.accent],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'LV.${finance.financialLevel}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              finance.financialLevelTitle,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                                color: textPrimary,
+                              ),
+                            ),
+                            Text(
+                              '${finance.xpPoints} XP · Buka karakter Avatar 2D eksklusif tiap naik level',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF97316).withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('🔥', style: TextStyle(fontSize: 13)),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${finance.streakDays} Hari',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFFF97316),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(99),
+                    child: LinearProgressIndicator(
+                      value: finance.levelProgressRatio,
+                      minHeight: 7,
+                      backgroundColor: AppColors.borderOf(context),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppColors.accent,
+                      ),
                     ),
                   ),
-                  IconButton(
-                    tooltip: 'Edit Profil',
-                    onPressed: () => context.push('/profile-account/edit'),
-                    icon: Icon(Icons.edit_outlined, color: primaryColor),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Lencana Pencapaian (${finance.badges.where((b) => b.unlocked).length}/${finance.badges.length})',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: finance.badges.map((b) {
+                      return Tooltip(
+                        message: '${b.title}: ${b.subtitle}',
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: b.unlocked
+                                ? AppColors.accent.withValues(alpha: 0.13)
+                                : AppColors.subtleOf(context),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: b.unlocked
+                                  ? AppColors.accent.withValues(alpha: 0.45)
+                                  : AppColors.borderOf(context),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                b.unlocked
+                                    ? Icons.workspace_premium_rounded
+                                    : Icons.lock_outline_rounded,
+                                size: 15,
+                                color: b.unlocked
+                                    ? AppColors.accent
+                                    : AppColors.textMutedOf(context),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                b.title,
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: b.unlocked
+                                      ? FontWeight.w800
+                                      : FontWeight.w500,
+                                  color: b.unlocked
+                                      ? textPrimary
+                                      : AppColors.textMutedOf(context),
+                                ),
+                              ),
+                              if (b.unlocked) ...[
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.check_circle_rounded,
+                                  size: 13,
+                                  color: AppColors.success,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Fitur Pintar & Otomatisasi (E-Wallet, Piutang/Split Bill, Dana Darurat)
+            SadarCard(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.bolt_rounded,
+                        color: AppColors.accent,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      'Koneksi E-Wallet & M-Banking Otomatis',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                        color: textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${finance.ewalletLinks.where((e) => e.autoRecordEnabled).length} e-wallet aktif (GoPay, DANA, OVO, ShopeePay, Livin, BCA)',
+                      style: TextStyle(fontSize: 12, color: textSecondary),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/ewallet-connect'),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.purple.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.groups_rounded,
+                        color: AppColors.purple,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      'Catatan Piutang Teman & Split Bill',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                        color: textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${finance.debts.where((d) => !d.isSettled).length} catatan aktif · Kalkulator patungan + pengingat WA',
+                      style: TextStyle(fontSize: 12, color: textSecondary),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/debt-split'),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.health_and_safety_rounded,
+                        color: AppColors.success,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      'Kalkulator Dana Darurat & Impian',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                        color: textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Simulasi 3x-12x pengeluaran bulanan & target tabungan',
+                      style: TextStyle(fontSize: 12, color: textSecondary),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/financial-plans?tab=2'),
                   ),
                 ],
               ),

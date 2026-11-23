@@ -31,6 +31,8 @@ class FinanceState {
   final List<TransferLogModel> transfers;
   final List<SavingsGoalModel> savingsGoals;
   final List<RecurringItemModel> recurringItems;
+  final List<DebtItemModel> debts;
+  final List<EWalletLinkModel> ewalletLinks;
   final BudgetModel? budget;
   final HealthScoreResult? healthScore;
   final List<ScoreHistoryItem> scoreHistory;
@@ -55,6 +57,8 @@ class FinanceState {
     this.transfers = const [],
     this.savingsGoals = const [],
     this.recurringItems = const [],
+    this.debts = const [],
+    this.ewalletLinks = const [],
     this.budget,
     this.healthScore,
     this.scoreHistory = const [],
@@ -111,6 +115,128 @@ class FinanceState {
   int get totalRecordsCount =>
       transactions.length + incomes.length + transfers.length;
 
+  // ── GAMIFICATION (STREAK, XP, LEVEL, BADGES) ──────────────
+
+  int get streakDays {
+    final activeDays = <String>{};
+    for (final t in transactions) {
+      activeDays.add(
+        '${t.transactionDate.year}-${t.transactionDate.month}-${t.transactionDate.day}',
+      );
+    }
+    for (final i in incomes) {
+      activeDays.add(
+        '${i.incomeDate.year}-${i.incomeDate.month}-${i.incomeDate.day}',
+      );
+    }
+    if (activeDays.isEmpty) return 0;
+
+    int streak = 0;
+    final today = DateTime.now();
+    for (int offset = 0; offset < 365; offset++) {
+      final d = today.subtract(Duration(days: offset));
+      final key = '${d.year}-${d.month}-${d.day}';
+      if (activeDays.contains(key)) {
+        streak++;
+      } else if (offset == 0) {
+        // Allow today to not have a record yet if yesterday had one
+        continue;
+      } else {
+        break;
+      }
+    }
+    return streak == 0 && activeDays.isNotEmpty ? 1 : streak;
+  }
+
+  int get xpPoints {
+    int xp = 0;
+    xp += transactions.length * 15;
+    xp += incomes.length * 25;
+    xp += transfers.length * 10;
+    xp += savingsGoals.length * 40;
+    xp += savingsGoals.where((g) => g.isCompleted).length * 120;
+    xp += recurringItems.length * 30;
+    xp += debts.where((d) => d.isSettled).length * 35;
+    xp += ewalletLinks.where((e) => e.autoRecordEnabled).length * 50;
+    if (hasBudgetConfigured) xp += 100;
+    if ((healthScore?.overallScore ?? 0) >= 70) xp += 120;
+    xp += streakDays * 20;
+    return xp;
+  }
+
+  int get financialLevel {
+    if (xpPoints >= 900) return 5;
+    if (xpPoints >= 550) return 4;
+    if (xpPoints >= 300) return 3;
+    if (xpPoints >= 120) return 2;
+    return 1;
+  }
+
+  double get levelProgressRatio {
+    final thresholds = [0, 120, 300, 550, 900, 1400];
+    final lvl = financialLevel;
+    final low = thresholds[lvl - 1];
+    final high = thresholds[lvl];
+    return ((xpPoints - low) / (high - low)).clamp(0.0, 1.0);
+  }
+
+  String get financialLevelTitle {
+    switch (financialLevel) {
+      case 5:
+        return 'Level 5 · Master 50/30/20';
+      case 4:
+        return 'Level 4 · Sultan Sabar';
+      case 3:
+        return 'Level 3 · Analis Finansial';
+      case 2:
+        return 'Level 2 · Pejuang Darurat';
+      default:
+        return 'Level 1 · Pemula Sadar';
+    }
+  }
+
+  List<({String id, String title, String subtitle, bool unlocked})>
+      get badges {
+    return [
+      (
+        id: 'first_record',
+        title: 'Langkah Pertama',
+        subtitle: 'Mencatat transaksi pertama',
+        unlocked: totalRecordsCount > 0,
+      ),
+      (
+        id: 'streak_3',
+        title: 'Disiplin 3 Hari',
+        subtitle: 'Streak pencatatan 3 hari',
+        unlocked: streakDays >= 3,
+      ),
+      (
+        id: 'budget_setter',
+        title: 'Arsitek 50/30/20',
+        subtitle: 'Mengatur target budget bulanan',
+        unlocked: hasBudgetConfigured,
+      ),
+      (
+        id: 'dream_saver',
+        title: 'Penabung Impian',
+        subtitle: 'Membuat target tabungan aktif',
+        unlocked: savingsGoals.isNotEmpty,
+      ),
+      (
+        id: 'smart_score',
+        title: 'Finansial Sehat',
+        subtitle: 'Mencapai Skor Finansial ≥ 70',
+        unlocked: (healthScore?.overallScore ?? 0) >= 70,
+      ),
+      (
+        id: 'ewallet_sync',
+        title: 'Auto-Pilot Digital',
+        subtitle: 'Menghubungkan E-Wallet otomatis',
+        unlocked: ewalletLinks.any((e) => e.autoRecordEnabled),
+      ),
+    ];
+  }
+
   /// Unique merchant suggestions learned from user's transaction history
   List<TransactionModel> get merchantSuggestions {
     final seen = <String>{};
@@ -165,6 +291,8 @@ class FinanceState {
     List<TransferLogModel>? transfers,
     List<SavingsGoalModel>? savingsGoals,
     List<RecurringItemModel>? recurringItems,
+    List<DebtItemModel>? debts,
+    List<EWalletLinkModel>? ewalletLinks,
     BudgetModel? budget,
     HealthScoreResult? healthScore,
     List<ScoreHistoryItem>? scoreHistory,
@@ -189,6 +317,8 @@ class FinanceState {
       transfers: transfers ?? this.transfers,
       savingsGoals: savingsGoals ?? this.savingsGoals,
       recurringItems: recurringItems ?? this.recurringItems,
+      debts: debts ?? this.debts,
+      ewalletLinks: ewalletLinks ?? this.ewalletLinks,
       budget: budget ?? this.budget,
       healthScore: healthScore ?? this.healthScore,
       scoreHistory: scoreHistory ?? this.scoreHistory,
@@ -289,6 +419,8 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       transfers: state.transfers,
       savingsGoals: state.savingsGoals,
       recurringItems: state.recurringItems,
+      debts: state.debts,
+      ewalletLinks: state.ewalletLinks,
       budget: state.budget,
       healthScore: state.healthScore,
       scoreHistory: state.scoreHistory,
@@ -319,6 +451,10 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         transfers: cached.transfers,
         savingsGoals: cached.savingsGoals,
         recurringItems: cached.recurringItems,
+        debts: cached.debts,
+        ewalletLinks: cached.ewalletLinks.isNotEmpty
+            ? cached.ewalletLinks
+            : EWalletLinkModel.defaultProviders,
         budget: cached.budget,
         healthScore: cached.healthScore,
         scoreHistory: cached.scoreHistory,
@@ -334,6 +470,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       state = state.copyWith(
         isLoading: true,
         pendingSyncCount: pending.length,
+        ewalletLinks: EWalletLinkModel.defaultProviders,
         clearError: true,
       );
     }
@@ -1456,6 +1593,142 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       transfers: state.transfers.where((t) => t.id != id).toList(),
     );
     await _persistState();
+  }
+
+  // ── DEBTS & SPLIT BILL (UTANG / PIUTANG & PATUNGAN) ────────
+
+  Future<void> addDebtItem({
+    required String personName,
+    String phone = '',
+    required double amount,
+    required bool isReceivable,
+    String note = '',
+    DateTime? dueDate,
+  }) async {
+    final item = DebtItemModel(
+      id: 'debt_${DateTime.now().millisecondsSinceEpoch}_${state.debts.length}',
+      personName: personName.trim(),
+      phone: phone.trim(),
+      amount: amount,
+      isReceivable: isReceivable,
+      note: note.trim(),
+      dueDate: dueDate,
+      createdAt: DateTime.now(),
+    );
+    state = state.copyWith(debts: [item, ...state.debts]);
+    await _persistState();
+  }
+
+  Future<void> settleDebtItem(String id, {String? accountId}) async {
+    final idx = state.debts.indexWhere((d) => d.id == id);
+    if (idx < 0) return;
+    final item = state.debts[idx];
+    if (item.isSettled) return;
+
+    if (accountId != null && accountId.isNotEmpty) {
+      if (item.isReceivable) {
+        await addIncome(
+          accountId: accountId,
+          amount: item.amount,
+          incomeDate: DateTime.now(),
+          source: 'Pelunasan Piutang: ${item.personName}',
+        );
+      } else {
+        await addTransaction(
+          accountId: accountId,
+          categoryGroup: 'Needs',
+          categoryDetail: 'Pelunasan Utang',
+          transactionDate: DateTime.now(),
+          description: 'Pelunasan Utang ke ${item.personName}',
+          amount: item.amount,
+        );
+      }
+    }
+
+    final updated = state.debts.map((d) {
+      if (d.id != id) return d;
+      return d.copyWith(isSettled: true);
+    }).toList();
+    state = state.copyWith(debts: updated);
+    await _persistState();
+  }
+
+  Future<void> deleteDebtItem(String id) async {
+    state = state.copyWith(
+      debts: state.debts.where((d) => d.id != id).toList(),
+    );
+    await _persistState();
+  }
+
+  // ── E-WALLET & BANK NOTIFICATION AUTO-SYNC ─────────────────
+
+  Future<void> configureEWalletLink({
+    required String providerId,
+    String? linkedAccountId,
+    required bool autoRecordEnabled,
+  }) async {
+    final base = state.ewalletLinks.isNotEmpty
+        ? state.ewalletLinks
+        : EWalletLinkModel.defaultProviders;
+    final updated = base.map((e) {
+      if (e.providerId != providerId) return e;
+      return e.copyWith(
+        linkedAccountId: linkedAccountId,
+        autoRecordEnabled: autoRecordEnabled,
+      );
+    }).toList();
+    state = state.copyWith(ewalletLinks: updated);
+    await _persistState();
+  }
+
+  /// Auto-records a transaction or income parsed from an incoming E-Wallet / Mobile Banking notification.
+  Future<bool> ingestEWalletNotification({
+    required String providerId,
+    required double amount,
+    required String merchantOrTitle,
+    bool isIncome = false,
+  }) async {
+    if (amount <= 0) return false;
+    final links = state.ewalletLinks.isNotEmpty
+        ? state.ewalletLinks
+        : EWalletLinkModel.defaultProviders;
+    final link = links.firstWhere(
+      (e) => e.providerId == providerId || e.packageName == providerId,
+      orElse: () => links.first,
+    );
+
+    final targetAccId = link.linkedAccountId ??
+        (state.accounts.isNotEmpty ? state.accounts.first.id : null);
+
+    if (isIncome) {
+      await addIncome(
+        accountId: targetAccId,
+        amount: amount,
+        incomeDate: DateTime.now(),
+        source: '${link.providerName}: $merchantOrTitle',
+      );
+    } else {
+      await addTransaction(
+        accountId: targetAccId,
+        categoryGroup: 'Wants',
+        categoryDetail: link.providerName,
+        transactionDate: DateTime.now(),
+        description: '$merchantOrTitle (${link.providerName})',
+        amount: amount,
+        source: 'ewallet_auto',
+      );
+    }
+
+    final updatedLinks = links.map((e) {
+      if (e.providerId != link.providerId) return e;
+      return e.copyWith(
+        syncedCount: e.syncedCount + 1,
+        lastDetectedAt: DateTime.now(),
+      );
+    }).toList();
+    state = state.copyWith(ewalletLinks: updatedLinks);
+    await _persistState();
+    return true;
   }
 
   void clear() {

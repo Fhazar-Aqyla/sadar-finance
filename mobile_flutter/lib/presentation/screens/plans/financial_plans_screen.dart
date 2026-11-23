@@ -38,9 +38,9 @@ class _FinancialPlansScreenState extends ConsumerState<FinancialPlansScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 2,
+      length: 3,
       vsync: this,
-      initialIndex: widget.initialTab.clamp(0, 1),
+      initialIndex: widget.initialTab.clamp(0, 2),
     );
   }
 
@@ -476,33 +476,43 @@ class _FinancialPlansScreenState extends ConsumerState<FinancialPlansScreen>
           tabs: [
             Tab(
               icon: const Icon(Icons.savings_outlined),
-              text: 'Target Tabungan (${finance.savingsGoals.length})',
+              text: 'Target (${finance.savingsGoals.length})',
             ),
             Tab(
               icon: const Icon(Icons.event_repeat_rounded),
-              text: 'Tagihan Rutin (${finance.recurringItems.length})',
+              text: 'Rutin (${finance.recurringItems.length})',
+            ),
+            const Tab(
+              icon: Icon(Icons.calculate_outlined),
+              text: 'Dana Darurat',
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (_tabController.index == 0) {
-            _showAddGoalSheet();
-          } else {
-            _showAddRecurringSheet(finance.accounts);
-          }
-        },
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Tambah'),
-      ),
+      floatingActionButton: _tabController.index < 2
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                if (_tabController.index == 0) {
+                  _showAddGoalSheet();
+                } else {
+                  _showAddRecurringSheet(finance.accounts);
+                }
+              },
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Tambah'),
+            )
+          : null,
       body: TabBarView(
         controller: _tabController,
         children: [
           _buildGoalsTab(finance, hidden),
           _buildRecurringTab(finance, hidden),
+          _EmergencyFundCalculatorTab(
+            finance: finance,
+            onCreatedGoal: () => _tabController.animateTo(0),
+          ),
         ],
       ),
     );
@@ -825,6 +835,196 @@ class _FinancialPlansScreenState extends ConsumerState<FinancialPlansScreen>
           ),
         );
       },
+    );
+  }
+}
+
+class _EmergencyFundCalculatorTab extends ConsumerStatefulWidget {
+  final FinanceState finance;
+  final VoidCallback onCreatedGoal;
+
+  const _EmergencyFundCalculatorTab({
+    required this.finance,
+    required this.onCreatedGoal,
+  });
+
+  @override
+  ConsumerState<_EmergencyFundCalculatorTab> createState() =>
+      _EmergencyFundCalculatorTabState();
+}
+
+class _EmergencyFundCalculatorTabState
+    extends ConsumerState<_EmergencyFundCalculatorTab> {
+  int _multiplier = 6; // 3x Lajang Pemula, 6x Lajang Ideal, 9x Menikah, 12x Keluarga / Freelancer
+  int _targetMonths = 12;
+
+  @override
+  Widget build(BuildContext context) {
+    final monthlyExp = widget.finance.currentMonthExpense > 0
+        ? widget.finance.currentMonthExpense
+        : (widget.finance.budget != null &&
+                widget.finance.budget!.needsAmount > 0
+            ? widget.finance.budget!.needsAmount
+            : 2500000.0);
+    final idealFund = monthlyExp * _multiplier;
+    final currentCushion = widget.finance.totalBalance;
+    final coveragePct = idealFund > 0
+        ? ((currentCushion / idealFund) * 100).clamp(0, 100).round()
+        : 0;
+    final shortfall = (idealFund - currentCushion).clamp(0.0, double.infinity);
+    final monthlySavingNeeded =
+        _targetMonths > 0 ? shortfall / _targetMonths : shortfall;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        SadarCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SectionHeader(
+                title: 'Kalkulator Kesehatan Dana Darurat',
+                subtitle:
+                    'Dihitung otomatis dari pengeluaran bulanan & saldo akun aktif Anda',
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Pilih Profil Tanggungan Anda:',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimaryOf(context),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  (3, 'Lajang Awal (3x)'),
+                  (6, 'Lajang Ideal (6x)'),
+                  (9, 'Menikah (9x)'),
+                  (12, 'Keluarga / Freelance (12x)'),
+                ].map((opt) {
+                  return ChoiceChip(
+                    label: Text(opt.$2),
+                    selected: _multiplier == opt.$1,
+                    onSelected: (_) => setState(() => _multiplier = opt.$1),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.primaryOf(context).withValues(alpha: 0.30),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Target Dana Darurat Ideal ($_multiplier Bulan)',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: AppColors.textSecondaryOf(context),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      AppFormatters.rupiah(idealFund),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryOf(context),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(
+                        value: (coveragePct / 100).clamp(0.0, 1.0),
+                        minHeight: 8,
+                        backgroundColor: AppColors.borderOf(context),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.success,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Kesiapan Dana Saat Ini: $coveragePct% (${AppFormatters.compactRupiah(currentCushion)})',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimaryOf(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (shortfall > 0) ...[
+                const SizedBox(height: 14),
+                Text(
+                  'Simulasi Waktu Pencapaian ($_targetMonths Bulan):',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Slider(
+                  value: _targetMonths.toDouble(),
+                  min: 3,
+                  max: 36,
+                  divisions: 11,
+                  label: '$_targetMonths Bulan',
+                  onChanged: (v) => setState(() => _targetMonths = v.round()),
+                ),
+                Text(
+                  'Rekomendasi sisihkan: ${AppFormatters.rupiah(monthlySavingNeeded)} / bulan',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.accentOf(context),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    await ref.read(financeProvider.notifier).addSavingsGoal(
+                          title: 'Dana Darurat Ideal (${_multiplier}x)',
+                          targetAmount: idealFund,
+                          initialAmount:
+                              currentCushion.clamp(0, idealFund).toDouble(),
+                          category: 'Dana Darurat',
+                        );
+                    widget.onCreatedGoal();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: AppColors.success,
+                          content: Text(
+                            'Target Dana Darurat berhasil ditambahkan ke Target Tabungan!',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.flag_rounded),
+                  label: const Text('Jadikan Target Tabungan Aktif'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,4 +1,5 @@
 # Keep Flutter engine & plugins safe under R8
+-keep class com.sadarfinance.sadar_finance.** { *; }
 -keep class io.flutter.app.** { *; }
 -keep class io.flutter.plugin.** { *; }
 -keep class io.flutter.util.** { *; }

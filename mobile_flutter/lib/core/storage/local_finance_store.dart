@@ -49,6 +49,8 @@ class LocalFinanceSnapshot {
   final List<TransferLogModel> transfers;
   final List<SavingsGoalModel> savingsGoals;
   final List<RecurringItemModel> recurringItems;
+  final List<DebtItemModel> debts;
+  final List<EWalletLinkModel> ewalletLinks;
   final BudgetModel? budget;
   final HealthScoreResult? healthScore;
   final List<ScoreHistoryItem> scoreHistory;
@@ -65,6 +67,8 @@ class LocalFinanceSnapshot {
     this.transfers = const [],
     this.savingsGoals = const [],
     this.recurringItems = const [],
+    this.debts = const [],
+    this.ewalletLinks = const [],
     this.budget,
     this.healthScore,
     this.scoreHistory = const [],
@@ -88,6 +92,8 @@ class LocalFinanceStore {
     List<TransferLogModel> transfers = const [],
     List<SavingsGoalModel> savingsGoals = const [],
     List<RecurringItemModel> recurringItems = const [],
+    List<DebtItemModel> debts = const [],
+    List<EWalletLinkModel> ewalletLinks = const [],
     BudgetModel? budget,
     HealthScoreResult? healthScore,
     List<ScoreHistoryItem> scoreHistory = const [],
@@ -106,6 +112,8 @@ class LocalFinanceStore {
         'transfers': transfers.map((e) => e.toJson()).toList(),
         'savingsGoals': savingsGoals.map((e) => e.toJson()).toList(),
         'recurringItems': recurringItems.map((e) => e.toJson()).toList(),
+        'debts': debts.map((e) => e.toJson()).toList(),
+        'ewalletLinks': ewalletLinks.map((e) => e.toJson()).toList(),
         'budget': budget?.toJson(),
         'healthScore': healthScore?.toJson(),
         'scoreHistory': scoreHistory.map((e) => e.toJson()).toList(),
@@ -145,6 +153,12 @@ class LocalFinanceStore {
             .toList(),
         recurringItems: ((map['recurringItems'] as List?) ?? const [])
             .map((e) => RecurringItemModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        debts: ((map['debts'] as List?) ?? const [])
+            .map((e) => DebtItemModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        ewalletLinks: ((map['ewalletLinks'] as List?) ?? const [])
+            .map((e) => EWalletLinkModel.fromJson(Map<String, dynamic>.from(e as Map)))
             .toList(),
         budget: map['budget'] is Map
             ? BudgetModel.fromJson(Map<String, dynamic>.from(map['budget'] as Map))

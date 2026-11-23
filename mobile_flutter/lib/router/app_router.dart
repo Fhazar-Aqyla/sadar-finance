@@ -6,6 +6,8 @@ import '../presentation/screens/auth/login_screen.dart';
 import '../presentation/screens/auth/register_screen.dart';
 import '../presentation/screens/auth/splash_screen.dart';
 import '../presentation/screens/dashboard/dashboard_screen.dart';
+import '../presentation/screens/debt/debt_split_screen.dart';
+import '../presentation/screens/ewallet/ewallet_connect_screen.dart';
 import '../presentation/screens/history/financial_history_screen.dart';
 import '../presentation/screens/insight/behavior_insight_screen.dart';
 import '../presentation/screens/onboarding/onboarding_screen.dart';
@@ -159,6 +161,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/financial-plans',
         builder: (_, state) => FinancialPlansScreen(
+          initialTab:
+              int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
+        ),
+      ),
+      GoRoute(
+        path: '/ewallet-connect',
+        builder: (_, _) => const EWalletConnectScreen(),
+      ),
+      GoRoute(
+        path: '/debt-split',
+        builder: (_, state) => DebtSplitScreen(
           initialTab:
               int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
         ),

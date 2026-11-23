@@ -24,16 +24,16 @@ void main() {
         AccountModel(
           id: 'a1',
           name: 'BCA',
+          type: 'Bank',
           accountNumber: '123',
           balance: 5000000,
-          type: 'bank',
         ),
         AccountModel(
           id: 'a2',
           name: 'GoPay',
+          type: 'E-Wallet',
           accountNumber: '456',
           balance: 500000,
-          type: 'ewallet',
         ),
       ],
       incomes: [

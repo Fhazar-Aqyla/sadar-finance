@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/google_auth_helper.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
@@ -31,6 +32,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final ok = await ref.read(authProvider.notifier).login(
           email: _emailCtrl.text,
           password: _passwordCtrl.text,
+        );
+    if (ok && mounted) {
+      final user = ref.read(authProvider).user;
+      ref.read(financeProvider.notifier).loadAll(userId: user?.id);
+      context.go('/dashboard');
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    final picked = await GoogleAuthHelper.pickGoogleAccount(context);
+    if (picked == null || !mounted) return;
+    final ok = await ref.read(authProvider.notifier).signInWithGoogle(
+          googleId: picked.googleId,
+          email: picked.email,
+          displayName: picked.displayName,
+          photoUrl: picked.photoUrl,
         );
     if (ok && mounted) {
       final user = ref.read(authProvider).user;
@@ -334,6 +351,64 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                           ),
                                         ],
                                       ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    color: AppColors.borderOf(context),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Text(
+                                    'ATAU MASUK CEPAT',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.8,
+                                      color: AppColors.textMutedOf(context),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    color: AppColors.borderOf(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              height: 48,
+                              child: OutlinedButton.icon(
+                                onPressed:
+                                    auth.isLoading ? null : _signInWithGoogle,
+                                icon: Container(
+                                  width: 22,
+                                  height: 22,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF4285F4),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Text(
+                                    'G',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                                label: const Text(
+                                  'Lanjutkan dengan Akun Google',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
                               ),
                             ),
                           ],

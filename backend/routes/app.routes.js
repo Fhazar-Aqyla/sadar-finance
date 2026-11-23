@@ -8,8 +8,8 @@ const { success } = require('../utils/response');
 const router = Router();
 
 router.get('/version', (_req, res) => {
-  const latestVersion = process.env.APP_LATEST_VERSION || '1.1.0';
-  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 5);
+  const latestVersion = process.env.APP_LATEST_VERSION || '1.2.0';
+  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 6);
   const minVersion = process.env.APP_MIN_VERSION || '1.0.0';
   const forceUpdate = String(process.env.APP_FORCE_UPDATE || 'false').toLowerCase() === 'true';
   const downloadUrl =
@@ -19,10 +19,10 @@ router.get('/version', (_req, res) => {
   const releaseNotes = rawNotes
     ? rawNotes.split('|').map((s) => s.trim()).filter(Boolean)
     : [
-        'Fitur Target Tabungan (Savings Goals) & Jadwal Tagihan/Gaji Rutin Bulanan 1-Klik',
-        'Auto-Suggest Merchant & Kategori Pintar di Catat Keuangan + Log Riwayat Transfer',
-        'Perbaikan format Bahasa Indonesia & anti-duplikat pada Notifikasi Peringatan Prediktif',
-        'Kalkulasi Skor Finansial & Dana Tersedia lebih akurat + Bagikan Ringkasan Laporan',
+        'Katalog 16 Karakter Avatar 2D Eksklusif & Gamifikasi (Level 1-5, Streak Harian 🔥 & Lencana)',
+        'Masuk/Tautkan Akun Google (Firebase Auth) & Verifikasi Email Kode OTP 6 Digit (Resend)',
+        'Koneksi Otomatis E-Wallet & M-Banking (GoPay, DANA, OVO, ShopeePay, Livin, BCA, SeaBank, Jago)',
+        'Catatan Piutang Teman, Kalkulator Patungan (Split Bill) + Pengingat WA & Simulasi Dana Darurat',
       ];
 
   return success(res, {

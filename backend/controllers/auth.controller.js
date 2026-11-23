@@ -166,6 +166,62 @@ const deleteAccount = asyncHandler(async (req, res) => {
   });
 });
 
+const sendOtp = asyncHandler(async (req, res) => {
+  const result = await authService.sendOtp({
+    userId: req.user?.id,
+    email: req.body.email,
+    purpose: req.body.purpose || 'verify',
+  });
+  return success(res, {
+    data: result,
+    message: result.message,
+  });
+});
+
+const verifyOtp = asyncHandler(async (req, res) => {
+  const user = await authService.verifyOtp({
+    userId: req.user?.id,
+    email: req.body.email,
+    otp: req.body.otp,
+  });
+  return success(res, {
+    data: { user },
+    message: 'Email berhasil diverifikasi!',
+  });
+});
+
+const resetPasswordOtp = asyncHandler(async (req, res) => {
+  const result = await authService.resetPasswordWithOtp(req.body);
+  return success(res, {
+    data: result,
+    message: result.message,
+  });
+});
+
+const googleAuth = asyncHandler(async (req, res) => {
+  const result = await authService.authenticateWithGoogle(req.body);
+  return success(res, {
+    data: result,
+    message: 'Autentikasi Google berhasil',
+  });
+});
+
+const linkGoogle = asyncHandler(async (req, res) => {
+  const user = await authService.linkGoogleAccount(req.user.id, req.body);
+  return success(res, {
+    data: { user },
+    message: 'Akun Google berhasil ditautkan!',
+  });
+});
+
+const unlinkGoogle = asyncHandler(async (req, res) => {
+  const user = await authService.unlinkGoogleAccount(req.user.id);
+  return success(res, {
+    data: { user },
+    message: 'Tautan akun Google dilepas.',
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -175,4 +231,10 @@ module.exports = {
   changePassword,
   uploadProfilePicture,
   deleteAccount,
+  sendOtp,
+  verifyOtp,
+  resetPasswordOtp,
+  googleAuth,
+  linkGoogle,
+  unlinkGoogle,
 };
