@@ -144,4 +144,9 @@ const deleteAccount = asyncHandler(async (req, res) => {
   return noContent(res);
 });
 
-module.exports = { createAccount, getAccounts, getAccount, updateAccount, deleteAccount };
+const transferFunds = asyncHandler(async (req, res) => {
+  const result = await accountService.transfer(req.user.id, req.body);
+  return success(res, { data: result, message: 'Transfer antar akun berhasil' });
+});
+
+module.exports = { createAccount, getAccounts, getAccount, updateAccount, deleteAccount, transferFunds };

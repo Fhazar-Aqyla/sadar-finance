@@ -29,3 +29,8 @@ uploads/
 # Self-hosted web & download binaries
 backend/downloads/*.apk
 backend/public_web/
+
+# Android release signing secrets
+*.jks
+*.keystore
+mobile_flutter/android/key.properties

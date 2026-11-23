@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../app.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
@@ -343,6 +344,64 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
             child: Column(
               children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: Icon(
+                    Icons.fingerprint_rounded,
+                    color: primaryColor,
+                  ),
+                  title: Text(
+                    'Kunci Aplikasi (Biometrik / PIN)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    uiPrefs.biometricLockEnabled
+                        ? 'Aktif saat membuka aplikasi atau kembali dari latar belakang'
+                        : 'Lindungi data keuangan dengan sidik jari, wajah, atau PIN HP',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  value: uiPrefs.biometricLockEnabled,
+                  onChanged: (enabled) async {
+                    final lockService = ref.read(appLockServiceProvider);
+                    final supported = await lockService.isSupported();
+                    if (!supported) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: AppColors.warning,
+                          content: Text(
+                            'Perangkat belum mengaktifkan kunci layar (PIN / Sidik Jari).',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    final verified = await lockService.authenticate(
+                      reason: enabled
+                          ? 'Verifikasi untuk mengaktifkan Kunci Aplikasi'
+                          : 'Verifikasi untuk menonaktifkan Kunci Aplikasi',
+                    );
+                    if (!verified) return;
+                    await ref
+                        .read(uiPreferencesProvider.notifier)
+                        .setBiometricLockEnabled(enabled);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: AppColors.success,
+                        content: Text(
+                          enabled
+                              ? 'Kunci Aplikasi biometrik berhasil diaktifkan.'
+                              : 'Kunci Aplikasi dinonaktifkan.',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.lock_reset_rounded, color: primaryColor),

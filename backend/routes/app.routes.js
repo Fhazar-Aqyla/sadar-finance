@@ -8,8 +8,8 @@ const { success } = require('../utils/response');
 const router = Router();
 
 router.get('/version', (_req, res) => {
-  const latestVersion = process.env.APP_LATEST_VERSION || '1.0.2';
-  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 3);
+  const latestVersion = process.env.APP_LATEST_VERSION || '1.0.3';
+  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 4);
   const minVersion = process.env.APP_MIN_VERSION || '1.0.0';
   const forceUpdate = String(process.env.APP_FORCE_UPDATE || 'false').toLowerCase() === 'true';
   const downloadUrl =
@@ -19,10 +19,10 @@ router.get('/version', (_req, res) => {
   const releaseNotes = rawNotes
     ? rawNotes.split('|').map((s) => s.trim()).filter(Boolean)
     : [
-        'Perbaikan upload & tampilan foto profil agar tersimpan permanen dan tidak blank',
-        'Perbaikan navigasi stabil saat edit profil, ganti tema, atau upload foto',
-        'Tampilan Splash Screen bersih tanpa border & halaman perkenalan selaras landing page',
-        'Ikon aplikasi resmi SADAR Finance ("A") & mode offline auto-sync',
+        'Fitur Transfer Antar Akun / Dompet tanpa merusak statistik pemasukan & pengeluaran',
+        'Kunci Aplikasi Biometrik (Sidik Jari / Face Unlock) & auto-logout sesi kedaluwarsa',
+        'Auto-format pemisah ribuan real-time, filter bulan/akun, dan Export Laporan CSV',
+        'Navigasi 5 tab lebih mulus (posisi scroll terjaga) & APK lebih ramping bertanda tangan rilis',
       ];
 
   return success(res, {

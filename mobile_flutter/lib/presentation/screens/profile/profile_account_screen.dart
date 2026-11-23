@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/constants/bank_data.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_input_formatter.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/account_model.dart';
 import '../../../providers/auth_provider.dart';
@@ -97,6 +98,7 @@ class ProfileAccountScreen extends ConsumerWidget {
               TextField(
                 controller: balanceCtrl,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [CurrencyInputFormatter()],
                 decoration: const InputDecoration(
                   labelText: 'Saldo',
                   prefixText: 'Rp ',
@@ -220,8 +222,9 @@ class ProfileAccountScreen extends ConsumerWidget {
               TextField(
                 controller: needsCtrl,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [CurrencyInputFormatter()],
                 decoration: const InputDecoration(
-                  labelText: 'Kebutuhan (Needs — 50%)',
+                  labelText: 'Kebutuhan (Needs, 50%)',
                   prefixText: 'Rp ',
                 ),
               ),
@@ -229,8 +232,9 @@ class ProfileAccountScreen extends ConsumerWidget {
               TextField(
                 controller: wantsCtrl,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [CurrencyInputFormatter()],
                 decoration: const InputDecoration(
-                  labelText: 'Keinginan (Wants — 30%)',
+                  labelText: 'Keinginan (Wants, 30%)',
                   prefixText: 'Rp ',
                 ),
               ),
@@ -238,8 +242,9 @@ class ProfileAccountScreen extends ConsumerWidget {
               TextField(
                 controller: savingsCtrl,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [CurrencyInputFormatter()],
                 decoration: const InputDecoration(
-                  labelText: 'Tabungan & Investasi (Savings — 20%)',
+                  labelText: 'Tabungan & Investasi (Savings, 20%)',
                   prefixText: 'Rp ',
                 ),
               ),

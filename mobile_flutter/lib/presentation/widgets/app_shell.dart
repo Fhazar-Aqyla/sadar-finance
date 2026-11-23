@@ -3,45 +3,27 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 
 class AppShell extends StatelessWidget {
-  final Widget child;
-  final String location;
+  final StatefulNavigationShell navigationShell;
 
   const AppShell({
     super.key,
-    required this.child,
-    required this.location,
+    required this.navigationShell,
   });
 
-  int get _selectedIndex {
-    if (location.startsWith('/behavior-insight')) return 1;
-    if (location.startsWith('/catat-keuangan')) return 2;
-    if (location.startsWith('/financial-score')) return 3;
-    if (location.startsWith('/profile-account')) return 4;
-    return 0;
-  }
-
-  void _onTap(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go('/dashboard');
-      case 1:
-        context.go('/behavior-insight');
-      case 2:
-        context.go('/catat-keuangan');
-      case 3:
-        context.go('/financial-score');
-      case 4:
-        context.go('/profile-account');
-    }
+  void _onTap(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final current = _selectedIndex;
+    final current = navigationShell.currentIndex;
     final isDark = AppColors.isDark(context);
 
     return Scaffold(
-      body: child,
+      body: navigationShell,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.surfaceOf(context),
@@ -65,18 +47,18 @@ class AppShell extends StatelessWidget {
                   inactiveIcon: Icons.home_outlined,
                   label: 'Beranda',
                   selected: current == 0,
-                  onTap: () => _onTap(context, 0),
+                  onTap: () => _onTap(0),
                 ),
                 _NavItem(
                   icon: Icons.insights_rounded,
                   inactiveIcon: Icons.insights_outlined,
                   label: 'Insight',
                   selected: current == 1,
-                  onTap: () => _onTap(context, 1),
+                  onTap: () => _onTap(1),
                 ),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => _onTap(context, 2),
+                    onTap: () => _onTap(2),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -124,14 +106,14 @@ class AppShell extends StatelessWidget {
                   inactiveIcon: Icons.speed_outlined,
                   label: 'Skor',
                   selected: current == 3,
-                  onTap: () => _onTap(context, 3),
+                  onTap: () => _onTap(3),
                 ),
                 _NavItem(
                   icon: Icons.person_rounded,
                   inactiveIcon: Icons.person_outline_rounded,
                   label: 'Profil',
                   selected: current == 4,
-                  onTap: () => _onTap(context, 4),
+                  onTap: () => _onTap(4),
                 ),
               ],
             ),

@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../core/constants/category_helpers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_input_formatter.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/account_model.dart';
 import '../../../providers/finance_provider.dart';
@@ -46,11 +50,100 @@ class _FinancialHistoryScreenState
   final _searchCtrl = TextEditingController();
   String _typeFilter = 'all'; // all | expense | income
   String _categoryFilter = 'all'; // all | Needs | Wants | Savings
+  String _periodFilter = 'all'; // all | this_month | last_month | custom
+  String _accountFilter = 'all'; // all | accountId
+  DateTimeRange? _customRange;
+  bool _exporting = false;
 
   @override
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickCustomRange() async {
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: now.add(const Duration(days: 30)),
+      initialDateRange: _customRange ??
+          DateTimeRange(
+            start: DateTime(now.year, now.month, 1),
+            end: now,
+          ),
+    );
+    if (picked != null) {
+      setState(() {
+        _customRange = picked;
+        _periodFilter = 'custom';
+      });
+    }
+  }
+
+  String _escapeCsv(String value) {
+    final clean = value.replaceAll('"', '""');
+    return '"$clean"';
+  }
+
+  Future<void> _exportCsv(List<_HistoryItem> rows) async {
+    if (rows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tidak ada data untuk diekspor pada filter saat ini.'),
+        ),
+      );
+      return;
+    }
+    setState(() => _exporting = true);
+    try {
+      final buf = StringBuffer('\uFEFF'); // UTF-8 BOM for Excel compatibility
+      buf.writeln('Tanggal,Tipe,Judul,Kategori,Detail,Akun,Nominal');
+      for (final item in rows) {
+        final dateStr = AppFormatters.isoDateOnly(item.date);
+        final typeStr = item.isIncome ? 'Pemasukan' : 'Pengeluaran';
+        final accName = item.subtitle.contains('·')
+            ? item.subtitle.split('·').last.trim()
+            : '-';
+        buf.writeln(
+          [
+            _escapeCsv(dateStr),
+            _escapeCsv(typeStr),
+            _escapeCsv(item.title),
+            _escapeCsv(
+              item.isIncome
+                  ? 'Pemasukan'
+                  : CategoryHelpers.labelForGroup(item.categoryGroup),
+            ),
+            _escapeCsv(item.categoryDetail ?? ''),
+            _escapeCsv(accName),
+            item.amount.round().toString(),
+          ].join(','),
+        );
+      }
+
+      final dir = await getTemporaryDirectory();
+      final stamp = AppFormatters.isoDateOnly(DateTime.now());
+      final file = File('${dir.path}/laporan-sadar-finance-$stamp.csv');
+      await file.writeAsString(buf.toString(), flush: true);
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'text/csv')],
+        subject: 'Laporan Keuangan SADAR Finance ($stamp)',
+        text: 'Laporan ${rows.length} catatan keuangan dari SADAR Finance.',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text('Gagal mengekspor laporan: $e'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
   }
 
   Future<void> _showEditSheet(_HistoryItem item, List<AccountModel> accounts) async {
@@ -127,6 +220,7 @@ class _FinancialHistoryScreenState
                 TextField(
                   controller: amountCtrl,
                   keyboardType: TextInputType.number,
+                  inputFormatters: const [CurrencyInputFormatter()],
                   decoration: const InputDecoration(
                     labelText: 'Nominal',
                     prefixText: 'Rp ',
@@ -345,9 +439,38 @@ class _FinancialHistoryScreenState
         }),
     ];
 
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1, 1);
+
     final filtered = items.where((item) {
       if (_categoryFilter != 'all' && item.categoryGroup != _categoryFilter) {
         return false;
+      }
+      if (_accountFilter != 'all' && item.accountId != _accountFilter) {
+        return false;
+      }
+      if (_periodFilter == 'this_month') {
+        if (item.date.year != now.year || item.date.month != now.month) {
+          return false;
+        }
+      } else if (_periodFilter == 'last_month') {
+        if (item.date.year != lastMonth.year ||
+            item.date.month != lastMonth.month) {
+          return false;
+        }
+      } else if (_periodFilter == 'custom' && _customRange != null) {
+        final d = DateTime(item.date.year, item.date.month, item.date.day);
+        final start = DateTime(
+          _customRange!.start.year,
+          _customRange!.start.month,
+          _customRange!.start.day,
+        );
+        final end = DateTime(
+          _customRange!.end.year,
+          _customRange!.end.month,
+          _customRange!.end.day,
+        );
+        if (d.isBefore(start) || d.isAfter(end)) return false;
       }
       if (query.isNotEmpty) {
         final hay = '${item.title} ${item.subtitle}'.toLowerCase();
@@ -364,8 +487,27 @@ class _FinancialHistoryScreenState
         .where((i) => !i.isIncome)
         .fold<double>(0, (sum, i) => sum + i.amount);
 
+    final customLabel = _customRange != null
+        ? '${AppFormatters.shortDate(_customRange!.start)} - ${AppFormatters.shortDate(_customRange!.end)}'
+        : 'Rentang Tanggal';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Riwayat Keuangan')),
+      appBar: AppBar(
+        title: const Text('Riwayat Keuangan'),
+        actions: [
+          IconButton(
+            tooltip: 'Ekspor Laporan CSV',
+            onPressed: _exporting ? null : () => _exportCsv(filtered),
+            icon: _exporting
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.file_download_outlined),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Container(
@@ -426,6 +568,67 @@ class _FinancialHistoryScreenState
                               selected: _categoryFilter == g,
                               onSelected: (sel) => setState(
                                 () => _categoryFilter = sel ? g : 'all',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      ChoiceChip(
+                        label: const Text('Semua Waktu'),
+                        selected: _periodFilter == 'all',
+                        onSelected: (_) => setState(() => _periodFilter = 'all'),
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Bulan Ini'),
+                        selected: _periodFilter == 'this_month',
+                        onSelected: (_) =>
+                            setState(() => _periodFilter = 'this_month'),
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Bulan Lalu'),
+                        selected: _periodFilter == 'last_month',
+                        onSelected: (_) =>
+                            setState(() => _periodFilter = 'last_month'),
+                      ),
+                      const SizedBox(width: 8),
+                      ActionChip(
+                        avatar: Icon(
+                          Icons.date_range_rounded,
+                          size: 16,
+                          color: _periodFilter == 'custom'
+                              ? AppColors.primaryOf(context)
+                              : AppColors.textSecondaryOf(context),
+                        ),
+                        label: Text(customLabel),
+                        onPressed: _pickCustomRange,
+                      ),
+                      if (finance.accounts.isNotEmpty) ...[
+                        const SizedBox(width: 12),
+                        ChoiceChip(
+                          label: const Text('Semua Akun'),
+                          selected: _accountFilter == 'all',
+                          onSelected: (_) =>
+                              setState(() => _accountFilter = 'all'),
+                        ),
+                        const SizedBox(width: 8),
+                        ...finance.accounts.map(
+                          (acc) => Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              label: Text(acc.name),
+                              selected: _accountFilter == acc.id,
+                              onSelected: (sel) => setState(
+                                () => _accountFilter = sel ? acc.id : 'all',
                               ),
                             ),
                           ),
@@ -502,9 +705,38 @@ class _FinancialHistoryScreenState
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
-                      itemCount: filtered.length,
+                      itemCount:
+                          filtered.length + (finance.hasMoreHistory ? 1 : 0),
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (ctx, index) {
+                        if (index >= filtered.length) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: OutlinedButton.icon(
+                                onPressed: finance.isLoadingMore
+                                    ? null
+                                    : () => ref
+                                        .read(financeProvider.notifier)
+                                        .loadMoreHistory(),
+                                icon: finance.isLoadingMore
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.expand_more_rounded),
+                                label: Text(
+                                  finance.isLoadingMore
+                                      ? 'Memuat data...'
+                                      : 'Muat Riwayat Lebih Lama',
+                                ),
+                              ),
+                            ),
+                          );
+                        }
                         final item = filtered[index];
                         final color = item.isIncome
                             ? AppColors.success

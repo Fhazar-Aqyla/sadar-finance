@@ -21,8 +21,8 @@ class AppConfig {
       _envApiUrl.isNotEmpty ? _envApiUrl : productionApiUrl;
 
   static const String appName = 'SADAR Finance';
-  static const String appVersion = '1.0.2';
-  static const int appBuildNumber = 3;
+  static const String appVersion = '1.0.3';
+  static const int appBuildNumber = 4;
   static const String appTagline = 'Kelola Keuangan Pribadi Lebih Sadar';
 
   static String resolveUploadUrl(String? path, String activeApiBaseUrl) {

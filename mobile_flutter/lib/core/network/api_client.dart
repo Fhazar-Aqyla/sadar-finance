@@ -7,6 +7,8 @@ class ApiClient {
   final SecureStorageService _storage;
   late Dio _dio;
   String _baseUrl;
+  Future<void> Function()? onUnauthorized;
+  bool _handlingUnauthorized = false;
 
   ApiClient(this._storage, {String? initialBaseUrl})
       : _baseUrl = initialBaseUrl ?? AppConfig.defaultApiUrl {
@@ -48,7 +50,24 @@ class ApiClient {
           }
           handler.next(options);
         },
-        onError: (error, handler) {
+        onError: (error, handler) async {
+          final statusCode = error.response?.statusCode;
+          final path = error.requestOptions.path;
+          final isAuthCredentialCall =
+              path.contains('/auth/login') ||
+              path.contains('/auth/register') ||
+              path.contains('/auth/password');
+          if (statusCode == 401 &&
+              !isAuthCredentialCall &&
+              onUnauthorized != null &&
+              !_handlingUnauthorized) {
+            _handlingUnauthorized = true;
+            try {
+              await onUnauthorized!.call();
+            } finally {
+              _handlingUnauthorized = false;
+            }
+          }
           handler.next(error);
         },
       ),

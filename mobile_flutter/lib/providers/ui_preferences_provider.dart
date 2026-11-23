@@ -6,12 +6,14 @@ class UiPreferencesState {
   final ThemeMode themeMode;
   final bool hideBalances;
   final bool onboardingSeen;
+  final bool biometricLockEnabled;
   final bool initialized;
 
   const UiPreferencesState({
     this.themeMode = ThemeMode.light,
     this.hideBalances = false,
     this.onboardingSeen = false,
+    this.biometricLockEnabled = false,
     this.initialized = false,
   });
 
@@ -21,12 +23,14 @@ class UiPreferencesState {
     ThemeMode? themeMode,
     bool? hideBalances,
     bool? onboardingSeen,
+    bool? biometricLockEnabled,
     bool? initialized,
   }) {
     return UiPreferencesState(
       themeMode: themeMode ?? this.themeMode,
       hideBalances: hideBalances ?? this.hideBalances,
       onboardingSeen: onboardingSeen ?? this.onboardingSeen,
+      biometricLockEnabled: biometricLockEnabled ?? this.biometricLockEnabled,
       initialized: initialized ?? this.initialized,
     );
   }
@@ -36,6 +40,7 @@ class UiPreferencesNotifier extends StateNotifier<UiPreferencesState> {
   static const _themeKey = 'sadar_theme_mode';
   static const _hideBalanceKey = 'sadar_hide_balances';
   static const _onboardingKey = 'sadar_onboarding_seen_v1';
+  static const _biometricLockKey = 'sadar_biometric_lock_enabled';
   static String _tourKey(String userId) => 'sadar_tour_seen_$userId';
 
   UiPreferencesNotifier() : super(const UiPreferencesState()) {
@@ -48,15 +53,25 @@ class UiPreferencesNotifier extends StateNotifier<UiPreferencesState> {
       final isDark = prefs.getBool(_themeKey) ?? false;
       final hide = prefs.getBool(_hideBalanceKey) ?? false;
       final onboarding = prefs.getBool(_onboardingKey) ?? false;
+      final biometricLock = prefs.getBool(_biometricLockKey) ?? false;
       state = UiPreferencesState(
         themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
         hideBalances: hide,
         onboardingSeen: onboarding,
+        biometricLockEnabled: biometricLock,
         initialized: true,
       );
     } catch (_) {
       state = state.copyWith(initialized: true);
     }
+  }
+
+  Future<void> setBiometricLockEnabled(bool enabled) async {
+    state = state.copyWith(biometricLockEnabled: enabled);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_biometricLockKey, enabled);
+    } catch (_) {}
   }
 
   Future<void> toggleTheme() async {

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/category_helpers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_input_formatter.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/ocr_scan_model.dart';
 import '../../../providers/auth_provider.dart';
@@ -49,16 +50,28 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
   DateTime _incDate = DateTime.now();
   bool _incSubmitting = false;
 
+  // Transfer form
+  final _trfFormKey = GlobalKey<FormState>();
+  final _trfAmountCtrl = TextEditingController();
+  final _trfNoteCtrl = TextEditingController();
+  String? _trfFromAccountId;
+  String? _trfToAccountId;
+  bool _trfSubmitting = false;
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     Future.microtask(() {
       final accounts = ref.read(financeProvider).accounts;
       if (accounts.isNotEmpty) {
         setState(() {
           _expAccountId ??= accounts.first.id;
           _incAccountId ??= accounts.first.id;
+          _trfFromAccountId ??= accounts.first.id;
+          if (accounts.length > 1) {
+            _trfToAccountId ??= accounts[1].id;
+          }
         });
       }
       if (widget.openScanner) {
@@ -75,6 +88,8 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
     _expDetailCtrl.dispose();
     _incAmountCtrl.dispose();
     _incSourceCtrl.dispose();
+    _trfAmountCtrl.dispose();
+    _trfNoteCtrl.dispose();
     super.dispose();
   }
 
@@ -307,6 +322,58 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
     }
   }
 
+  Future<void> _submitTransfer() async {
+    if (!_trfFormKey.currentState!.validate()) return;
+    final amount = AppFormatters.parseAmount(_trfAmountCtrl.text);
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nominal transfer harus lebih dari 0')),
+      );
+      return;
+    }
+    if (_trfFromAccountId == null ||
+        _trfToAccountId == null ||
+        _trfFromAccountId == _trfToAccountId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.warning,
+          content: Text('Pilih dua akun berbeda untuk transfer saldo.'),
+        ),
+      );
+      return;
+    }
+    setState(() => _trfSubmitting = true);
+    try {
+      final syncedOnline =
+          await ref.read(financeProvider.notifier).transferBetweenAccounts(
+                fromAccountId: _trfFromAccountId!,
+                toAccountId: _trfToAccountId!,
+                amount: amount,
+                note: _trfNoteCtrl.text.trim(),
+              );
+      if (!mounted) return;
+      _trfAmountCtrl.clear();
+      _trfNoteCtrl.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: syncedOnline ? AppColors.success : AppColors.warning,
+          content: Text(
+            syncedOnline
+                ? 'Transfer saldo antar akun berhasil!'
+                : 'Transfer disimpan lokal (Offline). Akan sinkron otomatis saat online.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: AppColors.danger, content: Text('$e')),
+      );
+    } finally {
+      if (mounted) setState(() => _trfSubmitting = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final finance = ref.watch(financeProvider);
@@ -316,6 +383,12 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
     }
     if (_incAccountId == null && accounts.isNotEmpty) {
       _incAccountId = accounts.first.id;
+    }
+    if (_trfFromAccountId == null && accounts.isNotEmpty) {
+      _trfFromAccountId = accounts.first.id;
+    }
+    if (_trfToAccountId == null && accounts.length > 1) {
+      _trfToAccountId = accounts[1].id;
     }
 
     return Scaffold(
@@ -329,6 +402,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
           tabs: const [
             Tab(icon: Icon(Icons.receipt_long_rounded), text: 'Pengeluaran'),
             Tab(icon: Icon(Icons.savings_rounded), text: 'Pemasukan'),
+            Tab(icon: Icon(Icons.swap_horiz_rounded), text: 'Transfer'),
           ],
         ),
       ),
@@ -337,6 +411,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
         children: [
           _buildExpenseTab(accounts, finance.isOffline),
           _buildIncomeTab(accounts),
+          _buildTransferTab(accounts),
         ],
       ),
     );
@@ -402,7 +477,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                 const SizedBox(height: 6),
                 Text(
                   isOffline
-                      ? 'Mode Offline: Pindai struk & kategori AI membutuhkan internet. Gunakan form manual di bawah — otomatis sinkron saat online.'
+                      ? 'Mode Offline: Pindai struk & kategori AI membutuhkan internet. Gunakan form manual di bawah, otomatis sinkron saat online.'
                       : 'Ambil foto atau unggah gambar struk. Sistem akan mengisi nominal, merchant, dan tanggal secara otomatis.',
                   style: TextStyle(
                     fontSize: 12.5,
@@ -484,7 +559,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Struk terbaca (${_scanResult!.merchant ?? "Merchant"}) — periksa formulir di bawah lalu simpan.',
+                            'Struk terbaca (${_scanResult!.merchant ?? "Merchant"}), periksa formulir di bawah lalu simpan.',
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
@@ -534,6 +609,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                   TextFormField(
                     controller: _expAmountCtrl,
                     keyboardType: TextInputType.number,
+                    inputFormatters: const [CurrencyInputFormatter()],
                     decoration: const InputDecoration(
                       labelText: 'Nominal Pengeluaran',
                       prefixText: 'Rp ',
@@ -547,7 +623,8 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
-                    children: [25000, 50000, 100000, 250000, 500000].map((val) {
+                    children: [10000, 25000, 50000, 100000, 250000, 500000]
+                        .map((val) {
                       return ActionChip(
                         label: Text(AppFormatters.compactRupiah(val.toDouble())),
                         onPressed: () => setState(
@@ -752,6 +829,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
               TextFormField(
                 controller: _incAmountCtrl,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [CurrencyInputFormatter()],
                 decoration: const InputDecoration(
                   labelText: 'Nominal Pemasukan',
                   prefixText: 'Rp ',
@@ -825,6 +903,195 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                         )
                       : const Icon(Icons.add_rounded),
                   label: const Text('Simpan Pemasukan'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransferTab(List accounts) {
+    if (accounts.length < 2) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: SadarCard(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.swap_horiz_rounded,
+                  size: 46,
+                  color: AppColors.primaryOf(context),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Butuh Minimal 2 Akun Keuangan',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimaryOf(context),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Tambahkan minimal dua rekening, e-wallet, atau dompet di menu Profil untuk memindahkan saldo antar akun.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondaryOf(context),
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final validFrom = accounts.any((a) => a.id == _trfFromAccountId)
+        ? _trfFromAccountId
+        : accounts.first.id;
+    final validTo = accounts.any((a) => a.id == _trfToAccountId)
+        ? _trfToAccountId
+        : accounts.firstWhere((a) => a.id != validFrom, orElse: () => accounts.last).id;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: SadarCard(
+        child: Form(
+          key: _trfFormKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Transfer Saldo Antar Akun',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimaryOf(context),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Pindahkan dana antar bank, e-wallet, atau dompet tunai tanpa menambah pengeluaran atau pemasukan bulanan.',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: AppColors.textSecondaryOf(context),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                initialValue: validFrom,
+                decoration: const InputDecoration(
+                  labelText: 'Dari Akun (Sumber)',
+                  prefixIcon: Icon(Icons.call_made_rounded),
+                ),
+                items: accounts
+                    .map<DropdownMenuItem<String>>(
+                      (a) => DropdownMenuItem<String>(
+                        value: a.id,
+                        child: Text(
+                          '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) => setState(() => _trfFromAccountId = v),
+              ),
+              const SizedBox(height: 6),
+              Center(
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      final tmp = _trfFromAccountId;
+                      _trfFromAccountId = _trfToAccountId;
+                      _trfToAccountId = tmp;
+                    });
+                  },
+                  icon: const Icon(Icons.swap_vert_rounded, size: 18),
+                  label: const Text('Tukar Arah Akun'),
+                ),
+              ),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                initialValue: validTo,
+                decoration: const InputDecoration(
+                  labelText: 'Ke Akun (Tujuan)',
+                  prefixIcon: Icon(Icons.call_received_rounded),
+                ),
+                items: accounts
+                    .map<DropdownMenuItem<String>>(
+                      (a) => DropdownMenuItem<String>(
+                        value: a.id,
+                        child: Text(
+                          '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) => setState(() => _trfToAccountId = v),
+              ),
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: _trfAmountCtrl,
+                keyboardType: TextInputType.number,
+                inputFormatters: const [CurrencyInputFormatter()],
+                decoration: const InputDecoration(
+                  labelText: 'Nominal Transfer',
+                  prefixText: 'Rp ',
+                  hintText: '200.000',
+                ),
+                validator: (v) => AppFormatters.parseAmount(v ?? '') <= 0
+                    ? 'Masukkan nominal valid'
+                    : null,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [50000, 100000, 250000, 500000, 1000000].map((val) {
+                  return ActionChip(
+                    label: Text(AppFormatters.compactRupiah(val.toDouble())),
+                    onPressed: () => setState(
+                      () => _trfAmountCtrl.text =
+                          AppFormatters.number(val.toDouble()),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: _trfNoteCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Catatan Transfer (Opsional)',
+                  hintText: 'Contoh: Top up GoPay, Pindah ke Tabungan',
+                  prefixIcon: Icon(Icons.notes_rounded),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: _trfSubmitting ? null : _submitTransfer,
+                  icon: _trfSubmitting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.swap_horiz_rounded),
+                  label: const Text('Proses Transfer Saldo'),
                 ),
               ),
             ],

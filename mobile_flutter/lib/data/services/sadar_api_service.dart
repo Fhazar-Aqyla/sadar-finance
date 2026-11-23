@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../core/network/api_client.dart';
 import '../../core/utils/formatters.dart';
-import '../mock/mock_repository.dart';
 import '../models/account_model.dart';
 import '../models/analytics_models.dart';
 import '../models/budget_model.dart';
@@ -20,14 +19,8 @@ class AuthResult {
 
 class SadarApiService {
   final ApiClient _client;
-  final MockRepository _mock;
-  bool isDemoMode;
 
-  SadarApiService(
-    this._client,
-    this._mock, {
-    this.isDemoMode = false,
-  });
+  SadarApiService(this._client);
 
   String get baseUrl => _client.baseUrl;
 
@@ -39,13 +32,6 @@ class SadarApiService {
     required String email,
     required String password,
   }) async {
-    if (isDemoMode) {
-      await Future.delayed(const Duration(milliseconds: 350));
-      return AuthResult(
-        user: _mock.user,
-        token: 'demo-jwt-token-sadar-finance',
-      );
-    }
     final data = await _client.post(
       '/auth/login',
       data: {'email': email.trim(), 'password': password},
@@ -64,16 +50,6 @@ class SadarApiService {
     String? phoneNumber,
     String? occupation,
   }) async {
-    if (isDemoMode) {
-      await Future.delayed(const Duration(milliseconds: 350));
-      final updated = _mock.updateUser(
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phoneNumber,
-        occupation: occupation,
-      );
-      return AuthResult(user: updated, token: 'demo-jwt-token-sadar-finance');
-    }
     final payload = <String, dynamic>{
       'firstName': firstName.trim(),
       'lastName': lastName.trim(),
@@ -92,10 +68,6 @@ class SadarApiService {
   }
 
   Future<String> forgotPassword(String email) async {
-    if (isDemoMode) {
-      await Future.delayed(const Duration(milliseconds: 300));
-      return 'Permintaan reset password telah dicatat (Mode Demo).';
-    }
     final data = await _client.post(
       '/auth/forgot-password',
       data: {'email': email.trim()},
@@ -107,7 +79,6 @@ class SadarApiService {
   }
 
   Future<UserModel> getProfile() async {
-    if (isDemoMode) return _mock.user;
     final data = await _client.get('/auth/me');
     final map = (data is Map && data['user'] is Map)
         ? Map<String, dynamic>.from(data['user'] as Map)
@@ -124,16 +95,6 @@ class SadarApiService {
     String? address,
     String? occupation,
   }) async {
-    if (isDemoMode) {
-      return _mock.updateUser(
-        firstName: firstName,
-        lastName: lastName,
-        gender: gender,
-        phoneNumber: phoneNumber,
-        address: address,
-        occupation: occupation,
-      );
-    }
     final payload = <String, dynamic>{
       if (firstName != null && firstName.trim().isNotEmpty)
         'firstName': firstName.trim(),
@@ -159,10 +120,6 @@ class SadarApiService {
     required String newPassword,
     required String confirmPassword,
   }) async {
-    if (isDemoMode) {
-      await Future.delayed(const Duration(milliseconds: 300));
-      return;
-    }
     await _client.put(
       '/auth/password',
       data: {
@@ -174,7 +131,6 @@ class SadarApiService {
   }
 
   Future<UserModel> uploadProfilePicture(File imageFile) async {
-    if (isDemoMode) return _mock.user;
     final filename = imageFile.path.split(RegExp(r'[/\\]')).last;
     final ext = filename.split('.').last.toLowerCase();
     final mediaType = ext == 'png'
@@ -206,14 +162,12 @@ class SadarApiService {
   }
 
   Future<void> deleteUserAccount(String password) async {
-    if (isDemoMode) return;
     await _client.delete('/auth/me', data: {'password': password});
   }
 
   // ── ACCOUNTS ───────────────────────────────────────────────
 
   Future<List<AccountModel>> getAccounts() async {
-    if (isDemoMode) return _mock.getAccounts();
     final data = await _client.get('/accounts');
     final list = _extractList(data);
     return list
@@ -226,13 +180,6 @@ class SadarApiService {
     String accountNumber = '',
     required double balance,
   }) async {
-    if (isDemoMode) {
-      return _mock.addAccount(
-        name: accountName,
-        accountNumber: accountNumber,
-        balance: balance,
-      );
-    }
     final data = await _client.post(
       '/accounts',
       data: {
@@ -250,14 +197,6 @@ class SadarApiService {
     String? accountNumber,
     double? balance,
   }) async {
-    if (isDemoMode) {
-      return _mock.updateAccount(
-        id,
-        name: accountName,
-        accountNumber: accountNumber,
-        balance: balance,
-      );
-    }
     final data = await _client.put(
       '/accounts/$id',
       data: {
@@ -270,18 +209,36 @@ class SadarApiService {
   }
 
   Future<void> deleteAccount(String id) async {
-    if (isDemoMode) {
-      _mock.deleteAccount(id);
-      return;
-    }
     await _client.delete('/accounts/$id');
+  }
+
+  Future<void> transferFunds({
+    required String fromAccountId,
+    required String toAccountId,
+    required double amount,
+    String? note,
+  }) async {
+    await _client.post(
+      '/accounts/transfer',
+      data: {
+        'fromAccountId': fromAccountId,
+        'toAccountId': toAccountId,
+        'amount': amount,
+        if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
+      },
+    );
   }
 
   // ── TRANSACTIONS ───────────────────────────────────────────
 
-  Future<List<TransactionModel>> getTransactions({int limit = 100}) async {
-    if (isDemoMode) return _mock.getTransactions();
-    final data = await _client.get('/transactions', query: {'limit': limit});
+  Future<List<TransactionModel>> getTransactions({
+    int limit = 100,
+    int page = 1,
+  }) async {
+    final data = await _client.get(
+      '/transactions',
+      query: {'limit': limit, 'page': page},
+    );
     final list = _extractList(data);
     return list
         .map((e) =>
@@ -299,17 +256,6 @@ class SadarApiService {
     String source = 'manual',
     String? ocrScanId,
   }) async {
-    if (isDemoMode) {
-      return _mock.addTransaction(
-        accountId: accountId,
-        categoryGroup: categoryGroup,
-        categoryDetail: categoryDetail,
-        date: transactionDate,
-        description: description,
-        amount: amount,
-        source: source,
-      );
-    }
     final data = await _client.post(
       '/transactions',
       data: {
@@ -336,25 +282,15 @@ class SadarApiService {
     required String description,
     required double amount,
   }) async {
-    if (isDemoMode) {
-      return _mock.updateTransaction(
-        id,
-        accountId: accountId,
-        categoryGroup: categoryGroup,
-        categoryDetail: categoryDetail,
-        date: transactionDate,
-        description: description,
-        amount: amount,
-      );
-    }
     final data = await _client.put(
       '/transactions/$id',
       data: {
         if (accountId != null && accountId.isNotEmpty) 'accountId': accountId,
         'categoryGroup': categoryGroup,
-        'categoryDetail': (categoryDetail != null && categoryDetail.trim().isNotEmpty)
-            ? categoryDetail.trim()
-            : null,
+        'categoryDetail':
+            (categoryDetail != null && categoryDetail.trim().isNotEmpty)
+                ? categoryDetail.trim()
+                : null,
         'transactionDate': transactionDate.toUtc().toIso8601String(),
         'description': description.trim(),
         'amount': amount,
@@ -364,18 +300,19 @@ class SadarApiService {
   }
 
   Future<void> deleteTransaction(String id) async {
-    if (isDemoMode) {
-      _mock.deleteTransaction(id);
-      return;
-    }
     await _client.delete('/transactions/$id');
   }
 
   // ── INCOMES ────────────────────────────────────────────────
 
-  Future<List<IncomeModel>> getIncomes({int limit = 100}) async {
-    if (isDemoMode) return _mock.getIncomes();
-    final data = await _client.get('/incomes', query: {'limit': limit});
+  Future<List<IncomeModel>> getIncomes({
+    int limit = 100,
+    int page = 1,
+  }) async {
+    final data = await _client.get(
+      '/incomes',
+      query: {'limit': limit, 'page': page},
+    );
     final list = _extractList(data);
     return list
         .map((e) => IncomeModel.fromJson(Map<String, dynamic>.from(e as Map)))
@@ -388,14 +325,6 @@ class SadarApiService {
     required DateTime incomeDate,
     required String source,
   }) async {
-    if (isDemoMode) {
-      return _mock.addIncome(
-        accountId: accountId,
-        amount: amount,
-        date: incomeDate,
-        source: source,
-      );
-    }
     final data = await _client.post(
       '/incomes',
       data: {
@@ -415,15 +344,6 @@ class SadarApiService {
     required DateTime incomeDate,
     required String source,
   }) async {
-    if (isDemoMode) {
-      return _mock.updateIncome(
-        id,
-        accountId: accountId,
-        amount: amount,
-        date: incomeDate,
-        source: source,
-      );
-    }
     final data = await _client.put(
       '/incomes/$id',
       data: {
@@ -437,20 +357,12 @@ class SadarApiService {
   }
 
   Future<void> deleteIncome(String id) async {
-    if (isDemoMode) {
-      _mock.deleteIncome(id);
-      return;
-    }
     await _client.delete('/incomes/$id');
   }
 
   // ── OCR ────────────────────────────────────────────────────
 
   Future<OcrScanModel> uploadReceipt(File imageFile) async {
-    if (isDemoMode) {
-      await Future.delayed(const Duration(milliseconds: 900));
-      return _mock.simulateReceiptScan();
-    }
     final filename = imageFile.path.split(RegExp(r'[/\\]')).last;
     final ext = filename.split('.').last.toLowerCase();
     final mediaType = ext == 'png'
@@ -494,18 +406,6 @@ class SadarApiService {
     required String description,
     required double amount,
   }) async {
-    if (isDemoMode) {
-      _mock.addTransaction(
-        accountId: accountId,
-        categoryGroup: categoryGroup,
-        categoryDetail: categoryDetail,
-        date: transactionDate,
-        description: description,
-        amount: amount,
-        source: 'ocr',
-      );
-      return;
-    }
     await _client.post(
       '/ocr/$scanId/confirm-transaction',
       data: {
@@ -524,7 +424,6 @@ class SadarApiService {
   // ── ANALYTICS & BUDGET ─────────────────────────────────────
 
   Future<BudgetModel?> getLatestBudget() async {
-    if (isDemoMode) return _mock.getLatestBudget();
     final data = await _client.get('/analytics/budget');
     if (data == null || data is! Map) return null;
     return BudgetModel.fromJson(Map<String, dynamic>.from(data));
@@ -535,13 +434,6 @@ class SadarApiService {
     required double wantsAmount,
     required double savingsAmount,
   }) async {
-    if (isDemoMode) {
-      return _mock.saveBudget(
-        needsAmount: needsAmount,
-        wantsAmount: wantsAmount,
-        savingsAmount: savingsAmount,
-      );
-    }
     final data = await _client.post(
       '/analytics/budget',
       data: {
@@ -555,7 +447,6 @@ class SadarApiService {
   }
 
   Future<HealthScoreResult> calculateHealthScore({String period = '3m'}) async {
-    if (isDemoMode) return _mock.calculateHealthScore(period: period);
     final data = await _client.post(
       '/analytics/health-score',
       data: {'period': period},
@@ -564,7 +455,6 @@ class SadarApiService {
   }
 
   Future<List<ScoreHistoryItem>> getScoreHistory() async {
-    if (isDemoMode) return _mock.getScoreHistory();
     final data = await _client.get('/analytics/health-score/history');
     return _extractList(data)
         .map((e) =>
@@ -573,7 +463,6 @@ class SadarApiService {
   }
 
   Future<List<InsightModel>> getInsights() async {
-    if (isDemoMode) return _mock.getInsights();
     final data = await _client.get('/analytics/insights');
     return _extractList(data)
         .map((e) => InsightModel.fromJson(Map<String, dynamic>.from(e as Map)))
@@ -581,7 +470,6 @@ class SadarApiService {
   }
 
   Future<List<AlertModel>> getAlerts() async {
-    if (isDemoMode) return _mock.getAlerts();
     final data = await _client.get('/analytics/alerts');
     return _extractList(data)
         .map((e) => AlertModel.fromJson(Map<String, dynamic>.from(e as Map)))
@@ -593,25 +481,6 @@ class SadarApiService {
     String? merchant,
     double? amount,
   }) async {
-    if (isDemoMode) {
-      await Future.delayed(const Duration(milliseconds: 350));
-      final lower = text.toLowerCase();
-      String group = 'Wants';
-      String detail = 'Belanja Gaya Hidup';
-      if (RegExp(r'tabung|invest|darurat|reksadana|emas|saham').hasMatch(lower)) {
-        group = 'Savings';
-        detail = 'Tabungan & Investasi';
-      } else if (RegExp(r'indomaret|alfamart|superindo|beras|listrik|air|wifi|bensin|grab|gojek|apotek|dokter|kuliah|spp|makan|warung').hasMatch(lower)) {
-        group = 'Needs';
-        detail = 'Kebutuhan Pokok';
-      }
-      return {
-        'categoryGroup': group,
-        'categoryDetail': detail,
-        'confidence': 0.91,
-        'source': 'demo-ai',
-      };
-    }
     final data = await _client.post(
       '/analytics/categorize',
       data: {
@@ -630,7 +499,6 @@ class SadarApiService {
     String? merchant,
     double? rolling7dSpending,
   }) async {
-    if (isDemoMode) return _mock.getBehaviorPrediction();
     final data = await _client.post(
       '/analytics/behavior/predict',
       data: {
@@ -648,7 +516,6 @@ class SadarApiService {
   Future<OverspendingForecastModel> predictOverspending({
     double? budgetLimit,
   }) async {
-    if (isDemoMode) return _mock.getOverspendingForecast();
     final now = DateTime.now();
     final data = await _client.post(
       '/analytics/overspending',
@@ -665,7 +532,18 @@ class SadarApiService {
   List<dynamic> _extractList(dynamic data) {
     if (data is List) return data;
     if (data is Map) {
-      for (final key in ['items', 'rows', 'data', 'records', 'transactions', 'incomes', 'accounts', 'insights', 'alerts', 'scores']) {
+      for (final key in [
+        'items',
+        'rows',
+        'data',
+        'records',
+        'transactions',
+        'incomes',
+        'accounts',
+        'insights',
+        'alerts',
+        'scores',
+      ]) {
         if (data[key] is List) return data[key] as List;
       }
     }

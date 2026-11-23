@@ -13,14 +13,14 @@ import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
-  latestVersion: "1.0.1",
-  buildNumber: 2,
-  downloadUrl: "/downloads/sadar-finance-v1.0.1.apk",
+  latestVersion: "1.0.3",
+  buildNumber: 4,
+  downloadUrl: "/downloads/sadar-finance-v1.0.3.apk",
   releaseNotes: [
-    'Ikon aplikasi resmi SADAR Finance ("A") & logo konsisten dengan landing page',
-    "Tampilan Dark Mode & Light Mode yang konsisten dan nyaman di mata",
-    "Mode Offline dengan penyimpanan lokal & sinkronisasi otomatis",
-    "Menu Pengaturan Aplikasi terpisah & panduan interaktif pengguna baru",
+    "Fitur Transfer Antar Akun / Dompet tanpa merusak statistik pemasukan & pengeluaran",
+    "Kunci Aplikasi Biometrik (Sidik Jari / Face Unlock) & auto-logout sesi kedaluwarsa",
+    "Auto-format pemisah ribuan real-time, filter bulan/akun, dan Export Laporan CSV",
+    "Navigasi 5 tab lebih mulus (posisi scroll terjaga) & APK lebih ramping bertanda tangan rilis",
   ],
 };
 

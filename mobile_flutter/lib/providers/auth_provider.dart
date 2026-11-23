@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/app_config.dart';
 import '../core/network/api_client.dart';
+import '../core/network/api_exception.dart';
 import '../core/storage/secure_storage.dart';
-import '../data/mock/mock_repository.dart';
 import '../data/models/user_model.dart';
 import '../data/services/sadar_api_service.dart';
 
@@ -11,20 +11,12 @@ final secureStorageProvider = Provider<SecureStorageService>(
   (ref) => SecureStorageService(),
 );
 
-final mockRepositoryProvider = Provider<MockRepository>(
-  (ref) => MockRepository(),
-);
-
 final apiClientProvider = Provider<ApiClient>(
   (ref) => ApiClient(ref.watch(secureStorageProvider)),
 );
 
 final sadarApiServiceProvider = Provider<SadarApiService>(
-  (ref) => SadarApiService(
-    ref.watch(apiClientProvider),
-    ref.watch(mockRepositoryProvider),
-    isDemoMode: false,
-  ),
+  (ref) => SadarApiService(ref.watch(apiClientProvider)),
 );
 
 enum AuthStatus { initial, authenticated, unauthenticated }
@@ -99,7 +91,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
 
     _api.setBaseUrl(effectiveUrl);
-    _api.isDemoMode = false;
 
     final token = await _storage.getToken();
     final cachedUserMap = await _storage.getUserMap();
@@ -117,13 +108,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
         apiBaseUrl: effectiveUrl,
         clearError: true,
       );
-      // Silently refresh profile if online; stay authenticated offline if unreachable
+      // Silently refresh profile if online; logout cleanly if token expired (401)
       try {
         final fresh = await _api.getProfile();
         await _storage.saveUserMap(fresh.toJson());
         state = state.copyWith(user: fresh, isOfflineSession: false);
       } catch (e) {
-        if (_isNetworkError(e)) {
+        if (e is ApiException && e.statusCode == 401) {
+          await handleSessionExpired();
+        } else if (_isNetworkError(e)) {
           state = state.copyWith(isOfflineSession: true);
         }
       }
@@ -290,6 +283,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> handleSessionExpired() async {
+    if (state.status == AuthStatus.unauthenticated) return;
+    await _storage.clearAuth();
+    state = state.copyWith(
+      status: AuthStatus.unauthenticated,
+      clearUser: true,
+      isOfflineSession: false,
+      isLoading: false,
+      error: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
+    );
+  }
+
   Future<void> logout() async {
     await _storage.clearAuth();
     state = state.copyWith(
@@ -302,9 +307,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) => AuthNotifier(
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  final client = ref.watch(apiClientProvider);
+  final notifier = AuthNotifier(
     ref.watch(secureStorageProvider),
     ref.watch(sadarApiServiceProvider),
-  ),
-);
+  );
+  client.onUnauthorized = notifier.handleSessionExpired;
+  return notifier;
+});

@@ -17,6 +17,8 @@ final localFinanceStoreProvider = Provider<LocalFinanceStore>(
 
 class FinanceState {
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMoreHistory;
   final bool isOffline;
   final bool isSyncing;
   final int pendingSyncCount;
@@ -36,6 +38,8 @@ class FinanceState {
 
   const FinanceState({
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMoreHistory = false,
     this.isOffline = false,
     this.isSyncing = false,
     this.pendingSyncCount = 0,
@@ -116,6 +120,8 @@ class FinanceState {
 
   FinanceState copyWith({
     bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMoreHistory,
     bool? isOffline,
     bool? isSyncing,
     int? pendingSyncCount,
@@ -136,6 +142,8 @@ class FinanceState {
   }) {
     return FinanceState(
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMoreHistory: hasMoreHistory ?? this.hasMoreHistory,
       isOffline: isOffline ?? this.isOffline,
       isSyncing: isSyncing ?? this.isSyncing,
       pendingSyncCount: pendingSyncCount ?? this.pendingSyncCount,
@@ -162,6 +170,8 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
   final String? Function() _currentUserId;
   StreamSubscription<List<ConnectivityResult>>? _connSub;
   String? _activeUserId;
+  int _historyPage = 1;
+  static const int _pageSize = 100;
 
   FinanceNotifier(this._api, this._store, this._currentUserId)
       : super(const FinanceState()) {
@@ -289,15 +299,21 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       ]);
 
       final now = DateTime.now();
+      _historyPage = 1;
+      final trxList = results[0] as List<TransactionModel>;
+      final incList = results[1] as List<IncomeModel>;
       final remainingQueue = await _store.loadQueue(uid);
       state = state.copyWith(
         isLoading: false,
+        isLoadingMore: false,
+        hasMoreHistory:
+            trxList.length >= _pageSize || incList.length >= _pageSize,
         isOffline: false,
         pendingSyncCount: remainingQueue.length,
         lastSyncedAt: now,
         accounts: accounts,
-        transactions: results[0] as List<TransactionModel>,
-        incomes: results[1] as List<IncomeModel>,
+        transactions: trxList,
+        incomes: incList,
         budget: results[2] as BudgetModel?,
         insights: results[3] as List<InsightModel>,
         alerts: results[4] as List<AlertModel>,
@@ -454,6 +470,21 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
               wantsAmount: (p['wantsAmount'] as num?)?.toDouble() ?? 0,
               savingsAmount: (p['savingsAmount'] as num?)?.toDouble() ?? 0,
             );
+            break;
+          case 'transfer_accounts':
+            final fromId = resolveId(p['fromAccountId']?.toString());
+            final toId = resolveId(p['toAccountId']?.toString());
+            if (fromId != null &&
+                toId != null &&
+                !fromId.startsWith('local_') &&
+                !toId.startsWith('local_')) {
+              await _api.transferFunds(
+                fromAccountId: fromId,
+                toAccountId: toId,
+                amount: (p['amount'] as num?)?.toDouble() ?? 0,
+                note: p['note']?.toString(),
+              );
+            }
             break;
         }
       } catch (e) {
@@ -1053,8 +1084,112 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     }
   }
 
+  Future<void> loadMoreHistory() async {
+    if (state.isOffline || state.isLoadingMore || !state.hasMoreHistory) return;
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final nextPage = _historyPage + 1;
+      final moreTrx = await _api
+          .getTransactions(limit: _pageSize, page: nextPage)
+          .catchError((_) => <TransactionModel>[]);
+      final moreInc = await _api
+          .getIncomes(limit: _pageSize, page: nextPage)
+          .catchError((_) => <IncomeModel>[]);
+
+      final existingTrxIds = state.transactions.map((t) => t.id).toSet();
+      final existingIncIds = state.incomes.map((i) => i.id).toSet();
+      final mergedTrx = [
+        ...state.transactions,
+        ...moreTrx.where((t) => !existingTrxIds.contains(t.id)),
+      ];
+      final mergedInc = [
+        ...state.incomes,
+        ...moreInc.where((i) => !existingIncIds.contains(i.id)),
+      ];
+
+      _historyPage = nextPage;
+      state = state.copyWith(
+        isLoadingMore: false,
+        hasMoreHistory:
+            moreTrx.length >= _pageSize || moreInc.length >= _pageSize,
+        transactions: mergedTrx,
+        incomes: mergedInc,
+      );
+      await _persistState();
+    } catch (_) {
+      state = state.copyWith(isLoadingMore: false);
+    }
+  }
+
+  /// Transfers balance between two accounts without inflating monthly expense/income metrics.
+  /// Returns `true` if synced online immediately, `false` if saved offline to queue.
+  Future<bool> transferBetweenAccounts({
+    required String fromAccountId,
+    required String toAccountId,
+    required double amount,
+    String? note,
+  }) async {
+    if (fromAccountId == toAccountId) {
+      throw Exception('Akun asal dan akun tujuan tidak boleh sama.');
+    }
+    if (amount <= 0) {
+      throw Exception('Nominal transfer harus lebih dari 0.');
+    }
+    try {
+      await _api.transferFunds(
+        fromAccountId: fromAccountId,
+        toAccountId: toAccountId,
+        amount: amount,
+        note: note,
+      );
+      await loadAll();
+      return true;
+    } catch (e) {
+      if (!_isNetworkError(e)) rethrow;
+      final sourceIdx = state.accounts.indexWhere((a) => a.id == fromAccountId);
+      if (sourceIdx >= 0 && state.accounts[sourceIdx].balance < amount) {
+        throw Exception(
+          'Saldo akun "${state.accounts[sourceIdx].name}" tidak mencukupi untuk transfer ini.',
+        );
+      }
+      final updatedAccounts = state.accounts.map((a) {
+        if (a.id == fromAccountId) {
+          return a.copyWith(
+            balance: (a.balance - amount).clamp(0, double.infinity),
+          );
+        }
+        if (a.id == toAccountId) {
+          return a.copyWith(balance: a.balance + amount);
+        }
+        return a;
+      }).toList();
+      await _store.enqueue(
+        _uid,
+        PendingSyncOp(
+          id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+          type: 'transfer_accounts',
+          payload: {
+            'fromAccountId': fromAccountId,
+            'toAccountId': toAccountId,
+            'amount': amount,
+            if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
+          },
+          createdAt: DateTime.now(),
+        ),
+      );
+      state = state.copyWith(
+        isOffline: true,
+        accounts: updatedAccounts,
+        pendingSyncCount: state.pendingSyncCount + 1,
+      );
+      await _persistState();
+      return false;
+    }
+  }
+
   void clear() {
     _activeUserId = null;
+    _historyPage = 1;
     state = const FinanceState();
   }
 }

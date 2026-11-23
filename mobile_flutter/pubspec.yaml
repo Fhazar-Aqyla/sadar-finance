@@ -1,7 +1,7 @@
 name: sadar_finance
-description: "SADAR Finance — Smart AI-Driven Automated Receipt & Personal Finance Management (iOS & Android)"
+description: "SADAR Finance - Smart AI-Driven Automated Receipt & Personal Finance Management (iOS & Android)"
 publish_to: 'none'
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: ^3.13.3
@@ -23,6 +23,9 @@ dependencies:
   crypto: ^3.0.6
   url_launcher: ^6.3.1
   shorebird_code_push: ^2.0.4
+  local_auth: ^2.3.0
+  path_provider: ^2.1.5
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_test:

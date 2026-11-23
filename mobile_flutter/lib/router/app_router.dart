@@ -20,7 +20,7 @@ import '../providers/auth_provider.dart';
 import '../providers/ui_preferences_provider.dart';
 
 /// Notifies GoRouter ONLY when routing-relevant state changes
-/// (auth status, onboarding initialization/completion) — never when
+/// (auth status, onboarding initialization/completion) - never when
 /// loading flags, theme mode, privacy toggle, or user profile fields update.
 class _RouterRefreshNotifier extends ChangeNotifier {
   _RouterRefreshNotifier(Ref ref) {
@@ -102,33 +102,52 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         builder: (_, _) => const ForgotPasswordScreen(),
       ),
-      ShellRoute(
-        builder: (context, state, child) => AppShell(
-          location: state.matchedLocation,
-          child: child,
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => AppShell(
+          navigationShell: navigationShell,
         ),
-        routes: [
-          GoRoute(
-            path: '/dashboard',
-            builder: (_, _) => const DashboardScreen(),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/dashboard',
+                builder: (_, _) => const DashboardScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/behavior-insight',
-            builder: (_, _) => const BehaviorInsightScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/behavior-insight',
+                builder: (_, _) => const BehaviorInsightScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/catat-keuangan',
-            builder: (_, state) => RecordScreen(
-              openScanner: state.uri.queryParameters['scan'] == '1',
-            ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/catat-keuangan',
+                builder: (_, state) => RecordScreen(
+                  openScanner: state.uri.queryParameters['scan'] == '1',
+                ),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/financial-score',
-            builder: (_, _) => const FinancialScoreScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/financial-score',
+                builder: (_, _) => const FinancialScoreScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/profile-account',
-            builder: (_, _) => const ProfileAccountScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile-account',
+                builder: (_, _) => const ProfileAccountScreen(),
+              ),
+            ],
           ),
         ],
       ),
