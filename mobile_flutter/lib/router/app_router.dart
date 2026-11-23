@@ -9,6 +9,7 @@ import '../presentation/screens/dashboard/dashboard_screen.dart';
 import '../presentation/screens/history/financial_history_screen.dart';
 import '../presentation/screens/insight/behavior_insight_screen.dart';
 import '../presentation/screens/onboarding/onboarding_screen.dart';
+import '../presentation/screens/plans/financial_plans_screen.dart';
 import '../presentation/screens/profile/app_settings_screen.dart';
 import '../presentation/screens/profile/edit_profile_screen.dart';
 import '../presentation/screens/profile/legal_screen.dart';
@@ -154,6 +155,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/financial-history',
         builder: (_, _) => const FinancialHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/financial-plans',
+        builder: (_, state) => FinancialPlansScreen(
+          initialTab:
+              int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
+        ),
       ),
       GoRoute(
         path: '/profile-account/edit',

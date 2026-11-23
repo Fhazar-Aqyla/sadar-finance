@@ -78,73 +78,93 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _showNotificationsSheet() {
-    final finance = ref.read(financeProvider);
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Notifikasi & Peringatan',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimaryOf(ctx),
-              ),
-            ),
-            const SizedBox(height: 14),
-            if (finance.alerts.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Center(
-                  child: Text(
-                    'Belum ada peringatan keuangan. Kondisi terkendali!',
-                    style: TextStyle(color: AppColors.textSecondaryOf(ctx)),
-                  ),
-                ),
-              )
-            else
-              ...finance.alerts.take(5).map(
-                    (a) => Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: AppColors.warning.withValues(alpha: 0.35),
+      builder: (ctx) => Consumer(
+        builder: (ctx, modalRef, _) {
+          final finance = modalRef.watch(financeProvider);
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Notifikasi & Peringatan',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimaryOf(ctx),
                         ),
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            color: AppColors.warning,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              a.message,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textPrimaryOf(ctx),
-                              ),
-                            ),
-                          ),
-                        ],
+                    ),
+                    if (finance.alerts.isNotEmpty)
+                      TextButton.icon(
+                        onPressed: () {
+                          modalRef
+                              .read(financeProvider.notifier)
+                              .clearAlerts();
+                        },
+                        icon: const Icon(Icons.done_all_rounded, size: 17),
+                        label: const Text('Bersihkan'),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (finance.alerts.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: Text(
+                        'Belum ada peringatan keuangan. Kondisi terkendali!',
+                        style: TextStyle(color: AppColors.textSecondaryOf(ctx)),
                       ),
                     ),
-                  ),
-          ],
-        ),
+                  )
+                else
+                  ...finance.alerts.take(5).map(
+                        (a) => Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.warning.withValues(alpha: 0.35),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.warning_amber_rounded,
+                                color: AppColors.warning,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  a.message,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textPrimaryOf(ctx),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -182,6 +202,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     const SizedBox(height: 16),
                   ],
                   _buildSummaryGrid(finance, uiPrefs.hideBalances),
+                  const SizedBox(height: 16),
+                  _buildFinancialPlansCard(finance, uiPrefs.hideBalances),
                   const SizedBox(height: 16),
                   if (finance.alerts.isNotEmpty) ...[
                     _buildAlertBanner(finance),
@@ -737,11 +759,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _buildSummaryGrid(FinanceState finance, bool hidden) {
     final score = finance.healthScore?.overallScore;
     final remBudget = finance.remainingBudget;
+    final hasBudgetOrIncome = finance.hasBudgetOrIncome;
     return Row(
       children: [
         Expanded(
           child: SadarCard(
             padding: const EdgeInsets.all(14),
+            onTap: () => context.go('/profile-account'),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -753,11 +777,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       color: remBudget < 0 ? AppColors.danger : AppColors.accent,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      'Sisa Budget',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondaryOf(context),
+                    Expanded(
+                      child: Text(
+                        hasBudgetOrIncome ? 'Sisa Budget' : 'Dana Tersedia',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondaryOf(context),
+                        ),
                       ),
                     ),
                   ],
@@ -775,10 +803,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${finance.totalRecordsCount} total catatan',
+                  hasBudgetOrIncome
+                      ? '${finance.totalRecordsCount} total catatan'
+                      : 'Ketuk untuk atur budget',
                   style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMutedOf(context),
+                    color: hasBudgetOrIncome
+                        ? AppColors.textMutedOf(context)
+                        : AppColors.accentOf(context),
+                    fontWeight:
+                        hasBudgetOrIncome ? FontWeight.w500 : FontWeight.w700,
                   ),
                 ),
               ],
@@ -848,6 +882,132 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildFinancialPlansCard(FinanceState finance, bool hidden) {
+    final goals = finance.savingsGoals;
+    final recurring = finance.recurringItems;
+    final now = DateTime.now();
+    final unpaidRecurring =
+        recurring.where((r) => !r.isPaidFor(now)).toList();
+
+    return SadarCard(
+      onTap: () => context.push('/financial-plans'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.flag_rounded,
+                  color: AppColors.primaryOf(context),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Target Tabungan & Tagihan Rutin',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: AppColors.textPrimaryOf(context),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      goals.isEmpty && recurring.isEmpty
+                          ? 'Atur target dana darurat, impian, & jadwal tagihan bulanan'
+                          : '${goals.length} target tabungan · ${unpaidRecurring.length} jadwal rutin menunggu bulan ini',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondaryOf(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textMutedOf(context),
+              ),
+            ],
+          ),
+          if (goals.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.subtleOf(context),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderOf(context)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          goals.first.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimaryOf(context),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${goals.first.progressPercent}%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.success,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(99),
+                    child: LinearProgressIndicator(
+                      value: goals.first.progressRatio,
+                      minHeight: 6,
+                      backgroundColor: AppColors.borderOf(context),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppColors.success,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    hidden
+                        ? 'Rp ••••• dari Rp •••••'
+                        : '${AppFormatters.compactRupiah(goals.first.currentAmount)} dari ${AppFormatters.compactRupiah(goals.first.targetAmount)}',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: AppColors.textSecondaryOf(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 

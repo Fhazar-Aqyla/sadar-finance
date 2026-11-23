@@ -6,6 +6,7 @@ import '../core/storage/local_finance_store.dart';
 import '../data/models/account_model.dart';
 import '../data/models/analytics_models.dart';
 import '../data/models/budget_model.dart';
+import '../data/models/financial_plan_models.dart';
 import '../data/models/income_model.dart';
 import '../data/models/transaction_model.dart';
 import '../data/services/sadar_api_service.dart';
@@ -27,6 +28,9 @@ class FinanceState {
   final List<AccountModel> accounts;
   final List<TransactionModel> transactions;
   final List<IncomeModel> incomes;
+  final List<TransferLogModel> transfers;
+  final List<SavingsGoalModel> savingsGoals;
+  final List<RecurringItemModel> recurringItems;
   final BudgetModel? budget;
   final HealthScoreResult? healthScore;
   final List<ScoreHistoryItem> scoreHistory;
@@ -48,6 +52,9 @@ class FinanceState {
     this.accounts = const [],
     this.transactions = const [],
     this.incomes = const [],
+    this.transfers = const [],
+    this.savingsGoals = const [],
+    this.recurringItems = const [],
     this.budget,
     this.healthScore,
     this.scoreHistory = const [],
@@ -87,12 +94,36 @@ class FinanceState {
         .fold(0, (sum, t) => sum + t.amount);
   }
 
+  bool get hasBudgetConfigured => budget != null && budget!.totalLimit > 0;
+
+  bool get hasBudgetOrIncome => hasBudgetConfigured || currentMonthIncome > 0;
+
   double get remainingBudget {
-    if (budget == null) return currentMonthIncome - currentMonthExpense;
-    return budget!.totalLimit - currentMonthTotalOutflow;
+    if (hasBudgetConfigured) {
+      return budget!.totalLimit - currentMonthTotalOutflow;
+    }
+    if (currentMonthIncome > 0) {
+      return currentMonthIncome - currentMonthExpense;
+    }
+    return totalBalance;
   }
 
-  int get totalRecordsCount => transactions.length + incomes.length;
+  int get totalRecordsCount =>
+      transactions.length + incomes.length + transfers.length;
+
+  /// Unique merchant suggestions learned from user's transaction history
+  List<TransactionModel> get merchantSuggestions {
+    final seen = <String>{};
+    final result = <TransactionModel>[];
+    for (final t in transactions) {
+      final key = t.description.trim().toLowerCase();
+      if (key.isEmpty || seen.contains(key)) continue;
+      seen.add(key);
+      result.add(t);
+      if (result.length >= 8) break;
+    }
+    return result;
+  }
 
   Map<String, double> get categoryTotalsCurrentMonth {
     final now = DateTime.now();
@@ -131,6 +162,9 @@ class FinanceState {
     List<AccountModel>? accounts,
     List<TransactionModel>? transactions,
     List<IncomeModel>? incomes,
+    List<TransferLogModel>? transfers,
+    List<SavingsGoalModel>? savingsGoals,
+    List<RecurringItemModel>? recurringItems,
     BudgetModel? budget,
     HealthScoreResult? healthScore,
     List<ScoreHistoryItem>? scoreHistory,
@@ -152,6 +186,9 @@ class FinanceState {
       accounts: accounts ?? this.accounts,
       transactions: transactions ?? this.transactions,
       incomes: incomes ?? this.incomes,
+      transfers: transfers ?? this.transfers,
+      savingsGoals: savingsGoals ?? this.savingsGoals,
+      recurringItems: recurringItems ?? this.recurringItems,
       budget: budget ?? this.budget,
       healthScore: healthScore ?? this.healthScore,
       scoreHistory: scoreHistory ?? this.scoreHistory,
@@ -222,12 +259,36 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     }
   }
 
+  static List<AlertModel> _deduplicateAlerts(List<AlertModel> raw) {
+    final seen = <String>{};
+    final unique = <AlertModel>[];
+    for (final a in raw) {
+      final msg = sanitizeIndonesianFinanceText(a.message).trim();
+      if (msg.isEmpty) continue;
+      final key = msg.toLowerCase();
+      if (seen.contains(key)) continue;
+      seen.add(key);
+      unique.add(
+        AlertModel(
+          id: a.id,
+          message: msg,
+          alertType: a.alertType,
+          createdAt: a.createdAt,
+        ),
+      );
+    }
+    return unique;
+  }
+
   Future<void> _persistState({DateTime? syncedAt}) async {
     await _store.saveSnapshot(
       _uid,
       accounts: state.accounts,
       transactions: state.transactions,
       incomes: state.incomes,
+      transfers: state.transfers,
+      savingsGoals: state.savingsGoals,
+      recurringItems: state.recurringItems,
       budget: state.budget,
       healthScore: state.healthScore,
       scoreHistory: state.scoreHistory,
@@ -255,11 +316,14 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         accounts: cached.accounts,
         transactions: cached.transactions,
         incomes: cached.incomes,
+        transfers: cached.transfers,
+        savingsGoals: cached.savingsGoals,
+        recurringItems: cached.recurringItems,
         budget: cached.budget,
         healthScore: cached.healthScore,
         scoreHistory: cached.scoreHistory,
         insights: cached.insights,
-        alerts: cached.alerts,
+        alerts: _deduplicateAlerts(cached.alerts),
         behaviorPrediction: cached.behaviorPrediction,
         overspendingForecast: cached.overspendingForecast,
         lastSyncedAt: cached.lastSyncedAt,
@@ -316,7 +380,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         incomes: incList,
         budget: results[2] as BudgetModel?,
         insights: results[3] as List<InsightModel>,
-        alerts: results[4] as List<AlertModel>,
+        alerts: _deduplicateAlerts(results[4] as List<AlertModel>),
         scoreHistory: results[5] as List<ScoreHistoryItem>,
         clearError: true,
       );
@@ -511,7 +575,55 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       return;
     }
     try {
-      final score = await _api.calculateHealthScore(period: targetPeriod);
+      var score = await _api.calculateHealthScore(period: targetPeriod);
+      // Fallback: if user hasn't recorded monthly income yet (totalIncome == 0)
+      // and server returned <=15, compute a fair local baseline from available balance & transactions
+      if (score.overallScore <= 15 &&
+          score.totalIncome <= 0 &&
+          (state.totalBalance > 0 || state.currentMonthTotalOutflow > 0)) {
+        final effectiveFunds =
+            state.totalBalance + state.currentMonthTotalOutflow;
+        final expRatio = effectiveFunds > 0
+            ? (state.currentMonthExpense / effectiveFunds).clamp(0.0, 1.5)
+            : 0.0;
+        final savRate = effectiveFunds > 0
+            ? (state.totalBalance / effectiveFunds).clamp(0.0, 1.0)
+            : 0.0;
+        final expScore = (100 - (expRatio * 55)).round().clamp(25, 95);
+        final savScore = ((savRate / 0.25) * 100).round().clamp(20, 100);
+        final budScore = state.hasBudgetConfigured ? score.budgetScore : 65;
+        final consScore =
+            score.consistencyScore > 0 ? score.consistencyScore : 60;
+        final overall =
+            (savScore * 0.35 + expScore * 0.30 + budScore * 0.25 + consScore * 0.10)
+                .round()
+                .clamp(1, 100);
+        score = HealthScoreResult(
+          overallScore: overall,
+          status: HealthScoreResult.statusForScore(overall),
+          savingsScore: savScore,
+          expenseScore: expScore,
+          budgetScore: budScore,
+          consistencyScore: consScore,
+          savingsRate: savRate,
+          expenseRatio: expRatio,
+          budgetUsage: score.budgetUsage,
+          needsRatio: score.needsRatio,
+          wantsRatio: score.wantsRatio,
+          savingsRatio: savRate,
+          totalIncome: effectiveFunds,
+          totalExpense: state.currentMonthExpense,
+          budgetLimit: state.budget?.totalLimit ?? effectiveFunds,
+          insights: [
+            'Skor dihitung dari rasio saldo aktif (${(savRate * 100).toStringAsFixed(0)}%) terhadap pengeluaran karena pemasukan bulanan belum dicatat.',
+            ...score.insights,
+          ],
+          recommendations: [
+            'Catat pemasukan bulanan atau atur Target Budget 50/30/20 di menu Profil agar skor finansial makin presisi.',
+            ...score.recommendations,
+          ],
+        );
+      }
       final history =
           await _api.getScoreHistory().catchError((_) => state.scoreHistory);
       state = state.copyWith(
@@ -544,15 +656,20 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       } catch (_) {}
 
       OverspendingForecastModel? overspending;
+      List<AlertModel>? freshAlerts;
       try {
         overspending = await _api.predictOverspending(
           budgetLimit: state.budget?.totalLimit,
         );
+        freshAlerts = await _api.getAlerts();
       } catch (_) {}
 
       state = state.copyWith(
         behaviorPrediction: behavior ?? state.behaviorPrediction,
         overspendingForecast: overspending ?? state.overspendingForecast,
+        alerts: freshAlerts != null
+            ? _deduplicateAlerts(freshAlerts)
+            : state.alerts,
       );
       await _persistState();
     } catch (_) {}
@@ -1135,6 +1252,18 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     if (amount <= 0) {
       throw Exception('Nominal transfer harus lebih dari 0.');
     }
+    final fromName = state.accountNameById(fromAccountId);
+    final toName = state.accountNameById(toAccountId);
+    final logEntry = TransferLogModel(
+      id: 'trf_${DateTime.now().millisecondsSinceEpoch}',
+      fromAccountId: fromAccountId,
+      fromAccountName: fromName,
+      toAccountId: toAccountId,
+      toAccountName: toName,
+      amount: amount,
+      note: (note ?? '').trim(),
+      date: DateTime.now(),
+    );
     try {
       await _api.transferFunds(
         fromAccountId: fromAccountId,
@@ -1142,6 +1271,10 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         amount: amount,
         note: note,
       );
+      state = state.copyWith(
+        transfers: [logEntry, ...state.transfers],
+      );
+      await _persistState();
       await loadAll();
       return true;
     } catch (e) {
@@ -1180,11 +1313,149 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       state = state.copyWith(
         isOffline: true,
         accounts: updatedAccounts,
+        transfers: [logEntry, ...state.transfers],
         pendingSyncCount: state.pendingSyncCount + 1,
       );
       await _persistState();
       return false;
     }
+  }
+
+  Future<void> clearAlerts() async {
+    state = state.copyWith(alerts: const []);
+    await _persistState();
+  }
+
+  // ── SAVINGS GOALS (TARGET TABUNGAN) ────────────────────────
+
+  Future<void> addSavingsGoal({
+    required String title,
+    required double targetAmount,
+    double initialAmount = 0,
+    String category = 'Dana Darurat',
+    DateTime? targetDate,
+  }) async {
+    final goal = SavingsGoalModel(
+      id: 'goal_${DateTime.now().millisecondsSinceEpoch}',
+      title: title.trim(),
+      targetAmount: targetAmount,
+      currentAmount: initialAmount,
+      category: category,
+      targetDate: targetDate,
+      createdAt: DateTime.now(),
+    );
+    state = state.copyWith(savingsGoals: [goal, ...state.savingsGoals]);
+    await _persistState();
+  }
+
+  Future<void> contributeToSavingsGoal({
+    required String goalId,
+    required double amount,
+    String? sourceAccountId,
+  }) async {
+    final idx = state.savingsGoals.indexWhere((g) => g.id == goalId);
+    if (idx < 0 || amount <= 0) return;
+    final goal = state.savingsGoals[idx];
+
+    if (sourceAccountId != null && sourceAccountId.isNotEmpty) {
+      await addTransaction(
+        accountId: sourceAccountId,
+        categoryGroup: 'Savings',
+        categoryDetail: goal.category,
+        transactionDate: DateTime.now(),
+        description: 'Tabungan: ${goal.title}',
+        amount: amount,
+      );
+    }
+
+    final updated = state.savingsGoals.map((g) {
+      if (g.id != goalId) return g;
+      return g.copyWith(currentAmount: g.currentAmount + amount);
+    }).toList();
+    state = state.copyWith(savingsGoals: updated);
+    await _persistState();
+  }
+
+  Future<void> deleteSavingsGoal(String goalId) async {
+    state = state.copyWith(
+      savingsGoals: state.savingsGoals.where((g) => g.id != goalId).toList(),
+    );
+    await _persistState();
+  }
+
+  // ── RECURRING BILLS & SALARY (TAGIHAN & GAJI RUTIN) ────────
+
+  Future<void> addRecurringItem({
+    required String title,
+    required double amount,
+    required bool isIncome,
+    String categoryGroup = 'Needs',
+    String? accountId,
+    int dayOfMonth = 1,
+  }) async {
+    final item = RecurringItemModel(
+      id: 'rec_${DateTime.now().millisecondsSinceEpoch}',
+      title: title.trim(),
+      amount: amount,
+      isIncome: isIncome,
+      categoryGroup: isIncome ? 'Income' : categoryGroup,
+      accountId: accountId,
+      dayOfMonth: dayOfMonth.clamp(1, 31),
+      createdAt: DateTime.now(),
+    );
+    state = state.copyWith(recurringItems: [item, ...state.recurringItems]);
+    await _persistState();
+  }
+
+  Future<bool> executeRecurringItem(String id) async {
+    final idx = state.recurringItems.indexWhere((r) => r.id == id);
+    if (idx < 0) return false;
+    final item = state.recurringItems[idx];
+    final now = DateTime.now();
+    final targetAccountId = item.accountId ??
+        (state.accounts.isNotEmpty ? state.accounts.first.id : null);
+
+    bool syncedOnline;
+    if (item.isIncome) {
+      syncedOnline = await addIncome(
+        accountId: targetAccountId,
+        amount: item.amount,
+        incomeDate: now,
+        source: item.title,
+      );
+    } else {
+      syncedOnline = await addTransaction(
+        accountId: targetAccountId,
+        categoryGroup: item.categoryGroup,
+        categoryDetail: 'Rutin Bulanan',
+        transactionDate: now,
+        description: item.title,
+        amount: item.amount,
+      );
+    }
+
+    final period = RecurringItemModel.periodKey(now);
+    final updated = state.recurringItems.map((r) {
+      if (r.id != id) return r;
+      return r.copyWith(lastPaidPeriod: period);
+    }).toList();
+    state = state.copyWith(recurringItems: updated);
+    await _persistState();
+    return syncedOnline;
+  }
+
+  Future<void> deleteRecurringItem(String id) async {
+    state = state.copyWith(
+      recurringItems: state.recurringItems.where((r) => r.id != id).toList(),
+    );
+    await _persistState();
+  }
+
+  Future<void> deleteTransferLog(String id) async {
+    state = state.copyWith(
+      transfers: state.transfers.where((t) => t.id != id).toList(),
+    );
+    await _persistState();
   }
 
   void clear() {

@@ -3,12 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/account_model.dart';
 import '../../data/models/analytics_models.dart';
 import '../../data/models/budget_model.dart';
+import '../../data/models/financial_plan_models.dart';
 import '../../data/models/income_model.dart';
 import '../../data/models/transaction_model.dart';
 
 class PendingSyncOp {
   final String id;
-  final String type; // create_account | update_account | delete_account | create_transaction | update_transaction | delete_transaction | create_income | update_income | delete_income | save_budget
+  final String type; // create_account | update_account | delete_account | create_transaction | update_transaction | delete_transaction | create_income | update_income | delete_income | save_budget | transfer_accounts
   final Map<String, dynamic> payload;
   final String? localId;
   final DateTime createdAt;
@@ -45,6 +46,9 @@ class LocalFinanceSnapshot {
   final List<AccountModel> accounts;
   final List<TransactionModel> transactions;
   final List<IncomeModel> incomes;
+  final List<TransferLogModel> transfers;
+  final List<SavingsGoalModel> savingsGoals;
+  final List<RecurringItemModel> recurringItems;
   final BudgetModel? budget;
   final HealthScoreResult? healthScore;
   final List<ScoreHistoryItem> scoreHistory;
@@ -58,6 +62,9 @@ class LocalFinanceSnapshot {
     this.accounts = const [],
     this.transactions = const [],
     this.incomes = const [],
+    this.transfers = const [],
+    this.savingsGoals = const [],
+    this.recurringItems = const [],
     this.budget,
     this.healthScore,
     this.scoreHistory = const [],
@@ -78,6 +85,9 @@ class LocalFinanceStore {
     required List<AccountModel> accounts,
     required List<TransactionModel> transactions,
     required List<IncomeModel> incomes,
+    List<TransferLogModel> transfers = const [],
+    List<SavingsGoalModel> savingsGoals = const [],
+    List<RecurringItemModel> recurringItems = const [],
     BudgetModel? budget,
     HealthScoreResult? healthScore,
     List<ScoreHistoryItem> scoreHistory = const [],
@@ -93,6 +103,9 @@ class LocalFinanceStore {
         'accounts': accounts.map((e) => e.toJson()).toList(),
         'transactions': transactions.map((e) => e.toJson()).toList(),
         'incomes': incomes.map((e) => e.toJson()).toList(),
+        'transfers': transfers.map((e) => e.toJson()).toList(),
+        'savingsGoals': savingsGoals.map((e) => e.toJson()).toList(),
+        'recurringItems': recurringItems.map((e) => e.toJson()).toList(),
         'budget': budget?.toJson(),
         'healthScore': healthScore?.toJson(),
         'scoreHistory': scoreHistory.map((e) => e.toJson()).toList(),
@@ -123,6 +136,15 @@ class LocalFinanceStore {
             .toList(),
         incomes: ((map['incomes'] as List?) ?? const [])
             .map((e) => IncomeModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        transfers: ((map['transfers'] as List?) ?? const [])
+            .map((e) => TransferLogModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        savingsGoals: ((map['savingsGoals'] as List?) ?? const [])
+            .map((e) => SavingsGoalModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        recurringItems: ((map['recurringItems'] as List?) ?? const [])
+            .map((e) => RecurringItemModel.fromJson(Map<String, dynamic>.from(e as Map)))
             .toList(),
         budget: map['budget'] is Map
             ? BudgetModel.fromJson(Map<String, dynamic>.from(map['budget'] as Map))

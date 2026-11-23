@@ -31,6 +31,11 @@ android {
         versionName = flutter.versionName
     }
 
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {

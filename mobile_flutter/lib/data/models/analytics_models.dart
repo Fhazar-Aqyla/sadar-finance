@@ -1,3 +1,61 @@
+/// Normalizes Indonesian Rupiah strings and translates legacy English/GMT alert text
+String sanitizeIndonesianFinanceText(String raw) {
+  if (raw.trim().isEmpty) return raw;
+  var text = raw.trim();
+
+  // Fix legacy English overspending alert with raw JS Date ("Sun Nov 01 2026 00:00:00 GMT+0000...")
+  final approachingMatch = RegExp(
+    r'You are approaching your budget limit for .*?Predicted:\s*Rp\s*([0-9.,]+),\s*Budget:\s*Rp\s*([0-9.,]+)',
+    caseSensitive: false,
+  ).firstMatch(text);
+  if (approachingMatch != null) {
+    final pred = approachingMatch
+        .group(1)!
+        .replaceAll(RegExp(r'[.,]+$'), '')
+        .replaceAll(',', '.');
+    final bud = approachingMatch
+        .group(2)!
+        .replaceAll(RegExp(r'[.,]+$'), '')
+        .replaceAll(',', '.');
+    return 'Pengeluaran bulan ini diprediksi mendekati batas anggaran. Prediksi: Rp $pred dari anggaran Rp $bud.';
+  }
+
+  final exceededMatch = RegExp(
+    r'Predicted spending for .*?is\s*Rp\s*([0-9.,]+),\s*which exceeds your budget of\s*Rp\s*([0-9.,]+)\s*by\s*([0-9.]+)%',
+    caseSensitive: false,
+  ).firstMatch(text);
+  if (exceededMatch != null) {
+    final pred = exceededMatch.group(1)!.replaceAll(',', '.');
+    final bud = exceededMatch.group(2)!.replaceAll(',', '.');
+    final pct = exceededMatch.group(3)!;
+    return 'Prediksi pengeluaran bulan ini sebesar Rp $pred melampaui target anggaran Rp $bud (+$pct%).';
+  }
+
+  final catExceedMatch = RegExp(
+    r'^([A-Za-z &]+)\s+spending\s*\(Rp\s*([0-9.,]+)\)\s*exceeds 30% of your budget',
+    caseSensitive: false,
+  ).firstMatch(text);
+  if (catExceedMatch != null) {
+    final cat = catExceedMatch.group(1)!.trim();
+    final amt = catExceedMatch.group(2)!.replaceAll(',', '.');
+    return 'Pengeluaran kategori $cat (Rp $amt) melewati 30% dari batas anggaran bulanan Anda.';
+  }
+
+  // Strip any leftover raw JS GMT timezone dump if present
+  text = text.replaceAll(
+    RegExp(r'\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+[A-Za-z]{3}\s+\d{2}\s+\d{4}\s+\d{2}:\d{2}:\d{2}\s+GMT[^\s.]*\s*(\([^)]*\))?'),
+    'periode ini',
+  );
+
+  // Normalize "Rp28,000" or "Rp 123,200" (comma thousand separator) into "Rp 28.000" / "Rp 123.200"
+  text = text.replaceAllMapped(
+    RegExp(r'Rp\s?(\d{1,3}(?:,\d{3})+)'),
+    (m) => 'Rp ${m.group(1)!.replaceAll(',', '.')}',
+  );
+
+  return text;
+}
+
 class InsightModel {
   final String id;
   final String title;
@@ -14,8 +72,12 @@ class InsightModel {
   factory InsightModel.fromJson(Map<String, dynamic> json) {
     return InsightModel(
       id: (json['insight_id'] ?? json['id'] ?? '').toString(),
-      title: (json['title'] ?? 'Insight Keuangan').toString(),
-      description: (json['description'] ?? '').toString(),
+      title: sanitizeIndonesianFinanceText(
+        (json['title'] ?? 'Insight Keuangan').toString(),
+      ),
+      description: sanitizeIndonesianFinanceText(
+        (json['description'] ?? '').toString(),
+      ),
       createdAt:
           DateTime.tryParse((json['created_at'] ?? '').toString()) ??
               DateTime.now(),
@@ -45,7 +107,9 @@ class AlertModel {
   factory AlertModel.fromJson(Map<String, dynamic> json) {
     return AlertModel(
       id: (json['alert_id'] ?? json['id'] ?? '').toString(),
-      message: (json['message'] ?? '').toString(),
+      message: sanitizeIndonesianFinanceText(
+        (json['message'] ?? '').toString(),
+      ),
       alertType:
           (json['alert_type'] ?? json['level'] ?? json['alertType'] ?? 'info')
               .toString(),
@@ -211,7 +275,10 @@ class HealthScoreResult {
 
   static List<String> _toStringList(dynamic v) {
     if (v is List) {
-      return v.map((e) => e.toString()).where((s) => s.isNotEmpty).toList();
+      return v
+          .map((e) => sanitizeIndonesianFinanceText(e.toString()))
+          .where((s) => s.isNotEmpty)
+          .toList();
     }
     return const [];
   }
@@ -248,11 +315,13 @@ class BehaviorPredictionModel {
               .toString()
               .toLowerCase(),
       spikeProbability: prob,
-      recommendation: (json['recommendation'] ??
-              json['message'] ??
-              json['insight'] ??
-              'Pantau pola pengeluaran mingguan agar tetap seimbang.')
-          .toString(),
+      recommendation: sanitizeIndonesianFinanceText(
+        (json['recommendation'] ??
+                json['message'] ??
+                json['insight'] ??
+                'Pantau pola pengeluaran mingguan agar tetap seimbang.')
+            .toString(),
+      ),
       source: (json['source'] ?? 'ai-service').toString(),
     );
   }

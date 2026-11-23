@@ -8,8 +8,8 @@ const { success } = require('../utils/response');
 const router = Router();
 
 router.get('/version', (_req, res) => {
-  const latestVersion = process.env.APP_LATEST_VERSION || '1.0.3';
-  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 4);
+  const latestVersion = process.env.APP_LATEST_VERSION || '1.1.0';
+  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 5);
   const minVersion = process.env.APP_MIN_VERSION || '1.0.0';
   const forceUpdate = String(process.env.APP_FORCE_UPDATE || 'false').toLowerCase() === 'true';
   const downloadUrl =
@@ -19,10 +19,10 @@ router.get('/version', (_req, res) => {
   const releaseNotes = rawNotes
     ? rawNotes.split('|').map((s) => s.trim()).filter(Boolean)
     : [
-        'Fitur Transfer Antar Akun / Dompet tanpa merusak statistik pemasukan & pengeluaran',
-        'Kunci Aplikasi Biometrik (Sidik Jari / Face Unlock) & auto-logout sesi kedaluwarsa',
-        'Auto-format pemisah ribuan real-time, filter bulan/akun, dan Export Laporan CSV',
-        'Navigasi 5 tab lebih mulus (posisi scroll terjaga) & APK lebih ramping bertanda tangan rilis',
+        'Fitur Target Tabungan (Savings Goals) & Jadwal Tagihan/Gaji Rutin Bulanan 1-Klik',
+        'Auto-Suggest Merchant & Kategori Pintar di Catat Keuangan + Log Riwayat Transfer',
+        'Perbaikan format Bahasa Indonesia & anti-duplikat pada Notifikasi Peringatan Prediktif',
+        'Kalkulasi Skor Finansial & Dana Tersedia lebih akurat + Bagikan Ringkasan Laporan',
       ];
 
   return success(res, {

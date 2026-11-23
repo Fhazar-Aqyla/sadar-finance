@@ -13,14 +13,14 @@ import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
-  latestVersion: "1.0.3",
-  buildNumber: 4,
-  downloadUrl: "/downloads/sadar-finance-v1.0.3.apk",
+  latestVersion: "1.1.0",
+  buildNumber: 5,
+  downloadUrl: "/downloads/sadar-finance-v1.1.0.apk",
   releaseNotes: [
-    "Fitur Transfer Antar Akun / Dompet tanpa merusak statistik pemasukan & pengeluaran",
-    "Kunci Aplikasi Biometrik (Sidik Jari / Face Unlock) & auto-logout sesi kedaluwarsa",
-    "Auto-format pemisah ribuan real-time, filter bulan/akun, dan Export Laporan CSV",
-    "Navigasi 5 tab lebih mulus (posisi scroll terjaga) & APK lebih ramping bertanda tangan rilis",
+    "Fitur Target Tabungan (Savings Goals) & Jadwal Tagihan/Gaji Rutin Bulanan 1-Klik",
+    "Auto-Suggest Merchant & Kategori Pintar di Catat Keuangan + Log Riwayat Transfer",
+    "Perbaikan format Bahasa Indonesia & anti-duplikat pada Notifikasi Peringatan Prediktif",
+    "Kalkulasi Skor Finansial & Dana Tersedia lebih akurat + Bagikan Ringkasan Laporan",
   ],
 };
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/category_helpers.dart';
 import '../../../core/theme/app_theme.dart';
@@ -394,6 +395,13 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Catat Keuangan'),
+        actions: [
+          TextButton.icon(
+            onPressed: () => context.push('/financial-plans?tab=1'),
+            icon: const Icon(Icons.event_repeat_rounded, size: 18),
+            label: const Text('Jadwal Rutin'),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primaryOf(context),
@@ -673,6 +681,44 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                         ? 'Deskripsi singkat wajib diisi'
                         : null,
                   ),
+                  if (ref.watch(financeProvider).merchantSuggestions.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: ref
+                            .watch(financeProvider)
+                            .merchantSuggestions
+                            .map((m) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: ActionChip(
+                              avatar: Icon(
+                                Icons.history_rounded,
+                                size: 15,
+                                color: AppColors.primaryOf(context),
+                              ),
+                              label: Text(
+                                '${m.description} (${CategoryHelpers.labelForGroup(m.categoryGroup)})',
+                                style: const TextStyle(fontSize: 11.5),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _expDescCtrl.text = m.description;
+                                  _expCategoryGroup = m.categoryGroup;
+                                  if (m.categoryDetail != null &&
+                                      m.categoryDetail!.isNotEmpty) {
+                                    _expDetailCtrl.text = m.categoryDetail!;
+                                  }
+                                  _aiCategoryBadge = 'Riwayat Pintar';
+                                });
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 14),
                   Row(
                     children: [

@@ -5,11 +5,33 @@
 
 const transactionRepository = require('../repositories/transaction.repository');
 const incomeRepository = require('../repositories/income.repository');
+const accountRepository = require('../repositories/account.repository');
 const analyticsRepository = require('../repositories/analytics.repository');
 const aiClient = require('./aiClient.service');
 const { BadRequestError } = require('../utils/errors');
 
 class AnalyticsService {
+  _formatRupiah(value) {
+    return Math.round(Number(value || 0)).toLocaleString('id-ID');
+  }
+
+  _formatMonthLabel(dateInput) {
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    ];
+    const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (Number.isNaN(d.getTime())) return String(dateInput || 'Bulan Ini');
+    return `${months[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  _formatCategoryLabel(group) {
+    const raw = String(group || '').toLowerCase();
+    if (raw === 'needs' || raw === 'kebutuhan') return 'Kebutuhan (Needs)';
+    if (raw === 'wants' || raw === 'keinginan') return 'Keinginan (Wants)';
+    if (raw === 'savings' || raw === 'tabungan' || raw === 'investment') return 'Tabungan & Investasi';
+    return group || 'Lainnya';
+  }
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // AI Categorization
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -96,10 +118,17 @@ class AnalyticsService {
 
     // Generate insights and save to insights table
     const insightEntries = [];
+    const trendLabels = {
+      frugal: 'Sangat Hemat',
+      balanced: 'Seimbang',
+      moderate: 'Cukup Terkendali',
+      stable: 'Stabil',
+      overspending: 'Melebihi Pemasukan',
+    };
 
     insightEntries.push({
-      title: `Spending Trend: ${spendingTrend.charAt(0).toUpperCase() + spendingTrend.slice(1)}`,
-      description: `During ${periodStart} to ${periodEnd}, your savings rate was ${savingsRate}%. Total income: Rp ${totalIncome.toLocaleString()}, Total expenses: Rp ${totalExpense.toLocaleString()}.`,
+      title: `Tren Pengeluaran: ${trendLabels[spendingTrend] || spendingTrend}`,
+      description: `Rasio tabungan Anda tercatat ${savingsRate}%. Total pemasukan: Rp ${this._formatRupiah(totalIncome)}, total pengeluaran: Rp ${this._formatRupiah(totalExpense)}.`,
     });
 
     if (expenseSummary.length > 0) {
@@ -107,21 +136,22 @@ class AnalyticsService {
       const percentage = totalExpense > 0
         ? ((parseFloat(topCategory.total) / totalExpense) * 100).toFixed(1)
         : 0;
+      const catLabel = this._formatCategoryLabel(topCategory.category_group);
       insightEntries.push({
-        title: `Top Category: ${topCategory.category_group || 'Uncategorized'}`,
-        description: `${topCategory.category_group || 'Uncategorized'} accounts for ${percentage}% of your total expenses (Rp ${parseFloat(topCategory.total).toLocaleString()}).`,
+        title: `Kategori Terbesar: ${catLabel}`,
+        description: `Pos ${catLabel} menyumbang ${percentage}% dari total pengeluaran Anda (Rp ${this._formatRupiah(topCategory.total)}).`,
       });
     }
 
     if (spendingTrend === 'overspending') {
       insightEntries.push({
-        title: 'Overspending Detected',
-        description: 'Your expenses exceed your income. Consider reviewing non-essential spending.',
+        title: 'Pengeluaran Melebihi Pemasukan',
+        description: 'Total pengeluaran Anda lebih besar dari pemasukan tercatat. Tinjau kembali pengeluaran non-prioritas.',
       });
     } else if (savingsRate > 30) {
       insightEntries.push({
-        title: 'Excellent Savings Rate',
-        description: `You saved ${savingsRate}% of your income. Great financial discipline!`,
+        title: 'Rasio Tabungan Sangat Baik',
+        description: `Anda berhasil menyisihkan ${savingsRate}% dari pemasukan. Pertahankan disiplin finansial ini!`,
       });
     }
 
@@ -264,10 +294,11 @@ class AnalyticsService {
 
     // Generate alerts and save to alerts table
     const alertEntries = [];
+    const monthLabel = this._formatMonthLabel(month);
 
-    if (riskLevel === 'critical' || riskLevel === 'high') {
+    if ((riskLevel === 'critical' || riskLevel === 'high') && effectiveBudget > 0) {
       alertEntries.push({
-        message: `⚠️ Predicted spending for ${month} is Rp ${predictedAmount.toLocaleString()}, which exceeds your budget of Rp ${effectiveBudget.toLocaleString()} by ${((ratio - 1) * 100).toFixed(0)}%.`,
+        message: `Prediksi pengeluaran ${monthLabel} sebesar Rp ${this._formatRupiah(predictedAmount)} melampaui target anggaran Rp ${this._formatRupiah(effectiveBudget)} (+${((ratio - 1) * 100).toFixed(0)}%).`,
         alertType: 'overspending',
       });
     }
@@ -275,10 +306,11 @@ class AnalyticsService {
     // Category-level risks
     const categoryRisks = categorySummary.slice(0, 5).map((c) => {
       const catTotal = parseFloat(c.total);
-      const isHigh = catTotal > (effectiveBudget * 0.3);
+      const isHigh = effectiveBudget > 0 && catTotal > (effectiveBudget * 0.3);
       if (isHigh) {
+        const catLabel = this._formatCategoryLabel(c.category_group);
         alertEntries.push({
-          message: `${c.category_group || 'Uncategorized'} spending (Rp ${catTotal.toLocaleString()}) exceeds 30% of your budget.`,
+          message: `Pengeluaran pos ${catLabel} (Rp ${this._formatRupiah(catTotal)}) melewati 30% dari batas anggaran bulanan Anda.`,
           alertType: 'budget_exceeded',
         });
       }
@@ -289,17 +321,17 @@ class AnalyticsService {
       };
     });
 
-    if (riskLevel === 'medium') {
+    if (riskLevel === 'medium' && effectiveBudget > 0) {
       alertEntries.push({
-        message: `You are approaching your budget limit for ${month}. Predicted: Rp ${predictedAmount.toLocaleString()}, Budget: Rp ${effectiveBudget.toLocaleString()}.`,
+        message: `Pengeluaran ${monthLabel} diprediksi mendekati batas anggaran. Prediksi: Rp ${this._formatRupiah(predictedAmount)} dari anggaran Rp ${this._formatRupiah(effectiveBudget)}.`,
         alertType: 'reminder',
       });
     }
 
-    // Save alerts to DB
+    // Replace active alerts in DB (prevents duplicate alert spam on every app refresh)
     const savedAlerts = alertEntries.length > 0
       ? await analyticsRepository.createManyAlerts(userId, alertEntries)
-      : [];
+      : (await analyticsRepository.clearAlerts(userId), []);
 
     return {
       predictedMonth: month,
@@ -329,23 +361,35 @@ class AnalyticsService {
       startDate.setMonth(startDate.getMonth() - periodConfig.months);
     }
 
-    const [totalExpenseData, totalIncomeData, expenseTrend, incomeTrend, latestBudget, expenseSummary] = await Promise.all([
+    const [totalExpenseData, totalIncomeData, expenseTrend, incomeTrend, latestBudget, expenseSummary, userAccounts] = await Promise.all([
       transactionRepository.getTotalExpense(userId, startDate.toISOString(), endDate.toISOString()),
       incomeRepository.getTotalIncome(userId, startDate.toISOString(), endDate.toISOString()),
       transactionRepository.getMonthlyExpenseTrend(userId, periodConfig.trendMonths),
       incomeRepository.getMonthlyIncomeTrend(userId, periodConfig.trendMonths),
       analyticsRepository.getLatestBudget(userId),
       transactionRepository.getSummary(userId, startDate.toISOString(), endDate.toISOString()),
+      accountRepository.findByUser(userId),
     ]);
 
     const totalIncome = parseFloat(totalIncomeData.total);
     const totalExpense = parseFloat(totalExpenseData.total);
+    const totalAccountBalance = (userAccounts || []).reduce(
+      (sum, acc) => sum + parseFloat(acc.balance || 0),
+      0
+    );
     const transactionCount = parseInt(totalExpenseData.count || 0, 10);
     const incomeCount = parseInt(totalIncomeData.count || 0, 10);
-    const netSavings = totalIncome - totalExpense;
-    const budgetLimit = latestBudget
+    const rawBudgetLimit = latestBudget
       ? parseFloat(latestBudget.budget_limit || latestBudget.limit_amount || 0)
-      : totalIncome;
+      : 0;
+    // Use recorded income if available; otherwise fall back to budget limit or available account funds (balance + expense)
+    const effectiveIncome = totalIncome > 0
+      ? totalIncome
+      : rawBudgetLimit > 0
+        ? rawBudgetLimit
+        : (totalAccountBalance + totalExpense);
+    const netSavings = effectiveIncome - totalExpense;
+    const budgetLimit = rawBudgetLimit > 0 ? rawBudgetLimit : effectiveIncome;
 
     const clampScore = (value) => Math.max(0, Math.min(100, Math.round(value)));
 
@@ -362,9 +406,9 @@ class AnalyticsService {
       return 'wants';
     };
 
-    const hasIncome = totalIncome > 0;
-    const expenseRatio = hasIncome ? totalExpense / totalIncome : totalExpense > 0 ? 1.2 : 0;
-    const savingsRate = hasIncome ? netSavings / totalIncome : 0;
+    const hasIncome = effectiveIncome > 0;
+    const expenseRatio = hasIncome ? totalExpense / effectiveIncome : totalExpense > 0 ? 1.2 : 0;
+    const savingsRate = hasIncome ? netSavings / effectiveIncome : 0;
     const budgetUsage = budgetLimit > 0 ? totalExpense / budgetLimit : 0;
 
     const expenseScore = !hasIncome
@@ -410,22 +454,24 @@ class AnalyticsService {
       return result;
     }, { needs: 0, wants: 0, savings: 0 });
 
-    const needsRatio = totalIncome > 0 ? allocationTotals.needs / totalIncome : 0;
-    const wantsRatio = totalIncome > 0 ? allocationTotals.wants / totalIncome : 0;
-    const savingsRatio = totalIncome > 0
-      ? Math.max(allocationTotals.savings, Math.max(netSavings, 0)) / totalIncome
+    const needsRatio = effectiveIncome > 0 ? allocationTotals.needs / effectiveIncome : 0;
+    const wantsRatio = effectiveIncome > 0 ? allocationTotals.wants / effectiveIncome : 0;
+    const savingsRatio = effectiveIncome > 0
+      ? Math.max(allocationTotals.savings, Math.max(netSavings, 0)) / effectiveIncome
       : 0;
 
     const insights = [
       totalIncome > 0
         ? `Pengeluaran memakai ${(expenseRatio * 100).toFixed(1)}% dari pemasukan pada periode ini.`
-        : 'Belum ada pemasukan tercatat pada periode ini, jadi skor belum bisa membaca rasio pemasukan secara penuh.',
-      budgetLimit > 0
-        ? `Anggaran terpakai ${(budgetUsage * 100).toFixed(1)}% dari batas yang tersedia.`
-        : 'Anggaran belum tersedia, skor memakai pemasukan sebagai batas pembanding sementara.',
+        : effectiveIncome > 0
+          ? `Belum ada pemasukan bulanan tercatat; evaluasi dihitung dari dana akun & transaksi aktif (${(expenseRatio * 100).toFixed(1)}% terpakai).`
+          : 'Belum ada pemasukan tercatat pada periode ini. Catat pemasukan agar skor makin akurat.',
+      rawBudgetLimit > 0
+        ? `Anggaran terpakai ${(budgetUsage * 100).toFixed(1)}% dari batas Rp ${this._formatRupiah(rawBudgetLimit)}.`
+        : 'Target budget bulanan 50/30/20 belum diatur di menu Profil.',
       savingsRate >= 0.2
-        ? 'Rasio tabungan sudah memenuhi target minimal 20%.'
-        : 'Rasio tabungan belum mencapai target 20%.',
+        ? 'Cadangan dana / rasio tabungan sudah memenuhi target minimal 20%.'
+        : 'Rasio tabungan belum mencapai target ideal 20%.',
     ];
 
     const recommendations = [];

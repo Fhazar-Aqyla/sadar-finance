@@ -93,6 +93,7 @@ class AnalyticsRepository {
   }
 
   async createManyInsights(userId, insights) {
+    await query(`DELETE FROM insights WHERE user_id = $1`, [userId]);
     const results = [];
     for (const insight of insights) {
       const result = await query(
@@ -128,8 +129,13 @@ class AnalyticsRepository {
   }
 
   async createManyAlerts(userId, alerts) {
+    await query(`DELETE FROM alerts WHERE user_id = $1`, [userId]);
     const results = [];
+    const seen = new Set();
     for (const alert of alerts) {
+      const key = `${alert.alertType || 'info'}::${alert.message}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
       const result = await query(
         `INSERT INTO alerts (user_id, message, alert_type)
          VALUES ($1, $2, $3)
@@ -139,6 +145,10 @@ class AnalyticsRepository {
       results.push(result.rows[0]);
     }
     return results;
+  }
+
+  async clearAlerts(userId) {
+    await query(`DELETE FROM alerts WHERE user_id = $1`, [userId]);
   }
 
   async getAlerts(userId, { page = 1, limit = 20 } = {}) {
@@ -153,6 +163,15 @@ class AnalyticsRepository {
 
   // ── Score ─────────────────────────────────────────────────
   async createScore(userId, score) {
+    const latest = await this.getLatestScore(userId);
+    if (
+      latest &&
+      Number(latest.score) === Number(score) &&
+      latest.created_at &&
+      Date.now() - new Date(latest.created_at).getTime() < 6 * 3600 * 1000
+    ) {
+      return latest;
+    }
     const result = await query(
       `INSERT INTO scores (user_id, score)
        VALUES ($1, $2)

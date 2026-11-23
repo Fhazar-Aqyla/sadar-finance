@@ -16,6 +16,7 @@ import '../../widgets/sadar_card.dart';
 class _HistoryItem {
   final String id;
   final bool isIncome;
+  final bool isTransfer;
   final String? accountId;
   final String title;
   final String subtitle;
@@ -27,6 +28,7 @@ class _HistoryItem {
   const _HistoryItem({
     required this.id,
     required this.isIncome,
+    this.isTransfer = false,
     required this.accountId,
     required this.title,
     required this.subtitle,
@@ -144,6 +146,49 @@ class _FinancialHistoryScreenState
     } finally {
       if (mounted) setState(() => _exporting = false);
     }
+  }
+
+  Future<void> _shareSummaryReport(
+    FinanceState finance,
+    List<_HistoryItem> rows,
+    double totalIn,
+    double totalOut,
+  ) async {
+    final now = DateTime.now();
+    final score = finance.healthScore?.overallScore ?? 0;
+    final status = finance.healthScore?.status ?? 'Belum Dihitung';
+    final buf = StringBuffer();
+    buf.writeln('RINGKASAN LAPORAN KEUANGAN SADAR FINANCE');
+    buf.writeln('Tanggal Cetak: ${AppFormatters.fullDate(now)}');
+    buf.writeln('----------------------------------------');
+    buf.writeln(
+      'Total Saldo Gabungan (${finance.accounts.length} akun): ${AppFormatters.rupiah(finance.totalBalance)}',
+    );
+    buf.writeln('Total Pemasukan (Filter): ${AppFormatters.rupiah(totalIn)}');
+    buf.writeln('Total Pengeluaran (Filter): ${AppFormatters.rupiah(totalOut)}');
+    buf.writeln('Selisih Arus Kas: ${AppFormatters.rupiah(totalIn - totalOut)}');
+    buf.writeln('Skor Kesehatan Finansial: $score / 100 ($status)');
+    if (finance.savingsGoals.isNotEmpty) {
+      buf.writeln('\nTARGET TABUNGAN:');
+      for (final g in finance.savingsGoals) {
+        buf.writeln(
+          '- ${g.title}: ${AppFormatters.rupiah(g.currentAmount)} / ${AppFormatters.rupiah(g.targetAmount)} (${g.progressPercent}%)',
+        );
+      }
+    }
+    if (rows.isNotEmpty) {
+      buf.writeln('\n10 CATATAN TERBARU:');
+      for (final r in rows.take(10)) {
+        final sign = r.isTransfer ? '' : (r.isIncome ? '+' : '-');
+        buf.writeln(
+          '- [${AppFormatters.shortDate(r.date)}] ${r.title}: $sign${AppFormatters.rupiah(r.amount)}',
+        );
+      }
+    }
+    await Share.share(
+      buf.toString(),
+      subject: 'Ringkasan Laporan SADAR Finance',
+    );
   }
 
   Future<void> _showEditSheet(_HistoryItem item, List<AccountModel> accounts) async {
@@ -382,7 +427,9 @@ class _FinancialHistoryScreenState
     if (confirmed != true) return;
 
     try {
-      if (item.isIncome) {
+      if (item.isTransfer) {
+        await ref.read(financeProvider.notifier).deleteTransferLog(item.id);
+      } else if (item.isIncome) {
         await ref.read(financeProvider.notifier).deleteIncome(item.id);
       } else {
         await ref.read(financeProvider.notifier).deleteTransaction(item.id);
@@ -408,7 +455,7 @@ class _FinancialHistoryScreenState
     final query = _searchCtrl.text.trim().toLowerCase();
 
     final items = <_HistoryItem>[
-      if (_typeFilter != 'income')
+      if (_typeFilter != 'income' && _typeFilter != 'transfer')
         ...finance.transactions.map((t) {
           final acc = t.accountName ?? finance.accountNameById(t.accountId);
           return _HistoryItem(
@@ -423,7 +470,9 @@ class _FinancialHistoryScreenState
             date: t.transactionDate,
           );
         }),
-      if (_typeFilter != 'expense' && _categoryFilter == 'all')
+      if (_typeFilter != 'expense' &&
+          _typeFilter != 'transfer' &&
+          _categoryFilter == 'all')
         ...finance.incomes.map((i) {
           final acc = i.accountName ?? finance.accountNameById(i.accountId);
           return _HistoryItem(
@@ -435,6 +484,23 @@ class _FinancialHistoryScreenState
             categoryGroup: 'Income',
             amount: i.amount,
             date: i.incomeDate,
+          );
+        }),
+      if ((_typeFilter == 'all' || _typeFilter == 'transfer') &&
+          _categoryFilter == 'all')
+        ...finance.transfers.map((tr) {
+          return _HistoryItem(
+            id: tr.id,
+            isIncome: false,
+            isTransfer: true,
+            accountId: tr.fromAccountId,
+            title: 'Transfer: ${tr.fromAccountName} ke ${tr.toAccountName}',
+            subtitle: tr.note.isNotEmpty
+                ? 'Mutasi Saldo · ${tr.note}'
+                : 'Mutasi Saldo Antar Akun',
+            categoryGroup: 'Transfer',
+            amount: tr.amount,
+            date: tr.date,
           );
         }),
     ];
@@ -484,7 +550,7 @@ class _FinancialHistoryScreenState
         .where((i) => i.isIncome)
         .fold<double>(0, (sum, i) => sum + i.amount);
     final filteredOut = filtered
-        .where((i) => !i.isIncome)
+        .where((i) => !i.isIncome && !i.isTransfer)
         .fold<double>(0, (sum, i) => sum + i.amount);
 
     final customLabel = _customRange != null
@@ -495,6 +561,12 @@ class _FinancialHistoryScreenState
       appBar: AppBar(
         title: const Text('Riwayat Keuangan'),
         actions: [
+          IconButton(
+            tooltip: 'Bagikan Ringkasan Laporan',
+            onPressed: () =>
+                _shareSummaryReport(finance, filtered, filteredIn, filteredOut),
+            icon: const Icon(Icons.assessment_outlined),
+          ),
           IconButton(
             tooltip: 'Ekspor Laporan CSV',
             onPressed: _exporting ? null : () => _exportCsv(filtered),
@@ -558,7 +630,17 @@ class _FinancialHistoryScreenState
                           _categoryFilter = 'all';
                         }),
                       ),
-                      if (_typeFilter != 'income') ...[
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Transfer'),
+                        selected: _typeFilter == 'transfer',
+                        onSelected: (_) => setState(() {
+                          _typeFilter = 'transfer';
+                          _categoryFilter = 'all';
+                        }),
+                      ),
+                      if (_typeFilter != 'income' &&
+                          _typeFilter != 'transfer') ...[
                         const SizedBox(width: 12),
                         ...CategoryHelpers.groups.map(
                           (g) => Padding(
@@ -738,11 +820,17 @@ class _FinancialHistoryScreenState
                           );
                         }
                         final item = filtered[index];
-                        final color = item.isIncome
-                            ? AppColors.success
-                            : CategoryHelpers.colorForGroup(item.categoryGroup);
+                        final color = item.isTransfer
+                            ? AppColors.primaryLight
+                            : item.isIncome
+                                ? AppColors.success
+                                : CategoryHelpers.colorForGroup(
+                                    item.categoryGroup,
+                                  );
                         return SadarCard(
-                          onTap: () => _showEditSheet(item, finance.accounts),
+                          onTap: item.isTransfer
+                              ? null
+                              : () => _showEditSheet(item, finance.accounts),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 14,
                             vertical: 12,
@@ -757,11 +845,13 @@ class _FinancialHistoryScreenState
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
-                                  item.isIncome
-                                      ? Icons.arrow_downward_rounded
-                                      : CategoryHelpers.iconForGroup(
-                                          item.categoryGroup,
-                                        ),
+                                  item.isTransfer
+                                      ? Icons.swap_horiz_rounded
+                                      : item.isIncome
+                                          ? Icons.arrow_downward_rounded
+                                          : CategoryHelpers.iconForGroup(
+                                              item.categoryGroup,
+                                            ),
                                   color: color,
                                   size: 20,
                                 ),
@@ -801,35 +891,41 @@ class _FinancialHistoryScreenState
                                   Text(
                                     hidden
                                         ? 'Rp •••••'
-                                        : '${item.isIncome ? '+' : '-'}${AppFormatters.rupiah(item.amount)}',
+                                        : item.isTransfer
+                                            ? AppFormatters.rupiah(item.amount)
+                                            : '${item.isIncome ? '+' : '-'}${AppFormatters.rupiah(item.amount)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 13.5,
-                                      color: item.isIncome
-                                          ? AppColors.success
-                                          : AppColors.danger,
+                                      color: item.isTransfer
+                                          ? AppColors.primaryOf(context)
+                                          : item.isIncome
+                                              ? AppColors.success
+                                              : AppColors.danger,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      InkWell(
-                                        onTap: () => _showEditSheet(
-                                          item,
-                                          finance.accounts,
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(2),
-                                          child: Icon(
-                                            Icons.edit_outlined,
-                                            size: 17,
-                                            color:
-                                                AppColors.textMutedOf(context),
+                                      if (!item.isTransfer) ...[
+                                        InkWell(
+                                          onTap: () => _showEditSheet(
+                                            item,
+                                            finance.accounts,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Icon(
+                                              Icons.edit_outlined,
+                                              size: 17,
+                                              color:
+                                                  AppColors.textMutedOf(context),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 8),
+                                        const SizedBox(width: 8),
+                                      ],
                                       InkWell(
                                         onTap: () => _confirmDelete(item),
                                         child: Padding(
