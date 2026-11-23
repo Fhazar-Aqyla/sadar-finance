@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-// SADAR Finance Pages
+// SADAR Finance Web App Pages (Basic SADAR Finance)
 import SadarDashboard from "../pages/SadarDashboard";
 import SadarBehaviorInsight from "../pages/SadarBehaviorInsight";
 import SadarFinancialScore from "../pages/SadarFinancialScore";
@@ -17,8 +17,9 @@ import Logout from "../pages/Authentication/Logout";
 import Register from "../pages/Authentication/Register";
 import UserProfile from "../pages/Authentication/user-profile";
 
-// Landing Index
+// Landing & Installation Pages
 import OnePage from "../pages/Landing/OnePage";
+import InstallPage from "../pages/Landing/InstallPage";
 
 // Legal / Policy Pages
 import PrivancyPolicy from "../pages/Pages/PrivancyPolicy/PrivancyPolicy";
@@ -35,19 +36,18 @@ const authProtectedRoutes = [
   { path: "/index", component: <SadarDashboard /> },
   { path: "/transactions/input", component: <TransactionInput /> },
   { path: "/profile", component: <UserProfile /> },
-
-  // this route should be at the end of all other routes
-  { path: "*", component: <Navigate to="/dashboard" /> },
+  { path: "*", component: <Navigate to="/dashboard" replace /> },
 ];
 
 const publicRoutes = [
-  // Authentication & Landing Pages (Redirect to dashboard if already logged in)
   { path: "/", component: <OnePage />, guestOnly: true },
+  { path: "/landing", component: <OnePage />, guestOnly: true },
+  { path: "/install", component: <InstallPage /> },
+  { path: "/download", component: <InstallPage /> },
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login />, guestOnly: true },
   { path: "/forgot-password", component: <ForgetPasswordPage />, guestOnly: true },
   { path: "/register", component: <Register />, guestOnly: true },
-  { path: "/landing", component: <OnePage />, guestOnly: true },
   { path: "/privancy-policy", component: <PrivancyPolicy /> },
   { path: "/privacy-policy", component: <PrivancyPolicy /> },
   { path: "/term-conditions", component: <TermAndConditions /> },

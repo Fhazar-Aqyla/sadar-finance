@@ -142,7 +142,7 @@ class AppUpdateService {
         return AppUpdateCheckResult(
           outcome: UpdateCheckOutcome.upToDate,
           message: currentPatch != null
-              ? 'Aplikasi sudah versi terbaru (v${AppConfig.appVersion} · Patch #$currentPatch).'
+              ? 'Aplikasi sudah versi terbaru (v${AppConfig.appVersion} - Patch #$currentPatch).'
               : 'Aplikasi SADAR Finance sudah menggunakan versi terbaru (v${AppConfig.appVersion}).',
           latestVersion: latestVersion,
           latestBuildNumber: latestBuild,

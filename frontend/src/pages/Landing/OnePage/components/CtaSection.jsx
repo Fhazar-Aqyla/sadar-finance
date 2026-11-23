@@ -1,103 +1,62 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { getStoredAuthUser } from "../../../../helpers/auth-storage";
-import { ArrowRight, Sparkles, CheckCircle2, Shield, Smartphone, Zap, Lock } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, CheckCircle2, Shield, Smartphone } from "lucide-react";
 
 export const CtaSection = () => {
-  const containerRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  // Parallax transforms for CTA Card (direct, no spring for performance)
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.92, 1, 0.96]);
-  const yCard = useTransform(scrollYProgress, [0, 1], [40, -30]);
-
-  const hasAuthToken = () => Boolean(getStoredAuthUser()?.token);
-  const isAuthenticated = hasAuthToken();
-
   return (
-    <section
-      ref={containerRef}
-      className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden"
-    >
-      <motion.div
-        style={{ scale, y: yCard }}
-        className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#1E3A8A] via-[#1E3A8A] to-[#0f172a] p-8 sm:p-12 lg:p-16 text-center text-white shadow-2xl border border-blue-800/80"
-      >
-        {/* Static Aurora Glow Orbs inside Card (no continuous animation for performance) */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-sky-400/20 blur-[90px] rounded-full pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-blue-600/30 blur-[90px] rounded-full pointer-events-none" />
+    <section className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-blue-100/80 via-indigo-50/70 to-white p-8 sm:p-12 lg:p-16 text-center border border-blue-200/70 shadow-sm">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#93c5fd_1px,transparent_1px)] [background-size:28px_28px] opacity-[0.28]" />
 
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 text-white text-xs font-bold uppercase tracking-wider mb-5 border border-white/20 shadow-xs"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-sky-300 animate-spin-slow" />
-            Saatnya Lebih Sadar Soal Keuangan
-          </motion.div>
-
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">
-            Mulai Perjalanan Sadar Finansialmu Hari Ini.
-          </h2>
-
-          <p className="mt-4 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto font-normal leading-relaxed">
-            Buat akun gratis dalam 30 detik. Tanpa kartu kredit, tanpa biaya tersembunyi, dan dirancang khusus untuk membantu kamu mengelola keuangan dengan lebih tenang.
+        <div className="relative z-10 max-w-2xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#1E3A8A] mb-3">
+            SADAR Finance untuk Android
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <motion.div
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="w-full sm:w-auto relative group overflow-hidden rounded-xl"
-            >
-              <Link
-                to={isAuthenticated ? "/dashboard" : "/register"}
-                className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-[#1E3A8A] hover:bg-slate-50 font-extrabold text-sm shadow-xl transition-all overflow-hidden"
-              >
-                <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-[#1E3A8A]/10 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
-                <span className="relative z-10 flex items-center gap-2">
-                  {isAuthenticated ? "Buka Dashboard" : "Mulai Sekarang"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Link>
-            </motion.div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-slate-900">
+            Mulai Perjalanan{" "}
+            <span className="bg-gradient-to-r from-[#1E3A8A] via-sky-500 to-[#1E3A8A] bg-clip-text text-transparent">
+              Sadar Finansialmu
+            </span>{" "}
+            Hari Ini.
+          </h2>
 
-            <motion.div
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="w-full sm:w-auto"
+          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-xl mx-auto leading-relaxed">
+            Pasang aplikasi SADAR Finance secara gratis di smartphone Android Anda. Cepat, aman, dan tetap bisa mencatat transaksi saat offline.
+          </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <Link
+              to="/login"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-sm shadow-sm hover:shadow-md transition-all"
             >
-              <Link
-                to={isAuthenticated ? "/dashboard" : "/login"}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white font-bold text-sm transition-all backdrop-blur-xs"
-              >
-                {isAuthenticated ? "Ke Dashboard" : "Masuk ke Akun"}
-              </Link>
-            </motion.div>
+              Masuk ke SADAR Web <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/install"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm shadow-xs transition-all"
+            >
+              <Smartphone className="w-4 h-4 text-[#1E3A8A]" />
+              Unduh Aplikasi Android (APK)
+            </Link>
           </div>
 
-          <div className="mt-10 pt-6 border-t border-white/15 flex flex-wrap items-center justify-center gap-6 text-xs text-blue-100 font-semibold">
+          <div className="mt-9 pt-6 border-t border-slate-200/80 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-600 font-semibold">
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>100% Gratis Digunakan</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Gratis & Bebas Iklan</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Shield className="w-4 h-4 text-sky-300" />
-              <span>Data Terisolasi & Aman</span>
+              <Shield className="w-4 h-4 text-[#1E3A8A]" />
+              <span>Data Terenkripsi</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4 text-sky-300" />
-              <span>Akses di Semua Perangkat</span>
+              <Smartphone className="w-4 h-4 text-sky-600" />
+              <span>Siap Online & Offline</span>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 };

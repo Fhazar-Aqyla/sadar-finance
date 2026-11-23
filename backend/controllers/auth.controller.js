@@ -222,6 +222,14 @@ const unlinkGoogle = asyncHandler(async (req, res) => {
   });
 });
 
+const getLeaderboard = asyncHandler(async (_req, res) => {
+  const leaderboard = await authService.getStreakLeaderboard();
+  return success(res, {
+    data: { leaderboard },
+    message: 'Leaderboard streak retrieved successfully',
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -237,4 +245,5 @@ module.exports = {
   googleAuth,
   linkGoogle,
   unlinkGoogle,
+  getLeaderboard,
 };

@@ -432,7 +432,7 @@ class _DebtSplitScreenState extends ConsumerState<DebtSplitScreen>
                                 ),
                               ),
                               Text(
-                                '${item.isReceivable ? "Piutang (Teman Pinjam)" : "Utang (Saya Pinjam)"}${item.note.isNotEmpty ? " · ${item.note}" : ""}',
+                                '${item.isReceivable ? "Piutang (Teman Pinjam)" : "Utang (Saya Pinjam)"}${item.note.isNotEmpty ? " - ${item.note}" : ""}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondaryOf(context),

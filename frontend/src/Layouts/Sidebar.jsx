@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Activity,
@@ -52,10 +52,9 @@ const normalizeAccountEmail = (value) => {
 };
 
 const resolveAvatarUrl = (url) => {
-  if (!url) return dummyAvatar;
+  if (!url || String(url).startsWith("avatar2d:")) return dummyAvatar;
   if (/^(https?:|data:)/i.test(url)) return url;
-  const serverUrl = "https://sadar-finance.up.railway.app";
-  return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  return `${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
 const Sidebar = ({ className = "", onLogoutClick }) => {

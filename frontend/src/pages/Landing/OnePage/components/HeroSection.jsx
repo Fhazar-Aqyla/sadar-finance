@@ -12,7 +12,6 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { getStoredAuthUser } from "../../../../helpers/auth-storage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -169,9 +168,6 @@ export const HeroSection = () => {
     { scope: containerRef }
   );
 
-  const hasAuthToken = () => Boolean(getStoredAuthUser()?.token);
-  const isAuthenticated = hasAuthToken();
-
   return (
     <section
       id="home"
@@ -269,20 +265,20 @@ export const HeroSection = () => {
           </p>
 
           {/* Call to Actions with Shimmer Effect */}
-          <div className="hero-actions flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
+          <div className="hero-actions flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="w-full sm:w-auto relative group overflow-hidden rounded-xl"
             >
               <Link
-                to={isAuthenticated ? "/dashboard" : "/register"}
+                to="/login"
                 className="w-full sm:w-auto relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-bold text-sm shadow-sm hover:shadow-md transition-all overflow-hidden"
               >
                 {/* Shimmer Sweep Animation */}
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
                 <span className="relative z-10 flex items-center gap-2">
-                  {isAuthenticated ? "Buka Dashboard" : "Mulai Gratis Sekarang"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Mulai Sekarang <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </motion.div>
@@ -292,12 +288,12 @@ export const HeroSection = () => {
               whileTap={{ scale: 0.97 }}
               className="w-full sm:w-auto"
             >
-              <a
-                href="#features"
+              <Link
+                to="/install"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-sm shadow-xs hover:bg-slate-50 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-all"
               >
-                Pelajari Fitur
-              </a>
+                Unduh Aplikasi Android (APK)
+              </Link>
             </motion.div>
           </div>
         </div>

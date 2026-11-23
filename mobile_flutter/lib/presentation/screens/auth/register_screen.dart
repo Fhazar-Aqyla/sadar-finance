@@ -5,6 +5,7 @@ import '../../../core/services/google_auth_helper.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
+import '../../widgets/google_logo_icon.dart';
 import '../../widgets/sadar_logo.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -433,23 +434,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               child: OutlinedButton.icon(
                                 onPressed:
                                     auth.isLoading ? null : _signUpWithGoogle,
-                                icon: Container(
-                                  width: 20,
-                                  height: 20,
-                                  alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF4285F4),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Text(
-                                    'G',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                ),
+                                icon: const GoogleLogoIcon(size: 18),
                                 label: const Text(
                                   'Daftar Cepat dengan Google',
                                   style: TextStyle(fontWeight: FontWeight.w700),

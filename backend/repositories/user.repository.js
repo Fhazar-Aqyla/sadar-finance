@@ -9,8 +9,12 @@
 const { query } = require('../config/database');
 
 const PUBLIC_USER_COLS = `
-  users_id, first_name, last_name, gender, email,
-  phone_number, date_of_birth, address, profile_picture, occupation, status,
+  users_id, first_name, middle_name, last_name, username, gender, email,
+  phone_number, date_of_birth, address, city, province, postal_code,
+  profile_picture, occupation, financial_goal, status,
+  COALESCE(streak_days, 1) AS streak_days,
+  COALESCE(xp_points, 50) AS xp_points,
+  COALESCE(financial_level, 1) AS financial_level,
   COALESCE(email_verified, FALSE) AS email_verified,
   google_id, google_email,
   created_at, updated_at
@@ -26,11 +30,38 @@ class UserRepository {
     try {
       await query(`
         ALTER TABLE users
+          ADD COLUMN IF NOT EXISTS middle_name VARCHAR(100),
+          ADD COLUMN IF NOT EXISTS username VARCHAR(60),
+          ADD COLUMN IF NOT EXISTS city VARCHAR(120),
+          ADD COLUMN IF NOT EXISTS province VARCHAR(120),
+          ADD COLUMN IF NOT EXISTS postal_code VARCHAR(20),
+          ADD COLUMN IF NOT EXISTS financial_goal VARCHAR(160),
+          ADD COLUMN IF NOT EXISTS streak_days INTEGER DEFAULT 1,
+          ADD COLUMN IF NOT EXISTS xp_points INTEGER DEFAULT 50,
+          ADD COLUMN IF NOT EXISTS financial_level INTEGER DEFAULT 1,
           ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE,
           ADD COLUMN IF NOT EXISTS google_id VARCHAR(255),
           ADD COLUMN IF NOT EXISTS google_email VARCHAR(255),
           ADD COLUMN IF NOT EXISTS otp_code VARCHAR(10),
           ADD COLUMN IF NOT EXISTS otp_expires_at TIMESTAMPTZ;
+      `);
+      // Auto-populate middle_name (nickname) if empty and last_name has 2+ words (e.g. "Habib Rafi" -> middle="Habib", last="Rafi")
+      await query(`
+        UPDATE users
+        SET
+          middle_name = split_part(TRIM(last_name), ' ', 1),
+          last_name = SUBSTRING(TRIM(last_name) FROM LENGTH(split_part(TRIM(last_name), ' ', 1)) + 2)
+        WHERE (middle_name IS NULL OR TRIM(middle_name) = '')
+          AND POSITION(' ' IN TRIM(last_name)) > 0;
+      `);
+      // Auto-populate username if empty
+      await query(`
+        UPDATE users
+        SET username = LOWER(REGEXP_REPLACE(
+          COALESCE(NULLIF(TRIM(middle_name), ''), TRIM(first_name)) || COALESCE(NULLIF(TRIM(last_name), ''), ''),
+          '[^a-zA-Z0-9_]', '', 'g'
+        ))
+        WHERE username IS NULL OR TRIM(username) = '';
       `);
       this._colsEnsured = true;
     } catch (_) {}
@@ -78,38 +109,54 @@ class UserRepository {
 
   async create({
     firstName,
+    middleName,
     lastName,
+    username,
     gender,
     email,
     passwordHash,
     phoneNumber,
     dateOfBirth,
     address,
+    city,
+    province,
+    postalCode,
     occupation,
+    financialGoal,
     profilePicture,
     emailVerified = false,
     googleId = null,
     googleEmail = null,
   }) {
     await this._ensureColumns();
+    const cleanUsername =
+      (username || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '') ||
+      `${(middleName || firstName || 'user').toLowerCase().replace(/[^a-z0-9]/g, '')}`;
     const result = await query(
       `INSERT INTO users (
-         first_name, last_name, gender, email, password_hash,
-         phone_number, date_of_birth, address, occupation, profile_picture,
+         first_name, middle_name, last_name, username, gender, email, password_hash,
+         phone_number, date_of_birth, address, city, province, postal_code,
+         occupation, financial_goal, profile_picture,
          email_verified, google_id, google_email
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        RETURNING ${PUBLIC_USER_COLS}`,
       [
         firstName,
+        middleName || null,
         lastName,
+        cleanUsername,
         gender || null,
         email,
         passwordHash,
         phoneNumber || null,
         dateOfBirth || null,
         address || null,
+        city || null,
+        province || null,
+        postalCode || null,
         occupation || null,
+        financialGoal || null,
         profilePicture || null,
         Boolean(emailVerified),
         googleId,
@@ -127,13 +174,22 @@ class UserRepository {
 
     const fieldMap = {
       firstName: 'first_name',
+      middleName: 'middle_name',
       lastName: 'last_name',
+      username: 'username',
       gender: 'gender',
       phoneNumber: 'phone_number',
       dateOfBirth: 'date_of_birth',
       address: 'address',
+      city: 'city',
+      province: 'province',
+      postalCode: 'postal_code',
       profilePicture: 'profile_picture',
       occupation: 'occupation',
+      financialGoal: 'financial_goal',
+      streakDays: 'streak_days',
+      xpPoints: 'xp_points',
+      financialLevel: 'financial_level',
       emailVerified: 'email_verified',
       googleId: 'google_id',
       googleEmail: 'google_email',
@@ -157,6 +213,35 @@ class UserRepository {
       params
     );
     return result.rows[0] || null;
+  }
+
+  async getStreakLeaderboard(limit = 15) {
+    await this._ensureColumns();
+    const result = await query(
+      `SELECT
+         u.users_id,
+         u.first_name,
+         u.middle_name,
+         u.last_name,
+         u.username,
+         u.profile_picture,
+         u.occupation,
+         u.city,
+         GREATEST(COALESCE(u.streak_days, 1), 1) AS streak_days,
+         GREATEST(COALESCE(u.xp_points, 50), 25 + COALESCE(tx.tx_count, 0) * 15) AS xp_points,
+         GREATEST(COALESCE(u.financial_level, 1), 1) AS financial_level
+       FROM users u
+       LEFT JOIN (
+         SELECT user_id, COUNT(*)::int AS tx_count
+         FROM transactions
+         GROUP BY user_id
+       ) tx ON tx.user_id = u.users_id
+       WHERE u.status = 'active'
+       ORDER BY streak_days DESC, xp_points DESC, u.created_at ASC
+       LIMIT $1`,
+      [limit]
+    );
+    return result.rows;
   }
 
   async saveOtp(id, otpCode, expiresAt) {

@@ -104,8 +104,8 @@ class _FinancialHistoryScreenState
       for (final item in rows) {
         final dateStr = AppFormatters.isoDateOnly(item.date);
         final typeStr = item.isIncome ? 'Pemasukan' : 'Pengeluaran';
-        final accName = item.subtitle.contains('·')
-            ? item.subtitle.split('·').last.trim()
+        final accName = item.subtitle.contains('-')
+            ? item.subtitle.split('-').last.trim()
             : '-';
         buf.writeln(
           [
@@ -463,7 +463,7 @@ class _FinancialHistoryScreenState
             isIncome: false,
             accountId: t.accountId,
             title: t.displayTitle,
-            subtitle: '${t.categoryLabel} · $acc',
+            subtitle: '${t.categoryLabel} - $acc',
             categoryGroup: t.categoryGroup,
             categoryDetail: t.categoryDetail,
             amount: t.amount,
@@ -480,7 +480,7 @@ class _FinancialHistoryScreenState
             isIncome: true,
             accountId: i.accountId,
             title: i.source,
-            subtitle: 'Pemasukan · $acc',
+            subtitle: 'Pemasukan - $acc',
             categoryGroup: 'Income',
             amount: i.amount,
             date: i.incomeDate,
@@ -496,7 +496,7 @@ class _FinancialHistoryScreenState
             accountId: tr.fromAccountId,
             title: 'Transfer: ${tr.fromAccountName} ke ${tr.toAccountName}',
             subtitle: tr.note.isNotEmpty
-                ? 'Mutasi Saldo · ${tr.note}'
+                ? 'Mutasi Saldo - ${tr.note}'
                 : 'Mutasi Saldo Antar Akun',
             categoryGroup: 'Transfer',
             amount: tr.amount,
@@ -873,7 +873,7 @@ class _FinancialHistoryScreenState
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      '${item.subtitle} · ${AppFormatters.shortDate(item.date)}',
+                                      '${item.subtitle} - ${AppFormatters.shortDate(item.date)}',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(

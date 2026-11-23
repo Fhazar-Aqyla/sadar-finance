@@ -192,34 +192,80 @@ class SadarApiService {
 
   Future<UserModel> updateProfile({
     String? firstName,
+    String? middleName,
     String? lastName,
+    String? username,
     String? gender,
     String? phoneNumber,
     String? dateOfBirth,
     String? address,
+    String? city,
+    String? province,
+    String? postalCode,
     String? occupation,
+    String? financialGoal,
     String? profilePicture,
+    int? streakDays,
+    int? xpPoints,
+    int? financialLevel,
   }) async {
-    final payload = <String, dynamic>{
-      if (firstName != null && firstName.trim().isNotEmpty)
-        'firstName': firstName.trim(),
-      if (lastName != null && lastName.trim().isNotEmpty)
-        'lastName': lastName.trim(),
-      if (gender != null && gender.trim().isNotEmpty) 'gender': gender.trim(),
-      if (phoneNumber != null && phoneNumber.trim().isNotEmpty)
-        'phoneNumber': phoneNumber.trim(),
-      if (dateOfBirth != null && dateOfBirth.trim().isNotEmpty)
-        'dateOfBirth': dateOfBirth.trim(),
-      if (address != null) 'address': address.trim(),
-      if (occupation != null) 'occupation': occupation.trim(),
-      if (profilePicture != null && profilePicture.trim().isNotEmpty)
-        'profilePicture': profilePicture.trim(),
-    };
+    final payload = <String, dynamic>{};
+    if (firstName != null && firstName.trim().isNotEmpty) {
+      payload['firstName'] = firstName.trim();
+    }
+    if (middleName != null) {
+      payload['middleName'] = middleName.trim();
+    }
+    if (lastName != null && lastName.trim().isNotEmpty) {
+      payload['lastName'] = lastName.trim();
+    }
+    if (username != null) {
+      payload['username'] =
+          username.trim().replaceAll('@', '').toLowerCase();
+    }
+    if (gender != null) payload['gender'] = gender.trim();
+    if (phoneNumber != null) payload['phoneNumber'] = phoneNumber.trim();
+    if (dateOfBirth != null) payload['dateOfBirth'] = dateOfBirth.trim();
+    if (address != null) payload['address'] = address.trim();
+    if (city != null) payload['city'] = city.trim();
+    if (province != null) payload['province'] = province.trim();
+    if (postalCode != null) payload['postalCode'] = postalCode.trim();
+    if (occupation != null) payload['occupation'] = occupation.trim();
+    if (financialGoal != null) payload['financialGoal'] = financialGoal.trim();
+    if (profilePicture != null && profilePicture.trim().isNotEmpty) {
+      payload['profilePicture'] = profilePicture.trim();
+    }
+    if (streakDays != null) payload['streakDays'] = streakDays;
+    if (xpPoints != null) payload['xpPoints'] = xpPoints;
+    if (financialLevel != null) payload['financialLevel'] = financialLevel;
+
     final data = await _client.put('/auth/me', data: payload);
     final map = (data is Map && data['user'] is Map)
         ? Map<String, dynamic>.from(data['user'] as Map)
         : Map<String, dynamic>.from(data as Map);
     return UserModel.fromJson(map);
+  }
+
+  Future<List<Map<String, dynamic>>> getStreakLeaderboard() async {
+    final data = await _client.get('/auth/leaderboard');
+    final rawList = (data is Map && data['leaderboard'] is List)
+        ? (data['leaderboard'] as List)
+        : (data is List ? data : const []);
+    return rawList
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getActiveBroadcasts() async {
+    final data = await _client.get('/app/broadcasts');
+    final rawList = (data is Map && data['broadcasts'] is List)
+        ? (data['broadcasts'] as List)
+        : (data is List ? data : const []);
+    return rawList
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 
   Future<void> changePassword({

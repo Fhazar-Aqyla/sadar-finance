@@ -108,9 +108,16 @@ class AuthService {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await userRepository.saveOtp(user.users_id, otp, expiresAt);
 
+    const greetingName =
+      (user.middle_name && user.middle_name.trim()) ||
+      [user.first_name, user.middle_name, user.last_name]
+        .filter((p) => p && String(p).trim())
+        .join(' ') ||
+      user.first_name;
+
     const delivery = await emailService.sendOtpEmail({
       toEmail: user.email,
-      name: user.first_name,
+      name: greetingName,
       otp,
       purpose,
     });
@@ -417,13 +424,22 @@ class AuthService {
   _pickProfileFields(data = {}) {
     const fields = [
       'firstName',
+      'middleName',
       'lastName',
+      'username',
       'gender',
       'phoneNumber',
       'dateOfBirth',
       'address',
+      'city',
+      'province',
+      'postalCode',
       'profilePicture',
       'occupation',
+      'financialGoal',
+      'streakDays',
+      'xpPoints',
+      'financialLevel',
     ];
 
     return fields.reduce((profileData, field) => {
@@ -432,6 +448,28 @@ class AuthService {
       }
       return profileData;
     }, {});
+  }
+
+  async getStreakLeaderboard() {
+    const rows = await userRepository.getStreakLeaderboard(15);
+    return rows.map((r, idx) => ({
+      rank: idx + 1,
+      userId: r.users_id,
+      firstName: r.first_name,
+      middleName: r.middle_name,
+      lastName: r.last_name,
+      displayName: (r.middle_name && r.middle_name.trim()) || r.first_name || 'Pengguna',
+      fullName: [r.first_name, r.middle_name, r.last_name]
+        .filter((p) => p && String(p).trim())
+        .join(' '),
+      username: r.username || (r.middle_name || r.first_name || 'user').toLowerCase().replace(/[^a-z0-9_]/g, ''),
+      profilePicture: r.profile_picture,
+      occupation: r.occupation,
+      city: r.city,
+      streakDays: Number(r.streak_days || 1),
+      xpPoints: Number(r.xp_points || 50),
+      financialLevel: Number(r.financial_level || 1),
+    }));
   }
 
   _normalizePasswordInput(data = {}) {

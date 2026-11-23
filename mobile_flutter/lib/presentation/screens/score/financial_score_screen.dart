@@ -164,7 +164,7 @@ class FinancialScoreScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '0–40 Perlu Perhatian · 41–70 Cukup Sehat · 71–100 Sehat',
+                    '0–40 Perlu Perhatian - 41–70 Cukup Sehat - 71–100 Sehat',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 11.5,

@@ -11,6 +11,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
 import '../../widgets/app_tour_dialog.dart';
+import '../../widgets/google_logo_icon.dart';
 import '../../widgets/sadar_card.dart';
 import '../../widgets/sadar_logo.dart';
 
@@ -777,27 +778,9 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                 const Divider(),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Container(
-                    width: 26,
-                    height: 26,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: (user?.isGoogleLinked == true
-                              ? const Color(0xFF4285F4)
-                              : secondaryColor)
-                          .withValues(alpha: 0.16),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      'G',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 13,
-                        color: user?.isGoogleLinked == true
-                            ? const Color(0xFF4285F4)
-                            : secondaryColor,
-                      ),
-                    ),
+                  leading: const GoogleLogoIcon(
+                    size: 18,
+                    withBadgeBackground: true,
                   ),
                   title: Text(
                     'Tautkan Akun Google',
@@ -858,8 +841,8 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                   ),
                   subtitle: Text(
                     finance.pendingSyncCount > 0
-                        ? '${finance.pendingSyncCount} perubahan menunggu sinkronisasi · Terakhir: $lastSyncText'
-                        : 'Data tersimpan lokal & otomatis sinkron · Terakhir: $lastSyncText',
+                        ? '${finance.pendingSyncCount} perubahan menunggu sinkronisasi - Sinkron terakhir: $lastSyncText'
+                        : 'Data tersimpan lokal & otomatis sinkron - Sinkron terakhir: $lastSyncText',
                     style: TextStyle(fontSize: 12, color: secondaryColor),
                   ),
                   trailing: finance.isSyncing
@@ -915,8 +898,8 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
               ),
               subtitle: Text(
                 _patchNumber != null
-                    ? 'Versi ${AppConfig.appVersion} · Patch OTA #$_patchNumber'
-                    : 'Versi ${AppConfig.appVersion} · Pembaruan OTA aktif',
+                    ? 'Versi ${AppConfig.appVersion} - Patch OTA #$_patchNumber'
+                    : 'Versi ${AppConfig.appVersion} - Pembaruan OTA aktif',
                 style: TextStyle(fontSize: 12, color: secondaryColor),
               ),
               trailing: _checkingUpdate
@@ -1003,8 +986,13 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Versi ${AppConfig.appVersion} · Smart Personal Finance',
-                  style: TextStyle(fontSize: 11.5, color: mutedColor),
+                  'V ${AppConfig.appVersion}',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.6,
+                    color: mutedColor,
+                  ),
                 ),
               ],
             ),

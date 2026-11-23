@@ -72,7 +72,7 @@ export const ScrollShowcase = () => {
           <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">Dashboard Modern.</span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-500 dark:text-slate-400">
-          Ringkasan pengeluaran, skor finansial, dan peringatan anggaran — semuanya dalam satu tampilan bersih dan responsif.
+          Ringkasan pengeluaran, skor finansial, dan peringatan anggaran, semuanya dalam satu tampilan bersih dan responsif.
         </p>
       </motion.div>
 

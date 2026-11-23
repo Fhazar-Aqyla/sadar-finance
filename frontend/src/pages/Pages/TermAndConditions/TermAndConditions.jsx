@@ -1,64 +1,84 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody } from 'reactstrap';
-import BreadCrumb from '../../../Components/Common/BreadCrumb';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import sadarLogo from "@/assets/images/landing/sadar-logo.png";
+import { FooterSection } from "../../Landing/OnePage/components/FooterSection";
 
 const TermAndConditions = () => {
-    return (
-        <React.Fragment>
-            <div className='page-content'>
-                <Container fluid>
-                    <BreadCrumb title="Syarat & Ketentuan" pageTitle="Halaman" />
-                </Container>
+  useEffect(() => {
+    document.title = "Syarat & Ketentuan | SADAR Finance";
+    window.scrollTo(0, 0);
+  }, []);
 
-                <Row className="justify-content-center">
-                    <Col lg={10}>
-                        <Card className="rounded-4 border-0 shadow-sm overflow-hidden">
-                            <div className="bg-primary-subtle p-4 p-md-5 text-center border-bottom border-primary-subtle">
-                                <h3 className="fw-bold text-primary mb-1">Syarat & Ketentuan</h3>
-                                <p className="mb-0 text-muted">Terakhir diperbarui: Januari 2025</p>
-                            </div>
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/70 dark:border-slate-800/70">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link to="/" aria-label="SADAR Finance">
+            <img src={sadarLogo} alt="SADAR Finance" className="h-7 w-auto object-contain" />
+          </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4" /> Kembali ke Beranda
+          </Link>
+        </div>
+      </header>
 
-                            <CardBody className='p-4 p-md-5'>
-                                <div className="mb-4">
-                                    <h5 className="fw-semibold text-primary">1. Ketentuan Umum</h5>
-                                    <p className="text-muted">Selamat datang di <strong>SADAR Finance</strong>. Dengan mengakses dan menggunakan platform SADAR Finance (situs web maupun aplikasi seluler), Anda menyetujui untuk terikat oleh Syarat dan Ketentuan ini. Jika Anda tidak menyetujui salah satu ketentuan, mohon untuk tidak melanjutkan penggunaan layanan kami.</p>
-                                    <p className="text-muted">SADAR Finance menyediakan fitur pencatatan, pemantauan, simulasi anggaran (50/30/20), dan analisis keuangan berbasis AI untuk membantu pengguna mengelola keuangan pribadi secara lebih terarah.</p>
-                                </div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+        <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-r from-[#0A1E36] to-[#1E3A8A] p-8 sm:p-10 text-white">
+            <h1 className="text-2xl sm:text-3xl font-black">Syarat & Ketentuan</h1>
+            <p className="mt-1 text-sm text-blue-100">SADAR Finance · Smart Personal Finance</p>
+          </div>
+          <div className="p-6 sm:p-10 space-y-6 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            <section>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">1. Ketentuan Umum</h2>
+              <p>
+                Dengan menggunakan platform SADAR Finance, Anda menyetujui Syarat & Ketentuan ini. SADAR Finance menyediakan pencatatan transaksi, scan struk otomatis, simulasi budget 50/30/20, serta analisis keuangan pribadi.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">2. Akun & Keamanan</h2>
+              <p>
+                Pengguna bertanggung jawab penuh atas kerahasiaan akun dan kata sandi. Dilarang menyalahgunakan API atau mengganggu integritas infrastruktur sistem SADAR Finance.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">3. Privasi & Data Finansial</h2>
+              <p>
+                Pengelolaan data pengguna mengikuti <Link to="/privacy-policy" className="text-[#1E3A8A] dark:text-sky-400 underline font-semibold">Kebijakan Privasi</Link> SADAR Finance.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">4. Batasan Tanggung Jawab</h2>
+              <p>
+                Analisis, grafik, dan skor kesehatan finansial bersifat informatif dan bukan nasihat investasi resmi. Keputusan finansial tetap menjadi tanggung jawab pengguna.
+              </p>
+            </section>
 
-                                <div className="mb-4">
-                                    <h5 className="fw-semibold text-primary">2. Akun dan Keamanan</h5>
-                                    <p className="text-muted">Pengguna bertanggung jawab penuh atas kerahasiaan informasi akun, termasuk kata sandi dan kredensial akses. Anda setuju untuk segera memberitahukan kepada tim SADAR Finance jika mengetahui adanya penggunaan akun tanpa izin.</p>
-                                    <p className="text-muted">Anda tidak diperkenankan untuk:</p>
-                                    <ul className="text-muted vstack gap-2">
-                                        <li>Menggunakan akun pihak lain tanpa izin yang sah.</li>
-                                        <li>Menyalahgunakan API atau mengganggu integritas sistem dan infrastruktur SADAR Finance.</li>
-                                        <li>Melakukan rekayasa balik (*reverse engineering*) terhadap platform kami.</li>
-                                    </ul>
-                                </div>
-
-                                <div className="mb-4">
-                                    <h5 className="fw-semibold text-primary">3. Privasi & Data Finansial</h5>
-                                    <p className="text-muted">Kami sangat menghormati privasi data finansial Anda. Seluruh catatan transaksi dan data pribadi disimpan dengan enkripsi standar industri dan tidak akan diperjualbelikan kepada pihak ketiga tanpa persetujuan Anda.</p>
-                                    <p className="text-muted">Ketentuan lengkap mengenai pengelolaan data pengguna dapat dibaca pada halaman <Link to="/privancy-policy" className="text-primary text-decoration-underline">Kebijakan Privasi</Link>.</p>
-                                </div>
-
-                                <div className="mb-4">
-                                    <h5 className="fw-semibold text-primary">4. Batasan Tanggung Jawab</h5>
-                                    <p className="text-muted">Analisis, grafik, dan simulasi anggaran yang disediakan oleh SADAR Finance bersifat informatif dan edukatif untuk membantu perencanaan finansial Anda. SADAR Finance bukan merupakan lembaga penasihat investasi berlisensi, dan keputusan finansial akhir tetap berada di tangan pengguna.</p>
-                                </div>
-
-                                <div className="text-end pt-3 border-top">
-                                    <Link to="/dashboard" className="btn btn-primary px-4 me-2">Saya Setuju</Link>
-                                    <Link to="/" className="btn btn-outline-secondary px-4">Kembali ke Beranda</Link>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-3 justify-end">
+              <Link
+                to="/install"
+                className="px-5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white text-sm font-bold"
+              >
+                Instal Aplikasi
+              </Link>
+              <Link
+                to="/"
+                className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold"
+              >
+                Kembali ke Beranda
+              </Link>
             </div>
-        </React.Fragment>
-    );
+          </div>
+        </div>
+      </main>
+
+      <FooterSection />
+    </div>
+  );
 };
 
 export default TermAndConditions;

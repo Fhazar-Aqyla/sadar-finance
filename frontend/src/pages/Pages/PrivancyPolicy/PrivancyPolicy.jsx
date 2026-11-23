@@ -1,71 +1,97 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardBody, Col, Container, Row } from 'reactstrap';
-import BreadCrumb from '../../../Components/Common/BreadCrumb';
-import FeatherIcon from 'feather-icons-react';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Database, Lock, Shield } from "lucide-react";
+import sadarLogo from "@/assets/images/landing/sadar-logo.png";
+import { FooterSection } from "../../Landing/OnePage/components/FooterSection";
 
 const PrivancyPolicy = () => {
-    return (
-        <React.Fragment>
-            <div className='page-content'>
-                <Container fluid>
-                    <BreadCrumb title="Kebijakan Privasi" pageTitle="Halaman" />
-                </Container>
-                <Row className="justify-content-center">
-                    <Col lg={10}>
-                        <Card className="rounded-4 border-0 shadow-sm overflow-hidden">
-                            <div className="bg-primary-subtle p-4 p-md-5 text-center border-bottom border-primary-subtle">
-                                <h3 className="fw-bold text-primary mb-1">Kebijakan Privasi</h3>
-                                <p className="mb-0 text-muted">Terakhir diperbarui: Januari 2025</p>
-                            </div>
-                            <CardBody className="p-4 p-md-5">
-                                <div className="d-flex mb-4">
-                                    <div className="flex-shrink-0 me-3">
-                                        <FeatherIcon icon="shield" className="text-primary icon-dual-primary icon-sm" />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <h5 className="fw-semibold text-primary">Komitmen Privasi SADAR Finance</h5>
-                                        <p className="text-muted">Di <strong>SADAR Finance</strong> (dapat diakses di platform web dan mobile), privasi dan keamanan data finansial pengguna adalah prioritas tertinggi kami. Dokumen Kebijakan Privasi ini menjelaskan jenis informasi yang kami kumpulkan dan bagaimana kami menggunakannya secara bertanggung jawab.</p>
-                                        <p className="text-muted">Jika Anda memiliki pertanyaan lebih lanjut mengenai Kebijakan Privasi ini, silakan hubungi tim kami melalui email di <a href="mailto:support@sadarfinance.id" className="text-primary fw-semibold">support@sadarfinance.id</a>.</p>
-                                    </div>
-                                </div>
+  useEffect(() => {
+    document.title = "Kebijakan Privasi | SADAR Finance";
+    window.scrollTo(0, 0);
+  }, []);
 
-                                <div className="d-flex mb-4">
-                                    <div className="flex-shrink-0 me-3">
-                                        <FeatherIcon icon="database" className="text-primary icon-dual-primary icon-sm" />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <h5 className="fw-semibold text-primary">Informasi yang Kami Kumpulkan</h5>
-                                        <p className="text-muted">Kami hanya mengumpulkan informasi yang diperlukan untuk memberikan layanan pencatatan dan analisis keuangan terbaik bagi Anda:</p>
-                                        <ul className="text-muted vstack gap-2">
-                                            <li><strong>Informasi Akun:</strong> Nama, alamat email, dan kredensial autentikasi terenkripsi saat mendaftar.</li>
-                                            <li><strong>Data Keuangan Pengguna:</strong> Riwayat pemasukan, pengeluaran, kategori transaksi, dan preferensi anggaran yang Anda masukkan secara mandiri.</li>
-                                            <li><strong>Log Penggunaan & Analitik:</strong> Informasi teknis perangkat dan sesi untuk meningkatkan performa dan keandalan sistem.</li>
-                                        </ul>
-                                    </div>
-                                </div>
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/70 dark:border-slate-800/70">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link to="/" aria-label="SADAR Finance">
+            <img src={sadarLogo} alt="SADAR Finance" className="h-7 w-auto object-contain" />
+          </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4" /> Kembali ke Beranda
+          </Link>
+        </div>
+      </header>
 
-                                <div className="d-flex mb-4">
-                                    <div className="flex-shrink-0 me-3">
-                                        <FeatherIcon icon="lock" className="text-primary icon-dual-primary icon-sm" />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <h5 className="fw-semibold text-primary">Keamanan Data</h5>
-                                        <p className="text-muted">Seluruh komunikasi data di SADAR Finance dilindungi dengan enkripsi SSL/TLS (HTTPS). Data sensitif Anda disimpan dalam database terisolasi dengan akses yang diawasi ketat. Kami <strong>tidak pernah</strong> menjual data keuangan pribadi Anda kepada pengiklan atau pihak ketiga manapun.</p>
-                                    </div>
-                                </div>
-
-                                <div className="text-end pt-3 border-top">
-                                    <Link to="/dashboard" className="btn btn-primary px-4 me-2">Mengerti</Link>
-                                    <Link to="/" className="btn btn-outline-secondary px-4">Kembali ke Beranda</Link>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+        <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-r from-[#0A1E36] to-[#1E3A8A] p-8 sm:p-10 text-white">
+            <h1 className="text-2xl sm:text-3xl font-black">Kebijakan Privasi</h1>
+            <p className="mt-1 text-sm text-blue-100">SADAR Finance · Smart Personal Finance</p>
+          </div>
+          <div className="p-6 sm:p-10 space-y-8 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            <div className="flex gap-4">
+              <Shield className="w-6 h-6 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-1" />
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                  Komitmen Privasi SADAR Finance
+                </h2>
+                <p>
+                  Privasi dan keamanan data finansial pengguna adalah prioritas tertinggi kami. Dokumen ini menjelaskan informasi apa yang kami kumpulkan dan bagaimana kami melindungi serta menggunakannya secara bertanggung jawab.
+                </p>
+              </div>
             </div>
-        </React.Fragment>
-    );
+
+            <div className="flex gap-4">
+              <Database className="w-6 h-6 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-1" />
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                  Informasi yang Kami Kumpulkan
+                </h2>
+                <ul className="list-disc pl-5 space-y-1.5">
+                  <li><strong>Informasi Akun:</strong> Nama, alamat email, dan kredensial autentikasi terenkripsi.</li>
+                  <li><strong>Data Keuangan Pengguna:</strong> Riwayat pemasukan, pengeluaran, kategori transaksi, struk belanja, dan target budget 50/30/20.</li>
+                  <li><strong>Penyimpanan Lokal Offline:</strong> Data tersimpan aman di perangkat untuk penggunaan offline dan otomatis tersinkronisasi saat online.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <Lock className="w-6 h-6 text-[#1E3A8A] dark:text-sky-400 shrink-0 mt-1" />
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                  Keamanan & Perlindungan Data
+                </h2>
+                <p>
+                  Seluruh komunikasi data dilindungi enkripsi HTTPS/TLS, kata sandi dienkripsi dengan bcrypt, dan kami <strong>tidak pernah</strong> menjual data keuangan pribadi Anda kepada pihak ketiga mana pun.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-3 justify-end">
+              <Link
+                to="/install"
+                className="px-5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white text-sm font-bold"
+              >
+                Instal Aplikasi
+              </Link>
+              <Link
+                to="/"
+                className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold"
+              >
+                Kembali ke Beranda
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <FooterSection />
+    </div>
+  );
 };
 
 export default PrivancyPolicy;

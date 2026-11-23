@@ -4,6 +4,7 @@ import 'package:sadar_finance/core/utils/currency_input_formatter.dart';
 import 'package:sadar_finance/core/utils/formatters.dart';
 import 'package:sadar_finance/data/models/analytics_models.dart';
 import 'package:sadar_finance/data/models/financial_plan_models.dart';
+import 'package:sadar_finance/data/models/user_model.dart';
 
 void main() {
   group('CurrencyInputFormatter', () {
@@ -89,6 +90,28 @@ void main() {
         lastPaidPeriod: RecurringItemModel.periodKey(now),
       );
       expect(paid.isPaidFor(now), isTrue);
+    });
+  });
+
+  group('Fase 3 Profile Identity & Nickname Greeting', () {
+    test('UserModel auto-splits middleName as displayName ("Habib") and formats address cleanly', () {
+      final user = UserModel.fromJson({
+        'users_id': 'u1',
+        'first_name': 'Muhammad',
+        'last_name': 'Habib Rafi',
+        'email': 'mhmdhabibrafi@gmail.com',
+        'address': 'JL CIPTA KARYA UJUNG PERUMAHAN KARYA GADING PERMAI NO B14',
+      });
+      expect(user.firstName, 'Muhammad');
+      expect(user.middleName, 'Habib');
+      expect(user.lastName, 'Rafi');
+      expect(user.displayName, 'Habib');
+      expect(user.fullName, 'Muhammad Habib Rafi');
+      expect(user.effectiveUsername, 'habibrafi');
+      expect(
+        user.formattedAddress,
+        'Jl. Cipta Karya Ujung Perumahan Karya Gading Permai No. B14',
+      );
     });
   });
 }

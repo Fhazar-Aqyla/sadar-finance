@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, Download, LogIn } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
-import { getStoredAuthUser } from "../../../../helpers/auth-storage";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
-  // Real scroll progress for the top progress line
   const { scrollYProgress } = useScroll();
   const scrollProgress = useSpring(scrollYProgress, {
     stiffness: 120,
@@ -40,7 +38,6 @@ export const Navbar = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 16);
 
-      // Throttle the DOM-read active-section detection to one pass per frame
       if (!ticking) {
         ticking = true;
         requestAnimationFrame(() => {
@@ -72,9 +69,6 @@ export const Navbar = () => {
     }
     setMobileMenuOpen(false);
   };
-
-  const hasAuthToken = () => Boolean(getStoredAuthUser()?.token);
-  const isAuthenticated = hasAuthToken();
 
   return (
     <header
@@ -130,20 +124,24 @@ export const Navbar = () => {
             })}
           </nav>
 
-          {/* CTA Buttons (Desktop) */}
-          <div className="hidden sm:flex items-center gap-3">
-            <Link
-              to={isAuthenticated ? "/dashboard" : "/login"}
-              className="text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white px-4 py-2 rounded-xl transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
-            >
-              {isAuthenticated ? "Dashboard" : "Masuk"}
-            </Link>
+          {/* Desktop Action Buttons: Masuk (Web App) & Unduh APK (Android) */}
+          <div className="hidden sm:flex items-center gap-2.5">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
-                to={isAuthenticated ? "/dashboard" : "/register"}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white text-sm font-semibold shadow-xs hover:shadow-md transition-all"
+                to="/login"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-300/90 bg-white/85 hover:bg-white text-slate-800 hover:text-[#1E3A8A] text-sm font-semibold shadow-2xs transition-all"
               >
-                {isAuthenticated ? "Buka Aplikasi" : "Mulai Gratis"} <ArrowRight className="w-4 h-4" />
+                <LogIn className="w-4 h-4" />
+                Masuk
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                to="/install"
+                className="inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white text-sm font-semibold shadow-xs hover:shadow-md transition-all"
+              >
+                <Download className="w-4 h-4" />
+                Unduh APK
               </Link>
             </motion.div>
           </div>
@@ -186,20 +184,22 @@ export const Navbar = () => {
                   {link.label}
                 </button>
               ))}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2.5">
                 <Link
-                  to={isAuthenticated ? "/dashboard" : "/login"}
+                  to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+                  className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold text-sm shadow-2xs"
                 >
-                  {isAuthenticated ? "Dashboard" : "Masuk"}
+                  <LogIn className="w-4 h-4" />
+                  Masuk Web
                 </Link>
                 <Link
-                  to={isAuthenticated ? "/dashboard" : "/register"}
+                  to="/install"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-semibold text-sm shadow-xs"
+                  className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#1A3175] text-white font-semibold text-sm shadow-xs"
                 >
-                  {isAuthenticated ? "Buka Aplikasi" : "Daftar"}
+                  <Download className="w-4 h-4" />
+                  Unduh APK
                 </Link>
               </div>
             </motion.div>

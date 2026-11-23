@@ -67,6 +67,7 @@ class LegalScreen extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         s.$2,
+                        textAlign: TextAlign.justify,
                         style: TextStyle(
                           fontSize: 13.5,
                           color: AppColors.textSecondaryOf(context),

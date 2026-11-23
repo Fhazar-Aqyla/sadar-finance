@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../presentation/widgets/google_logo_icon.dart';
 import '../theme/app_theme.dart';
 
 class GoogleAccountPayload {
@@ -97,22 +98,9 @@ class GoogleAuthHelper {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryOf(ctx).withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'G',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primaryOf(ctx),
-                      ),
-                    ),
+                  const GoogleLogoIcon(
+                    size: 20,
+                    withBadgeBackground: true,
                   ),
                   const SizedBox(width: 12),
                   Expanded(

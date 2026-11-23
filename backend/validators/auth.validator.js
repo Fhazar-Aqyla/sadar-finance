@@ -8,7 +8,9 @@ const Joi = require('joi');
 
 const registerSchema = Joi.object({
   firstName: Joi.string().min(2).max(100).trim().required(),
-  lastName: Joi.string().min(2).max(100).trim().required(),
+  middleName: Joi.string().max(100).trim().optional().allow(null, ''),
+  lastName: Joi.string().min(1).max(100).trim().required(),
+  username: Joi.string().max(60).trim().optional().allow(null, ''),
   gender: Joi.string().valid('male', 'female', 'other').optional(),
   email: Joi.string().email().lowercase().trim().required()
     .messages({ 'string.email': 'Please provide a valid email address' }),
@@ -18,11 +20,15 @@ const registerSchema = Joi.object({
       'string.pattern.base': 'Password must contain at least one uppercase, one lowercase, one number, and one special character',
       'string.min': 'Password must be at least 8 characters',
     }),
-  phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{10,20}$/).optional()
+  phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{8,20}$/).optional().allow(null, '')
     .messages({ 'string.pattern.base': 'Please provide a valid phone number' }),
-  dateOfBirth: Joi.date().iso().optional(),
-  address: Joi.string().max(500).optional().allow(''),
-  occupation: Joi.string().max(100).optional().allow(''),
+  dateOfBirth: Joi.date().iso().optional().allow(null, ''),
+  address: Joi.string().max(500).optional().allow(null, ''),
+  city: Joi.string().max(120).optional().allow(null, ''),
+  province: Joi.string().max(120).optional().allow(null, ''),
+  postalCode: Joi.string().max(20).optional().allow(null, ''),
+  occupation: Joi.string().max(100).optional().allow(null, ''),
+  financialGoal: Joi.string().max(160).optional().allow(null, ''),
 });
 
 const loginSchema = Joi.object({
@@ -63,14 +69,23 @@ const passwordAliasFields = {
 const changePasswordSchema = Joi.object(passwordAliasFields).min(1);
 
 const updateProfileSchema = Joi.object({
-  firstName: Joi.string().min(2).max(100).trim().optional(),
-  lastName: Joi.string().min(2).max(100).trim().optional(),
+  firstName: Joi.string().min(1).max(100).trim().optional(),
+  middleName: Joi.string().max(100).trim().optional().allow(null, ''),
+  lastName: Joi.string().min(1).max(100).trim().optional().allow(null, ''),
+  username: Joi.string().max(60).trim().optional().allow(null, ''),
   gender: Joi.string().valid('male', 'female', 'other').optional().allow(null, ''),
-  phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{10,20}$/).optional().allow(null, ''),
+  phoneNumber: Joi.string().pattern(/^\+?[\d\s-]{8,20}$/).optional().allow(null, ''),
   dateOfBirth: Joi.date().iso().optional().allow(null, ''),
   address: Joi.string().max(500).optional().allow(null, ''),
+  city: Joi.string().max(120).optional().allow(null, ''),
+  province: Joi.string().max(120).optional().allow(null, ''),
+  postalCode: Joi.string().max(20).optional().allow(null, ''),
   profilePicture: Joi.string().max(2000000).optional().allow(null, ''),
   occupation: Joi.string().max(100).optional().allow(null, ''),
+  financialGoal: Joi.string().max(160).optional().allow(null, ''),
+  streakDays: Joi.number().integer().min(0).max(10000).optional(),
+  xpPoints: Joi.number().integer().min(0).max(10000000).optional(),
+  financialLevel: Joi.number().integer().min(1).max(10).optional(),
   ...passwordAliasFields,
 }).min(1);
 

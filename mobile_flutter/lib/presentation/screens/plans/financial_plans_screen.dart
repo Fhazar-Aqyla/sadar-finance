@@ -738,7 +738,7 @@ class _FinancialPlansScreenState extends ConsumerState<FinancialPlansScreen>
                           ),
                         ),
                         Text(
-                          'Setiap Tgl ${item.dayOfMonth} · ${accName != '-' ? accName : 'Akun Default'}',
+                          'Setiap Tgl ${item.dayOfMonth} - ${accName != '-' ? accName : 'Akun Default'}',
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondaryOf(context),

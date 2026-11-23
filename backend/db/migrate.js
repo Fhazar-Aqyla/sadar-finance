@@ -69,6 +69,15 @@ const migrate = async () => {
 
     await client.query(`
       ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS middle_name VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS username VARCHAR(60),
+        ADD COLUMN IF NOT EXISTS city VARCHAR(120),
+        ADD COLUMN IF NOT EXISTS province VARCHAR(120),
+        ADD COLUMN IF NOT EXISTS postal_code VARCHAR(20),
+        ADD COLUMN IF NOT EXISTS financial_goal VARCHAR(160),
+        ADD COLUMN IF NOT EXISTS streak_days INTEGER DEFAULT 1,
+        ADD COLUMN IF NOT EXISTS xp_points INTEGER DEFAULT 50,
+        ADD COLUMN IF NOT EXISTS financial_level INTEGER DEFAULT 1,
         ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE,
         ADD COLUMN IF NOT EXISTS google_id VARCHAR(255),
         ADD COLUMN IF NOT EXISTS google_email VARCHAR(255),

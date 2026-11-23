@@ -5,6 +5,7 @@ import '../../../core/services/google_auth_helper.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
+import '../../widgets/google_logo_icon.dart';
 import '../../widgets/sadar_logo.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -388,23 +389,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: OutlinedButton.icon(
                                 onPressed:
                                     auth.isLoading ? null : _signInWithGoogle,
-                                icon: Container(
-                                  width: 22,
-                                  height: 22,
-                                  alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF4285F4),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Text(
-                                    'G',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                ),
+                                icon: const GoogleLogoIcon(size: 18),
                                 label: const Text(
                                   'Lanjutkan dengan Akun Google',
                                   style: TextStyle(fontWeight: FontWeight.w700),

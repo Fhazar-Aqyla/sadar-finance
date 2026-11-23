@@ -205,7 +205,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
         _expCategoryGroup = group;
         if (detail.isNotEmpty) _expDetailCtrl.text = detail;
         _aiCategoryBadge = conf != null
-            ? 'AI · ${(conf * 100).round()}%'
+            ? 'AI - ${(conf * 100).round()}%'
             : 'Kategori AI';
       });
       ScaffoldMessenger.of(context).showSnackBar(

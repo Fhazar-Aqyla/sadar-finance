@@ -27,36 +27,152 @@ class EmailService {
     return this.isSmtpConfigured || this.isBrevoConfigured || this.isResendConfigured;
   }
 
-  _buildOtpHtml({ name, otp, purpose }) {
-    const title =
-      purpose === 'reset'
-        ? 'Kode Pemulihan Kata Sandi SADAR Finance'
-        : 'Kode Verifikasi Email SADAR Finance';
-    const subtitle =
-      purpose === 'reset'
-        ? 'Gunakan kode OTP 6 digit berikut di aplikasi SADAR Finance untuk mengatur ulang kata sandi Anda.'
-        : 'Gunakan kode OTP 6 digit berikut di aplikasi SADAR Finance untuk memverifikasi alamat email akun Anda.';
+  _buildOtpHtml({ name, toEmail, otp, purpose }) {
+    const isReset = purpose === 'reset';
+    const docTitle = isReset
+      ? 'Otentikasi Pemulihan Kata Sandi'
+      : 'Otentikasi Verifikasi Alamat Email';
+    const serviceLabel = isReset
+      ? 'Pengaturan Ulang Kata Sandi Akun'
+      : 'Verifikasi Keamanan Alamat Email';
+    const introText = isReset
+      ? 'Kami menerima permintaan untuk mengatur ulang kata sandi akun SADAR Finance Anda. Gunakan Kode Otentikasi Satu Kali (OTP) resmi di bawah ini untuk melanjutkan proses pemulihan akun.'
+      : 'Terima kasih telah menggunakan SADAR Finance. Untuk memastikan keamanan dan keabsahan akun Anda, silakan masukkan Kode Otentikasi Satu Kali (OTP) resmi berikut pada aplikasi SADAR Finance.';
 
-    return `
-      <div style="font-family:Inter,Arial,sans-serif;max-width:520px;margin:0 auto;padding:28px;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;color:#0f172a;">
-        <div style="font-size:20px;font-weight:800;color:#1e3a8a;letter-spacing:1px;margin-bottom:16px;">SADAR FINANCE</div>
-        <h2 style="margin:0 0 8px 0;font-size:18px;color:#0f172a;">Halo, ${name || 'Pengguna SADAR'}!</h2>
-        <p style="margin:0 0 20px 0;font-size:14px;line-height:1.5;color:#475569;">${subtitle}</p>
-        <div style="background:#ffffff;border:2px dashed #14b8a6;border-radius:14px;padding:18px;text-align:center;margin-bottom:20px;">
-          <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:1.5px;margin-bottom:6px;">${title.toUpperCase()}</div>
-          <div style="font-size:32px;font-weight:800;letter-spacing:8px;color:#0f172a;">${otp}</div>
-        </div>
-        <p style="margin:0;font-size:12px;color:#64748b;">Kode ini berlaku selama <strong>10 menit</strong>. Jangan bagikan kode ini kepada siapa pun.</p>
-      </div>
-    `;
+    const formattedOtp = String(otp || '')
+      .trim()
+      .split('')
+      .join(' ');
+    const nowWib = new Intl.DateTimeFormat('id-ID', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+      timeZone: 'Asia/Jakarta',
+    }).format(new Date());
+    const logoUrl =
+      process.env.APP_EMAIL_LOGO_URL ||
+      'https://sadar-finance.web.id/api/v1/app/logo-light.png';
+    const greetingName = (name || 'Pengguna SADAR Finance').trim();
+    const recipientEmail = (toEmail || '-').trim();
+
+    return `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${docTitle} - SADAR Finance</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #cbd5e1;box-shadow:0 10px 25px rgba(15,23,42,0.06);">
+          <!-- Official Brand Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0a1e36 0%,#102a4c 55%,#1e3a8a 100%);background-color:#0a1e36;padding:26px 32px;border-bottom:3px solid #14b8a6;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="left" valign="middle">
+                    <img src="${logoUrl}" alt="SADAR Finance" height="26" style="display:block;height:26px;border:0;outline:none;text-decoration:none;color:#ffffff;font-size:20px;font-weight:900;letter-spacing:3px;" />
+                    <div style="margin-top:6px;font-size:11px;font-weight:600;letter-spacing:1.2px;color:#94a3b8;text-transform:uppercase;">
+                      Official Security Notification
+                    </div>
+                  </td>
+                  <td align="right" valign="middle">
+                    <span style="display:inline-block;padding:6px 12px;background-color:rgba(20,184,166,0.16);border:1px solid rgba(94,234,212,0.35);border-radius:999px;font-size:11px;font-weight:700;color:#5eead4;letter-spacing:0.5px;">
+                      RESMI - TERENKRIPSI
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Main Content Body -->
+          <tr>
+            <td style="padding:32px;">
+              <div style="font-size:12px;font-weight:700;color:#1e3a8a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+                ${docTitle}
+              </div>
+              <h1 style="margin:0 0 14px 0;font-size:20px;font-weight:800;color:#0f172a;line-height:1.35;">
+                Yth. ${greetingName},
+              </h1>
+              <p style="margin:0 0 24px 0;font-size:14px;line-height:1.65;color:#334155;text-align:justify;">
+                ${introText}
+              </p>
+
+              <!-- Official OTP Verification Box -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border:1px solid #cbd5e1;border-left:4px solid #1e3a8a;border-radius:12px;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:22px 24px;text-align:center;">
+                    <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:10px;">
+                      KODE OTENTIKASI SATU KALI (OTP)
+                    </div>
+                    <div style="display:inline-block;padding:12px 24px;background-color:#0a1e36;border-radius:10px;font-family:'Courier New',Courier,monospace;font-size:30px;font-weight:800;letter-spacing:8px;color:#ffffff;">
+                      ${formattedOtp}
+                    </div>
+                    <div style="margin-top:10px;font-size:12px;color:#64748b;">
+                      Masa berlaku kode: <strong style="color:#0f172a;">10 menit</strong> sejak email ini diterbitkan
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Request Details Table -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;font-size:13px;">
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;width:38%;">Akun Email</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#0f172a;font-weight:600;">${recipientEmail}</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;">Jenis Layanan</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#0f172a;font-weight:600;">${serviceLabel}</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;">Waktu Permintaan</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#0f172a;font-weight:600;">${nowWib} WIB</td>
+                </tr>
+              </table>
+
+              <!-- Security Warning Notice -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fffbeb;border:1px solid #fde68a;border-radius:10px;">
+                <tr>
+                  <td style="padding:14px 16px;font-size:12.5px;line-height:1.55;color:#92400e;text-align:justify;">
+                    <strong>Peringatan Keamanan Resmi:</strong> Pihak SADAR Finance tidak pernah meminta kode OTP atau kata sandi Anda melalui telepon, pesan singkat, maupun media sosial. Jangan berikan kode ini kepada siapa pun. Apabila Anda tidak merasa melakukan permintaan ini, abaikan pesan ini dan akun Anda tetap aman.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Official Corporate Footer -->
+          <tr>
+            <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:22px 32px;text-align:center;">
+              <div style="font-size:12.5px;font-weight:700;color:#0f172a;margin-bottom:4px;">
+                SADAR Finance - Official Security &amp; Identity Service
+              </div>
+              <div style="font-size:11.5px;color:#64748b;line-height:1.5;margin-bottom:10px;">
+                Pesan ini dikirim secara otomatis oleh sistem keamanan resmi SADAR Finance.<br />
+                Website Resmi: <a href="https://sadar-finance.web.id" style="color:#1e3a8a;text-decoration:none;font-weight:600;">https://sadar-finance.web.id</a>
+              </div>
+              <div style="font-size:11px;color:#94a3b8;">
+                &copy; ${new Date().getFullYear()} SADAR Finance. Seluruh hak cipta dilindungi undang-undang.
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
   }
 
   async sendOtpEmail({ toEmail, name, otp, purpose = 'verify' }) {
     const subject =
       purpose === 'reset'
-        ? `[SADAR Finance] Kode OTP Reset Password: ${otp}`
-        : `[SADAR Finance] Kode OTP Verifikasi Email: ${otp}`;
-    const html = this._buildOtpHtml({ name, otp, purpose });
+        ? `[SADAR Finance] Kode Otentikasi Pemulihan Kata Sandi Anda`
+        : `[SADAR Finance] Kode Otentikasi Verifikasi Email Akun Anda`;
+    const html = this._buildOtpHtml({ name, toEmail, otp, purpose });
 
     try {
       if (this.isBrevoConfigured) {

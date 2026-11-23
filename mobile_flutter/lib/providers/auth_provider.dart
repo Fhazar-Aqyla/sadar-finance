@@ -233,28 +233,118 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<bool> updateProfile({
     String? firstName,
+    String? middleName,
     String? lastName,
+    String? username,
     String? gender,
     String? phoneNumber,
     String? dateOfBirth,
     String? address,
+    String? city,
+    String? province,
+    String? postalCode,
     String? occupation,
+    String? financialGoal,
+    int? streakDays,
+    int? xpPoints,
+    int? financialLevel,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final updated = await _api.updateProfile(
         firstName: firstName,
+        middleName: middleName,
         lastName: lastName,
+        username: username,
         gender: gender,
         phoneNumber: phoneNumber,
         dateOfBirth: dateOfBirth,
         address: address,
+        city: city,
+        province: province,
+        postalCode: postalCode,
         occupation: occupation,
+        financialGoal: financialGoal,
+        streakDays: streakDays,
+        xpPoints: xpPoints,
+        financialLevel: financialLevel,
       );
-      await _storage.saveUserMap(updated.toJson());
-      state = state.copyWith(user: updated, isLoading: false);
+      // Merge extended fields locally too in case backend DB hasn't migrated new columns yet
+      final merged = updated.copyWith(
+        firstName: firstName?.trim().isNotEmpty == true
+            ? firstName!.trim()
+            : updated.firstName,
+        middleName: middleName != null ? middleName.trim() : updated.middleName,
+        lastName: lastName?.trim().isNotEmpty == true
+            ? lastName!.trim()
+            : updated.lastName,
+        username: username != null
+            ? username.trim().replaceAll('@', '').toLowerCase()
+            : updated.username,
+        gender: gender ?? updated.gender,
+        phoneNumber: phoneNumber ?? updated.phoneNumber,
+        dateOfBirth: dateOfBirth ?? updated.dateOfBirth,
+        address: address ?? updated.address,
+        city: city ?? updated.city,
+        province: province ?? updated.province,
+        postalCode: postalCode ?? updated.postalCode,
+        occupation: occupation ?? updated.occupation,
+        financialGoal: financialGoal ?? updated.financialGoal,
+        streakDays: streakDays ?? updated.streakDays,
+        xpPoints: xpPoints ?? updated.xpPoints,
+        financialLevel: financialLevel ?? updated.financialLevel,
+      );
+      await _storage.saveUserMap(merged.toJson());
+      state = state.copyWith(user: merged, isLoading: false);
       return true;
     } catch (e) {
+      // Fallback: if server rejects unknown columns before VPS update or device is offline, persist locally
+      if (state.user != null) {
+        final localUpdated = state.user!.copyWith(
+          firstName: firstName?.trim().isNotEmpty == true
+              ? firstName!.trim()
+              : state.user!.firstName,
+          middleName:
+              middleName != null ? middleName.trim() : state.user!.middleName,
+          lastName: lastName?.trim().isNotEmpty == true
+              ? lastName!.trim()
+              : state.user!.lastName,
+          username: username != null
+              ? username.trim().replaceAll('@', '').toLowerCase()
+              : state.user!.username,
+          gender: gender ?? state.user!.gender,
+          phoneNumber: phoneNumber ?? state.user!.phoneNumber,
+          dateOfBirth: dateOfBirth ?? state.user!.dateOfBirth,
+          address: address ?? state.user!.address,
+          city: city ?? state.user!.city,
+          province: province ?? state.user!.province,
+          postalCode: postalCode ?? state.user!.postalCode,
+          occupation: occupation ?? state.user!.occupation,
+          financialGoal: financialGoal ?? state.user!.financialGoal,
+          streakDays: streakDays ?? state.user!.streakDays,
+          xpPoints: xpPoints ?? state.user!.xpPoints,
+          financialLevel: financialLevel ?? state.user!.financialLevel,
+        );
+        await _storage.saveUserMap(localUpdated.toJson());
+        // Also try updating standard ERD columns on server if online
+        try {
+          await _api.updateProfile(
+            firstName: localUpdated.firstName,
+            lastName: [
+              if ((localUpdated.middleName ?? '').trim().isNotEmpty)
+                localUpdated.middleName!.trim(),
+              localUpdated.lastName.trim(),
+            ].where((s) => s.isNotEmpty).join(' '),
+            gender: localUpdated.gender,
+            phoneNumber: localUpdated.phoneNumber,
+            dateOfBirth: localUpdated.dateOfBirth,
+            address: localUpdated.address,
+            occupation: localUpdated.occupation,
+          );
+        } catch (_) {}
+        state = state.copyWith(user: localUpdated, isLoading: false);
+        return true;
+      }
       state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }

@@ -30,6 +30,7 @@ router.post('/send-otp', authenticate, validate(sendOtpSchema), authController.s
 router.post('/verify-otp', authenticate, validate(verifyOtpSchema), authController.verifyOtp);
 router.post('/google/link', authenticate, validate(googleAuthSchema), authController.linkGoogle);
 router.delete('/google/link', authenticate, authController.unlinkGoogle);
+router.get('/leaderboard', authenticate, authController.getLeaderboard);
 router.get('/me', authenticate, authController.getProfile);
 router.put('/me', authenticate, validate(updateProfileSchema), authController.updateProfile);
 router.put('/password', authenticate, validate(changePasswordSchema), authController.changePassword);

@@ -38,6 +38,7 @@ class FinanceState {
   final List<ScoreHistoryItem> scoreHistory;
   final List<InsightModel> insights;
   final List<AlertModel> alerts;
+  final List<Map<String, dynamic>> broadcasts;
   final BehaviorPredictionModel? behaviorPrediction;
   final OverspendingForecastModel? overspendingForecast;
   final String scorePeriod;
@@ -64,6 +65,7 @@ class FinanceState {
     this.scoreHistory = const [],
     this.insights = const [],
     this.alerts = const [],
+    this.broadcasts = const [],
     this.behaviorPrediction,
     this.overspendingForecast,
     this.scorePeriod = '3m',
@@ -183,15 +185,15 @@ class FinanceState {
   String get financialLevelTitle {
     switch (financialLevel) {
       case 5:
-        return 'Level 5 · Master 50/30/20';
+        return 'Level 5 - Master 50/30/20';
       case 4:
-        return 'Level 4 · Sultan Sabar';
+        return 'Level 4 - Sultan Sabar';
       case 3:
-        return 'Level 3 · Analis Finansial';
+        return 'Level 3 - Analis Finansial';
       case 2:
-        return 'Level 2 · Pejuang Darurat';
+        return 'Level 2 - Pejuang Darurat';
       default:
-        return 'Level 1 · Pemula Sadar';
+        return 'Level 1 - Pemula Sadar';
     }
   }
 
@@ -229,10 +231,10 @@ class FinanceState {
         unlocked: (healthScore?.overallScore ?? 0) >= 70,
       ),
       (
-        id: 'ewallet_sync',
-        title: 'Auto-Pilot Digital',
-        subtitle: 'Menghubungkan E-Wallet otomatis',
-        unlocked: ewalletLinks.any((e) => e.autoRecordEnabled),
+        id: 'multi_wallet',
+        title: 'Manajer Dompet',
+        subtitle: 'Mengelola minimal 2 akun dompet/rekening',
+        unlocked: accounts.length >= 2,
       ),
     ];
   }
@@ -298,6 +300,7 @@ class FinanceState {
     List<ScoreHistoryItem>? scoreHistory,
     List<InsightModel>? insights,
     List<AlertModel>? alerts,
+    List<Map<String, dynamic>>? broadcasts,
     BehaviorPredictionModel? behaviorPrediction,
     OverspendingForecastModel? overspendingForecast,
     String? scorePeriod,
@@ -324,6 +327,7 @@ class FinanceState {
       scoreHistory: scoreHistory ?? this.scoreHistory,
       insights: insights ?? this.insights,
       alerts: alerts ?? this.alerts,
+      broadcasts: broadcasts ?? this.broadcasts,
       behaviorPrediction: behaviorPrediction ?? this.behaviorPrediction,
       overspendingForecast: overspendingForecast ?? this.overspendingForecast,
       scorePeriod: scorePeriod ?? this.scorePeriod,
@@ -497,6 +501,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         _api.getInsights().catchError((_) => state.insights),
         _api.getAlerts().catchError((_) => state.alerts),
         _api.getScoreHistory().catchError((_) => state.scoreHistory),
+        _api.getActiveBroadcasts().catchError((_) => state.broadcasts),
       ]);
 
       final now = DateTime.now();
@@ -519,6 +524,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         insights: results[3] as List<InsightModel>,
         alerts: _deduplicateAlerts(results[4] as List<AlertModel>),
         scoreHistory: results[5] as List<ScoreHistoryItem>,
+        broadcasts: results[6] as List<Map<String, dynamic>>,
         clearError: true,
       );
       await _persistState(syncedAt: now);

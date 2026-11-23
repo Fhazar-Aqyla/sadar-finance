@@ -22,7 +22,7 @@ const LandingOnePage = () => {
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    document.title = "SADAR Finance — Sadar ke Mana Uangmu Pergi";
+    document.title = "SADAR Finance | Sadar ke Mana Uangmu Pergi";
 
     // Initialize butter-smooth Lenis momentum scrolling
     const lenis = new Lenis({

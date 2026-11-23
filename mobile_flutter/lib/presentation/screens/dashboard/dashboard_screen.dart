@@ -14,6 +14,7 @@ import '../../widgets/app_tour_dialog.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/sadar_card.dart';
 import '../../widgets/sadar_logo.dart';
+import '../../widgets/streak_leaderboard_sheet.dart';
 import '../profile/app_settings_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -26,6 +27,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _tourChecked = false;
   bool _otaChecked = false;
+  final Set<String> _dismissedBroadcastIds = <String>{};
 
   @override
   void initState() {
@@ -86,82 +88,209 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       builder: (ctx) => Consumer(
         builder: (ctx, modalRef, _) {
           final finance = modalRef.watch(financeProvider);
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Notifikasi & Peringatan',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimaryOf(ctx),
+          return SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.borderOf(ctx),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Notifikasi & Peringatan',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimaryOf(ctx),
+                          ),
                         ),
                       ),
-                    ),
-                    if (finance.alerts.isNotEmpty)
-                      TextButton.icon(
-                        onPressed: () {
-                          modalRef
-                              .read(financeProvider.notifier)
-                              .clearAlerts();
-                        },
-                        icon: const Icon(Icons.done_all_rounded, size: 17),
-                        label: const Text('Bersihkan'),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                if (finance.alerts.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Center(
-                      child: Text(
-                        'Belum ada peringatan keuangan. Kondisi terkendali!',
-                        style: TextStyle(color: AppColors.textSecondaryOf(ctx)),
-                      ),
-                    ),
-                  )
-                else
-                  ...finance.alerts.take(5).map(
-                        (a) => Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: AppColors.warning.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: AppColors.warning.withValues(alpha: 0.35),
-                            ),
+                      if (finance.alerts.isNotEmpty)
+                        TextButton.icon(
+                          onPressed: () {
+                            modalRef
+                                .read(financeProvider.notifier)
+                                .clearAlerts();
+                          },
+                          icon: const Icon(Icons.done_all_rounded, size: 17),
+                          label: const Text('Bersihkan'),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (finance.broadcasts.isNotEmpty)
+                    ...finance.broadcasts.map((b) {
+                      final type = (b['type'] ?? 'info').toString();
+                      final isMaint =
+                          type == 'maintenance' || type == 'urgent';
+                      final tone = isMaint ? AppColors.warning : AppColors.accent;
+                      final imageUrl = (b['imageUrl'] ?? '').toString().trim();
+                      final actionLabel =
+                          (b['actionLabel'] ?? '').toString().trim();
+                      final actionRoute =
+                          (b['actionRoute'] ?? '').toString().trim();
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: tone.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: tone.withValues(alpha: 0.38),
                           ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Icon(
-                                Icons.warning_amber_rounded,
-                                color: AppColors.warning,
-                                size: 20,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (imageUrl.isNotEmpty) ...[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  imageUrl,
+                                  width: double.infinity,
+                                  height: 128,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) =>
+                                      const SizedBox.shrink(),
+                                ),
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  a.message,
+                              const SizedBox(height: 10),
+                            ],
+                            Row(
+                              children: [
+                                Icon(
+                                  isMaint
+                                      ? Icons.build_circle_outlined
+                                      : Icons.campaign_rounded,
+                                  color: tone,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  (b['badge'] ?? 'INFORMASI RESMI')
+                                      .toString()
+                                      .toUpperCase(),
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textPrimaryOf(ctx),
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.6,
+                                    color: tone,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              (b['title'] ?? 'Pengumuman SADAR Finance')
+                                  .toString(),
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimaryOf(ctx),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              (b['message'] ?? '').toString(),
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                height: 1.4,
+                                color: AppColors.textSecondaryOf(ctx),
+                              ),
+                            ),
+                            if (actionLabel.isNotEmpty &&
+                                actionRoute.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    Navigator.pop(ctx);
+                                    context.push(actionRoute);
+                                  },
+                                  icon: const Icon(
+                                    Icons.arrow_forward_rounded,
+                                    size: 15,
+                                  ),
+                                  label: Text(
+                                    actionLabel,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
-                          ),
+                          ],
+                        ),
+                      );
+                    }),
+                  if (finance.alerts.isEmpty && finance.broadcasts.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: Text(
+                          'Belum ada peringatan keuangan. Kondisi terkendali!',
+                          style:
+                              TextStyle(color: AppColors.textSecondaryOf(ctx)),
                         ),
                       ),
-              ],
+                    )
+                  else
+                    ...finance.alerts.take(5).map(
+                          (a) => Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.warning.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color:
+                                    AppColors.warning.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: AppColors.warning,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    a.message,
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      height: 1.4,
+                                      color: AppColors.textPrimaryOf(ctx),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                ],
+              ),
             ),
           );
         },
@@ -192,6 +321,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     _buildSyncStatusBanner(finance),
                     const SizedBox(height: 14),
                   ],
+                  ..._buildActiveBroadcastBanners(finance),
                   _buildQuickActions(),
                   const SizedBox(height: 16),
                   if (finance.accounts.isNotEmpty) ...[
@@ -329,8 +459,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           minimumSize: const Size(38, 38),
                         ),
                         icon: Badge(
-                          isLabelVisible: finance.alerts.isNotEmpty,
-                          label: Text('${finance.alerts.length}'),
+                          isLabelVisible: finance.alerts.isNotEmpty ||
+                              finance.broadcasts.isNotEmpty,
+                          label: Text(
+                            '${finance.alerts.length + finance.broadcasts.length}',
+                          ),
                           child: const Icon(
                             Icons.notifications_outlined,
                             color: Colors.white,
@@ -368,11 +501,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => context.go('/profile-account'),
+                        onTap: () => StreakLeaderboardSheet.show(context),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
+                            horizontal: 11,
+                            vertical: 7,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.14),
@@ -384,10 +517,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text('🔥', style: TextStyle(fontSize: 13)),
-                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.local_fire_department_rounded,
+                                size: 15,
+                                color: Color(0xFFF97316),
+                              ),
+                              const SizedBox(width: 5),
                               Text(
-                                '${finance.streakDays}hr · Lv.${finance.financialLevel}',
+                                '${finance.streakDays} Hari - Lv.${finance.financialLevel}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 11.5,
@@ -541,7 +678,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: 112,
+          height: 128,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: finance.accounts.length,
@@ -552,8 +689,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               return GestureDetector(
                 onTap: () => context.go('/profile-account'),
                 child: Container(
-                  width: 196,
-                  padding: const EdgeInsets.all(14),
+                  width: 204,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: colors,
@@ -605,6 +745,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             acc.accountNumber.isNotEmpty
@@ -613,21 +754,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.72),
-                              fontSize: 10.5,
+                              color: Colors.white.withValues(alpha: 0.76),
+                              fontSize: 11,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            hidden
-                                ? 'Rp •••••••'
-                                : AppFormatters.rupiah(acc.balance),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 15,
+                          const SizedBox(height: 3),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              hidden
+                                  ? 'Rp •••••••'
+                                  : AppFormatters.rupiah(acc.balance),
+                              maxLines: 1,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15.5,
+                              ),
                             ),
                           ),
                         ],
@@ -698,6 +842,140 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  List<Widget> _buildActiveBroadcastBanners(FinanceState finance) {
+    final visible = finance.broadcasts.where((b) {
+      final id = (b['id'] ?? '').toString();
+      return id.isEmpty || !_dismissedBroadcastIds.contains(id);
+    }).toList();
+    if (visible.isEmpty) return const [];
+
+    return visible.map((b) {
+      final id = (b['id'] ?? '').toString();
+      final type = (b['type'] ?? 'info').toString();
+      final isMaint = type == 'maintenance' || type == 'urgent';
+      final tone = isMaint ? AppColors.warning : AppColors.accent;
+      final badge = (b['badge'] ?? 'INFORMASI RESMI').toString().toUpperCase();
+      final title = (b['title'] ?? 'Pengumuman SADAR Finance').toString();
+      final message = (b['message'] ?? '').toString();
+      final imageUrl = (b['imageUrl'] ?? '').toString().trim();
+      final actionLabel = (b['actionLabel'] ?? '').toString().trim();
+      final actionRoute = (b['actionRoute'] ?? '').toString().trim();
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: tone.withValues(
+              alpha: AppColors.isDark(context) ? 0.16 : 0.10,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: tone.withValues(alpha: 0.42)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    isMaint
+                        ? Icons.build_circle_outlined
+                        : Icons.campaign_rounded,
+                    color: tone,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      badge,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.7,
+                        color: tone,
+                      ),
+                    ),
+                  ),
+                  if (id.isNotEmpty)
+                    InkWell(
+                      onTap: () =>
+                          setState(() => _dismissedBroadcastIds.add(id)),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 17,
+                        color: AppColors.textMutedOf(context),
+                      ),
+                    ),
+                ],
+              ),
+              if (imageUrl.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    width: double.infinity,
+                    height: 140,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimaryOf(context),
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                message,
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  fontSize: 12,
+                  height: 1.4,
+                  color: AppColors.textSecondaryOf(context),
+                ),
+              ),
+              if (actionLabel.isNotEmpty && actionRoute.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () => context.push(actionRoute),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          actionLabel,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: tone,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: tone,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }).toList();
+  }
+
   Widget _buildSyncStatusBanner(FinanceState finance) {
     final offline = finance.isOffline;
     final tone = offline ? AppColors.warning : AppColors.accent;
@@ -722,7 +1000,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 Text(
                   offline
-                      ? 'Mode Offline · Fitur AI & OCR Dinonaktifkan'
+                      ? 'Mode Offline - Fitur AI & OCR Dinonaktifkan'
                       : 'Menyinkronkan Perubahan Lokal',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
@@ -784,10 +1062,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
             const SizedBox(width: 10),
             _QuickActionTile(
-              icon: Icons.bolt_rounded,
-              label: 'Auto\nE-Wallet',
+              icon: Icons.flag_rounded,
+              label: 'Target &\nTagihan',
               color: const Color(0xFF0EA5E9),
-              onTap: () => context.push('/ewallet-connect'),
+              onTap: () => context.push('/financial-plans'),
             ),
             const SizedBox(width: 10),
             _QuickActionTile(
@@ -1006,7 +1284,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     Text(
                       goals.isEmpty && recurring.isEmpty
                           ? 'Atur target dana darurat, impian, & jadwal tagihan bulanan'
-                          : '${goals.length} target tabungan · ${unpaidRecurring.length} jadwal rutin menunggu bulan ini',
+                          : '${goals.length} target tabungan - ${unpaidRecurring.length} jadwal rutin menunggu bulan ini',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondaryOf(context),
@@ -1122,10 +1400,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SizedBox(height: 3),
                 Text(
                   alert.message,
+                  textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textSecondaryOf(context),
-                    height: 1.35,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -1174,6 +1453,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SizedBox(height: 4),
                 Text(
                   rec,
+                  textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textSecondaryOf(context),
@@ -1779,7 +2059,7 @@ class _TransactionRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${transaction.categoryLabel} · $accountName · ${AppFormatters.shortDate(transaction.transactionDate)}',
+                  '${transaction.categoryLabel} - $accountName - ${AppFormatters.shortDate(transaction.transactionDate)}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

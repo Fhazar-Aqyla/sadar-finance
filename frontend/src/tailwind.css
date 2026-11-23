@@ -1,6 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+}
+
 @variant dark (&:where([data-bs-theme="dark"], [data-bs-theme="dark"] *));
 
 html.lenis, html.lenis body {
