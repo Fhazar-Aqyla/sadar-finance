@@ -105,6 +105,8 @@ class RecurringItemModel {
 
   bool isPaidFor(DateTime date) => lastPaidPeriod == periodKey(date);
 
+  bool isPaidForMonth(DateTime date) => isPaidFor(date);
+
   RecurringItemModel copyWith({
     String? title,
     double? amount,
@@ -216,6 +218,10 @@ class DebtItemModel {
   final DateTime? dueDate;
   final bool isSettled;
   final DateTime createdAt;
+
+  String get title => note.trim().isNotEmpty
+      ? note.trim()
+      : (isReceivable ? 'Piutang Teman' : 'Utang Pribadi');
 
   const DebtItemModel({
     required this.id,

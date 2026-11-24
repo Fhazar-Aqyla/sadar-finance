@@ -354,16 +354,52 @@ class SadarApiService {
     return const {};
   }
 
-  Future<Map<String, dynamic>> sendMonthlyStatementEmail() async {
-    final data = await _client.post('/analytics/statement/email');
+  Future<Map<String, dynamic>> syncFinancialPlans({
+    required List<dynamic> savingsGoals,
+    required List<dynamic> recurringItems,
+    required List<dynamic> debts,
+    required List<dynamic> transfers,
+  }) async {
+    return saveFinancialPlans(
+      savingsGoals: savingsGoals
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList(),
+      recurringItems: recurringItems
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList(),
+      debts: debts
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList(),
+      transfers: transfers
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList(),
+    );
+  }
+
+  Future<Map<String, dynamic>> sendMonthlyStatementEmail({
+    String? month,
+  }) async {
+    final data = await _client.post(
+      '/analytics/statement/email',
+      data: {if (month != null && month.isNotEmpty) 'month': month},
+    );
     if (data is Map) {
       return Map<String, dynamic>.from(data);
     }
     return const {};
   }
 
-  Future<Map<String, dynamic>> getMonthlyStatementPreview() async {
-    final data = await _client.get('/analytics/statement/preview');
+  Future<Map<String, dynamic>> getMonthlyStatementPreview({
+    String? month,
+  }) async {
+    final data = await _client.get(
+      '/analytics/statement/preview',
+      query: {if (month != null && month.isNotEmpty) 'month': month},
+    );
     if (data is Map) {
       return Map<String, dynamic>.from(data);
     }

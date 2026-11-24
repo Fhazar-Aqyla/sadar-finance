@@ -13,14 +13,14 @@ import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
-  latestVersion: "1.2.2",
-  buildNumber: 8,
-  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v1.2.2.apk?v=1.2.2-official",
+  latestVersion: "2.0.0",
+  buildNumber: 10,
+  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0",
   releaseNotes: [
+    "Rilis Utama SADAR Finance V 2.0.0: Pratinjau & Cetak e-Statement Bulanan Resmi di Dalam Aplikasi",
+    "Mode Kalender Arus Kas Bulanan Interaktif di Halaman Riwayat Keuangan",
     "Panel Admin Broadcast & Upload Foto Banner Real-Time Langsung dari Aplikasi & Web",
-    "Halaman Rencana Keuangan, Simulasi Dana Darurat & Kalkulator Split Bill di Web App",
-    "Sinkronisasi Cloud Penuh Target Tabungan, Jadwal Rutin, Piutang & e-Statement Resmi via Email",
-    "Integrasi Hybrid Hugging Face AI + Groq AI (OCR Struk, Klasifikasi 50/30/20 & Insight Perilaku)",
+    "Sinkronisasi Cloud Penuh Target Tabungan, Jadwal Rutin, Piutang & Simulasi Dana Darurat",
   ],
 };
 

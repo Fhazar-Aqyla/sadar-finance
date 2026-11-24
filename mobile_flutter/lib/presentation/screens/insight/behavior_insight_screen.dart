@@ -25,6 +25,21 @@ class BehaviorInsightScreen extends ConsumerWidget {
       1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0,
     };
 
+    final now = DateTime.now();
+    final lastMonthDate = DateTime(now.year, now.month - 1, 1);
+    double thisMonthTotal = 0;
+    double lastMonthTotal = 0;
+    final Map<String, double> thisMonthByGroup = {
+      'Needs': 0,
+      'Wants': 0,
+      'Savings': 0,
+    };
+    final Map<String, double> lastMonthByGroup = {
+      'Needs': 0,
+      'Wants': 0,
+      'Savings': 0,
+    };
+
     for (final t in transactions) {
       if (AppFormatters.isWeekend(t.transactionDate)) {
         weekendTotal += t.amount;
@@ -37,6 +52,19 @@ class BehaviorInsightScreen extends ConsumerWidget {
       byCategory[label] = (byCategory[label] ?? 0) + t.amount;
       byDayOfWeek[t.transactionDate.weekday] =
           (byDayOfWeek[t.transactionDate.weekday] ?? 0) + t.amount;
+
+      final normGroup = CategoryHelpers.normalizeGroup(t.categoryGroup);
+      if (t.transactionDate.year == now.year &&
+          t.transactionDate.month == now.month) {
+        thisMonthTotal += t.amount;
+        thisMonthByGroup[normGroup] =
+            (thisMonthByGroup[normGroup] ?? 0) + t.amount;
+      } else if (t.transactionDate.year == lastMonthDate.year &&
+          t.transactionDate.month == lastMonthDate.month) {
+        lastMonthTotal += t.amount;
+        lastMonthByGroup[normGroup] =
+            (lastMonthByGroup[normGroup] ?? 0) + t.amount;
+      }
     }
 
     final sortedCats = byCategory.entries.toList()
@@ -244,6 +272,117 @@ class BehaviorInsightScreen extends ConsumerWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 14),
+
+            // Month-over-Month Comparison Card (Item 5)
+            SadarCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SectionHeader(
+                    title: 'Perbandingan Antar Bulan (MoM)',
+                    subtitle:
+                        '${AppFormatters.monthYear(now)} vs ${AppFormatters.monthYear(lastMonthDate)}',
+                    trailing: _buildMoMBadge(thisMonthTotal, lastMonthTotal),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.subtleOf(context),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bulan Ini',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: textMuted,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                AppFormatters.rupiah(thisMonthTotal),
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.subtleOf(context),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bulan Lalu',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: textMuted,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                AppFormatters.rupiah(lastMonthTotal),
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMoMCategoryRow(
+                    context,
+                    label: 'Kebutuhan (50%)',
+                    current: thisMonthByGroup['Needs'] ?? 0,
+                    previous: lastMonthByGroup['Needs'] ?? 0,
+                    color: primaryColor,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildMoMCategoryRow(
+                    context,
+                    label: 'Keinginan (30%)',
+                    current: thisMonthByGroup['Wants'] ?? 0,
+                    previous: lastMonthByGroup['Wants'] ?? 0,
+                    color: purpleColor,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildMoMCategoryRow(
+                    context,
+                    label: 'Tabungan (20%)',
+                    current: thisMonthByGroup['Savings'] ?? 0,
+                    previous: lastMonthByGroup['Savings'] ?? 0,
+                    color: AppColors.success,
+                    invertGood: true,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 14),
 
@@ -561,5 +700,112 @@ class BehaviorInsightScreen extends ConsumerWidget {
       default:
         return 'Terkendali';
     }
+  }
+
+  Widget _buildMoMBadge(double current, double previous) {
+    if (previous <= 0) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: AppColors.accent.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(99),
+        ),
+        child: const Text(
+          'Data Baru',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            color: AppColors.accent,
+          ),
+        ),
+      );
+    }
+    final pct = ((current - previous) / previous) * 100;
+    final isUp = pct > 0;
+    final tone = isUp ? AppColors.warning : AppColors.success;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: tone.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Text(
+        '${isUp ? "+" : ""}${pct.toStringAsFixed(1)}%',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: tone,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMoMCategoryRow(
+    BuildContext context, {
+    required String label,
+    required double current,
+    required double previous,
+    required Color color,
+    bool invertGood = false,
+  }) {
+    String deltaText = 'Tetap';
+    Color deltaColor = AppColors.textMutedOf(context);
+    if (previous > 0) {
+      final diffPct = ((current - previous) / previous) * 100;
+      final isUp = diffPct > 0;
+      deltaText = '${isUp ? "Naik +" : "Turun "}${diffPct.toStringAsFixed(0)}%';
+      if (invertGood) {
+        deltaColor = isUp ? AppColors.success : AppColors.warning;
+      } else {
+        deltaColor = isUp ? AppColors.danger : AppColors.success;
+      }
+    } else if (current > 0) {
+      deltaText = 'Baru bulan ini';
+      deltaColor = color;
+    }
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimaryOf(context),
+            ),
+          ),
+        ),
+        Text(
+          AppFormatters.compactRupiah(current),
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimaryOf(context),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+          decoration: BoxDecoration(
+            color: deltaColor.withValues(alpha: 0.13),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            deltaText,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              color: deltaColor,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

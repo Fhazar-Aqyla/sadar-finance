@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../app.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/services/google_auth_helper.dart';
@@ -53,6 +57,151 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
     } finally {
       if (mounted) setState(() => _checkingUpdate = false);
     }
+  }
+
+  Future<void> _exportBackupJson(FinanceState finance) async {
+    try {
+      final user = ref.read(authProvider).user;
+      final payload = {
+        'app': 'SADAR Finance',
+        'version': AppConfig.appVersion,
+        'exportedAt': DateTime.now().toIso8601String(),
+        'userEmail': user?.email ?? '',
+        'accounts': finance.accounts.map((a) => a.toJson()).toList(),
+        'transactions': finance.transactions.map((t) => t.toJson()).toList(),
+        'incomes': finance.incomes.map((i) => i.toJson()).toList(),
+        'savingsGoals': finance.savingsGoals.map((g) => g.toJson()).toList(),
+        'recurringItems':
+            finance.recurringItems.map((r) => r.toJson()).toList(),
+        'debts': finance.debts.map((d) => d.toJson()).toList(),
+        'transfers': finance.transfers.map((tr) => tr.toJson()).toList(),
+      };
+      final jsonStr = const JsonEncoder.withIndent('  ').convert(payload);
+      final dir = await getTemporaryDirectory();
+      final stamp = AppFormatters.isoDateOnly(DateTime.now());
+      final file = File('${dir.path}/backup-sadar-finance-$stamp.json');
+      await file.writeAsString(jsonStr, flush: true);
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/json')],
+        subject: 'Cadangan Data SADAR Finance V 2.0 ($stamp)',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          content: Text('Gagal membuat file cadangan: $e'),
+        ),
+      );
+    }
+  }
+
+  void _showRestoreJsonSheet() {
+    final jsonCtrl = TextEditingController();
+    bool restoring = false;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Pulihkan Data dari Cadangan JSON',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimaryOf(ctx),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Tempelkan isi file backup-sadar-finance.json Anda di bawah ini untuk memulihkan dan menyinkronkan data rencana keuangan & akun.',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: AppColors.textSecondaryOf(ctx),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: jsonCtrl,
+                  maxLines: 6,
+                  decoration: const InputDecoration(
+                    labelText: 'Isi JSON Cadangan',
+                    hintText: '{\n  "app": "SADAR Finance",\n  ...\n}',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: restoring
+                      ? null
+                      : () async {
+                          final raw = jsonCtrl.text.trim();
+                          if (raw.isEmpty) return;
+                          setModalState(() => restoring = true);
+                          try {
+                            final decoded = jsonDecode(raw);
+                            if (decoded is! Map<String, dynamic>) {
+                              throw Exception('Format JSON tidak valid.');
+                            }
+                            await ref
+                                .read(sadarApiServiceProvider)
+                                .syncFinancialPlans(
+                                  savingsGoals:
+                                      (decoded['savingsGoals'] as List?) ??
+                                          const [],
+                                  recurringItems:
+                                      (decoded['recurringItems'] as List?) ??
+                                          const [],
+                                  debts:
+                                      (decoded['debts'] as List?) ?? const [],
+                                  transfers: (decoded['transfers'] as List?) ??
+                                      const [],
+                                );
+                            await ref.read(financeProvider.notifier).loadAll();
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  backgroundColor: AppColors.success,
+                                  content: Text(
+                                    'Data cadangan berhasil dipulihkan & disinkronkan!',
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setModalState(() => restoring = false);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: AppColors.danger,
+                                  content: Text('Gagal memulihkan data: $e'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  icon: const Icon(Icons.restore_rounded, size: 18),
+                  label: Text(
+                    restoring ? 'Memulihkan...' : 'Pulihkan & Sinkronkan Sekarang',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showChangePasswordSheet() {
@@ -870,8 +1019,50 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                               ),
                             );
                           },
-                          child: const Text('Sinkronkan'),
+                           child: const Text('Sinkronkan'),
                         ),
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    Icons.backup_table_rounded,
+                    color: primaryColor,
+                  ),
+                  title: Text(
+                    'Cadangkan Data Keuangan (Backup JSON)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Ekspor seluruh akun, transaksi, tabungan, dan jadwal rutin ke file cadangan (.json)',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  trailing: const Icon(Icons.download_rounded, size: 20),
+                  onTap: () => _exportBackupJson(finance),
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(
+                    Icons.restore_page_rounded,
+                    color: AppColors.accent,
+                  ),
+                  title: Text(
+                    'Pulihkan dari Cadangan (Restore JSON)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Impor kembali data cadangan JSON SADAR Finance ke perangkat & Cloud',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  trailing: const Icon(Icons.upload_file_rounded, size: 20),
+                  onTap: _showRestoreJsonSheet,
                 ),
               ],
             ),

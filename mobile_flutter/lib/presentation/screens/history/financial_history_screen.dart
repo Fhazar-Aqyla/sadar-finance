@@ -7,7 +7,9 @@ import '../../../core/constants/category_helpers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_input_formatter.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/pdf_report_generator.dart';
 import '../../../data/models/account_model.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
 import '../../widgets/account_selector_field.dart';
@@ -25,6 +27,8 @@ class _HistoryItem {
   final String? categoryDetail;
   final double amount;
   final DateTime date;
+  final String source;
+  final String? receiptImageUrl;
 
   const _HistoryItem({
     required this.id,
@@ -37,6 +41,8 @@ class _HistoryItem {
     this.categoryDetail,
     required this.amount,
     required this.date,
+    this.source = 'manual',
+    this.receiptImageUrl,
   });
 }
 
@@ -57,6 +63,10 @@ class _FinancialHistoryScreenState
   String _accountFilter = 'all'; // all | accountId
   DateTimeRange? _customRange;
   bool _exporting = false;
+  bool _calendarMode = false;
+  DateTime _calendarMonth =
+      DateTime(DateTime.now().year, DateTime.now().month, 1);
+  int? _selectedCalendarDay;
 
   @override
   void dispose() {
@@ -189,6 +199,223 @@ class _FinancialHistoryScreenState
     await Share.share(
       buf.toString(),
       subject: 'Ringkasan Laporan SADAR Finance',
+    );
+  }
+
+  Future<void> _exportPdf(
+    FinanceState finance,
+    List<_HistoryItem> rows,
+    double totalIn,
+    double totalOut,
+  ) async {
+    if (rows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tidak ada data untuk dicetak PDF pada filter ini.'),
+        ),
+      );
+      return;
+    }
+    setState(() => _exporting = true);
+    try {
+      final user = ref.read(authProvider).user;
+      final score = finance.healthScore?.overallScore ?? 0;
+      final status = finance.healthScore?.status ?? 'Sehat';
+      final net = totalIn - totalOut;
+
+      double needs = 0;
+      double wants = 0;
+      double savings = 0;
+      for (final r in rows.where((i) => !i.isIncome && !i.isTransfer)) {
+        final g = CategoryHelpers.normalizeGroup(r.categoryGroup);
+        if (g == 'Needs') {
+          needs += r.amount;
+        } else if (g == 'Wants') {
+          wants += r.amount;
+        } else {
+          savings += r.amount;
+        }
+      }
+
+      final pdfBytes = PdfReportGenerator.buildFinancialReportPdf(
+        title: 'LAPORAN RIWAYAT KEUANGAN SADAR FINANCE',
+        subtitle: 'Dokumen Resmi Rekapitulasi Transaksi & Mutasi Akun (V 2.0.0)',
+        userName: user?.fullName ?? 'Pengguna SADAR',
+        userEmail: user?.email ?? '-',
+        periodLabel: _calendarMode
+            ? AppFormatters.monthYear(_calendarMonth)
+            : '${rows.length} Catatan Terfilter',
+        totalIncome: AppFormatters.rupiah(totalIn),
+        totalExpense: AppFormatters.rupiah(totalOut),
+        netCashflow: '${net >= 0 ? "+" : ""}${AppFormatters.rupiah(net)}',
+        healthScoreLabel: '$score / 100 ($status)',
+        allocationRows: [
+          ('Kebutuhan (50%)', AppFormatters.rupiah(needs)),
+          ('Keinginan (30%)', AppFormatters.rupiah(wants)),
+          ('Tabungan (20%)', AppFormatters.rupiah(savings)),
+        ],
+        accountRows: finance.accounts
+            .map((a) => ('${a.name} (${a.type})', AppFormatters.rupiah(a.balance)))
+            .toList(),
+        transactionRows: rows
+            .take(16)
+            .map(
+              (r) => (
+                AppFormatters.shortDate(r.date),
+                r.title,
+                '${r.isTransfer ? "" : (r.isIncome ? "+" : "-")}${AppFormatters.rupiah(r.amount)}',
+              ),
+            )
+            .toList(),
+      );
+
+      final dir = await getTemporaryDirectory();
+      final stamp = AppFormatters.isoDateOnly(DateTime.now());
+      final file = File('${dir.path}/Laporan-SADAR-Finance-$stamp.pdf');
+      await file.writeAsBytes(pdfBytes, flush: true);
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/pdf')],
+        subject: 'Laporan PDF Resmi SADAR Finance ($stamp)',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text('Gagal membuat PDF: $e'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  void _showReceiptZoomDialog(_HistoryItem item) {
+    final apiBase = ref.read(authProvider).apiBaseUrl;
+    String? rawUrl = item.receiptImageUrl;
+    if (rawUrl != null && rawUrl.isNotEmpty && !rawUrl.startsWith('http')) {
+      final host = apiBase.replaceFirst(RegExp(r'/api/v1/?$'), '');
+      rawUrl = '$host${rawUrl.startsWith('/') ? '' : '/'}$rawUrl';
+    }
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.receipt_long_rounded,
+                    color: AppColors.accent,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Bukti Struk & Rincian OCR',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimaryOf(ctx),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              if (rawUrl != null && rawUrl.isNotEmpty)
+                SizedBox(
+                  height: 340,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: InteractiveViewer(
+                      minScale: 0.8,
+                      maxScale: 4.0,
+                      child: Image.network(
+                        rawUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, _, _) => Center(
+                          child: Text(
+                            'Gambar struk tersimpan pada arsip OCR server.',
+                            style: TextStyle(
+                              color: AppColors.textSecondaryOf(ctx),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: AppColors.subtleOf(ctx),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.borderOf(ctx)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.verified_rounded,
+                            color: AppColors.success,
+                            size: 18,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Tercatat via Pindai Struk Otomatis (OCR AI)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 13,
+                              color: AppColors.success,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Merchant / Catatan: ${item.title}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimaryOf(ctx),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Nominal Terbaca: ${AppFormatters.rupiah(item.amount)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryOf(ctx),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tanggal Transaksi: ${AppFormatters.fullDate(item.date)}',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: AppColors.textSecondaryOf(ctx),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -461,6 +688,8 @@ class _FinancialHistoryScreenState
             categoryDetail: t.categoryDetail,
             amount: t.amount,
             date: t.transactionDate,
+            source: t.source,
+            receiptImageUrl: t.receiptImageUrl,
           );
         }),
       if (_typeFilter != 'expense' &&
@@ -508,7 +737,16 @@ class _FinancialHistoryScreenState
       if (_accountFilter != 'all' && item.accountId != _accountFilter) {
         return false;
       }
-      if (_periodFilter == 'this_month') {
+      if (_calendarMode) {
+        if (item.date.year != _calendarMonth.year ||
+            item.date.month != _calendarMonth.month) {
+          return false;
+        }
+        if (_selectedCalendarDay != null &&
+            item.date.day != _selectedCalendarDay) {
+          return false;
+        }
+      } else if (_periodFilter == 'this_month') {
         if (item.date.year != now.year || item.date.month != now.month) {
           return false;
         }
@@ -555,6 +793,13 @@ class _FinancialHistoryScreenState
         title: const Text('Riwayat Keuangan'),
         actions: [
           IconButton(
+            tooltip: 'Unduh Laporan PDF (.pdf)',
+            onPressed: _exporting
+                ? null
+                : () => _exportPdf(finance, filtered, filteredIn, filteredOut),
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+          ),
+          IconButton(
             tooltip: 'Bagikan Ringkasan Laporan',
             onPressed: () =>
                 _shareSummaryReport(finance, filtered, filteredIn, filteredOut),
@@ -580,6 +825,99 @@ class _FinancialHistoryScreenState
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
             child: Column(
               children: [
+                // View Mode Toggle: Daftar Transaksi vs Kalender Arus Kas
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.subtleOf(context),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderOf(context)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(9),
+                          onTap: () => setState(() {
+                            _calendarMode = false;
+                            _selectedCalendarDay = null;
+                          }),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: !_calendarMode
+                                  ? AppColors.primaryOf(context)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.format_list_bulleted_rounded,
+                                  size: 16,
+                                  color: !_calendarMode
+                                      ? Colors.white
+                                      : AppColors.textSecondaryOf(context),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Mode Daftar',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: !_calendarMode
+                                        ? Colors.white
+                                        : AppColors.textSecondaryOf(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(9),
+                          onTap: () => setState(() => _calendarMode = true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _calendarMode
+                                  ? AppColors.primaryOf(context)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.calendar_month_rounded,
+                                  size: 16,
+                                  color: _calendarMode
+                                      ? Colors.white
+                                      : AppColors.textSecondaryOf(context),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Kalender Arus Kas',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: _calendarMode
+                                        ? Colors.white
+                                        : AppColors.textSecondaryOf(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _searchCtrl,
                   onChanged: (_) => setState(() {}),
@@ -767,180 +1105,507 @@ class _FinancialHistoryScreenState
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => ref.read(financeProvider.notifier).loadAll(),
-              child: filtered.isEmpty
-                  ? ListView(
-                      children: const [
-                        EmptyStateWidget(
-                          icon: Icons.receipt_long_outlined,
-                          title: 'Tidak Ada Data',
-                          message:
-                              'Belum ada riwayat keuangan yang cocok dengan pencarian atau filter ini.',
-                        ),
-                      ],
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  if (_calendarMode) ...[
+                    _buildCashflowCalendarCard(items, hidden),
+                    const SizedBox(height: 14),
+                  ],
+                  if (filtered.isEmpty)
+                    const EmptyStateWidget(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'Tidak Ada Data',
+                      message:
+                          'Belum ada riwayat keuangan yang cocok dengan pencarian atau tanggal ini.',
                     )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount:
-                          filtered.length + (finance.hasMoreHistory ? 1 : 0),
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (ctx, index) {
-                        if (index >= filtered.length) {
-                          return Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: OutlinedButton.icon(
-                                onPressed: finance.isLoadingMore
-                                    ? null
-                                    : () => ref
-                                        .read(financeProvider.notifier)
-                                        .loadMoreHistory(),
-                                icon: finance.isLoadingMore
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Icon(Icons.expand_more_rounded),
-                                label: Text(
-                                  finance.isLoadingMore
-                                      ? 'Memuat data...'
-                                      : 'Muat Riwayat Lebih Lama',
-                                ),
-                              ),
+                  else ...[
+                    for (int index = 0; index < filtered.length; index++) ...[
+                      if (index > 0) const SizedBox(height: 10),
+                      Builder(
+                        builder: (ctx) {
+                          final item = filtered[index];
+                          final color = item.isTransfer
+                              ? AppColors.primaryLight
+                              : item.isIncome
+                                  ? AppColors.success
+                                  : CategoryHelpers.colorForGroup(
+                                      item.categoryGroup,
+                                    );
+                          final hasReceipt = item.source == 'ocr' ||
+                              (item.receiptImageUrl != null &&
+                                  item.receiptImageUrl!.isNotEmpty);
+                          return SadarCard(
+                            onTap: item.isTransfer
+                                ? null
+                                : () => _showEditSheet(item, finance.accounts),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
                             ),
-                          );
-                        }
-                        final item = filtered[index];
-                        final color = item.isTransfer
-                            ? AppColors.primaryLight
-                            : item.isIncome
-                                ? AppColors.success
-                                : CategoryHelpers.colorForGroup(
-                                    item.categoryGroup,
-                                  );
-                        return SadarCard(
-                          onTap: item.isTransfer
-                              ? null
-                              : () => _showEditSheet(item, finance.accounts),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: color.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  item.isTransfer
-                                      ? Icons.swap_horiz_rounded
-                                      : item.isIncome
-                                          ? Icons.arrow_downward_rounded
-                                          : CategoryHelpers.iconForGroup(
-                                              item.categoryGroup,
-                                            ),
-                                  color: color,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                        color: AppColors.textPrimaryOf(context),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '${item.subtitle} - ${AppFormatters.shortDate(item.date)}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color:
-                                            AppColors.textSecondaryOf(context),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    hidden
-                                        ? 'Rp •••••'
-                                        : item.isTransfer
-                                            ? AppFormatters.rupiah(item.amount)
-                                            : '${item.isIncome ? '+' : '-'}${AppFormatters.rupiah(item.amount)}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 13.5,
-                                      color: item.isTransfer
-                                          ? AppColors.primaryOf(context)
-                                          : item.isIncome
-                                              ? AppColors.success
-                                              : AppColors.danger,
-                                    ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                  child: Icon(
+                                    item.isTransfer
+                                        ? Icons.swap_horiz_rounded
+                                        : item.isIncome
+                                            ? Icons.arrow_downward_rounded
+                                            : CategoryHelpers.iconForGroup(
+                                                item.categoryGroup,
+                                              ),
+                                    color: color,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      if (!item.isTransfer) ...[
-                                        InkWell(
-                                          onTap: () => _showEditSheet(
-                                            item,
-                                            finance.accounts,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(2),
-                                            child: Icon(
-                                              Icons.edit_outlined,
-                                              size: 17,
-                                              color:
-                                                  AppColors.textMutedOf(context),
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              item.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 14,
+                                                color: AppColors.textPrimaryOf(
+                                                  context,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                      ],
-                                      InkWell(
-                                        onTap: () => _confirmDelete(item),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(2),
-                                          child: Icon(
-                                            Icons.delete_outline_rounded,
-                                            size: 17,
-                                            color:
-                                                AppColors.textMutedOf(context),
+                                          if (hasReceipt) ...[
+                                            const SizedBox(width: 6),
+                                            InkWell(
+                                              onTap: () =>
+                                                  _showReceiptZoomDialog(item),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 2,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.accent
+                                                      .withValues(alpha: 0.14),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: const Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .receipt_long_rounded,
+                                                      size: 11,
+                                                      color: AppColors.accent,
+                                                    ),
+                                                    SizedBox(width: 3),
+                                                    Text(
+                                                      'Struk',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: AppColors.accent,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${item.subtitle} - ${AppFormatters.shortDate(item.date)}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondaryOf(
+                                            context,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      hidden
+                                          ? 'Rp •••••'
+                                          : item.isTransfer
+                                              ? AppFormatters.rupiah(
+                                                  item.amount,
+                                                )
+                                              : '${item.isIncome ? '+' : '-'}${AppFormatters.rupiah(item.amount)}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13.5,
+                                        color: item.isTransfer
+                                            ? AppColors.primaryOf(context)
+                                            : item.isIncome
+                                                ? AppColors.success
+                                                : AppColors.danger,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (hasReceipt) ...[
+                                          InkWell(
+                                            onTap: () =>
+                                                _showReceiptZoomDialog(item),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(2),
+                                              child: Icon(
+                                                Icons.visibility_outlined,
+                                                size: 17,
+                                                color:
+                                                    AppColors.accentOf(context),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                        ],
+                                        if (!item.isTransfer) ...[
+                                          InkWell(
+                                            onTap: () => _showEditSheet(
+                                              item,
+                                              finance.accounts,
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(2),
+                                              child: Icon(
+                                                Icons.edit_outlined,
+                                                size: 17,
+                                                color: AppColors.textMutedOf(
+                                                  context,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                        ],
+                                        InkWell(
+                                          onTap: () => _confirmDelete(item),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Icon(
+                                              Icons.delete_outline_rounded,
+                                              size: 17,
+                                              color: AppColors.textMutedOf(
+                                                context,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                    if (finance.hasMoreHistory)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 8),
+                          child: OutlinedButton.icon(
+                            onPressed: finance.isLoadingMore
+                                ? null
+                                : () => ref
+                                    .read(financeProvider.notifier)
+                                    .loadMoreHistory(),
+                            icon: finance.isLoadingMore
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.expand_more_rounded),
+                            label: Text(
+                              finance.isLoadingMore
+                                  ? 'Memuat data...'
+                                  : 'Muat Riwayat Lebih Lama',
+                            ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                  ],
+                ],
+              ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCashflowCalendarCard(List<_HistoryItem> allItems, bool hidden) {
+    final year = _calendarMonth.year;
+    final month = _calendarMonth.month;
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    final firstWeekday = DateTime(year, month, 1).weekday; // 1 = Mon .. 7 = Sun
+
+    final Map<int, double> dayIn = {};
+    final Map<int, double> dayOut = {};
+    for (final it in allItems) {
+      if (it.date.year == year && it.date.month == month && !it.isTransfer) {
+        final d = it.date.day;
+        if (it.isIncome) {
+          dayIn[d] = (dayIn[d] ?? 0) + it.amount;
+        } else {
+          dayOut[d] = (dayOut[d] ?? 0) + it.amount;
+        }
+      }
+    }
+
+    final cells = <Widget>[];
+    for (int i = 1; i < firstWeekday; i++) {
+      cells.add(const SizedBox.shrink());
+    }
+    for (int day = 1; day <= daysInMonth; day++) {
+      final inc = dayIn[day] ?? 0;
+      final exp = dayOut[day] ?? 0;
+      final isSelected = _selectedCalendarDay == day;
+      final hasActivity = inc > 0 || exp > 0;
+      cells.add(
+        InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            setState(() {
+              _selectedCalendarDay = isSelected ? null : day;
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primaryOf(context)
+                  : hasActivity
+                      ? AppColors.subtleOf(context)
+                      : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.primaryOf(context)
+                    : hasActivity
+                        ? AppColors.borderOf(context)
+                        : Colors.transparent,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '$day',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                        isSelected || hasActivity ? FontWeight.w800 : FontWeight.w500,
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.textPrimaryOf(context),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (inc > 0)
+                      Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFF5EEAD4)
+                              : AppColors.success,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    if (exp > 0)
+                      Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFFFCA5A5)
+                              : AppColors.danger,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    const dayHeaders = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+
+    return SadarCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppFormatters.monthYear(_calendarMonth),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  Text(
+                    _selectedCalendarDay != null
+                        ? 'Filter aktif: Tanggal $_selectedCalendarDay (ketuk lagi untuk semua)'
+                        : 'Ketuk tanggal untuk melihat rincian arus kas harian',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: AppColors.textSecondaryOf(context),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () {
+                      setState(() {
+                        _calendarMonth = DateTime(year, month - 1, 1);
+                        _selectedCalendarDay = null;
+                      });
+                    },
+                    icon: const Icon(Icons.chevron_left_rounded),
+                  ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () {
+                      setState(() {
+                        _calendarMonth = DateTime(year, month + 1, 1);
+                        _selectedCalendarDay = null;
+                      });
+                    },
+                    icon: const Icon(Icons.chevron_right_rounded),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: dayHeaders
+                .map(
+                  (d) => Expanded(
+                    child: Center(
+                      child: Text(
+                        d,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textMutedOf(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 8),
+          GridView.count(
+            crossAxisCount: 7,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 6,
+            crossAxisSpacing: 6,
+            childAspectRatio: 1.0,
+            children: cells,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Uang Masuk',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: AppColors.textSecondaryOf(context),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.danger,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Uang Keluar',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: AppColors.textSecondaryOf(context),
+                    ),
+                  ),
+                ],
+              ),
+              if (_selectedCalendarDay != null)
+                TextButton(
+                  onPressed: () =>
+                      setState(() => _selectedCalendarDay = null),
+                  child: const Text(
+                    'Tampilkan Sebulan',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+            ],
           ),
         ],
       ),

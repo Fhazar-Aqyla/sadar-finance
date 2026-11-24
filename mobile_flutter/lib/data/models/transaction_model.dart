@@ -10,6 +10,7 @@ class TransactionModel {
   final String description;
   final String source; // manual | ocr
   final double amount;
+  final String? receiptImageUrl;
 
   const TransactionModel({
     required this.id,
@@ -21,6 +22,7 @@ class TransactionModel {
     required this.description,
     this.source = 'manual',
     required this.amount,
+    this.receiptImageUrl,
   });
 
   String get categoryLabel => CategoryHelpers.labelForGroup(categoryGroup);
@@ -63,6 +65,11 @@ class TransactionModel {
               .toString(),
       source: (json['source'] ?? 'manual').toString(),
       amount: _toDouble(json['amount']),
+      receiptImageUrl: (json['receipt_url'] ??
+              json['image_url'] ??
+              json['imageUrl'] ??
+              json['receipt_image_url'])
+          ?.toString(),
     );
   }
 
@@ -76,6 +83,7 @@ class TransactionModel {
         'description': description,
         'source': source,
         'amount': amount,
+        if (receiptImageUrl != null) 'image_url': receiptImageUrl,
       };
 
   static double _toDouble(dynamic value) {

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/constants/bank_data.dart';
 import '../../../core/theme/app_theme.dart';
@@ -15,6 +13,7 @@ import '../../../data/services/app_update_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
+import '../../widgets/e_statement_preview_sheet.dart';
 import '../../widgets/google_logo_icon.dart';
 import '../../widgets/sadar_card.dart';
 import '../../widgets/sadar_logo.dart';
@@ -1399,45 +1398,18 @@ class ProfileAccountScreen extends ConsumerWidget {
                       color: AppColors.purpleOf(context),
                     ),
                     title: Text(
-                      'Unduh / Bagikan Laporan e-Statement',
+                      'Pratinjau & Cetak Laporan e-Statement',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
                       ),
                     ),
                     subtitle: Text(
-                      'Simpan dokumen e-Statement resmi untuk dicetak sebagai PDF',
+                      'Lihat ringkasan e-Statement resmi bulanan, kirim email & bagikan',
                       style: TextStyle(fontSize: 12, color: textSecondary),
                     ),
-                    trailing: const Icon(Icons.download_rounded, size: 19),
-                    onTap: () async {
-                      try {
-                        final res = await ref
-                            .read(sadarApiServiceProvider)
-                            .getMonthlyStatementPreview();
-                        final html = (res['html'] ?? '').toString();
-                        if (html.isEmpty) {
-                          throw Exception('Konten e-Statement kosong.');
-                        }
-                        final dir = await getTemporaryDirectory();
-                        final file = File(
-                          '${dir.path}/e-Statement-SADAR-Finance.html',
-                        );
-                        await file.writeAsString(html);
-                        await Share.shareXFiles(
-                          [XFile(file.path, mimeType: 'text/html')],
-                          subject: 'e-Statement Resmi SADAR Finance',
-                        );
-                      } catch (e) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: AppColors.danger,
-                            content: Text('Gagal mengunduh e-Statement: $e'),
-                          ),
-                        );
-                      }
-                    },
+                    trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                    onTap: () => EStatementPreviewSheet.show(context),
                   ),
                   const Divider(),
                   ListTile(

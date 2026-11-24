@@ -146,7 +146,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       final isMaint =
                           type == 'maintenance' || type == 'urgent';
                       final tone = isMaint ? AppColors.warning : AppColors.accent;
-                      final imageUrl = (b['imageUrl'] ?? '').toString().trim();
+                      final imageUrl =
+                          (b['bannerUrl'] ?? b['imageUrl'] ?? '')
+                              .toString()
+                              .trim();
                       final actionLabel =
                           (b['actionLabel'] ?? '').toString().trim();
                       final actionRoute =
@@ -249,7 +252,130 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                       );
                     }),
-                  if (finance.alerts.isEmpty && finance.broadcasts.isEmpty)
+                  if (finance.recurringItems
+                      .where((r) => !r.isPaidForMonth(DateTime.now()))
+                      .isNotEmpty)
+                    ...finance.recurringItems
+                        .where((r) => !r.isPaidForMonth(DateTime.now()))
+                        .take(3)
+                        .map(
+                          (r) => Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(13),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color:
+                                    AppColors.primary.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.event_repeat_rounded,
+                                  color: AppColors.primaryOf(ctx),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Tagihan Rutin: ${r.title} (Tgl ${r.dayOfMonth})',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 13,
+                                          color: AppColors.textPrimaryOf(ctx),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${AppFormatters.rupiah(r.amount)} • Belum dicatat bulan ini',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondaryOf(ctx),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(ctx);
+                                    context.push('/financial-plans?tab=1');
+                                  },
+                                  child: const Text('Buka'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                  if (finance.debts.where((d) => !d.isSettled).isNotEmpty)
+                    ...finance.debts
+                        .where((d) => !d.isSettled)
+                        .take(3)
+                        .map(
+                          (d) => Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(13),
+                            decoration: BoxDecoration(
+                              color: AppColors.purple.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color:
+                                    AppColors.purple.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.groups_rounded,
+                                  color: AppColors.purpleOf(ctx),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${d.isReceivable ? "Piutang" : "Utang"}: ${d.personName} (${d.title})',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 13,
+                                          color: AppColors.textPrimaryOf(ctx),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${AppFormatters.rupiah(d.amount)} • Belum lunas',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondaryOf(ctx),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(ctx);
+                                    context.push('/debt-split');
+                                  },
+                                  child: const Text('Kelola'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                  if (finance.alerts.isEmpty &&
+                      finance.broadcasts.isEmpty &&
+                      finance.debts.where((d) => !d.isSettled).isEmpty &&
+                      finance.recurringItems
+                          .where((r) => !r.isPaidForMonth(DateTime.now()))
+                          .isEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Center(
@@ -466,17 +592,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           backgroundColor: Colors.white.withValues(alpha: 0.12),
                           minimumSize: const Size(38, 38),
                         ),
-                        icon: Badge(
-                          isLabelVisible: finance.alerts.isNotEmpty ||
-                              finance.broadcasts.isNotEmpty,
-                          label: Text(
-                            '${finance.alerts.length + finance.broadcasts.length}',
-                          ),
-                          child: const Icon(
-                            Icons.notifications_outlined,
-                            color: Colors.white,
-                            size: 20,
-                          ),
+                        icon: Builder(
+                          builder: (_) {
+                            final dueBills = finance.recurringItems
+                                .where((r) => !r.isPaidForMonth(DateTime.now()))
+                                .length;
+                            final activeDebts = finance.debts
+                                .where((d) => !d.isSettled)
+                                .length;
+                            final totalNotif = finance.alerts.length +
+                                finance.broadcasts.length +
+                                dueBills +
+                                activeDebts;
+                            return Badge(
+                              isLabelVisible: totalNotif > 0,
+                              label: Text('$totalNotif'),
+                              child: const Icon(
+                                Icons.notifications_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -865,7 +1002,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       final badge = (b['badge'] ?? 'INFORMASI RESMI').toString().toUpperCase();
       final title = (b['title'] ?? 'Pengumuman SADAR Finance').toString();
       final message = (b['message'] ?? '').toString();
-      final imageUrl = (b['imageUrl'] ?? '').toString().trim();
+      final imageUrl =
+          (b['bannerUrl'] ?? b['imageUrl'] ?? '').toString().trim();
       final actionLabel = (b['actionLabel'] ?? '').toString().trim();
       final actionRoute = (b['actionRoute'] ?? '').toString().trim();
 

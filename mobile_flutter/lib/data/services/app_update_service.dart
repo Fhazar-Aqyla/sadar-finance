@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/config/app_config.dart';
@@ -184,104 +188,254 @@ class AppUpdateService {
     final textPrimary = AppColors.textPrimaryOf(context);
     final textSecondary = AppColors.textSecondaryOf(context);
 
+    bool downloading = false;
+    double progress = 0;
+    String progressLabel = '';
+    String? downloadedPath;
+    String? downloadError;
+
     await showDialog<void>(
       context: context,
       barrierDismissible: !result.forceUpdate,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(
-              result.outcome == UpdateCheckOutcome.otaDownloadedRestartRequired
-                  ? Icons.system_update_alt_rounded
-                  : result.outcome == UpdateCheckOutcome.nativeUpdateAvailable
-                      ? Icons.new_releases_rounded
-                      : Icons.verified_rounded,
-              color: result.outcome == UpdateCheckOutcome.upToDate
-                  ? AppColors.success
-                  : AppColors.accent,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                result.outcome ==
-                        UpdateCheckOutcome.otaDownloadedRestartRequired
-                    ? 'Pembaruan Siap Diterapkan'
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                result.outcome == UpdateCheckOutcome.otaDownloadedRestartRequired
+                    ? Icons.system_update_alt_rounded
                     : result.outcome == UpdateCheckOutcome.nativeUpdateAvailable
-                        ? 'Pembaruan Tersedia'
-                        : 'Status Pembaruan',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: textPrimary,
-                ),
+                        ? Icons.new_releases_rounded
+                        : Icons.verified_rounded,
+                color: result.outcome == UpdateCheckOutcome.upToDate
+                    ? AppColors.success
+                    : AppColors.accent,
               ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              result.message,
-              style: TextStyle(fontSize: 13.5, color: textSecondary, height: 1.45),
-            ),
-            if (result.releaseNotes.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                'Yang Baru:',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              ...result.releaseNotes.map(
-                (note) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('• ', style: TextStyle(color: AppColors.accent)),
-                      Expanded(
-                        child: Text(
-                          note,
-                          style: TextStyle(fontSize: 12.5, color: textSecondary),
-                        ),
-                      ),
-                    ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  result.outcome ==
+                          UpdateCheckOutcome.otaDownloadedRestartRequired
+                      ? 'Pembaruan Siap Diterapkan'
+                      : result.outcome == UpdateCheckOutcome.nativeUpdateAvailable
+                          ? 'Pembaruan Tersedia'
+                          : 'Status Pembaruan',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: textPrimary,
                   ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                result.message,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  color: textSecondary,
+                  height: 1.45,
+                ),
+              ),
+              if (result.releaseNotes.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  'Yang Baru:',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                ...result.releaseNotes.map(
+                  (note) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '• ',
+                          style: TextStyle(color: AppColors.accent),
+                        ),
+                        Expanded(
+                          child: Text(
+                            note,
+                            style: TextStyle(fontSize: 12.5, color: textSecondary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              if (downloading || downloadedPath != null) ...[
+                const SizedBox(height: 14),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: LinearProgressIndicator(
+                    value: progress > 0 ? progress : null,
+                    minHeight: 8,
+                    backgroundColor: AppColors.borderOf(ctx),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.accent,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  downloadedPath != null
+                      ? 'Unduhan 100% Selesai! Ketuk "Pasang APK" untuk menginstal.'
+                      : progressLabel.isNotEmpty
+                          ? progressLabel
+                          : 'Menyiapkan unduhan langsung di dalam aplikasi...',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: downloadedPath != null
+                        ? AppColors.success
+                        : AppColors.accentOf(ctx),
+                  ),
+                ),
+              ],
+              if (downloadError != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  downloadError!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.danger,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            if (!result.forceUpdate && !downloading)
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  result.outcome == UpdateCheckOutcome.nativeUpdateAvailable
+                      ? 'Nanti'
+                      : 'Tutup',
+                ),
+              ),
+            if (result.outcome == UpdateCheckOutcome.nativeUpdateAvailable &&
+                result.downloadUrl != null &&
+                result.downloadUrl!.isNotEmpty) ...[
+              if (!downloading)
+                TextButton(
+                  onPressed: () async {
+                    final uri = Uri.tryParse(result.downloadUrl!);
+                    if (uri != null) {
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
+                  child: const Text('Via Browser'),
+                ),
+              ElevatedButton.icon(
+                onPressed: downloading
+                    ? null
+                    : () async {
+                        if (downloadedPath != null) {
+                          await Share.shareXFiles(
+                            [
+                              XFile(
+                                downloadedPath!,
+                                mimeType:
+                                    'application/vnd.android.package-archive',
+                              ),
+                            ],
+                            subject:
+                                'Paket Pembaruan SADAR Finance v${result.latestVersion ?? "2.0.0"}',
+                          );
+                          return;
+                        }
+                        setDialogState(() {
+                          downloading = true;
+                          progress = 0;
+                          downloadError = null;
+                          progressLabel = 'Mengunduh 0%...';
+                        });
+                        try {
+                          final dir = await getTemporaryDirectory();
+                          final ver = result.latestVersion ?? '2.0.0';
+                          final savePath =
+                              '${dir.path}/SADAR-Finance-v$ver.apk';
+                          await Dio().download(
+                            result.downloadUrl!,
+                            savePath,
+                            onReceiveProgress: (received, total) {
+                              if (total > 0 && ctx.mounted) {
+                                final ratio = received / total;
+                                final recMb =
+                                    (received / (1024 * 1024)).toStringAsFixed(1);
+                                final totMb =
+                                    (total / (1024 * 1024)).toStringAsFixed(1);
+                                setDialogState(() {
+                                  progress = ratio;
+                                  progressLabel =
+                                      'Mengunduh ${(ratio * 100).round()}% ($recMb MB / $totMb MB)';
+                                });
+                              }
+                            },
+                          );
+                          final file = File(savePath);
+                          if (!file.existsSync() || file.lengthSync() < 1000000) {
+                            throw Exception('Ukuran paket APK tidak lengkap.');
+                          }
+                          if (ctx.mounted) {
+                            setDialogState(() {
+                              downloading = false;
+                              progress = 1.0;
+                              downloadedPath = savePath;
+                            });
+                          }
+                          await Share.shareXFiles(
+                            [
+                              XFile(
+                                savePath,
+                                mimeType:
+                                    'application/vnd.android.package-archive',
+                              ),
+                            ],
+                            subject: 'Pasang SADAR Finance v$ver',
+                          );
+                        } catch (e) {
+                          if (ctx.mounted) {
+                            setDialogState(() {
+                              downloading = false;
+                              downloadError =
+                                  'Unduhan in-app gagal ($e). Gunakan tombol Via Browser.';
+                            });
+                          }
+                        }
+                      },
+                icon: Icon(
+                  downloadedPath != null
+                      ? Icons.install_mobile_rounded
+                      : Icons.download_rounded,
+                  size: 18,
+                ),
+                label: Text(
+                  downloadedPath != null
+                      ? 'Pasang / Simpan APK'
+                      : downloading
+                          ? 'Mengunduh...'
+                          : 'Unduh di Aplikasi',
                 ),
               ),
             ],
           ],
         ),
-        actions: [
-          if (!result.forceUpdate)
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                result.outcome == UpdateCheckOutcome.nativeUpdateAvailable
-                    ? 'Nanti'
-                    : 'Tutup',
-              ),
-            ),
-          if (result.outcome == UpdateCheckOutcome.nativeUpdateAvailable &&
-              result.downloadUrl != null &&
-              result.downloadUrl!.isNotEmpty)
-            ElevatedButton.icon(
-              onPressed: () async {
-                final uri = Uri.tryParse(result.downloadUrl!);
-                if (uri != null) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
-                if (ctx.mounted && !result.forceUpdate) Navigator.pop(ctx);
-              },
-              icon: const Icon(Icons.download_rounded, size: 18),
-              label: const Text('Unduh Pembaruan'),
-            ),
-        ],
       ),
     );
   }

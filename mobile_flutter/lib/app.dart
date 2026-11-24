@@ -22,6 +22,7 @@ class SadarFinanceApp extends ConsumerStatefulWidget {
 class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
     with WidgetsBindingObserver {
   bool _locked = false;
+  bool _inBackground = false;
   bool _initialLockChecked = false;
   bool _authenticating = false;
   DateTime? _pausedAt;
@@ -42,6 +43,16 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final uiPrefs = ref.read(uiPreferencesProvider);
     final auth = ref.read(authProvider);
+
+    if (auth.status == AuthStatus.authenticated) {
+      final shouldShield = state == AppLifecycleState.inactive ||
+          state == AppLifecycleState.hidden ||
+          state == AppLifecycleState.paused;
+      if (_inBackground != shouldShield && mounted) {
+        setState(() => _inBackground = shouldShield);
+      }
+    }
+
     if (!uiPrefs.biometricLockEnabled ||
         auth.status != AuthStatus.authenticated) {
       return;
@@ -105,6 +116,10 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
         return Stack(
           children: [
             ?child,
+            if (_inBackground && !_locked)
+              const Positioned.fill(
+                child: _PrivacyShieldOverlay(),
+              ),
             if (_locked)
               Positioned.fill(
                 child: _AppLockOverlay(
@@ -199,6 +214,60 @@ class _AppLockOverlay extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrivacyShieldOverlay extends StatelessWidget {
+  const _PrivacyShieldOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFF0F172A),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SadarLogo(
+              variant: SadarLogoVariant.light,
+              height: 34,
+              showFinanceSubtitle: true,
+              alignment: CrossAxisAlignment.center,
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.16),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.shield_outlined,
+                    color: Color(0xFF5EEAD4),
+                    size: 16,
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    'Pelindung Privasi Aktif • Nominal Disembunyikan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

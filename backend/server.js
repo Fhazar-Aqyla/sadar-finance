@@ -144,7 +144,7 @@ app.get('/downloads/:filename', (req, res) => {
   res.status(200);
   res.setHeader('Content-Type', 'application/vnd.android.package-archive');
   res.setHeader('Content-Length', String(stat.size));
-  res.setHeader('Content-Disposition', 'attachment; filename="SADAR-Finance-v1.2.2-official.apk"');
+  res.setHeader('Content-Disposition', 'attachment; filename="SADAR-Finance-v2.0.0.apk"');
   res.setHeader('Accept-Ranges', 'none');
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   res.setHeader('CDN-Cache-Control', 'no-store');

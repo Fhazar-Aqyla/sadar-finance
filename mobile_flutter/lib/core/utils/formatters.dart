@@ -52,6 +52,14 @@ class AppFormatters {
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
+  static String monthYear(DateTime date) {
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    ];
+    return '${months[(date.month - 1).clamp(0, 11)]} ${date.year}';
+  }
+
   static String fullDateTime(DateTime date) {
     final local = date.toLocal();
     const months = [
