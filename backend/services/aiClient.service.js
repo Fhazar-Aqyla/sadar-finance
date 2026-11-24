@@ -41,29 +41,49 @@ class AiClientService {
       return this._mockCategoryResult(text, transactionId);
     }
 
+    let hfResult = null;
+    try {
+      const response = await this._postJson('/categorize', {
+        text,
+        transactionId,
+        merchant,
+        amount,
+        items,
+      });
+      hfResult = this._normalizeCategoryResult(response, text, transactionId);
+    } catch (_hfErr) {
+      // Hugging Face unavailable or timed out; Groq AI will handle below
+    }
+
+    // Return Hugging Face result directly if high confidence, otherwise enhance/fallback with Groq AI
+    if (hfResult && hfResult.confidence >= 0.75 && !hfResult.needsReview) {
+      return hfResult;
+    }
+
     if (config.groq?.apiKey) {
       try {
-        return await this._categorizeWithGroq({
+        const groqResult = await this._categorizeWithGroq({
           text,
           transactionId,
           merchant,
           amount,
           items,
         });
+        return {
+          ...groqResult,
+          decisionSource: hfResult ? 'huggingface+groq' : 'groq-fallback',
+          modelVersion: hfResult
+            ? `${hfResult.modelVersion}+${groqResult.modelVersion}`
+            : groqResult.modelVersion,
+        };
       } catch (_groqErr) {
-        // Fall through to Python AI microservice if Groq fails
+        if (hfResult) return hfResult;
+        throw _groqErr;
       }
     }
 
-    const response = await this._postJson('/categorize', {
-      text,
-      transactionId,
-      merchant,
-      amount,
-      items,
-    });
-
-    return this._normalizeCategoryResult(response, text, transactionId);
+    if (hfResult) return hfResult;
+    throw new Error('AI categorization service unavailable');
   }
 
   async generateInsights(payload) {
@@ -71,16 +91,40 @@ class AiClientService {
       return this._mockInsightResult(payload);
     }
 
+    let hfInsights = null;
+    try {
+      const response = await this._postJson('/insights', payload);
+      hfInsights = this._normalizeInsightResult(response);
+    } catch (_hfErr) {
+      // Hugging Face unavailable or endpoint not active; Groq AI will supplement
+    }
+
     if (config.groq?.apiKey) {
       try {
-        return await this._generateInsightsWithGroq(payload);
+        const groqInsights = await this._generateInsightsWithGroq(payload);
+        const combined = [
+          ...(hfInsights?.insights || []),
+          ...(groqInsights?.insights || []),
+        ].slice(0, 4);
+        return {
+          insights: combined.length > 0 ? combined : groqInsights.insights,
+          alerts: hfInsights?.alerts || [],
+          recommendations:
+            groqInsights.recommendations?.length > 0
+              ? groqInsights.recommendations
+              : hfInsights?.recommendations || [],
+          modelVersion: hfInsights
+            ? `${hfInsights.modelVersion}+${groqInsights.modelVersion}`
+            : groqInsights.modelVersion,
+        };
       } catch (_groqErr) {
-        // Fall through to Python AI microservice if Groq fails
+        if (hfInsights) return hfInsights;
+        throw _groqErr;
       }
     }
 
-    const response = await this._postJson('/insights', payload);
-    return this._normalizeInsightResult(response);
+    if (hfInsights) return hfInsights;
+    throw new Error('AI insights service unavailable');
   }
 
   async predictBehavior(payload) {
@@ -88,16 +132,36 @@ class AiClientService {
       return this._mockBehaviorResult(payload);
     }
 
+    let hfBehavior = null;
+    try {
+      const response = await this._postJson('/behavior/predict', payload);
+      hfBehavior = this._normalizeBehaviorResult(response);
+    } catch (_hfErr) {
+      // Hugging Face unavailable; Groq AI will act as fallback
+    }
+
     if (config.groq?.apiKey) {
       try {
-        return await this._predictBehaviorWithGroq(payload);
+        const groqBehavior = await this._predictBehaviorWithGroq({
+          ...payload,
+          hfPrediction: hfBehavior,
+        });
+        if (hfBehavior) {
+          return {
+            ...hfBehavior,
+            recommendation: groqBehavior.recommendation || hfBehavior.recommendation,
+            modelVersion: `${hfBehavior.modelVersion}+${groqBehavior.modelVersion}`,
+          };
+        }
+        return groqBehavior;
       } catch (_groqErr) {
-        // Fall through to Python AI microservice if Groq fails
+        if (hfBehavior) return hfBehavior;
+        throw _groqErr;
       }
     }
 
-    const response = await this._postJson('/behavior/predict', payload);
-    return this._normalizeBehaviorResult(response);
+    if (hfBehavior) return hfBehavior;
+    throw new Error('AI behavior service unavailable');
   }
 
   async _callGroqJson({ systemPrompt, userPayload, schemaName, schema }) {
