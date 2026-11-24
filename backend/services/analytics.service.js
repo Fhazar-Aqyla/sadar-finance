@@ -7,6 +7,9 @@ const transactionRepository = require('../repositories/transaction.repository');
 const incomeRepository = require('../repositories/income.repository');
 const accountRepository = require('../repositories/account.repository');
 const analyticsRepository = require('../repositories/analytics.repository');
+const userRepository = require('../repositories/user.repository');
+const plansRepository = require('../repositories/plans.repository');
+const emailService = require('./email.service');
 const aiClient = require('./aiClient.service');
 const { BadRequestError } = require('../utils/errors');
 
@@ -674,6 +677,96 @@ class AnalyticsService {
 
   async getLatestScore(userId) {
     return analyticsRepository.getLatestScore(userId);
+  }
+
+  async generateMonthlyStatement(userId, { sendEmail = false } = {}) {
+    const now = new Date();
+    const periodLabel = this._formatMonthLabel(now);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+
+    const [user, accounts, transactionsResult, incomesResult, budget, healthScore, plans] =
+      await Promise.all([
+        userRepository.findById(userId),
+        accountRepository.findByUser(userId),
+        transactionRepository.findByUser(userId, { page: 1, limit: 50 }),
+        incomeRepository.findByUser(userId, { page: 1, limit: 50 }),
+        this.getLatestBudget(userId).catch(() => null),
+        this.calculateHealthScore(userId, { period: '1m' }).catch(() => null),
+        plansRepository.getByUser(userId).catch(() => ({ savingsGoals: [], debts: [] })),
+      ]);
+
+    const transactions = transactionsResult?.data || transactionsResult || [];
+    const incomes = incomesResult?.data || incomesResult || [];
+    const totalBalance = (accounts || []).reduce(
+      (sum, a) => sum + parseFloat(a.balance || 0),
+      0
+    );
+
+    const monthTrx = transactions.filter((t) => {
+      const d = new Date(t.transaction_date || t.transactionDate || 0).toISOString();
+      return d >= startOfMonth && d <= endOfMonth;
+    });
+    const monthInc = incomes.filter((i) => {
+      const d = new Date(i.income_date || i.incomeDate || 0).toISOString();
+      return d >= startOfMonth && d <= endOfMonth;
+    });
+
+    const totalExpense =
+      monthTrx.length > 0
+        ? monthTrx.reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+        : transactions.reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+    const totalIncome =
+      monthInc.length > 0
+        ? monthInc.reduce((s, i) => s + parseFloat(i.amount || 0), 0)
+        : incomes.reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+    const netCashflow = totalIncome - totalExpense;
+
+    const html = emailService.buildFinancialStatementHtml({
+      user,
+      periodLabel,
+      totalBalance,
+      totalIncome,
+      totalExpense,
+      netCashflow,
+      healthScore: {
+        overallScore: healthScore?.breakdown?.overallScore ?? healthScore?.score?.score ?? 75,
+        status: healthScore?.status || 'Cukup Sehat',
+        needsRatio: healthScore?.ratios?.needsRatio ?? 0.5,
+        wantsRatio: healthScore?.ratios?.wantsRatio ?? 0.3,
+        savingsRatio: healthScore?.ratios?.savingsRatio ?? 0.2,
+      },
+      accounts,
+      budget,
+      transactions,
+      incomes,
+      savingsGoals: plans?.savingsGoals || [],
+      debts: plans?.debts || [],
+    });
+
+    let delivery = { sent: false, provider: 'none' };
+    if (sendEmail && user?.email) {
+      const greetingName =
+        user.middle_name || user.first_name || 'Pengguna SADAR Finance';
+      delivery = await emailService.sendFinancialStatementEmail({
+        toEmail: user.email,
+        name: greetingName,
+        periodLabel,
+        html,
+      });
+    }
+
+    return {
+      periodLabel,
+      email: user?.email || null,
+      sent: Boolean(delivery.sent),
+      provider: delivery.provider,
+      totalBalance,
+      totalIncome,
+      totalExpense,
+      netCashflow,
+      html,
+    };
   }
 }
 

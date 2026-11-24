@@ -1,12 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/constants/bank_data.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_input_formatter.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/account_model.dart';
+import '../../../data/services/app_update_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
@@ -15,6 +19,7 @@ import '../../widgets/sadar_card.dart';
 import '../../widgets/sadar_logo.dart';
 import '../../widgets/streak_leaderboard_sheet.dart';
 import '../../widgets/user_avatar.dart';
+import 'app_settings_screen.dart';
 
 class ProfileAccountScreen extends ConsumerWidget {
   const ProfileAccountScreen({super.key});
@@ -431,9 +436,12 @@ class ProfileAccountScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 14),
 
-                  // Structured Identity Metadata Box
+                  // Structured 2x2 Symmetric Identity Metadata Box
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.subtleOf(context),
                       borderRadius: BorderRadius.circular(14),
@@ -454,10 +462,11 @@ class ProfileAccountScreen extends ConsumerWidget {
                             ),
                             Container(
                               width: 1,
-                              height: 28,
+                              height: 30,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               color: AppColors.borderOf(context),
                             ),
-                            const SizedBox(width: 12),
                             Expanded(
                               child: _IdentityMetaItem(
                                 icon: Icons.location_on_outlined,
@@ -471,61 +480,51 @@ class ProfileAccountScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        const Divider(height: 18),
+                        const Divider(height: 20),
                         Row(
                           children: [
-                            Icon(
-                              user?.emailVerified == true
-                                  ? Icons.verified_user_rounded
-                                  : Icons.info_outline_rounded,
-                              size: 15,
-                              color: user?.emailVerified == true
-                                  ? AppColors.success
-                                  : AppColors.warning,
-                            ),
-                            const SizedBox(width: 6),
                             Expanded(
-                              child: Text(
-                                user?.emailVerified == true
+                              child: _IdentityMetaItem(
+                                icon: user?.emailVerified == true
+                                    ? Icons.verified_user_rounded
+                                    : Icons.info_outline_rounded,
+                                iconColor: user?.emailVerified == true
+                                    ? AppColors.success
+                                    : AppColors.warning,
+                                label: 'Status Email',
+                                value: user?.emailVerified == true
                                     ? 'Email Terverifikasi'
-                                    : 'Email Belum Verifikasi OTP',
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: user?.emailVerified == true
-                                      ? AppColors.success
-                                      : AppColors.warning,
+                                    : 'Belum Verifikasi',
+                                valueColor: user?.emailVerified == true
+                                    ? AppColors.success
+                                    : AppColors.warning,
+                              ),
+                            ),
+                            Container(
+                              width: 1,
+                              height: 30,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              color: AppColors.borderOf(context),
+                            ),
+                            Expanded(
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: user?.isGoogleLinked == true
+                                    ? null
+                                    : () => context.push('/settings'),
+                                child: _IdentityMetaItem(
+                                  customLeading: const GoogleLogoIcon(size: 16),
+                                  label: 'Akun Google',
+                                  value: user?.isGoogleLinked == true
+                                      ? 'Google Tertaut'
+                                      : 'Tautkan Google',
+                                  valueColor: user?.isGoogleLinked == true
+                                      ? textPrimary
+                                      : primaryColor,
                                 ),
                               ),
                             ),
-                            if (user?.isGoogleLinked == true)
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const GoogleLogoIcon(size: 13),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Google Tertaut',
-                                    style: TextStyle(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: textPrimary,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            else
-                              GestureDetector(
-                                onTap: () => context.push('/settings'),
-                                child: Text(
-                                  'Tautkan Google',
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
                       ],
@@ -608,7 +607,7 @@ class ProfileAccountScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Level ${finance.financialLevel} - ${finance.financialLevelTitle}',
+                              finance.financialLevelTitle,
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 14.5,
@@ -706,18 +705,21 @@ class ProfileAccountScreen extends ConsumerWidget {
                   // Symmetric 2-Column Equal-Width Badge Grid (Zero empty space on right)
                   for (int i = 0; i < badges.length; i += 2) ...[
                     if (i > 0) const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _AchievementBadgeTile(badge: badges[i]),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: i + 1 < badges.length
-                              ? _AchievementBadgeTile(badge: badges[i + 1])
-                              : const SizedBox.shrink(),
-                        ),
-                      ],
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _AchievementBadgeTile(badge: badges[i]),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: i + 1 < badges.length
+                                ? _AchievementBadgeTile(badge: badges[i + 1])
+                                : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
 
@@ -833,7 +835,6 @@ class ProfileAccountScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Text(
                         'Belum ada akun keuangan. Tambahkan rekening bank, e-wallet, atau tunai.',
-                        textAlign: TextAlign.justify,
                         style: TextStyle(
                           fontSize: 13,
                           color: textSecondary,
@@ -842,49 +843,82 @@ class ProfileAccountScreen extends ConsumerWidget {
                     )
                   else
                     ...finance.accounts.map(
-                      (acc) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            BankData.iconForAccount(acc.name, acc.type),
-                            color: primaryColor,
-                            size: 20,
+                      (acc) => Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.subtleOf(context),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: AppColors.borderOf(context),
                           ),
                         ),
-                        title: Text(
-                          acc.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: textPrimary,
-                          ),
-                        ),
-                        subtitle: Text(
-                          acc.accountNumber.isNotEmpty
-                              ? '${acc.type} - ${acc.accountNumber}'
-                              : acc.type,
-                          style: TextStyle(fontSize: 12, color: textSecondary),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        child: Row(
                           children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: primaryColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                BankData.iconForAccount(acc.name, acc.type),
+                                color: primaryColor,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    acc.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      color: textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    acc.accountNumber.isNotEmpty
+                                        ? '${acc.type} - ${acc.accountNumber}'
+                                        : acc.type,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                             Text(
                               hidden
                                   ? 'Rp •••••••'
                                   : AppFormatters.rupiah(acc.balance),
                               style: TextStyle(
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w800,
                                 fontSize: 13.5,
                                 color: textPrimary,
                               ),
                             ),
                             PopupMenuButton<String>(
+                              padding: EdgeInsets.zero,
+                              icon: Icon(
+                                Icons.more_vert_rounded,
+                                size: 20,
+                                color: textSecondary,
+                              ),
                               onSelected: (val) async {
                                 if (val == 'edit') {
                                   _showAccountFormSheet(
@@ -901,12 +935,12 @@ class ProfileAccountScreen extends ConsumerWidget {
                               itemBuilder: (_) => const [
                                 PopupMenuItem(
                                   value: 'edit',
-                                  child: Text('Ubah'),
+                                  child: Text('Ubah Akun'),
                                 ),
                                 PopupMenuItem(
                                   value: 'delete',
                                   child: Text(
-                                    'Hapus',
+                                    'Hapus Akun',
                                     style: TextStyle(color: AppColors.danger),
                                   ),
                                 ),
@@ -937,11 +971,11 @@ class ProfileAccountScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   if (budget == null)
                     Text(
-                      'Belum ada target budget. Ketuk "Atur" untuk menetapkan batas bulanan.',
-                      textAlign: TextAlign.justify,
+                      'Belum ada target budget. Ketuk "Atur" untuk menetapkan batas alokasi 50/30/20 bulanan Anda.',
                       style: TextStyle(
                         fontSize: 13,
                         color: textSecondary,
+                        height: 1.4,
                       ),
                     )
                   else ...[
@@ -988,6 +1022,136 @@ class ProfileAccountScreen extends ConsumerWidget {
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/financial-history'),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(
+                      Icons.forward_to_inbox_rounded,
+                      color: AppColors.success,
+                    ),
+                    title: Text(
+                      'Kirim e-Statement Bulanan ke Email',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Kirim laporan resmi berlogo SADAR Finance ke ${user?.email ?? "email Anda"}',
+                      style: TextStyle(fontSize: 12, color: textSecondary),
+                    ),
+                    trailing: const Icon(Icons.send_rounded, size: 18),
+                    onTap: () async {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Sedang menyiapkan & mengirim e-Statement resmi ke email Anda...',
+                          ),
+                        ),
+                      );
+                      try {
+                        final res = await ref
+                            .read(sadarApiServiceProvider)
+                            .sendMonthlyStatementEmail();
+                        if (!context.mounted) return;
+                        final period =
+                            (res['periodLabel'] ?? 'Bulan Ini').toString();
+                        final email =
+                            (res['email'] ?? user?.email ?? '').toString();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: AppColors.success,
+                            content: Text(
+                              'e-Statement Resmi ($period) berhasil dikirim ke $email!',
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: AppColors.danger,
+                            content: Text('Gagal mengirim e-Statement: $e'),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.picture_as_pdf_rounded,
+                      color: AppColors.purpleOf(context),
+                    ),
+                    title: Text(
+                      'Unduh / Bagikan Laporan e-Statement',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Simpan dokumen e-Statement resmi untuk dicetak sebagai PDF',
+                      style: TextStyle(fontSize: 12, color: textSecondary),
+                    ),
+                    trailing: const Icon(Icons.download_rounded, size: 19),
+                    onTap: () async {
+                      try {
+                        final res = await ref
+                            .read(sadarApiServiceProvider)
+                            .getMonthlyStatementPreview();
+                        final html = (res['html'] ?? '').toString();
+                        if (html.isEmpty) {
+                          throw Exception('Konten e-Statement kosong.');
+                        }
+                        final dir = await getTemporaryDirectory();
+                        final file = File(
+                          '${dir.path}/e-Statement-SADAR-Finance.html',
+                        );
+                        await file.writeAsString(html);
+                        await Share.shareXFiles(
+                          [XFile(file.path, mimeType: 'text/html')],
+                          subject: 'e-Statement Resmi SADAR Finance',
+                        );
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: AppColors.danger,
+                            content: Text('Gagal mengunduh e-Statement: $e'),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(
+                      Icons.system_update_rounded,
+                      color: AppColors.accent,
+                    ),
+                    title: Text(
+                      'Cek Pembaruan Aplikasi (V ${AppConfig.appVersion})',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Periksa rilis APK terbaru dari server resmi SADAR Finance',
+                      style: TextStyle(fontSize: 12, color: textSecondary),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () async {
+                      final result = await ref
+                          .read(appUpdateServiceProvider)
+                          .checkForUpdates();
+                      if (!context.mounted) return;
+                      await AppUpdateService.showUpdateDialog(context, result);
+                    },
                   ),
                   const Divider(),
                   ListTile(
@@ -1063,25 +1227,32 @@ class ProfileAccountScreen extends ConsumerWidget {
 }
 
 class _IdentityMetaItem extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
+  final Color? iconColor;
+  final Widget? customLeading;
   final String label;
   final String value;
+  final Color? valueColor;
 
   const _IdentityMetaItem({
-    required this.icon,
+    this.icon,
+    this.iconColor,
+    this.customLeading,
     required this.label,
     required this.value,
+    this.valueColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: AppColors.primaryOf(context),
-        ),
+        customLeading ??
+            Icon(
+              icon ?? Icons.info_outline_rounded,
+              size: 16,
+              color: iconColor ?? AppColors.primaryOf(context),
+            ),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -1089,12 +1260,15 @@ class _IdentityMetaItem extends StatelessWidget {
             children: [
               Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 10.5,
                   color: AppColors.textMutedOf(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 1),
               Text(
                 value,
                 maxLines: 1,
@@ -1102,7 +1276,7 @@ class _IdentityMetaItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimaryOf(context),
+                  color: valueColor ?? AppColors.textPrimaryOf(context),
                 ),
               ),
             ],
@@ -1138,22 +1312,24 @@ class _AchievementBadgeTile extends StatelessWidget {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 30,
+            height: 30,
+            margin: const EdgeInsets.only(top: 2),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: unlocked
                   ? AppColors.accent.withValues(alpha: 0.18)
                   : AppColors.borderOf(context).withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(9),
             ),
             child: Icon(
               unlocked
                   ? Icons.workspace_premium_rounded
                   : Icons.lock_outline_rounded,
-              size: 17,
+              size: 16,
               color: unlocked ? AppColors.accent : textMuted,
             ),
           ),
@@ -1161,6 +1337,7 @@ class _AchievementBadgeTile extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
                   children: [
@@ -1187,10 +1364,11 @@ class _AchievementBadgeTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   badge.subtitle,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 10.5,
+                    height: 1.25,
                     color: AppColors.textSecondaryOf(context),
                   ),
                 ),

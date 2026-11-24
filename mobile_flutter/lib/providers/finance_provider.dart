@@ -502,12 +502,50 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         _api.getAlerts().catchError((_) => state.alerts),
         _api.getScoreHistory().catchError((_) => state.scoreHistory),
         _api.getActiveBroadcasts().catchError((_) => state.broadcasts),
+        _api.getFinancialPlans().catchError((_) => const <String, dynamic>{}),
       ]);
 
       final now = DateTime.now();
       _historyPage = 1;
       final trxList = results[0] as List<TransactionModel>;
       final incList = results[1] as List<IncomeModel>;
+      final cloudPlans = results[7] as Map<String, dynamic>;
+
+      List<SavingsGoalModel> mergedGoals = state.savingsGoals;
+      List<RecurringItemModel> mergedRecurring = state.recurringItems;
+      List<DebtItemModel> mergedDebts = state.debts;
+      List<TransferLogModel> mergedTransfers = state.transfers;
+
+      final rawGoals = cloudPlans['savingsGoals'];
+      final rawRec = cloudPlans['recurringItems'];
+      final rawDebts = cloudPlans['debts'];
+      final rawTrf = cloudPlans['transfers'];
+
+      if (rawGoals is List && rawGoals.isNotEmpty) {
+        mergedGoals = rawGoals
+            .whereType<Map>()
+            .map((e) => SavingsGoalModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      if (rawRec is List && rawRec.isNotEmpty) {
+        mergedRecurring = rawRec
+            .whereType<Map>()
+            .map((e) => RecurringItemModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      if (rawDebts is List && rawDebts.isNotEmpty) {
+        mergedDebts = rawDebts
+            .whereType<Map>()
+            .map((e) => DebtItemModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      if (rawTrf is List && rawTrf.isNotEmpty) {
+        mergedTransfers = rawTrf
+            .whereType<Map>()
+            .map((e) => TransferLogModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+
       final remainingQueue = await _store.loadQueue(uid);
       state = state.copyWith(
         isLoading: false,
@@ -520,6 +558,10 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         accounts: accounts,
         transactions: trxList,
         incomes: incList,
+        savingsGoals: mergedGoals,
+        recurringItems: mergedRecurring,
+        debts: mergedDebts,
+        transfers: mergedTransfers,
         budget: results[2] as BudgetModel?,
         insights: results[3] as List<InsightModel>,
         alerts: _deduplicateAlerts(results[4] as List<AlertModel>),
@@ -528,6 +570,19 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         clearError: true,
       );
       await _persistState(syncedAt: now);
+
+      // If local device had plans that were not yet in cloud, push them up
+      final cloudEmpty = (rawGoals is! List || rawGoals.isEmpty) &&
+          (rawRec is! List || rawRec.isEmpty) &&
+          (rawDebts is! List || rawDebts.isEmpty) &&
+          (rawTrf is! List || rawTrf.isEmpty);
+      if (cloudEmpty &&
+          (mergedGoals.isNotEmpty ||
+              mergedRecurring.isNotEmpty ||
+              mergedDebts.isNotEmpty ||
+              mergedTransfers.isNotEmpty)) {
+        unawaited(_syncPlansToCloud());
+      }
 
       // Load AI analytics in parallel without blocking primary UI
       await Future.wait([
@@ -1477,6 +1532,18 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     await _persistState();
   }
 
+  Future<void> _syncPlansToCloud() async {
+    if (state.isOffline) return;
+    try {
+      await _api.saveFinancialPlans(
+        savingsGoals: state.savingsGoals.map((g) => g.toJson()).toList(),
+        recurringItems: state.recurringItems.map((r) => r.toJson()).toList(),
+        debts: state.debts.map((d) => d.toJson()).toList(),
+        transfers: state.transfers.map((t) => t.toJson()).toList(),
+      );
+    } catch (_) {}
+  }
+
   // ── SAVINGS GOALS (TARGET TABUNGAN) ────────────────────────
 
   Future<void> addSavingsGoal({
@@ -1497,6 +1564,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     );
     state = state.copyWith(savingsGoals: [goal, ...state.savingsGoals]);
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   Future<void> contributeToSavingsGoal({
@@ -1525,6 +1593,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     }).toList();
     state = state.copyWith(savingsGoals: updated);
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   Future<void> deleteSavingsGoal(String goalId) async {
@@ -1532,6 +1601,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       savingsGoals: state.savingsGoals.where((g) => g.id != goalId).toList(),
     );
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   // ── RECURRING BILLS & SALARY (TAGIHAN & GAJI RUTIN) ────────
@@ -1556,6 +1626,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     );
     state = state.copyWith(recurringItems: [item, ...state.recurringItems]);
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   Future<bool> executeRecurringItem(String id) async {
@@ -1592,6 +1663,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     }).toList();
     state = state.copyWith(recurringItems: updated);
     await _persistState();
+    await _syncPlansToCloud();
     return syncedOnline;
   }
 
@@ -1600,6 +1672,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       recurringItems: state.recurringItems.where((r) => r.id != id).toList(),
     );
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   Future<void> deleteTransferLog(String id) async {
@@ -1607,6 +1680,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       transfers: state.transfers.where((t) => t.id != id).toList(),
     );
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   // ── DEBTS & SPLIT BILL (UTANG / PIUTANG & PATUNGAN) ────────
@@ -1631,6 +1705,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     );
     state = state.copyWith(debts: [item, ...state.debts]);
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   Future<void> settleDebtItem(String id, {String? accountId}) async {
@@ -1665,6 +1740,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     }).toList();
     state = state.copyWith(debts: updated);
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   Future<void> deleteDebtItem(String id) async {
@@ -1672,6 +1748,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
       debts: state.debts.where((d) => d.id != id).toList(),
     );
     await _persistState();
+    await _syncPlansToCloud();
   }
 
   // ── E-WALLET & BANK NOTIFICATION AUTO-SYNC ─────────────────

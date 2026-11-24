@@ -8,6 +8,7 @@ import '../../../data/models/account_model.dart';
 import '../../../data/models/financial_plan_models.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
+import '../../widgets/account_selector_field.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/sadar_card.dart';
 
@@ -229,24 +230,10 @@ class _FinancialPlansScreenState extends ConsumerState<FinancialPlansScreen>
                         setModalState(() => deductFromAccount = v),
                   ),
                   if (deductFromAccount)
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedAccountId,
-                      decoration: const InputDecoration(
-                        labelText: 'Pilih Rekening Sumber',
-                        prefixIcon:
-                            Icon(Icons.account_balance_wallet_outlined),
-                      ),
-                      items: accounts
-                          .map(
-                            (a) => DropdownMenuItem<String>(
-                              value: a.id,
-                              child: Text(
-                                '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                    AccountSelectorField(
+                      label: 'Pilih Rekening Sumber',
+                      selectedAccountId: selectedAccountId,
+                      accounts: accounts,
                       onChanged: (v) =>
                           setModalState(() => selectedAccountId = v),
                     ),
@@ -412,20 +399,10 @@ class _FinancialPlansScreenState extends ConsumerState<FinancialPlansScreen>
                 ],
                 if (accounts.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: accountId,
-                    decoration: const InputDecoration(
-                      labelText: 'Akun Default',
-                      prefixIcon: Icon(Icons.account_balance_wallet_outlined),
-                    ),
-                    items: accounts
-                        .map(
-                          (a) => DropdownMenuItem<String>(
-                            value: a.id,
-                            child: Text(a.name, overflow: TextOverflow.ellipsis),
-                          ),
-                        )
-                        .toList(),
+                  AccountSelectorField(
+                    label: 'Akun Default',
+                    selectedAccountId: accountId,
+                    accounts: accounts,
                     onChanged: (v) => setModalState(() => accountId = v),
                   ),
                 ],

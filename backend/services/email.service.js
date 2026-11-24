@@ -195,6 +195,263 @@ class EmailService {
     return { sent: false, provider: 'sandbox' };
   }
 
+  buildFinancialStatementHtml({
+    user,
+    periodLabel,
+    totalBalance,
+    totalIncome,
+    totalExpense,
+    netCashflow,
+    healthScore,
+    accounts = [],
+    budget,
+    transactions = [],
+    incomes = [],
+    savingsGoals = [],
+    debts = [],
+  }) {
+    const fmtRp = (v) =>
+      `Rp ${Math.round(Number(v || 0)).toLocaleString('id-ID')}`;
+    const logoUrl =
+      process.env.APP_EMAIL_LOGO_URL ||
+      'https://sadar-finance.web.id/api/v1/app/logo-light.png';
+    const greetingName = (
+      user?.middle_name ||
+      user?.middleName ||
+      user?.first_name ||
+      user?.firstName ||
+      'Pengguna SADAR Finance'
+    ).trim();
+    const fullName = [
+      user?.first_name || user?.firstName,
+      user?.middle_name || user?.middleName,
+      user?.last_name || user?.lastName,
+    ]
+      .filter((p) => p && String(p).toLowerCase() !== 'user')
+      .join(' ') || greetingName;
+    const nowWib = new Intl.DateTimeFormat('id-ID', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+      timeZone: 'Asia/Jakarta',
+    }).format(new Date());
+
+    const scoreVal = Number(healthScore?.overallScore ?? 0);
+    const scoreStatus = healthScore?.status || 'Cukup Sehat';
+    const needsPct = ((Number(healthScore?.needsRatio || 0)) * 100).toFixed(1);
+    const wantsPct = ((Number(healthScore?.wantsRatio || 0)) * 100).toFixed(1);
+    const savingsPct = ((Number(healthScore?.savingsRatio || 0)) * 100).toFixed(1);
+
+    const accountRowsHtml =
+      accounts.length === 0
+        ? `<tr><td colspan="3" style="padding:10px 12px;color:#64748b;text-align:center;">Belum ada akun tercatat</td></tr>`
+        : accounts
+            .map(
+              (acc) => `<tr>
+                <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#0f172a;">${acc.account_name || acc.name || 'Akun'}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;">${acc.account_number || acc.accountNumber || '-'}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#0f172a;text-align:right;">${fmtRp(acc.balance)}</td>
+              </tr>`
+            )
+            .join('');
+
+    const combinedMutations = [
+      ...incomes.map((i) => ({
+        date: String(i.income_date || i.incomeDate || '').slice(0, 10),
+        desc: i.source || 'Pemasukan',
+        cat: 'Pemasukan',
+        amount: Number(i.amount || 0),
+        isIncome: true,
+      })),
+      ...transactions.map((t) => ({
+        date: String(t.transaction_date || t.transactionDate || '').slice(0, 10),
+        desc: t.description || 'Pengeluaran',
+        cat: t.category_group || t.categoryGroup || 'Needs',
+        amount: Number(t.amount || 0),
+        isIncome: false,
+      })),
+    ]
+      .sort((a, b) => String(b.date).localeCompare(String(a.date)))
+      .slice(0, 20);
+
+    const mutationRowsHtml =
+      combinedMutations.length === 0
+        ? `<tr><td colspan="4" style="padding:12px;color:#64748b;text-align:center;">Belum ada mutasi transaksi pada periode ini</td></tr>`
+        : combinedMutations
+            .map(
+              (m) => `<tr>
+                <td style="padding:9px 10px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:12px;">${m.date}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid #e2e8f0;color:#0f172a;font-weight:600;font-size:12.5px;">${m.desc}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid #e2e8f0;color:#475569;font-size:12px;">${m.cat}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid #e2e8f0;font-weight:700;font-size:12.5px;text-align:right;color:${m.isIncome ? '#16a34a' : '#dc2626'};">${m.isIncome ? '+' : '-'}${fmtRp(m.amount)}</td>
+              </tr>`
+            )
+            .join('');
+
+    return `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>e-Statement Resmi ${periodLabel} - SADAR Finance</title>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #ffffff !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a;">
+  <div class="no-print" style="max-width:680px;margin:18px auto 0 auto;padding:0 16px;text-align:right;">
+    <button onclick="window.print()" style="background-color:#0a1e36;color:#ffffff;border:none;border-radius:8px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;">
+      Cetak / Simpan sebagai PDF
+    </button>
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:24px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #cbd5e1;box-shadow:0 10px 25px rgba(15,23,42,0.06);">
+          <!-- Official Brand Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0a1e36 0%,#102a4c 55%,#1e3a8a 100%);background-color:#0a1e36;padding:26px 32px;border-bottom:3px solid #14b8a6;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="left" valign="middle">
+                    <img src="${logoUrl}" alt="SADAR Finance" height="28" style="display:block;height:28px;border:0;color:#ffffff;font-size:20px;font-weight:900;" />
+                    <div style="margin-top:6px;font-size:11px;font-weight:600;letter-spacing:1.2px;color:#94a3b8;text-transform:uppercase;">
+                      Official Financial e-Statement - ${periodLabel}
+                    </div>
+                  </td>
+                  <td align="right" valign="middle">
+                    <span style="display:inline-block;padding:6px 12px;background-color:rgba(20,184,166,0.16);border:1px solid rgba(94,234,212,0.35);border-radius:999px;font-size:11px;font-weight:700;color:#5eead4;">
+                      E-STATEMENT RESMI
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:30px 32px;">
+              <h1 style="margin:0 0 8px 0;font-size:19px;font-weight:800;color:#0f172a;">
+                Yth. ${greetingName},
+              </h1>
+              <p style="margin:0 0 20px 0;font-size:13.5px;line-height:1.65;color:#334155;text-align:justify;">
+                Berikut adalah Laporan Ringkasan Keuangan Resmi (<em>e-Statement</em>) akun SADAR Finance atas nama <strong>${fullName}</strong> (${user?.email || '-'}) untuk periode <strong>${periodLabel}</strong> yang diterbitkan pada ${nowWib} WIB.
+              </p>
+
+              <!-- Summary Metrics Grid -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;margin-bottom:22px;">
+                <tr>
+                  <td style="padding:16px;border-right:1px solid #e2e8f0;width:33%;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Total Saldo Aktif</div>
+                    <div style="font-size:16px;font-weight:800;color:#0a1e36;margin-top:4px;">${fmtRp(totalBalance)}</div>
+                  </td>
+                  <td style="padding:16px;border-right:1px solid #e2e8f0;width:33%;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Pemasukan Bulan Ini</div>
+                    <div style="font-size:16px;font-weight:800;color:#16a34a;margin-top:4px;">${fmtRp(totalIncome)}</div>
+                  </td>
+                  <td style="padding:16px;width:34%;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Pengeluaran Bulan Ini</div>
+                    <div style="font-size:16px;font-weight:800;color:#dc2626;margin-top:4px;">${fmtRp(totalExpense)}</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 50/30/20 & Health Score -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:22px;font-size:13px;">
+                <tr>
+                  <td style="padding:10px 12px;background-color:#0a1e36;color:#ffffff;font-weight:700;border-radius:8px 0 0 0;">Indikator Kesehatan &amp; Alokasi 50/30/20</td>
+                  <td style="padding:10px 12px;background-color:#0a1e36;color:#ffffff;font-weight:700;text-align:right;border-radius:0 8px 0 0;">Nilai Evaluasi</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#475569;">Skor Kesehatan Finansial</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:800;color:#0f172a;text-align:right;">${scoreVal} / 100 (${scoreStatus})</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#475569;">Arus Kas Bersih (Net Cashflow)</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:${netCashflow >= 0 ? '#16a34a' : '#dc2626'};text-align:right;">${fmtRp(netCashflow)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#475569;">Rasio 50/30/20 (Kebutuhan / Keinginan / Tabungan)</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#0f172a;text-align:right;">${needsPct}% / ${wantsPct}% / ${savingsPct}%</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#475569;">Target Tabungan &amp; Catatan Piutang Aktif</td>
+                  <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#0f172a;text-align:right;">${savingsGoals.length} Target Tabungan - ${debts.filter((d) => !d.isSettled).length} Piutang/Utang</td>
+                </tr>
+              </table>
+
+              <!-- Accounts Table -->
+              <div style="font-size:13px;font-weight:800;color:#0a1e36;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">
+                Daftar Rekening &amp; Dompet Aktif
+              </div>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:22px;font-size:13px;border:1px solid #e2e8f0;">
+                <tr style="background-color:#f8fafc;">
+                  <th align="left" style="padding:9px 12px;border-bottom:1px solid #cbd5e1;color:#475569;">Nama Akun</th>
+                  <th align="left" style="padding:9px 12px;border-bottom:1px solid #cbd5e1;color:#475569;">No. Rekening / ID</th>
+                  <th align="right" style="padding:9px 12px;border-bottom:1px solid #cbd5e1;color:#475569;">Saldo</th>
+                </tr>
+                ${accountRowsHtml}
+              </table>
+
+              <!-- Recent Mutations Table -->
+              <div style="font-size:13px;font-weight:800;color:#0a1e36;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">
+                20 Mutasi Keuangan Terbaru
+              </div>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:18px;border:1px solid #e2e8f0;">
+                <tr style="background-color:#f8fafc;font-size:12px;">
+                  <th align="left" style="padding:9px 10px;border-bottom:1px solid #cbd5e1;color:#475569;">Tanggal</th>
+                  <th align="left" style="padding:9px 10px;border-bottom:1px solid #cbd5e1;color:#475569;">Deskripsi</th>
+                  <th align="left" style="padding:9px 10px;border-bottom:1px solid #cbd5e1;color:#475569;">Kategori</th>
+                  <th align="right" style="padding:9px 10px;border-bottom:1px solid #cbd5e1;color:#475569;">Nominal</th>
+                </tr>
+                ${mutationRowsHtml}
+              </table>
+            </td>
+          </tr>
+
+          <!-- Official Footer -->
+          <tr>
+            <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 32px;text-align:center;">
+              <div style="font-size:12.5px;font-weight:700;color:#0f172a;margin-bottom:4px;">
+                SADAR Finance - Official Monthly Financial e-Statement
+              </div>
+              <div style="font-size:11.5px;color:#64748b;line-height:1.5;">
+                Dokumen ini diterbitkan secara elektronik oleh sistem resmi SADAR Finance (<a href="https://sadar-finance.web.id" style="color:#1e3a8a;text-decoration:none;font-weight:600;">https://sadar-finance.web.id</a>).
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+  }
+
+  async sendFinancialStatementEmail({ toEmail, name, periodLabel, html }) {
+    const subject = `[SADAR Finance] Laporan e-Statement Keuangan Resmi - ${periodLabel}`;
+    try {
+      if (this.isBrevoConfigured) {
+        await this._sendViaBrevo({ toEmail, name, subject, html });
+        return { sent: true, provider: 'brevo' };
+      }
+      if (this.isResendConfigured) {
+        await this._sendViaResend({ toEmail, subject, html });
+        return { sent: true, provider: 'resend' };
+      }
+      if (this.isSmtpConfigured) {
+        await this._sendViaSmtps({ toEmail, subject, html });
+        return { sent: true, provider: 'smtp' };
+      }
+    } catch (err) {
+      console.error('[EmailService] e-Statement delivery error:', err.message);
+      return { sent: false, provider: 'sandbox-fallback', error: err.message };
+    }
+    return { sent: false, provider: 'sandbox' };
+  }
+
   async _sendViaBrevo({ toEmail, name, subject, html }) {
     const senderEmail = process.env.SMTP_FROM || 'noreply@sadar-finance.web.id';
     const res = await fetch('https://api.brevo.com/v3/smtp/email', {

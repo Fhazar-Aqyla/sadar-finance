@@ -1,4 +1,4 @@
-﻿import axios from "axios";
+import axios from "axios";
 import { api } from "../../config";
 import {
   accounts as mockAccounts,
@@ -255,6 +255,20 @@ export const authApi = {
     isSadarMockDataScenario
       ? Promise.resolve({ message: "Account deleted (Mock)" })
       : apiClient.delete("/auth/me", { data: { password } }).then(unwrapData),
+  leaderboard: () =>
+    isSadarMockDataScenario
+      ? Promise.resolve({ leaderboard: [] })
+      : apiClient.get("/auth/leaderboard").then(unwrapData),
+};
+
+export const appApi = {
+  broadcasts: () => apiClient.get("/app/broadcasts").then(unwrapData),
+  version: () => apiClient.get("/app/version").then(unwrapData),
+};
+
+export const plansApi = {
+  get: () => apiClient.get("/plans").then(unwrapData),
+  save: (payload) => apiClient.put("/plans", payload).then(unwrapData),
 };
 
 export const accountApi = {
@@ -293,6 +307,8 @@ export const analyticsApi = {
   latestBudget: () => isSadarMockDataScenario ? mockApi.analytics.latestBudget() : apiClient.get("/analytics/budget").then(unwrapData),
   insights: (params = {}) => isSadarMockDataScenario ? mockApi.analytics.insights(params) : apiClient.get("/analytics/insights", { params }).then(unwrapData),
   alerts: (params = {}) => isSadarMockDataScenario ? mockApi.analytics.alerts(params) : apiClient.get("/analytics/alerts", { params }).then(unwrapData),
+  sendStatementEmail: () => apiClient.post("/analytics/statement/email").then(unwrapData),
+  previewStatement: () => apiClient.get("/analytics/statement/preview").then(unwrapData),
 };
 
 export const ocrApi = {

@@ -8,6 +8,7 @@ import '../../../data/models/account_model.dart';
 import '../../../data/models/financial_plan_models.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
+import '../../widgets/account_selector_field.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/sadar_card.dart';
 
@@ -213,20 +214,10 @@ class _DebtSplitScreenState extends ConsumerState<DebtSplitScreen>
                   onChanged: (v) => setModalState(() => adjustBalance = v),
                 ),
                 if (adjustBalance)
-                  DropdownButtonFormField<String>(
-                    initialValue: accountId,
-                    decoration: const InputDecoration(
-                      labelText: 'Pilih Akun',
-                      prefixIcon: Icon(Icons.account_balance_wallet_outlined),
-                    ),
-                    items: accounts
-                        .map(
-                          (a) => DropdownMenuItem<String>(
-                            value: a.id,
-                            child: Text(a.name),
-                          ),
-                        )
-                        .toList(),
+                  AccountSelectorField(
+                    label: 'Pilih Akun',
+                    selectedAccountId: accountId,
+                    accounts: accounts,
                     onChanged: (v) => setModalState(() => accountId = v),
                   ),
               ],

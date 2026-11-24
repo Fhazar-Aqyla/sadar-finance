@@ -52,21 +52,39 @@ router.get('/banners/:filename', (req, res) => {
 });
 
 router.get('/version', (_req, res) => {
-  const latestVersion = process.env.APP_LATEST_VERSION || '1.2.0';
-  const buildNumber = Number(process.env.APP_BUILD_NUMBER || 6);
-  const minVersion = process.env.APP_MIN_VERSION || '1.0.0';
-  const forceUpdate = String(process.env.APP_FORCE_UPDATE || 'false').toLowerCase() === 'true';
+  let fileConfig = {};
+  try {
+    const versionFile = path.join(__dirname, '../config/app-version.json');
+    if (fs.existsSync(versionFile)) {
+      fileConfig = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
+    }
+  } catch (_) {}
+
+  const latestVersion =
+    process.env.APP_LATEST_VERSION || fileConfig.latestVersion || '1.2.1';
+  const buildNumber = Number(
+    process.env.APP_BUILD_NUMBER || fileConfig.buildNumber || 7
+  );
+  const minVersion =
+    process.env.APP_MIN_VERSION || fileConfig.minVersion || '1.0.0';
+  const forceUpdate =
+    String(
+      process.env.APP_FORCE_UPDATE || fileConfig.forceUpdate || 'false'
+    ).toLowerCase() === 'true';
   const downloadUrl =
     process.env.APP_DOWNLOAD_URL ||
+    fileConfig.downloadUrl ||
     `https://sadar-finance.web.id/downloads/sadar-finance-v${latestVersion}.apk`;
   const rawNotes = process.env.APP_RELEASE_NOTES || '';
   const releaseNotes = rawNotes
     ? rawNotes.split('|').map((s) => s.trim()).filter(Boolean)
-    : [
-        'Katalog 16 Karakter Avatar 2D Eksklusif & Gamifikasi (Level 1-5, Streak Harian 🔥 & Lencana)',
-        'Masuk/Tautkan Akun Google (Firebase Auth) & Verifikasi Email Kode OTP 6 Digit (Resend)',
-        'Catatan Piutang Teman, Kalkulator Patungan (Split Bill) + Pengingat WA & Simulasi Dana Darurat',
-      ];
+    : Array.isArray(fileConfig.releaseNotes) && fileConfig.releaseNotes.length > 0
+      ? fileConfig.releaseNotes
+      : [
+          'Sinkronisasi Cloud Penuh untuk Target Tabungan, Tagihan Rutin, Utang/Piutang & Riwayat Transfer',
+          'Laporan e-Statement Bulanan Resmi (Kirim ke Email & Cetak PDF)',
+          'Integrasi Hybrid Hugging Face AI + Groq AI (OCR Struk, Klasifikasi 50/30/20 & Insight Perilaku)',
+        ];
 
   const broadcasts = loadActiveBroadcasts();
 
@@ -74,7 +92,7 @@ router.get('/version', (_req, res) => {
     message: 'App version info',
     data: {
       latestVersion,
-      buildNumber: Number.isFinite(buildNumber) ? buildNumber : 1,
+      buildNumber: Number.isFinite(buildNumber) ? buildNumber : 7,
       minVersion,
       forceUpdate,
       otaChannel: 'stable',

@@ -7,6 +7,7 @@ import '../../../core/constants/category_helpers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/transaction_model.dart';
+import '../../../data/services/app_update_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
 import '../../../providers/ui_preferences_provider.dart';
@@ -65,8 +66,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Future<void> _maybeCheckSilentOta() async {
     if (_otaChecked) return;
     _otaChecked = true;
-    final ready =
-        await ref.read(appUpdateServiceProvider).checkSilentOtaOnLaunch();
+    final updateSvc = ref.read(appUpdateServiceProvider);
+    final ready = await updateSvc.checkSilentOtaOnLaunch();
     if (ready && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -76,6 +77,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       );
+      return;
+    }
+
+    // Check backend /api/v1/app/version for new native APK releases
+    final check = await updateSvc.checkForUpdates();
+    if (check.outcome == UpdateCheckOutcome.nativeUpdateAvailable && mounted) {
+      await AppUpdateService.showUpdateDialog(context, check);
     }
   }
 

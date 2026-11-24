@@ -71,8 +71,31 @@ const getLatestScore = asyncHandler(async (req, res) => {
   return success(res, { data, message: 'Latest score retrieved' });
 });
 
+const sendMonthlyStatementEmail = asyncHandler(async (req, res) => {
+  const data = await analyticsService.generateMonthlyStatement(req.user.id, {
+    sendEmail: true,
+  });
+  return success(res, {
+    data,
+    message: data.sent
+      ? `Laporan e-Statement ${data.periodLabel} berhasil dikirim ke ${data.email}`
+      : `Laporan e-Statement ${data.periodLabel} berhasil dibuat`,
+  });
+});
+
+const previewMonthlyStatement = asyncHandler(async (req, res) => {
+  const data = await analyticsService.generateMonthlyStatement(req.user.id, {
+    sendEmail: false,
+  });
+  return success(res, {
+    data,
+    message: 'Monthly e-Statement generated',
+  });
+});
+
 module.exports = {
   categorize, analyzeBehavior, predictBehavior, predictOverspending, calculateHealthScore,
   createBudget, getLatestBudget,
   getInsights, getAlerts, getScoreHistory, getLatestScore,
+  sendMonthlyStatementEmail, previewMonthlyStatement,
 };

@@ -11,6 +11,7 @@ const ocrRoutes = require('./ocr.routes');
 const analyticsRoutes = require('./analytics.routes');
 const categoryRoutes = require('./category.routes');
 const appRoutes = require('./app.routes');
+const plansRoutes = require('./plans.routes');
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/ocr', ocrRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/app', appRoutes);
+router.use('/plans', plansRoutes);
 
 module.exports = router;

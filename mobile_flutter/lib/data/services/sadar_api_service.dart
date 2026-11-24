@@ -268,6 +268,51 @@ class SadarApiService {
         .toList();
   }
 
+  Future<Map<String, dynamic>> getFinancialPlans() async {
+    final data = await _client.get('/plans');
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return const {};
+  }
+
+  Future<Map<String, dynamic>> saveFinancialPlans({
+    required List<Map<String, dynamic>> savingsGoals,
+    required List<Map<String, dynamic>> recurringItems,
+    required List<Map<String, dynamic>> debts,
+    required List<Map<String, dynamic>> transfers,
+  }) async {
+    final data = await _client.put(
+      '/plans',
+      data: {
+        'savingsGoals': savingsGoals,
+        'recurringItems': recurringItems,
+        'debts': debts,
+        'transfers': transfers,
+      },
+    );
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return const {};
+  }
+
+  Future<Map<String, dynamic>> sendMonthlyStatementEmail() async {
+    final data = await _client.post('/analytics/statement/email');
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return const {};
+  }
+
+  Future<Map<String, dynamic>> getMonthlyStatementPreview() async {
+    final data = await _client.get('/analytics/statement/preview');
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return const {};
+  }
+
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,

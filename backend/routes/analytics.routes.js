@@ -40,4 +40,8 @@ router.get('/budget', c.getLatestBudget);
 router.get('/insights', c.getInsights);
 router.get('/alerts', c.getAlerts);
 
+// Monthly Official e-Statement (HTML/PDF Printable & Email Delivery)
+router.get('/statement/preview', c.previewMonthlyStatement);
+router.post('/statement/email', c.sendMonthlyStatementEmail);
+
 module.exports = router;

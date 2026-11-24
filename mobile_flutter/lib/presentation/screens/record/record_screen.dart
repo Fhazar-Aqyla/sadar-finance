@@ -7,9 +7,11 @@ import '../../../core/constants/category_helpers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_input_formatter.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../data/models/account_model.dart';
 import '../../../data/models/ocr_scan_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/finance_provider.dart';
+import '../../widgets/account_selector_field.dart';
 import '../../widgets/sadar_card.dart';
 
 class RecordScreen extends ConsumerStatefulWidget {
@@ -608,25 +610,16 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                   ),
                   const SizedBox(height: 14),
                   if (accounts.isNotEmpty) ...[
-                    DropdownButtonFormField<String>(
-                      initialValue: accounts.any((a) => a.id == _expAccountId)
-                          ? _expAccountId
-                          : accounts.first.id,
-                      decoration: const InputDecoration(
-                        labelText: 'Pilih Akun Sumber Dana',
-                        prefixIcon: Icon(Icons.account_balance_wallet_outlined),
-                      ),
-                      items: accounts
-                          .map<DropdownMenuItem<String>>(
-                            (a) => DropdownMenuItem<String>(
-                              value: a.id,
-                              child: Text(
-                                '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                    AccountSelectorField(
+                      label: 'Pilih Akun Sumber Dana',
+                      selectedAccountId:
+                          accounts.any((a) => a.id == _expAccountId)
+                              ? _expAccountId
+                              : accounts.first.id,
+                      accounts: accounts.cast<AccountModel>(),
+                      leadingIcon: Icons.account_balance_wallet_rounded,
+                      helperText:
+                          'Saldo akun yang dipilih akan otomatis berkurang sesuai nominal pengeluaran',
                       onChanged: (v) => setState(() => _expAccountId = v),
                     ),
                     const SizedBox(height: 14),
@@ -866,25 +859,15 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
               ),
               const SizedBox(height: 16),
               if (accounts.isNotEmpty) ...[
-                DropdownButtonFormField<String>(
-                  initialValue: accounts.any((a) => a.id == _incAccountId)
+                AccountSelectorField(
+                  label: 'Pilih Akun Tujuan Dana',
+                  selectedAccountId: accounts.any((a) => a.id == _incAccountId)
                       ? _incAccountId
                       : accounts.first.id,
-                  decoration: const InputDecoration(
-                    labelText: 'Akun Tujuan Dana',
-                    prefixIcon: Icon(Icons.account_balance_outlined),
-                  ),
-                  items: accounts
-                      .map<DropdownMenuItem<String>>(
-                        (a) => DropdownMenuItem<String>(
-                          value: a.id,
-                          child: Text(
-                            '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
+                  accounts: accounts.cast<AccountModel>(),
+                  leadingIcon: Icons.account_balance_rounded,
+                  helperText:
+                      'Pemasukan akan otomatis menambah saldo akun tujuan ini',
                   onChanged: (v) => setState(() => _incAccountId = v),
                 ),
                 const SizedBox(height: 14),
@@ -1050,26 +1033,15 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                initialValue: validFrom,
-                decoration: const InputDecoration(
-                  labelText: 'Dari Akun (Sumber)',
-                  prefixIcon: Icon(Icons.call_made_rounded),
-                ),
-                items: accounts
-                    .map<DropdownMenuItem<String>>(
-                      (a) => DropdownMenuItem<String>(
-                        value: a.id,
-                        child: Text(
-                          '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    )
-                    .toList(),
+              AccountSelectorField(
+                label: 'Dari Akun (Sumber Dana)',
+                selectedAccountId: validFrom,
+                accounts: accounts.cast<AccountModel>(),
+                leadingIcon: Icons.call_made_rounded,
+                helperText: 'Pilih akun asal yang saldonya akan dipindahkan',
                 onChanged: (v) => setState(() => _trfFromAccountId = v),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Center(
                 child: TextButton.icon(
                   onPressed: () {
@@ -1083,24 +1055,13 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                   label: const Text('Tukar Arah Akun'),
                 ),
               ),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<String>(
-                initialValue: validTo,
-                decoration: const InputDecoration(
-                  labelText: 'Ke Akun (Tujuan)',
-                  prefixIcon: Icon(Icons.call_received_rounded),
-                ),
-                items: accounts
-                    .map<DropdownMenuItem<String>>(
-                      (a) => DropdownMenuItem<String>(
-                        value: a.id,
-                        child: Text(
-                          '${a.name} (${AppFormatters.compactRupiah(a.balance)})',
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    )
-                    .toList(),
+              const SizedBox(height: 4),
+              AccountSelectorField(
+                label: 'Ke Akun (Tujuan Dana)',
+                selectedAccountId: validTo,
+                accounts: accounts.cast<AccountModel>(),
+                leadingIcon: Icons.call_received_rounded,
+                helperText: 'Pilih akun tujuan penerima transfer saldo',
                 onChanged: (v) => setState(() => _trfToAccountId = v),
               ),
               const SizedBox(height: 14),

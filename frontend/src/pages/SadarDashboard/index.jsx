@@ -20,7 +20,7 @@ import {
 } from "reactstrap";
 import { useDispatch } from "react-redux";
 import { profileSuccess } from "../../slices/auth/profile/reducer";
-import { accountApi, analyticsApi, authApi, incomeApi, transactionApi } from "../../Components/services/api";
+import { accountApi, analyticsApi, appApi, authApi, incomeApi, transactionApi } from "../../Components/services/api";
 
 import "./sadar-dashboard.css";
 import "../SadarShared/sadar-pages.css";
@@ -257,13 +257,22 @@ const getStoredProfile = () => {
   try {
     const authUser = getStoredAuthUser();
     const user = authUser?.user || authUser?.data || authUser || {};
-    const name = user?.first_name || user?.username || user?.name || user?.email || "SADAR";
+    const name =
+      user?.middle_name ||
+      user?.middleName ||
+      user?.first_name ||
+      user?.firstName ||
+      user?.username ||
+      user?.name ||
+      user?.email ||
+      "SADAR";
 
     return {
       name: String(name || "SADAR").trim(),
+      username: user?.username || "",
     };
   } catch {
-    return { name: "SADAR" };
+    return { name: "SADAR", username: "" };
   }
 };
 
@@ -1005,7 +1014,11 @@ const DashboardWithData = () => {
     budgets: [],
     profile: getStoredProfile(),
     healthScore: null,
+    broadcasts: [],
+    leaderboard: [],
   });
+  const [sendingStatement, setSendingStatement] = useState(false);
+  const [statementMessage, setStatementMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const displayProfile = apiRows.profile;
@@ -1015,13 +1028,15 @@ const DashboardWithData = () => {
 
     const loadDashboard = async () => {
       try {
-        const [profileResponse, accountRows, incomeRows, transactionRows, budgetResponse, healthScoreResponse] = await Promise.all([
+        const [profileResponse, accountRows, incomeRows, transactionRows, budgetResponse, healthScoreResponse, broadcastsRes, leaderboardRes] = await Promise.all([
           authApi.me(),
           accountApi.list(),
           incomeApi.list({ limit: 100 }),
           transactionApi.list({ limit: 100 }),
           analyticsApi.latestBudget().catch(() => null),
           analyticsApi.healthScore({ period: "all", periodMonths: 24 }).catch(() => null),
+          appApi.broadcasts().catch(() => ({ broadcasts: [] })),
+          authApi.leaderboard().catch(() => ({ leaderboard: [] })),
         ]);
 
         if (!isMounted) return;
@@ -1030,8 +1045,10 @@ const DashboardWithData = () => {
         dispatch(profileSuccess({ data: profileResponse, status: "success" }));
 
         const firstName = profileResponse?.first_name || profileResponse?.firstName || "";
+        const middleName = profileResponse?.middle_name || profileResponse?.middleName || "";
         const lastName = profileResponse?.last_name || profileResponse?.lastName || "";
         const cleanLastName = (lastName === "User" || lastName === "user") ? "" : lastName;
+        const nickname = middleName.trim() || firstName.trim() || `${firstName} ${cleanLastName}`.trim();
         const normalizedTransactions = (transactionRows || []).map(normalizeTransaction);
         setApiRows({
           accounts: (accountRows || []).map(normalizeAccount),
@@ -1039,9 +1056,12 @@ const DashboardWithData = () => {
           transactions: normalizedTransactions,
           budgets: buildBudgetRows(budgetResponse, normalizedTransactions),
           profile: {
-            name: `${firstName} ${cleanLastName}`.trim() || profileResponse?.email || getStoredProfile().name,
+            name: nickname || profileResponse?.email || getStoredProfile().name,
+            username: profileResponse?.username || "",
           },
           healthScore: healthScoreResponse || null,
+          broadcasts: Array.isArray(broadcastsRes?.broadcasts) ? broadcastsRes.broadcasts : [],
+          leaderboard: Array.isArray(leaderboardRes?.leaderboard) ? leaderboardRes.leaderboard : [],
         });
         setLoadError("");
       } catch {
@@ -1326,6 +1346,78 @@ const DashboardWithData = () => {
   return (
     <div className="page-content sadar-dashboard">
       <Container fluid>
+        {apiRows.broadcasts && apiRows.broadcasts.length > 0 && (
+          <div className="mb-3">
+            {apiRows.broadcasts.map((b) => (
+              <Card
+                key={b.id || b.title}
+                className="border-0 shadow-sm mb-2"
+                style={{
+                  borderRadius: "16px",
+                  background: "linear-gradient(135deg, #0a1e36 0%, #102a4c 60%, #1e3a8a 100%)",
+                  color: "#ffffff",
+                }}
+              >
+                <CardBody className="p-3 p-md-4">
+                  <Row className="align-items-center g-3">
+                    {b.imageUrl && (
+                      <Col md={4} lg={3}>
+                        <img
+                          src={b.imageUrl}
+                          alt={b.title}
+                          style={{
+                            width: "100%",
+                            height: "120px",
+                            objectFit: "cover",
+                            borderRadius: "12px",
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      </Col>
+                    )}
+                    <Col md={b.imageUrl ? 8 : 12} lg={b.imageUrl ? 9 : 12}>
+                      <span
+                        className="badge mb-2"
+                        style={{
+                          backgroundColor: "rgba(20,184,166,0.2)",
+                          color: "#5eead4",
+                          border: "1px solid rgba(94,234,212,0.4)",
+                        }}
+                      >
+                        {b.badge || "PENGUMUMAN RESMI"}
+                      </span>
+                      <h5 className="fw-bold text-white mb-1">{b.title}</h5>
+                      <p
+                        className="mb-2"
+                        style={{
+                          fontSize: "13.5px",
+                          color: "#cbd5e1",
+                          textAlign: "justify",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        {b.message}
+                      </p>
+                      {b.actionLabel && b.actionRoute && (
+                        <Button
+                          tag={Link}
+                          to={b.actionRoute}
+                          size="sm"
+                          color="info"
+                          className="fw-semibold"
+                        >
+                          {b.actionLabel}
+                        </Button>
+                      )}
+                    </Col>
+                  </Row>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
         <section className="sadar-overview">
           <div className="sadar-overview-main">
             <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow">
@@ -1346,7 +1438,32 @@ const DashboardWithData = () => {
                 <i className="ri-lightbulb-flash-line align-bottom me-1"></i>
                 Lihat Insight
               </Button>
+              <Button
+                color="light"
+                className="sadar-ghost-btn"
+                disabled={sendingStatement}
+                onClick={async () => {
+                  setSendingStatement(true);
+                  setStatementMessage("");
+                  try {
+                    const res = await analyticsApi.sendStatementEmail();
+                    setStatementMessage(
+                      `e-Statement ${res?.periodLabel || "Bulan Ini"} berhasil dikirim ke ${res?.email || "email Anda"}!`
+                    );
+                  } catch (e) {
+                    setStatementMessage(e?.message || "Gagal mengirim e-Statement.");
+                  } finally {
+                    setSendingStatement(false);
+                  }
+                }}
+              >
+                <i className="ri-mail-send-line align-bottom me-1"></i>
+                {sendingStatement ? "Mengirim e-Statement..." : "Kirim e-Statement ke Email"}
+              </Button>
             </div>
+            {statementMessage && (
+              <div className="mt-2 small fw-semibold text-info">{statementMessage}</div>
+            )}
           </div>
           <div className="sadar-overview-note">
             <span className="sadar-note-icon bg-warning-subtle text-warning">
@@ -1569,6 +1686,65 @@ const DashboardWithData = () => {
             </div>
           </CardBody>
         </Card>
+
+        {apiRows.leaderboard && apiRows.leaderboard.length > 0 && (
+          <Card className="dashboard-panel mt-3">
+            <CardHeader>
+              <div>
+                <h4 className="card-title mb-1">Papan Peringkat Streak (Leaderboard)</h4>
+                <p className="text-muted mb-0">
+                  Konsistensi pencatatan keuangan dari akun pengguna aktif SADAR Finance
+                </p>
+              </div>
+              <Badge color="warning" className="bg-warning-subtle text-warning">
+                100% Akun Aktif Database
+              </Badge>
+            </CardHeader>
+            <CardBody className="pt-0">
+              <div className="table-responsive sadar-table-wrap">
+                <Table className="align-middle mb-0 sadar-table">
+                  <thead>
+                    <tr>
+                      <th>Peringkat</th>
+                      <th>Pengguna</th>
+                      <th>Username</th>
+                      <th>Profesi / Kota</th>
+                      <th>Level</th>
+                      <th className="text-end">Streak &amp; XP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {apiRows.leaderboard.map((u, idx) => {
+                      const fullName = [u.first_name, u.middle_name, u.last_name]
+                        .filter((p) => p && String(p).toLowerCase() !== "user")
+                        .join(" ");
+                      return (
+                        <tr key={u.users_id || idx}>
+                          <td>
+                            <Badge color={idx === 0 ? "warning" : idx === 1 ? "secondary" : idx === 2 ? "info" : "light"}>
+                              #{idx + 1}
+                            </Badge>
+                          </td>
+                          <td className="fw-bold text-dark">{fullName || u.username || "Pengguna"}</td>
+                          <td className="text-primary fw-semibold">@{u.username || "sadar"}</td>
+                          <td className="text-muted">{[u.occupation, u.city].filter(Boolean).join(" - ") || "-"}</td>
+                          <td>
+                            <Badge color="primary" className="bg-primary-subtle text-primary">
+                              LV.{u.financial_level || 1}
+                            </Badge>
+                          </td>
+                          <td className="text-end fw-bold text-warning">
+                            {u.streak_days || 0} Hari ({u.xp_points || 0} XP)
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </div>
+            </CardBody>
+          </Card>
+        )}
       </Container>
     </div>
   );

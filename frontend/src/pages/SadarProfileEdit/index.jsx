@@ -50,14 +50,20 @@ const updateSessionUser = (updatedUser) => {
 
 const defaultProfile = {
   firstName: "",
+  middleName: "",
   lastName: "",
+  username: "",
   name: "Pengguna SADAR",
   email: "",
   avatar: "",
   phoneNumber: "",
   dateOfBirth: "",
   address: "",
+  city: "",
+  province: "",
+  postalCode: "",
   occupation: "",
+  financialGoal: "",
   gender: "",
 };
 
@@ -70,16 +76,21 @@ const resolveAvatarUrl = (url) => {
 
 const normalizeProfile = (user) => {
   const firstName = user?.first_name || user?.firstName || "";
+  const middleName = user?.middle_name || user?.middleName || "";
   const lastName = user?.last_name || user?.lastName || "";
   const cleanLastName =
     lastName === "User" || lastName === "user" ? "" : lastName;
   const rawAvatar = user?.profile_picture || user?.profilePicture || "";
+  const fullName = [firstName, middleName, cleanLastName]
+    .filter(Boolean)
+    .join(" ");
 
   return {
     firstName: firstName,
+    middleName: middleName,
     lastName: cleanLastName,
-    name:
-      `${firstName} ${cleanLastName}`.trim() || user?.email || "Pengguna SADAR",
+    username: user?.username || "",
+    name: fullName || user?.email || "Pengguna SADAR",
     email: user?.email || "",
     avatar: resolveAvatarUrl(rawAvatar),
     phoneNumber: user?.phone_number || user?.phoneNumber || "",
@@ -87,7 +98,11 @@ const normalizeProfile = (user) => {
       ? String(user.date_of_birth || "").slice(0, 10)
       : "",
     address: user?.address || "",
+    city: user?.city || "",
+    province: user?.province || "",
+    postalCode: user?.postal_code || user?.postalCode || "",
     occupation: user?.occupation || "",
+    financialGoal: user?.financial_goal || user?.financialGoal || "",
     gender: user?.gender || "",
   };
 };
@@ -101,19 +116,26 @@ const ProfileEdit = () => {
 
   const [profile, setProfile] = useState({
     firstName: defaultProfile.firstName,
+    middleName: defaultProfile.middleName,
     lastName: defaultProfile.lastName,
+    username: defaultProfile.username,
     name: defaultProfile.name,
     email: defaultProfile.email,
     avatar: defaultProfile.avatar,
     phoneNumber: defaultProfile.phoneNumber,
     dateOfBirth: defaultProfile.dateOfBirth,
     address: defaultProfile.address,
+    city: defaultProfile.city,
+    province: defaultProfile.province,
+    postalCode: defaultProfile.postalCode,
     occupation: defaultProfile.occupation,
+    financialGoal: defaultProfile.financialGoal,
     gender: defaultProfile.gender,
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [isLocatingGps, setIsLocatingGps] = useState(false);
 
   const [activeTab, setActiveTab] = useState("details");
 
@@ -439,11 +461,19 @@ const ProfileEdit = () => {
     try {
       const updatedUser = await authApi.updateMe({
         firstName: profile.firstName,
+        middleName: profile.middleName || null,
         lastName: profile.lastName,
+        username: profile.username
+          ? profile.username.replace(/^@/, "").toLowerCase()
+          : null,
         phoneNumber: profile.phoneNumber || null,
         dateOfBirth: profile.dateOfBirth || null,
         address: profile.address || null,
+        city: profile.city || null,
+        province: profile.province || null,
+        postalCode: profile.postalCode || null,
         occupation: profile.occupation || null,
+        financialGoal: profile.financialGoal || null,
         gender: profile.gender || null,
       });
       setProfile((current) => ({
@@ -862,7 +892,7 @@ const ProfileEdit = () => {
                     )}
 
                     <Row className="g-3">
-                      <Col md={6}>
+                      <Col md={4}>
                         <Label
                           htmlFor="profile-firstName"
                           className="form-label"
@@ -882,7 +912,24 @@ const ProfileEdit = () => {
                         )}
                       </Col>
 
-                      <Col md={6}>
+                      <Col md={4}>
+                        <Label
+                          htmlFor="profile-middleName"
+                          className="form-label"
+                        >
+                          Nama Tengah / Panggilan
+                        </Label>
+                        <Input
+                          id="profile-middleName"
+                          value={profile.middleName}
+                          onChange={(e) =>
+                            handleChange("middleName", e.target.value)
+                          }
+                          placeholder="Digunakan untuk sapaan Halo, ..."
+                        />
+                      </Col>
+
+                      <Col md={4}>
                         <Label
                           htmlFor="profile-lastName"
                           className="form-label"
@@ -896,6 +943,53 @@ const ProfileEdit = () => {
                             handleChange("lastName", e.target.value)
                           }
                         />
+                      </Col>
+
+                      <Col md={6}>
+                        <Label
+                          htmlFor="profile-username"
+                          className="form-label"
+                        >
+                          Username Leaderboard (@username)
+                        </Label>
+                        <InputGroup>
+                          <InputGroupText>@</InputGroupText>
+                          <Input
+                            id="profile-username"
+                            value={profile.username}
+                            onChange={(e) =>
+                              handleChange(
+                                "username",
+                                e.target.value.replace(/^@/, "").toLowerCase()
+                              )
+                            }
+                            placeholder="mhmdhabibrafi"
+                          />
+                        </InputGroup>
+                      </Col>
+
+                      <Col md={6}>
+                        <Label
+                          htmlFor="profile-financialGoal"
+                          className="form-label"
+                        >
+                          Tujuan Finansial Utama
+                        </Label>
+                        <Input
+                          id="profile-financialGoal"
+                          type="select"
+                          value={profile.financialGoal}
+                          onChange={(e) =>
+                            handleChange("financialGoal", e.target.value)
+                          }
+                        >
+                          <option value="">Pilih Tujuan Finansial</option>
+                          <option value="Membangun Dana Darurat">Membangun Dana Darurat</option>
+                          <option value="Disiplin Metode 50/30/20">Disiplin Metode 50/30/20</option>
+                          <option value="Menabung & Investasi Rutin">Menabung &amp; Investasi Rutin</option>
+                          <option value="Melunasi Utang / Cicilan">Melunasi Utang / Cicilan</option>
+                          <option value="Persiapan Pendidikan / Masa Depan">Persiapan Pendidikan / Masa Depan</option>
+                        </Input>
                       </Col>
 
                       <Col md={6}>
@@ -984,17 +1078,97 @@ const ProfileEdit = () => {
                         />
                       </Col>
 
-                      <Col md={6}>
-                        <Label htmlFor="profile-address" className="form-label">
-                          Kota / Alamat
-                        </Label>
+                      <Col md={12}>
+                        <div className="d-flex justify-content-between align-items-center mb-1">
+                          <Label htmlFor="profile-address" className="form-label mb-0">
+                            Alamat Lengkap
+                          </Label>
+                          <Button
+                            color="info"
+                            size="sm"
+                            outline
+                            disabled={isLocatingGps}
+                            onClick={() => {
+                              if (!navigator.geolocation) return;
+                              setIsLocatingGps(true);
+                              navigator.geolocation.getCurrentPosition(
+                                async (pos) => {
+                                  try {
+                                    const { latitude, longitude } = pos.coords;
+                                    const res = await fetch(
+                                      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=id`
+                                    );
+                                    const data = await res.json();
+                                    const addr = data?.address || {};
+                                    const road = addr.road || addr.suburb || addr.village || "";
+                                    const city = addr.city || addr.town || addr.county || "";
+                                    const province = addr.state || "";
+                                    const postcode = addr.postcode || "";
+                                    handleChange("address", road || data?.display_name || "");
+                                    if (city) handleChange("city", city);
+                                    if (province) handleChange("province", province);
+                                    if (postcode) handleChange("postalCode", postcode);
+                                  } catch (_) {
+                                  } finally {
+                                    setIsLocatingGps(false);
+                                  }
+                                },
+                                () => setIsLocatingGps(false),
+                                { enableHighAccuracy: true, timeout: 10000 }
+                              );
+                            }}
+                          >
+                            <i className="ri-map-pin-user-line me-1"></i>
+                            {isLocatingGps ? "Melacak GPS..." : "Lacak Alamat via GPS"}
+                          </Button>
+                        </div>
                         <Input
                           id="profile-address"
                           value={profile.address}
                           onChange={(e) =>
                             handleChange("address", e.target.value)
                           }
-                          placeholder="Contoh: Jakarta, Indonesia"
+                          placeholder="Contoh: Jl. Cipta Karya Ujung, Perumahan Karya Gading Permai No. B14"
+                        />
+                      </Col>
+
+                      <Col md={4}>
+                        <Label htmlFor="profile-city" className="form-label">
+                          Kota / Kabupaten
+                        </Label>
+                        <Input
+                          id="profile-city"
+                          value={profile.city}
+                          onChange={(e) => handleChange("city", e.target.value)}
+                          placeholder="Contoh: Pekanbaru"
+                        />
+                      </Col>
+
+                      <Col md={4}>
+                        <Label htmlFor="profile-province" className="form-label">
+                          Provinsi
+                        </Label>
+                        <Input
+                          id="profile-province"
+                          value={profile.province}
+                          onChange={(e) =>
+                            handleChange("province", e.target.value)
+                          }
+                          placeholder="Contoh: Riau"
+                        />
+                      </Col>
+
+                      <Col md={4}>
+                        <Label htmlFor="profile-postalCode" className="form-label">
+                          Kode Pos
+                        </Label>
+                        <Input
+                          id="profile-postalCode"
+                          value={profile.postalCode}
+                          onChange={(e) =>
+                            handleChange("postalCode", e.target.value)
+                          }
+                          placeholder="Contoh: 28294"
                         />
                       </Col>
                     </Row>
