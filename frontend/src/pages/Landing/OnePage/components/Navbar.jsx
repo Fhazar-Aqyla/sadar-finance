@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Download, LogIn } from "lucide-react";
+import { Menu, X, Download, LogIn, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import sadarLogo from "@/assets/images/landing/sadar-logo.png";
+import { getStoredAuthUser } from "@/helpers/auth-storage";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const isLoggedIn = Boolean(getStoredAuthUser()?.token);
 
   const { scrollYProgress } = useScroll();
   const scrollProgress = useSpring(scrollYProgress, {
@@ -124,15 +126,24 @@ export const Navbar = () => {
             })}
           </nav>
 
-          {/* Desktop Action Buttons: Masuk (Web App) & Unduh APK (Android) */}
+          {/* Desktop Action Buttons: Masuk/Dashboard (Web App) & Unduh APK (Android) */}
           <div className="hidden sm:flex items-center gap-2.5">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
-                to="/login"
+                to={isLoggedIn ? "/dashboard" : "/login"}
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-300/90 bg-white/85 hover:bg-white text-slate-800 hover:text-[#1E3A8A] text-sm font-semibold shadow-2xs transition-all"
               >
-                <LogIn className="w-4 h-4" />
-                Masuk
+                {isLoggedIn ? (
+                  <>
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    Masuk
+                  </>
+                )}
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -186,12 +197,21 @@ export const Navbar = () => {
               ))}
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2.5">
                 <Link
-                  to="/login"
+                  to={isLoggedIn ? "/dashboard" : "/login"}
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold text-sm shadow-2xs"
                 >
-                  <LogIn className="w-4 h-4" />
-                  Masuk Web
+                  {isLoggedIn ? (
+                    <>
+                      <LayoutDashboard className="w-4 h-4" />
+                      Dashboard
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="w-4 h-4" />
+                      Masuk Web
+                    </>
+                  )}
                 </Link>
                 <Link
                   to="/install"

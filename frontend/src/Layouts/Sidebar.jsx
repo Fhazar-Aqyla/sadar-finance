@@ -207,7 +207,7 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
           }`}
         >
           {!isCollapsed && (
-            <Link to="/dashboard" className="flex min-w-0 items-center no-underline">
+            <Link to="/landing" title="Buka Halaman Landing Page" className="flex min-w-0 items-center no-underline">
               <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[104px] object-contain" />
               <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto w-[104px] object-contain" />
             </Link>
@@ -215,7 +215,8 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
 
           {isCollapsed && (
             <Link
-              to="/dashboard"
+              to="/landing"
+              title="Buka Halaman Landing Page"
               className="sadar-sidebar-collapsed-logo-link flex items-center justify-center overflow-hidden bg-white shadow-sm"
               aria-label="SADAR Finance"
             >

@@ -561,7 +561,7 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
     final mutedColor = AppColors.textMutedOf(context);
 
     final lastSyncText = finance.lastSyncedAt != null
-        ? AppFormatters.shortDate(finance.lastSyncedAt!)
+        ? AppFormatters.fullDateTime(finance.lastSyncedAt!)
         : 'Belum tersinkron';
 
     return Scaffold(

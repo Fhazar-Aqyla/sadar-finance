@@ -40,8 +40,8 @@ const authProtectedRoutes = [
 ];
 
 const publicRoutes = [
-  { path: "/", component: <OnePage />, guestOnly: true },
-  { path: "/landing", component: <OnePage />, guestOnly: true },
+  { path: "/", component: <OnePage /> },
+  { path: "/landing", component: <OnePage /> },
   { path: "/install", component: <InstallPage /> },
   { path: "/download", component: <InstallPage /> },
   { path: "/logout", component: <Logout /> },
