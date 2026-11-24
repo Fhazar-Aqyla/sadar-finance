@@ -102,6 +102,116 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.dispose();
   }
 
+  String _formatDobDisplay(String iso) {
+    if (iso.isEmpty) return '';
+    final dt = DateTime.tryParse(iso);
+    if (dt == null) return iso;
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+  }
+
+  void _showOptionPickerSheet({
+    required String title,
+    required String subtitle,
+    required List<String> options,
+    required String currentValue,
+    required ValueChanged<String> onSelected,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.borderOf(ctx),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimaryOf(ctx),
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: AppColors.textSecondaryOf(ctx),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: options.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (_, idx) {
+                    final item = options[idx];
+                    final isSelected =
+                        currentValue.toLowerCase() == item.toLowerCase();
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        item,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight:
+                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected
+                              ? AppColors.accentOf(ctx)
+                              : AppColors.textPrimaryOf(ctx),
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColors.accentOf(ctx),
+                              size: 20,
+                            )
+                          : const Icon(Icons.chevron_right_rounded, size: 18),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        onSelected(item);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _detectAddressFromGps() async {
     if (_locatingGps) return;
     setState(() => _locatingGps = true);
@@ -132,7 +242,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           backgroundColor: AppColors.warning,
           content: Text(
             e.message ??
-                'Aktifkan GPS dan izinkan akses lokasi, atau gunakan fitur Cari Lokasi.',
+                'Aktifkan GPS dan izinkan akses lokasi, atau gunakan fitur Cari di Peta.',
           ),
         ),
       );
@@ -194,16 +304,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 '')
             .toString()
             .trim();
-        final city =
-            (addr['city'] ?? addr['town'] ?? addr['regency'] ?? addr['county'] ?? '')
-                .toString()
-                .trim();
+        final city = (addr['city'] ??
+                addr['town'] ??
+                addr['regency'] ??
+                addr['county'] ??
+                '')
+            .toString()
+            .trim();
         final state = (addr['state'] ?? addr['region'] ?? '').toString().trim();
         final postcode = (addr['postcode'] ?? '').toString().trim();
 
-        final streetParts = [road, suburb, district]
-            .where((s) => s.isNotEmpty)
-            .toList();
+        final streetParts =
+            [road, suburb, district].where((s) => s.isNotEmpty).toList();
         final streetLine = streetParts.isNotEmpty
             ? streetParts.join(', ')
             : (data['display_name'] ?? '').toString();
@@ -220,7 +332,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       }
     } catch (_) {}
 
-    // Fallback to BigDataCloud Reverse Geocoding API
     final bdc = await dio.get(
       'https://api.bigdatacloud.net/data/reverse-geocode-client',
       queryParameters: {
@@ -261,7 +372,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         builder: (ctx, setModalState) => Padding(
           padding: EdgeInsets.fromLTRB(
             20,
-            20,
+            18,
             20,
             MediaQuery.of(ctx).viewInsets.bottom + 24,
           ),
@@ -308,7 +419,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       controller: searchCtrl,
                       textInputAction: TextInputAction.search,
                       decoration: const InputDecoration(
-                        labelText: 'Nama Jalan / Perumahan / Kota',
                         hintText: 'Contoh: Cipta Karya Pekanbaru',
                         prefixIcon: Icon(Icons.search_rounded),
                       ),
@@ -735,13 +845,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         : (_firstNameCtrl.text.trim().isNotEmpty
             ? _firstNameCtrl.text.trim()
             : 'Pengguna');
+    final previewUsername = _usernameCtrl.text.trim().isNotEmpty
+        ? _usernameCtrl.text.trim().replaceAll('@', '').toLowerCase()
+        : (auth.user?.effectiveUsername ?? 'pengguna');
 
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Identitas Profil')),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
-          // 1. Kartu Foto & Avatar 2D
+          // 1. Kartu Foto Profil & Karakter Avatar 2D
           SadarCard(
             child: Column(
               children: [
@@ -785,25 +898,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Text(
-                  'Sapaan Beranda: "Halo, $previewGreeting"',
+                  'Sapaan Aktif: "Halo, $previewGreeting"',
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
-                  '@${_usernameCtrl.text.trim().isEmpty ? (auth.user?.effectiveUsername ?? 'username') : _usernameCtrl.text.trim().replaceAll('@', '')} - ${finance.financialLevelTitle}',
+                  '@$previewUsername - ${finance.financialLevelTitle}',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.accentOf(context),
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
@@ -812,13 +925,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             _uploadingAvatar ? null : _showAvatar2DPickerSheet,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
-                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: const Icon(
                           Icons.face_retouching_natural_rounded,
                           size: 18,
                         ),
-                        label: const Text('Pilih Avatar 2D'),
+                        label: const Text(
+                          'Pilih Avatar 2D',
+                          style: TextStyle(fontSize: 13),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -826,7 +942,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: OutlinedButton.icon(
                         onPressed: _uploadingAvatar ? null : _pickAvatar,
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: const Icon(
                           Icons.photo_camera_outlined,
@@ -834,6 +950,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                         label: Text(
                           _uploadingAvatar ? 'Mengunggah...' : 'Upload Foto',
+                          style: const TextStyle(fontSize: 13),
                         ),
                       ),
                     ),
@@ -844,7 +961,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 2. Kartu Identitas Nama & Username Leaderboard
+          // 2. Kartu Identitas Nama & Username Leaderboard (1-Kolom Penuh Standar Industri)
           SadarCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -852,226 +969,203 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const SectionHeader(
                   title: 'Identitas Nama & Username',
                   subtitle:
-                      'Nama Tengah digunakan sebagai nama panggilan di Beranda & Email',
+                      'Nama Tengah/Panggilan digunakan untuk menyapa Anda di Beranda dan Email Resmi',
+                ),
+                const SizedBox(height: 16),
+                _CleanLabeledField(
+                  label: 'Nama Depan',
+                  child: TextField(
+                    controller: _firstNameCtrl,
+                    onChanged: (_) => setState(() {}),
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'Contoh: Muhammad',
+                      prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _firstNameCtrl,
-                        onChanged: (_) => setState(() {}),
-                        decoration: const InputDecoration(
-                          labelText: 'Nama Depan',
-                          hintText: 'Muhammad',
-                          prefixIcon: Icon(Icons.person_outline_rounded),
-                        ),
-                      ),
+                _CleanLabeledField(
+                  label: 'Nama Tengah / Nama Panggilan (Sapaan Utama)',
+                  helperText: 'Kosongkan jika ingin disapa dengan Nama Depan',
+                  child: TextField(
+                    controller: _middleNameCtrl,
+                    onChanged: (_) => setState(() {}),
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'Contoh: Habib',
+                      prefixIcon:
+                          Icon(Icons.record_voice_over_outlined, size: 20),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: _middleNameCtrl,
-                        onChanged: (_) => setState(() {}),
-                        decoration: const InputDecoration(
-                          labelText: 'Nama Tengah (Panggilan)',
-                          hintText: 'Habib',
-                          prefixIcon: Icon(Icons.record_voice_over_outlined),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _lastNameCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Nama Belakang',
-                          hintText: 'Rafi',
-                          prefixIcon: Icon(Icons.badge_outlined),
-                        ),
-                      ),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Nama Belakang',
+                  child: TextField(
+                    controller: _lastNameCtrl,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'Contoh: Rafi',
+                      prefixIcon: Icon(Icons.badge_outlined, size: 20),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: _usernameCtrl,
-                        onChanged: (_) => setState(() {}),
-                        decoration: const InputDecoration(
-                          labelText: 'Username Leaderboard',
-                          hintText: 'habibrafi',
-                          prefixText: '@',
-                          prefixIcon: Icon(Icons.emoji_events_outlined),
-                        ),
-                      ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Username Papan Peringkat (Leaderboard Streak)',
+                  child: TextField(
+                    controller: _usernameCtrl,
+                    onChanged: (_) => setState(() {}),
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'habibrafi',
+                      prefixText: '@ ',
+                      prefixIcon: Icon(Icons.alternate_email_rounded, size: 20),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
 
-          // 3. Kartu Profesi, Data Diri & Fokus Finansial
+          // 3. Kartu Data Personal, Profesi & Tujuan Finansial (1-Kolom Bersih Tanpa Chip Berantakan)
           SadarCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SectionHeader(
-                  title: 'Profesi & Identitas Personal',
-                  subtitle: 'Data profil untuk personalisasi analisis keuangan',
+                  title: 'Data Personal & Profesi',
+                  subtitle:
+                      'Informasi pekerjaan dan profil finansial pengguna',
+                ),
+                const SizedBox(height: 16),
+                _CleanLabeledField(
+                  label: 'Jenis Kelamin',
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _GenderSegmentButton(
+                          label: 'Laki-laki',
+                          icon: Icons.male_rounded,
+                          selected: _selectedGender == 'male',
+                          onTap: () =>
+                              setState(() => _selectedGender = 'male'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _GenderSegmentButton(
+                          label: 'Perempuan',
+                          icon: Icons.female_rounded,
+                          selected: _selectedGender == 'female',
+                          onTap: () =>
+                              setState(() => _selectedGender = 'female'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 14),
-                Text(
-                  'Pilih Kategori Pekerjaan / Profesi',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: textSecondary,
+                _CleanLabeledField(
+                  label: 'Tanggal Lahir',
+                  child: _CleanSelectorTile(
+                    icon: Icons.calendar_today_outlined,
+                    valueText: _selectedDob.isNotEmpty
+                        ? _formatDobDisplay(_selectedDob)
+                        : '',
+                    placeholder: 'Pilih tanggal lahir',
+                    onTap: _pickDateOfBirth,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: _occupationOptions.map((occ) {
-                    final selected = _occupationCtrl.text.trim().toLowerCase() ==
-                        occ.toLowerCase();
-                    return ChoiceChip(
-                      label: Text(
-                        occ,
-                        style: const TextStyle(fontSize: 11.5),
-                      ),
-                      selected: selected,
-                      onSelected: (_) {
-                        setState(() => _occupationCtrl.text = occ);
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _occupationCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Detail Pekerjaan /Jabatan / Jurusan',
-                    hintText: 'Contoh: Mahasiswa Teknik Informatika',
-                    prefixIcon: Icon(Icons.work_outline_rounded),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue:
-                            (_selectedGender == 'male' || _selectedGender == 'female')
-                                ? _selectedGender
-                                : null,
-                        decoration: const InputDecoration(
-                          labelText: 'Jenis Kelamin',
-                          prefixIcon: Icon(Icons.wc_rounded),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'male',
-                            child: Text('Laki-laki'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'female',
-                            child: Text('Perempuan'),
-                          ),
-                        ],
-                        onChanged: (v) =>
-                            setState(() => _selectedGender = v ?? ''),
-                      ),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Nomor Handphone / WhatsApp',
+                  child: TextField(
+                    controller: _phoneCtrl,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'Contoh: 081234567890',
+                      prefixIcon: Icon(Icons.phone_outlined, size: 20),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: InkWell(
-                        onTap: _pickDateOfBirth,
-                        borderRadius: BorderRadius.circular(14),
-                        child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'Tanggal Lahir',
-                            prefixIcon: Icon(Icons.cake_outlined),
-                          ),
-                          child: Text(
-                            _selectedDob.isNotEmpty
-                                ? _selectedDob
-                                : 'Pilih Tanggal',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              color: _selectedDob.isNotEmpty
-                                  ? textPrimary
-                                  : AppColors.textMutedOf(context),
-                            ),
-                          ),
-                        ),
-                      ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Kategori Pekerjaan / Profesi',
+                  child: _CleanSelectorTile(
+                    icon: Icons.work_outline_rounded,
+                    valueText: _occupationCtrl.text.trim(),
+                    placeholder: 'Pilih kategori pekerjaan',
+                    onTap: () => _showOptionPickerSheet(
+                      title: 'Pilih Kategori Pekerjaan',
+                      subtitle:
+                          'Pilih profesi utama atau ketik detail pekerjaan di kolom bawah',
+                      options: _occupationOptions,
+                      currentValue: _occupationCtrl.text.trim(),
+                      onSelected: (val) =>
+                          setState(() => _occupationCtrl.text = val),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _phoneCtrl,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Nomor Handphone / WhatsApp',
-                    hintText: '081234567890',
-                    prefixIcon: Icon(Icons.phone_outlined),
                   ),
                 ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: _financialGoalOptions.contains(_selectedGoal)
-                      ? _selectedGoal
-                      : null,
-                  isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Fokus Tujuan Finansial Utama',
-                    prefixIcon: Icon(Icons.flag_outlined),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Detail Pekerjaan / Instansi / Program Studi',
+                  child: TextField(
+                    controller: _occupationCtrl,
+                    onChanged: (_) => setState(() {}),
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'Contoh: Mahasiswa Sistem Informasi',
+                      prefixIcon: Icon(Icons.business_center_outlined, size: 20),
+                    ),
                   ),
-                  items: _financialGoalOptions
-                      .map(
-                        (g) => DropdownMenuItem(
-                          value: g,
-                          child: Text(
-                            g,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => setState(() => _selectedGoal = v ?? ''),
+                ),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Fokus Tujuan Finansial Utama',
+                  child: _CleanSelectorTile(
+                    icon: Icons.flag_outlined,
+                    valueText: _selectedGoal,
+                    placeholder: 'Pilih fokus tujuan finansial Anda',
+                    onTap: () => _showOptionPickerSheet(
+                      title: 'Fokus Tujuan Finansial',
+                      subtitle:
+                          'Pilih prioritas utama pengelolaan keuangan Anda di SADAR Finance',
+                      options: _financialGoalOptions,
+                      currentValue: _selectedGoal,
+                      onSelected: (val) =>
+                          setState(() => _selectedGoal = val),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
 
-          // 4. Kartu Alamat & Pelacak Lokasi GPS (Google Maps / OpenStreetMap)
+          // 4. Kartu Alamat & Pelacak Lokasi GPS
           SadarCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SectionHeader(
                   title: 'Alamat & Lokasi Domisili',
-                  subtitle: 'Lacak koordinat GPS HP atau cari nama jalan otomatis',
-                  trailing: TextButton.icon(
+                  subtitle:
+                      'Lacak otomatis dari titik GPS perangkat atau cari nama lokasi di peta',
+                  trailing: TextButton(
                     onPressed: () {
                       setState(() {
                         _addressCtrl.text =
                             UserModel.formatTitleCaseAddress(_addressCtrl.text);
                       });
                     },
-                    icon: const Icon(Icons.auto_fix_high_rounded, size: 16),
-                    label: const Text('Rapikan'),
+                    child: const Text('Rapikan Huruf'),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
@@ -1079,7 +1173,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         onPressed: _locatingGps ? null : _detectAddressFromGps,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: _locatingGps
                             ? const SizedBox(
@@ -1102,7 +1196,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: OutlinedButton.icon(
                         onPressed: _showLocationSearchSheet,
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: const Icon(Icons.map_outlined, size: 17),
                         label: const Text(
@@ -1113,58 +1207,67 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _addressCtrl,
-                  maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Alamat Jalan / Perumahan / Nomor Rumah',
-                    hintText:
-                        'Jl. Cipta Karya Ujung, Perumahan Karya Gading Permai No. B14',
-                    prefixIcon: Icon(Icons.location_on_outlined),
+                const SizedBox(height: 16),
+                _CleanLabeledField(
+                  label: 'Alamat Lengkap (Jalan / Perumahan / Nomor Rumah)',
+                  child: TextField(
+                    controller: _addressCtrl,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      hintText:
+                          'Jl. Cipta Karya Ujung, Perumahan Karya Gading Permai No. B14',
+                      prefixIcon: Icon(Icons.location_on_outlined, size: 20),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
+                _CleanLabeledField(
+                  label: 'Kota / Kabupaten',
+                  child: TextField(
+                    controller: _cityCtrl,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      hintText: 'Contoh: Pekanbaru',
+                      prefixIcon: Icon(Icons.location_city_rounded, size: 20),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
                       flex: 3,
-                      child: TextField(
-                        controller: _cityCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Kota / Kabupaten',
-                          hintText: 'Pekanbaru',
-                          prefixIcon: Icon(Icons.location_city_rounded),
+                      child: _CleanLabeledField(
+                        label: 'Provinsi',
+                        child: TextField(
+                          controller: _provinceCtrl,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            hintText: 'Contoh: Riau',
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       flex: 2,
-                      child: TextField(
-                        controller: _postalCodeCtrl,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Kode Pos',
-                          hintText: '28294',
+                      child: _CleanLabeledField(
+                        label: 'Kode Pos',
+                        child: TextField(
+                          controller: _postalCodeCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: '28294',
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _provinceCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Provinsi',
-                    hintText: 'Riau',
-                    prefixIcon: Icon(Icons.public_rounded),
-                  ),
-                ),
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
 
           SizedBox(
             height: 52,
@@ -1180,7 +1283,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                     )
                   : const Icon(Icons.check_circle_outline_rounded, size: 20),
-              label: const Text('Simpan Seluruh Perubahan Profil'),
+              label: const Text('Simpan Perubahan Profil'),
             ),
           ),
           const SizedBox(height: 14),
@@ -1189,7 +1292,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                Icon(Icons.settings_outlined, color: primaryColor, size: 22),
+                Icon(Icons.shield_outlined, color: primaryColor, size: 22),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -1222,6 +1325,166 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CleanLabeledField extends StatelessWidget {
+  final String label;
+  final String? helperText;
+  final Widget child;
+
+  const _CleanLabeledField({
+    required this.label,
+    this.helperText,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textSecondaryOf(context),
+          ),
+        ),
+        const SizedBox(height: 6),
+        child,
+        if (helperText != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            helperText!,
+            style: TextStyle(
+              fontSize: 11,
+              color: AppColors.textMutedOf(context),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _CleanSelectorTile extends StatelessWidget {
+  final IconData icon;
+  final String valueText;
+  final String placeholder;
+  final VoidCallback onTap;
+
+  const _CleanSelectorTile({
+    required this.icon,
+    required this.valueText,
+    required this.placeholder,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasValue = valueText.trim().isNotEmpty;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.subtleOf(context),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.borderOf(context)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: AppColors.textSecondaryOf(context),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                hasValue ? valueText : placeholder,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
+                  color: hasValue
+                      ? AppColors.textPrimaryOf(context)
+                      : AppColors.textMutedOf(context),
+                ),
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 20,
+              color: AppColors.textSecondaryOf(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GenderSegmentButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _GenderSegmentButton({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = AppColors.accentOf(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? activeColor.withValues(alpha: 0.14)
+              : AppColors.subtleOf(context),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? activeColor : AppColors.borderOf(context),
+            width: selected ? 1.6 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: selected
+                  ? activeColor
+                  : AppColors.textSecondaryOf(context),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                color: selected
+                    ? AppColors.textPrimaryOf(context)
+                    : AppColors.textSecondaryOf(context),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

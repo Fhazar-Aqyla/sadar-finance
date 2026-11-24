@@ -41,6 +41,20 @@ class AiClientService {
       return this._mockCategoryResult(text, transactionId);
     }
 
+    if (config.groq?.apiKey) {
+      try {
+        return await this._categorizeWithGroq({
+          text,
+          transactionId,
+          merchant,
+          amount,
+          items,
+        });
+      } catch (_groqErr) {
+        // Fall through to Python AI microservice if Groq fails
+      }
+    }
+
     const response = await this._postJson('/categorize', {
       text,
       transactionId,
@@ -57,6 +71,14 @@ class AiClientService {
       return this._mockInsightResult(payload);
     }
 
+    if (config.groq?.apiKey) {
+      try {
+        return await this._generateInsightsWithGroq(payload);
+      } catch (_groqErr) {
+        // Fall through to Python AI microservice if Groq fails
+      }
+    }
+
     const response = await this._postJson('/insights', payload);
     return this._normalizeInsightResult(response);
   }
@@ -66,8 +88,208 @@ class AiClientService {
       return this._mockBehaviorResult(payload);
     }
 
+    if (config.groq?.apiKey) {
+      try {
+        return await this._predictBehaviorWithGroq(payload);
+      } catch (_groqErr) {
+        // Fall through to Python AI microservice if Groq fails
+      }
+    }
+
     const response = await this._postJson('/behavior/predict', payload);
     return this._normalizeBehaviorResult(response);
+  }
+
+  async _callGroqJson({ systemPrompt, userPayload, schemaName, schema }) {
+    this._assertFetchSupport();
+    const controller = new AbortController();
+    const timeoutMs = config.groq?.timeoutMs || 15000;
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${config.groq.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: config.groq.model || 'openai/gpt-oss-20b',
+          temperature: 0.1,
+          reasoning_effort: config.groq.reasoningEffort || 'low',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: JSON.stringify(userPayload) },
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: schemaName,
+              strict: true,
+              schema,
+            },
+          },
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        throw new Error(`Groq API returned ${response.status}: ${errText}`);
+      }
+
+      const data = await response.json();
+      const content = data?.choices?.[0]?.message?.content;
+      if (!content) {
+        throw new Error('Groq returned empty content');
+      }
+      return typeof content === 'string' ? JSON.parse(content) : content;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async _categorizeWithGroq({ text, transactionId, merchant, amount, items }) {
+    const schema = {
+      type: 'object',
+      additionalProperties: false,
+      required: ['categoryGroup', 'categoryDetail', 'confidence', 'needsReview'],
+      properties: {
+        categoryGroup: {
+          type: 'string',
+          enum: ['Needs', 'Wants', 'Savings'],
+        },
+        categoryDetail: { type: 'string' },
+        confidence: { type: 'number' },
+        needsReview: { type: 'boolean' },
+      },
+    };
+
+    const systemPrompt = `Anda adalah sistem klasifikasi transaksi keuangan pribadi Indonesia berbasis metode anggaran 50/30/20 (SADAR Finance).
+Klasifikasikan deskripsi/merchant transaksi ke dalam salah satu categoryGroup berikut:
+- "Needs": kebutuhan pokok, makan sehari-hari/warteg/sembako/minimarket (Indomaret/Alfamart), transportasi harian (Grab/Gojek/KRL/Bensin/Parkir), tagihan rutin (Listrik PLN, Air PDAM, Internet/WiFi, Pulsa, Kos/Sewa), kesehatan (Apotek, RS, Obat), dan pendidikan.
+- "Wants": gaya hidup, kopi/kafe/boba (Kopi Kenangan, Fore, Starbucks), restoran/kuliner hiburan, belanja marketplace non-pokok (Shopee, Tokopedia, Fashion, Gadget), langganan hiburan (Netflix, Spotify, Bioskop, Game), liburan/staycation.
+- "Savings": tabungan, dana darurat, deposito, reksa dana, saham, emas, investasi (Bibit, Bareksa, Ajaib, Pluang).
+Isi categoryDetail dengan label singkat Bahasa Indonesia yang rapi (contoh: "Makanan & Kebutuhan Pokok", "Transportasi Harian", "Kopi & Gaya Hidup", "Tagihan & Utilitas", "Belanja Online", "Tabungan & Investasi").`;
+
+    const parsed = await this._callGroqJson({
+      systemPrompt,
+      userPayload: {
+        text: text || '',
+        merchant: merchant || text || '',
+        amount: amount || null,
+        items: items || [],
+      },
+      schemaName: 'transaction_categorization',
+      schema,
+    });
+
+    return {
+      inputText: text,
+      predictedCategory: parsed.categoryGroup,
+      categoryGroup: parsed.categoryGroup,
+      categoryDetail: parsed.categoryDetail,
+      decisionSource: 'groq-ai',
+      needsReview: Boolean(parsed.needsReview),
+      confidence: this._safeConfidence(parsed.confidence, 0.92),
+      modelVersion: config.groq.model || 'openai/gpt-oss-20b',
+      transactionId: transactionId || null,
+    };
+  }
+
+  async _generateInsightsWithGroq(payload) {
+    const schema = {
+      type: 'object',
+      additionalProperties: false,
+      required: ['insights', 'recommendations'],
+      properties: {
+        insights: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['title', 'description'],
+            properties: {
+              title: { type: 'string' },
+              description: { type: 'string' },
+            },
+          },
+        },
+        recommendations: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+      },
+    };
+
+    const systemPrompt = `Anda adalah penasihat keuangan pribadi AI resmi SADAR Finance (Smart Automated Digital Assistant for Resourceful Finance).
+Hasilkan 3 sampai 4 insight perilaku keuangan yang sangat relevan, profesional, dan personal dalam Bahasa Indonesia baku yang mudah dipahami berdasarkan data ringkasan pengguna.
+Aturan penulisan:
+1. Setiap description harus berupa paragraf 2 kalimat yang informatif, menyebutkan angka Rupiah atau persentase nyata dari data pengguna, serta memberikan saran konkret berpedoman pada prinsip 50/30/20 (50% Kebutuhan, 30% Keinginan, 20% Tabungan & Investasi).
+2. Jangan gunakan tanda em-dash (—) atau titik tengah (·); gunakan tanda hubung biasa (-).`;
+
+    const parsed = await this._callGroqJson({
+      systemPrompt,
+      userPayload: payload,
+      schemaName: 'financial_behavior_insights',
+      schema,
+    });
+
+    return {
+      insights: (parsed.insights || []).filter((i) => i.title && i.description),
+      alerts: [],
+      recommendations: parsed.recommendations || [],
+      modelVersion: config.groq.model || 'openai/gpt-oss-20b',
+    };
+  }
+
+  async _predictBehaviorWithGroq(payload) {
+    const schema = {
+      type: 'object',
+      additionalProperties: false,
+      required: [
+        'spikeProbability',
+        'predictedSpike',
+        'riskLevel',
+        'categoryPrimary',
+        'recommendedAllocation',
+        'recommendation',
+      ],
+      properties: {
+        spikeProbability: { type: 'number' },
+        predictedSpike: { type: 'boolean' },
+        riskLevel: { type: 'string', enum: ['low', 'medium', 'high'] },
+        categoryPrimary: { type: 'string', enum: ['Needs', 'Wants', 'Savings'] },
+        recommendedAllocation: { type: 'number' },
+        recommendation: { type: 'string' },
+      },
+    };
+
+    const systemPrompt = `Anda adalah mesin analisis risiko lonjakan belanja (Behavior Spike Prediction) SADAR Finance.
+Evaluasi transaksi terbaru dan total pengeluaran 7 hari terakhir (rolling7dSpending) pengguna:
+- Tentukan spikeProbability (0.05 s/d 0.95), predictedSpike (true jika spikeProbability >= 0.5), dan riskLevel ("low", "medium", atau "high").
+- Tulis recommendation dalam Bahasa Indonesia formal sepanjang 2 hingga 3 kalimat yang menjelaskan kondisi laju pengeluaran mingguan pengguna serta langkah pengendalian anggaran 50/30/20 secara spesifik. Jangan gunakan simbol em-dash (—).`;
+
+    const parsed = await this._callGroqJson({
+      systemPrompt,
+      userPayload: payload,
+      schemaName: 'behavior_spike_prediction',
+      schema,
+    });
+
+    return {
+      spikeProbability: this._safeConfidence(parsed.spikeProbability, 0.25),
+      predictedSpike: Boolean(parsed.predictedSpike),
+      riskLevel: parsed.riskLevel || 'low',
+      categoryPrimary: parsed.categoryPrimary || payload.categoryGroup || 'Needs',
+      budgetBucket: {
+        name: parsed.categoryPrimary || payload.categoryGroup || 'Needs',
+        recommendedAllocation: this._safeConfidence(parsed.recommendedAllocation, 0.5),
+      },
+      modelName: 'groq-behavior-ai',
+      modelVersion: config.groq.model || 'openai/gpt-oss-20b',
+      recommendation: parsed.recommendation || '',
+    };
   }
 
   async _postJson(endpoint, payload) {

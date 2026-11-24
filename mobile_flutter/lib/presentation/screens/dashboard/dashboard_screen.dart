@@ -1043,72 +1043,69 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildQuickActions() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            _QuickActionTile(
-              icon: Icons.receipt_long_rounded,
-              label: 'Catat\nBelanja',
-              color: AppColors.primaryLight,
-              onTap: () => context.go('/catat-keuangan'),
-            ),
-            const SizedBox(width: 10),
-            _QuickActionTile(
-              icon: Icons.document_scanner_rounded,
-              label: 'Scan\nStruk AI',
-              color: AppColors.accent,
-              onTap: () => context.go('/catat-keuangan?scan=1'),
-            ),
-            const SizedBox(width: 10),
-            _QuickActionTile(
-              icon: Icons.flag_rounded,
-              label: 'Target &\nTagihan',
-              color: const Color(0xFF0EA5E9),
-              onTap: () => context.push('/financial-plans'),
-            ),
-            const SizedBox(width: 10),
-            _QuickActionTile(
-              icon: Icons.groups_rounded,
-              label: 'Piutang &\nSplit Bill',
-              color: AppColors.purple,
-              onTap: () => context.push('/debt-split'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            _QuickActionTile(
-              icon: Icons.health_and_safety_rounded,
-              label: 'Dana\nDarurat',
-              color: AppColors.success,
-              onTap: () => context.push('/financial-plans?tab=2'),
-            ),
-            const SizedBox(width: 10),
-            _QuickActionTile(
-              icon: Icons.face_retouching_natural_rounded,
-              label: 'Avatar\n2D & Level',
-              color: const Color(0xFFF59E0B),
-              onTap: () => context.push('/profile-account/edit'),
-            ),
-            const SizedBox(width: 10),
-            _QuickActionTile(
-              icon: Icons.insights_rounded,
-              label: 'Insight\nPerilaku',
-              color: const Color(0xFFEC4899),
-              onTap: () => context.go('/behavior-insight'),
-            ),
-            const SizedBox(width: 10),
-            _QuickActionTile(
-              icon: Icons.history_rounded,
-              label: 'Riwayat\nLengkap',
-              color: const Color(0xFF6366F1),
-              onTap: () => context.push('/financial-history'),
-            ),
-          ],
-        ),
-      ],
+    return SadarCard(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              _QuickActionTile(
+                icon: Icons.receipt_long_rounded,
+                label: 'Catat Belanja',
+                color: AppColors.primaryLight,
+                onTap: () => context.go('/catat-keuangan'),
+              ),
+              _QuickActionTile(
+                icon: Icons.document_scanner_rounded,
+                label: 'Scan Struk AI',
+                color: AppColors.accent,
+                onTap: () => context.go('/catat-keuangan?scan=1'),
+              ),
+              _QuickActionTile(
+                icon: Icons.flag_rounded,
+                label: 'Target & Rutin',
+                color: const Color(0xFF0EA5E9),
+                onTap: () => context.push('/financial-plans'),
+              ),
+              _QuickActionTile(
+                icon: Icons.groups_rounded,
+                label: 'Split Bill',
+                color: AppColors.purple,
+                onTap: () => context.push('/debt-split'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _QuickActionTile(
+                icon: Icons.health_and_safety_rounded,
+                label: 'Dana Darurat',
+                color: AppColors.success,
+                onTap: () => context.push('/financial-plans?tab=2'),
+              ),
+              _QuickActionTile(
+                icon: Icons.face_retouching_natural_rounded,
+                label: 'Avatar 2D',
+                color: const Color(0xFFF59E0B),
+                onTap: () => context.push('/profile-account/edit'),
+              ),
+              _QuickActionTile(
+                icon: Icons.insights_rounded,
+                label: 'Insight AI',
+                color: const Color(0xFFEC4899),
+                onTap: () => context.go('/behavior-insight'),
+              ),
+              _QuickActionTile(
+                icon: Icons.history_rounded,
+                label: 'Riwayat',
+                color: const Color(0xFF6366F1),
+                onTap: () => context.push('/financial-history'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -1945,33 +1942,35 @@ class _QuickActionTile extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceOf(context),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderOf(context)),
-          ),
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(9),
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.28),
+                  ),
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(icon, color: color, size: 21),
               ),
               const SizedBox(height: 6),
               Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textPrimaryOf(context),
-                  height: 1.2,
                 ),
               ),
             ],

@@ -86,88 +86,48 @@ class _StreakLeaderboardSheetState
           await ref.read(sadarApiServiceProvider).getStreakLeaderboard();
       for (final r in remote) {
         final uid = (r['userId'] ?? r['users_id'] ?? '').toString();
-        if (uid.isNotEmpty && uid == myEntry.userId) continue;
+        final isMe = uid.isNotEmpty && uid == myEntry.userId;
         final occ = (r['occupation'] ?? '').toString().trim();
         final city = (r['city'] ?? '').toString().trim();
         list.add(
           LeaderboardEntry(
             userId: uid.isEmpty ? 'u_${list.length}' : uid,
-            displayName:
-                (r['displayName'] ?? r['firstName'] ?? 'Pengguna').toString(),
-            username: (r['username'] ?? 'user').toString().replaceAll('@', ''),
-            profilePicture: r['profilePicture']?.toString(),
-            subtitle: [if (occ.isNotEmpty) occ, if (city.isNotEmpty) city]
-                .join(' - '),
-            streakDays: int.tryParse('${r['streakDays'] ?? 1}') ?? 1,
-            xpPoints: int.tryParse('${r['xpPoints'] ?? 50}') ?? 50,
-            financialLevel: int.tryParse('${r['financialLevel'] ?? 1}') ?? 1,
+            displayName: isMe
+                ? myEntry.displayName
+                : (r['displayName'] ?? r['firstName'] ?? 'Pengguna').toString(),
+            username: isMe
+                ? myEntry.username
+                : (r['username'] ?? 'user').toString().replaceAll('@', ''),
+            profilePicture: isMe
+                ? myEntry.profilePicture
+                : r['profilePicture']?.toString(),
+            subtitle: isMe && myEntry.subtitle.isNotEmpty
+                ? myEntry.subtitle
+                : [if (occ.isNotEmpty) occ, if (city.isNotEmpty) city]
+                    .join(' - '),
+            streakDays: isMe
+                ? (myEntry.streakDays > (int.tryParse('${r['streakDays'] ?? 0}') ?? 0)
+                    ? myEntry.streakDays
+                    : (int.tryParse('${r['streakDays'] ?? 0}') ?? 0))
+                : (int.tryParse('${r['streakDays'] ?? 0}') ?? 0),
+            xpPoints: isMe
+                ? (myEntry.xpPoints > (int.tryParse('${r['xpPoints'] ?? 0}') ?? 0)
+                    ? myEntry.xpPoints
+                    : (int.tryParse('${r['xpPoints'] ?? 0}') ?? 0))
+                : (int.tryParse('${r['xpPoints'] ?? 0}') ?? 0),
+            financialLevel: isMe
+                ? myEntry.financialLevel
+                : (int.tryParse('${r['financialLevel'] ?? 1}') ?? 1),
+            isCurrentUser: isMe,
           ),
         );
       }
     } catch (_) {}
 
-    // Ensure rich community benchmark entries if fewer than 6 users exist
-    const benchmarks = [
-      LeaderboardEntry(
-        userId: 'bench_1',
-        displayName: 'Arjuna',
-        username: 'arjunawijaya',
-        profilePicture: 'avatar2d:sultan_gold',
-        subtitle: 'Financial Analyst - Jakarta',
-        streakDays: 14,
-        xpPoints: 540,
-        financialLevel: 4,
-      ),
-      LeaderboardEntry(
-        userId: 'bench_2',
-        displayName: 'Nadya',
-        username: 'nadyaputri',
-        profilePicture: 'avatar2d:nadya_hijab',
-        subtitle: 'Karyawan Swasta - Bandung',
-        streakDays: 9,
-        xpPoints: 390,
-        financialLevel: 3,
-      ),
-      LeaderboardEntry(
-        userId: 'bench_3',
-        displayName: 'Bima',
-        username: 'bimasatria',
-        profilePicture: 'avatar2d:bima_exec',
-        subtitle: 'Wiraswasta - Surabaya',
-        streakDays: 6,
-        xpPoints: 265,
-        financialLevel: 2,
-      ),
-      LeaderboardEntry(
-        userId: 'bench_4',
-        displayName: 'Kirana',
-        username: 'kiranadewi',
-        profilePicture: 'avatar2d:kirana_creative',
-        subtitle: 'Mahasiswa - Yogyakarta',
-        streakDays: 4,
-        xpPoints: 185,
-        financialLevel: 2,
-      ),
-      LeaderboardEntry(
-        userId: 'bench_5',
-        displayName: 'Farhan',
-        username: 'farhanrizky',
-        profilePicture: 'avatar2d:farhan_doctor',
-        subtitle: 'Profesional - Medan',
-        streakDays: 2,
-        xpPoints: 110,
-        financialLevel: 1,
-      ),
-    ];
-
-    for (final b in benchmarks) {
-      if (list.length >= 8) break;
-      if (!list.any((e) => e.username == b.username)) {
-        list.add(b);
-      }
+    if (!list.any((e) => e.isCurrentUser)) {
+      list.add(myEntry);
     }
 
-    list.add(myEntry);
     list.sort((a, b) {
       final cmp = b.streakDays.compareTo(a.streakDays);
       if (cmp != 0) return cmp;

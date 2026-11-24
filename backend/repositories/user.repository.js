@@ -215,7 +215,7 @@ class UserRepository {
     return result.rows[0] || null;
   }
 
-  async getStreakLeaderboard(limit = 15) {
+  async getStreakLeaderboard(limit = 30) {
     await this._ensureColumns();
     const result = await query(
       `SELECT
@@ -227,21 +227,60 @@ class UserRepository {
          u.profile_picture,
          u.occupation,
          u.city,
-         GREATEST(COALESCE(u.streak_days, 1), 1) AS streak_days,
-         GREATEST(COALESCE(u.xp_points, 50), 25 + COALESCE(tx.tx_count, 0) * 15) AS xp_points,
-         GREATEST(COALESCE(u.financial_level, 1), 1) AS financial_level
+         COALESCE(act.active_days, 0) AS streak_days,
+         (
+           COALESCE(acc.acc_count, 0) * 25 +
+           COALESCE(tx.tx_count, 0) * 15 +
+           COALESCE(inc.inc_count, 0) * 15 +
+           COALESCE(bdg.has_budget, 0) * 50 +
+           COALESCE(act.active_days, 0) * 20
+         ) AS xp_points
        FROM users u
        LEFT JOIN (
          SELECT user_id, COUNT(*)::int AS tx_count
          FROM transactions
          GROUP BY user_id
        ) tx ON tx.user_id = u.users_id
+       LEFT JOIN (
+         SELECT user_id, COUNT(*)::int AS inc_count
+         FROM incomes
+         GROUP BY user_id
+       ) inc ON inc.user_id = u.users_id
+       LEFT JOIN (
+         SELECT user_id, COUNT(*)::int AS acc_count
+         FROM accounts
+         GROUP BY user_id
+       ) acc ON acc.user_id = u.users_id
+       LEFT JOIN (
+         SELECT user_id, CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS has_budget
+         FROM budgets
+         GROUP BY user_id
+       ) bdg ON bdg.user_id = u.users_id
+       LEFT JOIN (
+         SELECT user_id, COUNT(DISTINCT activity_day)::int AS active_days
+         FROM (
+           SELECT user_id, (transaction_date AT TIME ZONE 'Asia/Jakarta')::date AS activity_day FROM transactions
+           UNION
+           SELECT user_id, (income_date AT TIME ZONE 'Asia/Jakarta')::date AS activity_day FROM incomes
+         ) d
+         GROUP BY user_id
+       ) act ON act.user_id = u.users_id
        WHERE u.status = 'active'
+         AND LOWER(u.email) != 'demo@sadarfinance.com'
        ORDER BY streak_days DESC, xp_points DESC, u.created_at ASC
        LIMIT $1`,
       [limit]
     );
-    return result.rows;
+    return result.rows.map((r) => {
+      const xp = Number(r.xp_points || 0);
+      const level = xp >= 800 ? 5 : xp >= 450 ? 4 : xp >= 220 ? 3 : xp >= 80 ? 2 : 1;
+      return {
+        ...r,
+        streak_days: Number(r.streak_days || 0),
+        xp_points: xp,
+        financial_level: level,
+      };
+    });
   }
 
   async saveOtp(id, otpCode, expiresAt) {

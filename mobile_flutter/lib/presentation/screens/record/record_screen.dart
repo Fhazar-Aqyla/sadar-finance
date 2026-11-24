@@ -123,6 +123,20 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
       final scan = await ref.read(sadarApiServiceProvider).uploadReceipt(file);
       if (!mounted) return;
 
+      if (scan.status == 'failed') {
+        setState(() => _scanning = false);
+        final errReason = scan.warnings.isNotEmpty
+            ? scan.warnings.first
+            : 'Gagal membaca teks struk. Pastikan foto struk terang dan terlihat jelas.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text(errReason),
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _scanResult = scan;
         _scanning = false;
@@ -142,6 +156,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
           final parsed = DateTime.tryParse(scan.transactionDate!);
           if (parsed != null) _expDate = parsed;
         }
+        _aiCategoryBadge = 'OCR + AI';
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -486,10 +501,12 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                 Text(
                   isOffline
                       ? 'Mode Offline: Pindai struk & kategori AI membutuhkan internet. Gunakan form manual di bawah, otomatis sinkron saat online.'
-                      : 'Ambil foto atau unggah gambar struk. Sistem akan mengisi nominal, merchant, dan tanggal secara otomatis.',
+                      : 'Ambil foto atau unggah gambar struk. Sistem akan mengisi nominal, merchant, kategori 50/30/20, dan tanggal secara otomatis.',
+                  textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textSecondaryOf(context),
+                    height: 1.45,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1025,10 +1042,11 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
               const SizedBox(height: 4),
               Text(
                 'Pindahkan dana antar bank, e-wallet, atau dompet tunai tanpa menambah pengeluaran atau pemasukan bulanan.',
+                textAlign: TextAlign.justify,
                 style: TextStyle(
                   fontSize: 12.5,
                   color: AppColors.textSecondaryOf(context),
-                  height: 1.4,
+                  height: 1.45,
                 ),
               ),
               const SizedBox(height: 16),

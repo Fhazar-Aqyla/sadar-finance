@@ -93,6 +93,7 @@ class BehaviorInsightScreen extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         'Mode Offline: Menampilkan analisis tersimpan. Pembaruan analisis AI membutuhkan internet.',
+                        textAlign: TextAlign.justify,
                         style: TextStyle(fontSize: 12, color: textPrimary),
                       ),
                     ),
@@ -146,11 +147,12 @@ class BehaviorInsightScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
                   Text(
                     prediction?.recommendation ??
-                        'Pola belanjamu sedang dianalisis. Catat transaksi secara rutin untuk mendapatkan masukan yang lebih personal.',
+                        'Pola belanjamu sedang dianalisis. Catat transaksi secara rutin untuk mendapatkan masukan yang lebih personal dan terukur sesuai metode anggaran 50/30/20.',
+                    textAlign: TextAlign.justify,
                     style: TextStyle(
                       fontSize: 13.5,
                       color: textPrimary,
-                      height: 1.45,
+                      height: 1.5,
                     ),
                   ),
                   if (prediction?.spikeProbability != null) ...[
@@ -179,7 +181,7 @@ class BehaviorInsightScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hari Kerja (Sen–Jum)',
+                          'Hari Kerja (Sen - Jum)',
                           style: TextStyle(
                             fontSize: 12,
                             color: textSecondary,
@@ -214,7 +216,7 @@ class BehaviorInsightScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Akhir Pekan (Sab–Min)',
+                          'Akhir Pekan (Sab - Min)',
                           style: TextStyle(
                             fontSize: 12,
                             color: textSecondary,
@@ -434,23 +436,68 @@ class BehaviorInsightScreen extends ConsumerWidget {
             const SizedBox(height: 14),
 
             // Saved AI Insights list
-            if (finance.insights.isNotEmpty)
-              SadarCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SectionHeader(title: 'Rekomendasi & Catatan Kebiasaan'),
-                    const SizedBox(height: 12),
+            SadarCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SectionHeader(
+                    title: 'Rekomendasi & Catatan Kebiasaan AI',
+                    subtitle: 'Evaluasi otomatis pola pengeluaran dan tabungan Anda',
+                  ),
+                  const SizedBox(height: 12),
+                  if (finance.insights.isEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: primaryColor.withValues(alpha: 0.18),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sistem AI SADAR Finance menganalisis riwayat pemasukan, pengeluaran, dan rasio 50/30/20 Anda secara berkala. Tekan tombol pembaruan di pojok kanan atas atau catat transaksi baru untuk menghasilkan insight perilaku terkini.',
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: textSecondary,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () => ref
+                                  .read(financeProvider.notifier)
+                                  .refreshBehaviorAndOverspending(),
+                              icon: const Icon(
+                                Icons.auto_awesome_rounded,
+                                size: 16,
+                              ),
+                              label: const Text('Perbarui Analisis AI'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
                     ...finance.insights.map(
                       (ins) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.only(bottom: 14),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.check_circle_outline_rounded,
-                              size: 18,
-                              color: AppColors.accent,
+                            const Padding(
+                              padding: EdgeInsets.only(top: 2),
+                              child: Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 18,
+                                color: AppColors.accent,
+                              ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -465,13 +512,14 @@ class BehaviorInsightScreen extends ConsumerWidget {
                                       color: textPrimary,
                                     ),
                                   ),
-                                  const SizedBox(height: 2),
+                                  const SizedBox(height: 4),
                                   Text(
                                     ins.description,
+                                    textAlign: TextAlign.justify,
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       color: textSecondary,
-                                      height: 1.35,
+                                      height: 1.48,
                                     ),
                                   ),
                                 ],
@@ -481,9 +529,9 @@ class BehaviorInsightScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                ],
               ),
+            ),
           ],
         ),
       ),

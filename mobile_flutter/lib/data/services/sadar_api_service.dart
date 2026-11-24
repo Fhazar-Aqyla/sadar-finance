@@ -622,6 +622,25 @@ class SadarApiService {
         .toList();
   }
 
+  Future<List<InsightModel>> analyzeBehavior({
+    DateTime? periodStart,
+    DateTime? periodEnd,
+  }) async {
+    final now = DateTime.now();
+    final start = periodStart ?? DateTime(now.year, now.month - 1, 1);
+    final end = periodEnd ?? now;
+    final data = await _client.post(
+      '/analytics/behavior',
+      data: {
+        'periodStart': AppFormatters.isoDateOnly(start),
+        'periodEnd': AppFormatters.isoDateOnly(end),
+      },
+    );
+    return _extractList(data)
+        .map((e) => InsightModel.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
+
   Future<List<AlertModel>> getAlerts() async {
     final data = await _client.get('/analytics/alerts');
     return _extractList(data)

@@ -800,6 +800,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
 
       OverspendingForecastModel? overspending;
       List<AlertModel>? freshAlerts;
+      List<InsightModel>? freshInsights;
       try {
         overspending = await _api.predictOverspending(
           budgetLimit: state.budget?.totalLimit,
@@ -807,9 +808,16 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
         freshAlerts = await _api.getAlerts();
       } catch (_) {}
 
+      try {
+        freshInsights = await _api.analyzeBehavior();
+      } catch (_) {}
+
       state = state.copyWith(
         behaviorPrediction: behavior ?? state.behaviorPrediction,
         overspendingForecast: overspending ?? state.overspendingForecast,
+        insights: (freshInsights != null && freshInsights.isNotEmpty)
+            ? freshInsights
+            : state.insights,
         alerts: freshAlerts != null
             ? _deduplicateAlerts(freshAlerts)
             : state.alerts,

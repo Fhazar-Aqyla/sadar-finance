@@ -66,6 +66,7 @@ class FinancialScoreScreen extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         'Mode Offline: Menampilkan skor terakhir yang tersimpan di perangkat.',
+                        textAlign: TextAlign.justify,
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textPrimaryOf(context),
@@ -164,7 +165,7 @@ class FinancialScoreScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '0–40 Perlu Perhatian - 41–70 Cukup Sehat - 71–100 Sehat',
+                    '0-40 Perlu Perhatian  |  41-70 Cukup Sehat  |  71-100 Sehat',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 11.5,
@@ -457,10 +458,11 @@ class _BulletItem extends StatelessWidget {
           Expanded(
             child: Text(
               text,
+              textAlign: TextAlign.justify,
               style: TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondaryOf(context),
-                height: 1.4,
+                height: 1.48,
               ),
             ),
           ),
