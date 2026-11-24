@@ -17,10 +17,10 @@ const DEFAULT_META = {
   buildNumber: 8,
   downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v1.2.2.apk?v=1.2.2-official",
   releaseNotes: [
-    "Pencatatan Cepat Kalimat & Dikte Suara Pintar (Hemat Kuota Free-Tier + Deteksi Akun & Nominal Otomatis)",
     "Panel Admin Broadcast & Upload Foto Banner Real-Time Langsung dari Aplikasi & Web",
     "Halaman Rencana Keuangan, Simulasi Dana Darurat & Kalkulator Split Bill di Web App",
     "Sinkronisasi Cloud Penuh Target Tabungan, Jadwal Rutin, Piutang & e-Statement Resmi via Email",
+    "Integrasi Hybrid Hugging Face AI + Groq AI (OCR Struk, Klasifikasi 50/30/20 & Insight Perilaku)",
   ],
 };
 
