@@ -268,6 +268,63 @@ class SadarApiService {
         .toList();
   }
 
+  Future<List<Map<String, dynamic>>> getAdminBroadcasts() async {
+    final data = await _client.get('/app/admin/broadcasts');
+    final rawList = (data is Map && data['broadcasts'] is List)
+        ? (data['broadcasts'] as List)
+        : (data is List ? data : const []);
+    return rawList
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> saveAdminBroadcast(
+    Map<String, dynamic> payload,
+  ) async {
+    final data = await _client.post('/app/admin/broadcasts', data: payload);
+    final rawList = (data is Map && data['broadcasts'] is List)
+        ? (data['broadcasts'] as List)
+        : const [];
+    return rawList
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> deleteAdminBroadcast(String id) async {
+    final data = await _client.delete('/app/admin/broadcasts/$id');
+    final rawList = (data is Map && data['broadcasts'] is List)
+        ? (data['broadcasts'] as List)
+        : const [];
+    return rawList
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+  }
+
+  Future<String> uploadBroadcastBanner(File imageFile) async {
+    final filename = imageFile.path.split(RegExp(r'[/\\]')).last;
+    final ext = filename.split('.').last.toLowerCase();
+    final mediaType = ext == 'png'
+        ? MediaType('image', 'png')
+        : ext == 'webp'
+            ? MediaType('image', 'webp')
+            : MediaType('image', 'jpeg');
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: filename,
+        contentType: mediaType,
+      ),
+    });
+    final data = await _client.post('/app/admin/banner-upload', data: formData);
+    if (data is Map && data['imageUrl'] != null) {
+      return data['imageUrl'].toString();
+    }
+    return '';
+  }
+
   Future<Map<String, dynamic>> getFinancialPlans() async {
     final data = await _client.get('/plans');
     if (data is Map) {

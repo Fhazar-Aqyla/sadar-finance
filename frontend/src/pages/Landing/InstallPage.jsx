@@ -13,14 +13,14 @@ import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
-  latestVersion: "1.2.0",
-  buildNumber: 6,
-  downloadUrl: "/downloads/sadar-finance-v1.2.0.apk",
+  latestVersion: "1.2.2",
+  buildNumber: 8,
+  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-latest.apk",
   releaseNotes: [
-    "Katalog 16 Karakter Avatar 2D Eksklusif & Gamifikasi (Level 1-5, Streak Harian & Leaderboard)",
-    "Masuk/Tautkan Akun Google (Firebase Auth) & Verifikasi Email Kode OTP 6 Digit Resmi",
-    "Catatan Piutang Teman, Kalkulator Patungan (Split Bill) + Pengingat WA & Simulasi Dana Darurat",
-    "Identitas Profil Lengkap (Nama Panggilan, @username, Pelacak Alamat GPS Maps) & Biometrik Lock",
+    "Pencatatan Cepat Kalimat & Dikte Suara Pintar (Hemat Kuota Free-Tier + Deteksi Akun & Nominal Otomatis)",
+    "Panel Admin Broadcast & Upload Foto Banner Real-Time Langsung dari Aplikasi & Web",
+    "Halaman Rencana Keuangan, Simulasi Dana Darurat & Kalkulator Split Bill di Web App",
+    "Sinkronisasi Cloud Penuh Target Tabungan, Jadwal Rutin, Piutang & e-Statement Resmi via Email",
   ],
 };
 

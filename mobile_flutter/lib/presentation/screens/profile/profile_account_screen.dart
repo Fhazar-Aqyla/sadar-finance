@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../core/config/app_config.dart';
@@ -296,6 +297,294 @@ class ProfileAccountScreen extends ConsumerWidget {
                 child: const Text('Simpan Target Budget'),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showAdminBroadcastSheet(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final api = ref.read(sadarApiServiceProvider);
+    List<Map<String, dynamic>> broadcasts = [];
+    try {
+      broadcasts = await api.getAdminBroadcasts();
+    } catch (_) {}
+
+    if (!context.mounted) return;
+    final first = broadcasts.isNotEmpty ? broadcasts.first : null;
+    final idCtrl = TextEditingController(
+      text: (first?['id'] ?? 'bcast-main-2026').toString(),
+    );
+    final badgeCtrl = TextEditingController(
+      text: (first?['badge'] ?? 'PENGUMUMAN & FITUR BARU').toString(),
+    );
+    final titleCtrl = TextEditingController(
+      text: (first?['title'] ?? '').toString(),
+    );
+    final msgCtrl = TextEditingController(
+      text: (first?['message'] ?? '').toString(),
+    );
+    final bannerCtrl = TextEditingController(
+      text: (first?['bannerUrl'] ?? '').toString(),
+    );
+    final actionLabelCtrl = TextEditingController(
+      text: (first?['actionLabel'] ?? 'Coba Sekarang').toString(),
+    );
+    final actionRouteCtrl = TextEditingController(
+      text: (first?['actionRoute'] ?? '/financial-plans').toString(),
+    );
+    String type = (first?['type'] ?? 'info').toString();
+    bool active = first?['active'] != false;
+    bool saving = false;
+    bool uploading = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.campaign_rounded,
+                      color: AppColors.accent,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Panel Admin Broadcast & Banner',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimaryOf(ctx),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Kelola pengumuman & foto banner yang tampil real-time di Beranda Web dan Aplikasi Android semua pengguna.',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: AppColors.textSecondaryOf(ctx),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Tampilkan Broadcast ke Semua Pengguna',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                  ),
+                  value: active,
+                  onChanged: (v) => setModalState(() => active = v),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: badgeCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Label Badge',
+                          hintText: 'PENGUMUMAN & FITUR BARU',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue:
+                            ['info', 'promo', 'maintenance'].contains(type)
+                                ? type
+                                : 'info',
+                        decoration: const InputDecoration(
+                          labelText: 'Tipe Tema',
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'info',
+                            child: Text('Info (Teal/Navy)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'promo',
+                            child: Text('Promo (Hijau)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'maintenance',
+                            child: Text('Penting (Amber)'),
+                          ),
+                        ],
+                        onChanged: (v) =>
+                            setModalState(() => type = v ?? 'info'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: titleCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Judul Pengumuman',
+                    hintText: 'Contoh: Rilis SADAR Finance v1.2.2',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: msgCtrl,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Isi Pesan Broadcast',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: bannerCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'URL Foto Banner (Opsional)',
+                          hintText: 'https://sadar-finance.web.id/...',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      onPressed: uploading
+                          ? null
+                          : () async {
+                              final picked = await ImagePicker().pickImage(
+                                source: ImageSource.gallery,
+                                maxWidth: 1400,
+                                imageQuality: 85,
+                              );
+                              if (picked == null) return;
+                              setModalState(() => uploading = true);
+                              try {
+                                final url = await api.uploadBroadcastBanner(
+                                  File(picked.path),
+                                );
+                                setModalState(() => bannerCtrl.text = url);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: AppColors.danger,
+                                      content: Text('Gagal upload banner: $e'),
+                                    ),
+                                  );
+                                }
+                              } finally {
+                                setModalState(() => uploading = false);
+                              }
+                            },
+                      icon: uploading
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.upload_rounded, size: 18),
+                      label: const Text('Foto'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: actionLabelCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Teks Tombol Aksi',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: actionRouteCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Rute Tujuan',
+                          hintText: '/financial-plans',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton.icon(
+                  onPressed: saving
+                      ? null
+                      : () async {
+                          if (titleCtrl.text.trim().isEmpty ||
+                              msgCtrl.text.trim().isEmpty) {
+                            return;
+                          }
+                          setModalState(() => saving = true);
+                          try {
+                            await api.saveAdminBroadcast({
+                              'id': idCtrl.text.trim(),
+                              'badge': badgeCtrl.text.trim(),
+                              'title': titleCtrl.text.trim(),
+                              'message': msgCtrl.text.trim(),
+                              'type': type,
+                              'active': active,
+                              'bannerUrl': bannerCtrl.text.trim().isEmpty
+                                  ? null
+                                  : bannerCtrl.text.trim(),
+                              'actionLabel': actionLabelCtrl.text.trim(),
+                              'actionRoute': actionRouteCtrl.text.trim(),
+                            });
+                            await ref.read(financeProvider.notifier).loadAll();
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  backgroundColor: AppColors.success,
+                                  content: Text(
+                                    'Broadcast & Banner berhasil diperbarui secara live!',
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: AppColors.danger,
+                                  content: Text('Gagal menyimpan broadcast: $e'),
+                                ),
+                              );
+                            }
+                          } finally {
+                            setModalState(() => saving = false);
+                          }
+                        },
+                  icon: const Icon(Icons.publish_rounded, size: 18),
+                  label: Text(
+                    saving ? 'Menyimpan...' : 'Tayangkan Broadcast Sekarang',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1023,6 +1312,30 @@ class ProfileAccountScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/financial-history'),
                   ),
+                  if ((user?.email ?? '').toLowerCase() ==
+                      'mhmdhabibrafi@gmail.com') ...[
+                    const Divider(),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(
+                        Icons.campaign_rounded,
+                        color: AppColors.accent,
+                      ),
+                      title: Text(
+                        'Panel Admin Broadcast & Banner',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: textPrimary,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Tayangkan pengumuman & foto banner ke seluruh pengguna Web & APK',
+                        style: TextStyle(fontSize: 12, color: textSecondary),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () => _showAdminBroadcastSheet(context, ref),
+                    ),
+                  ],
                   const Divider(),
                   ListTile(
                     contentPadding: EdgeInsets.zero,

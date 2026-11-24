@@ -29,6 +29,7 @@ import { profileSuccess } from "../../slices/auth/profile/reducer";
 import {
   accountApi,
   analyticsApi,
+  appApi,
   authApi,
   incomeApi,
 } from "../../Components/services/api";
@@ -692,8 +693,29 @@ const ProfileAccountWithData = () => {
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
   const [monthlyIncome, setMonthlyIncome] = useState(0);
 
+  // Admin Broadcast & Banner state (for mhmdhabibrafi@gmail.com)
+  const [adminBroadcasts, setAdminBroadcasts] = useState([]);
+  const [bcastForm, setBcastForm] = useState({
+    id: "bcast-main-2026",
+    badge: "PENGUMUMAN & FITUR BARU",
+    title: "SADAR Finance v1.2.2 Kini Tersedia di Web & Android!",
+    message:
+      "Kini dilengkapi Rencana & Simulasi Dana Darurat Tersinkron Cloud, Kalimat Pintar & Dikte Suara 0-Kuota, serta e-Statement Bulanan Resmi.",
+    type: "info",
+    active: true,
+    bannerUrl: "",
+    actionLabel: "Buka Rencana & Dana Darurat",
+    actionRoute: "/financial-plans",
+  });
+  const [bcastNotice, setBcastNotice] = useState(null);
+  const [isSavingBcast, setIsSavingBcast] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+
   const dispatch = useDispatch();
   const [profile, setProfile] = useState(getStoredUserProfile);
+  const isAdminUser =
+    String(profile?.email || "").trim().toLowerCase() ===
+    "mhmdhabibrafi@gmail.com";
   const totalBalance = useMemo(
     () => sumBy(accounts, (account) => account.balance),
     [accounts],
@@ -741,6 +763,34 @@ const ProfileAccountWithData = () => {
           dispatch(
             profileSuccess({ data: profileResponse, status: "success" }),
           );
+          if (
+            String(profileResponse?.email || "").trim().toLowerCase() ===
+            "mhmdhabibrafi@gmail.com"
+          ) {
+            appApi
+              .adminBroadcasts()
+              .then((res) => {
+                const list = Array.isArray(res?.broadcasts)
+                  ? res.broadcasts
+                  : [];
+                setAdminBroadcasts(list);
+                if (list.length > 0) {
+                  const first = list[0];
+                  setBcastForm({
+                    id: first.id || "bcast-main-2026",
+                    badge: first.badge || "PENGUMUMAN & FITUR BARU",
+                    title: first.title || "",
+                    message: first.message || "",
+                    type: first.type || "info",
+                    active: first.active !== false,
+                    bannerUrl: first.bannerUrl || "",
+                    actionLabel: first.actionLabel || "",
+                    actionRoute: first.actionRoute || "/financial-plans",
+                  });
+                }
+              })
+              .catch(() => {});
+          }
           setAccounts(normalizedAccounts);
           setBudgetRows(
             apiBudgetRows.length
@@ -988,6 +1038,65 @@ const ProfileAccountWithData = () => {
     } catch (error) {
       setIsBudgetSaved(false);
       setBudgetNotice(error?.message || "Anggaran gagal disimpan.");
+    }
+  };
+
+  const handleUploadBroadcastBanner = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsUploadingBanner(true);
+    setBcastNotice(null);
+    try {
+      const formData = new FormData();
+      formData.append("banner", file);
+      const res = await appApi.uploadBanner(formData);
+      if (res?.bannerUrl) {
+        setBcastForm((curr) => ({ ...curr, bannerUrl: res.bannerUrl }));
+        setBcastNotice({
+          color: "success",
+          text: "Foto banner berhasil diunggah!",
+        });
+      }
+    } catch (err) {
+      setBcastNotice({
+        color: "danger",
+        text: err?.message || "Gagal mengunggah foto banner.",
+      });
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
+
+  const handleSaveBroadcast = async (event) => {
+    event.preventDefault();
+    if (!bcastForm.title.trim() || !bcastForm.message.trim()) {
+      setBcastNotice({
+        color: "warning",
+        text: "Judul dan isi pesan broadcast wajib diisi.",
+      });
+      return;
+    }
+    setIsSavingBcast(true);
+    setBcastNotice(null);
+    try {
+      const res = await appApi.saveBroadcast({
+        ...bcastForm,
+        bannerUrl: bcastForm.bannerUrl.trim() || null,
+      });
+      if (Array.isArray(res?.broadcasts)) {
+        setAdminBroadcasts(res.broadcasts);
+      }
+      setBcastNotice({
+        color: "success",
+        text: "Broadcast & Banner berhasil ditayangkan secara live ke Web & Android APK!",
+      });
+    } catch (err) {
+      setBcastNotice({
+        color: "danger",
+        text: err?.message || "Gagal menyimpan broadcast.",
+      });
+    } finally {
+      setIsSavingBcast(false);
     }
   };
 
@@ -1274,6 +1383,190 @@ const ProfileAccountWithData = () => {
             </Card>
           </Col>
         </Row>
+
+        {isAdminUser && (
+          <Row className="g-3 mt-1">
+            <Col xl={12}>
+              <Card className="sadar-panel" id="admin-broadcast-panel">
+                <CardHeader className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div>
+                    <div className="d-flex align-items-center gap-2">
+                      <h4 className="card-title mb-0">
+                        Panel Admin Broadcast & Banner
+                      </h4>
+                      <Badge color="info" pill>
+                        Admin Eksklusif
+                      </Badge>
+                    </div>
+                    <p className="text-muted mb-0 mt-1">
+                      Tayangkan pengumuman & foto banner secara real-time ke Beranda Web App dan Aplikasi Android semua pengguna.
+                    </p>
+                  </div>
+                  <div className="form-check form-switch">
+                    <Input
+                      type="switch"
+                      id="bcast-active-switch"
+                      checked={bcastForm.active}
+                      onChange={(e) =>
+                        setBcastForm((curr) => ({
+                          ...curr,
+                          active: e.target.checked,
+                        }))
+                      }
+                    />
+                    <Label
+                      className="form-check-label fw-semibold"
+                      htmlFor="bcast-active-switch"
+                    >
+                      {bcastForm.active ? "Broadcast Aktif" : "Nonaktif"}
+                    </Label>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  {bcastNotice && (
+                    <div
+                      className={`alert alert-${bcastNotice.color} py-2 mb-3`}
+                    >
+                      {bcastNotice.text}
+                    </div>
+                  )}
+                  <Form onSubmit={handleSaveBroadcast}>
+                    <Row className="g-3">
+                      <Col md={4}>
+                        <Label className="form-label">Label Badge</Label>
+                        <Input
+                          value={bcastForm.badge}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              badge: e.target.value,
+                            }))
+                          }
+                          placeholder="PENGUMUMAN & FITUR BARU"
+                        />
+                      </Col>
+                      <Col md={4}>
+                        <Label className="form-label">Tema Warna</Label>
+                        <Input
+                          type="select"
+                          value={bcastForm.type}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              type: e.target.value,
+                            }))
+                          }
+                        >
+                          <option value="info">Info Resmi (Navy & Teal)</option>
+                          <option value="promo">Update & Fitur (Hijau)</option>
+                          <option value="maintenance">
+                            Peringatan / Maintenance (Amber)
+                          </option>
+                        </Input>
+                      </Col>
+                      <Col md={4}>
+                        <Label className="form-label">
+                          Unggah Foto Banner (Opsional)
+                        </Label>
+                        <div className="d-flex gap-2">
+                          <Input
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            onChange={handleUploadBroadcastBanner}
+                            disabled={isUploadingBanner}
+                          />
+                        </div>
+                      </Col>
+                      <Col md={6}>
+                        <Label className="form-label">Judul Pengumuman</Label>
+                        <Input
+                          value={bcastForm.title}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              title: e.target.value,
+                            }))
+                          }
+                          placeholder="Contoh: Rilis SADAR Finance v1.2.2"
+                          required
+                        />
+                      </Col>
+                      <Col md={6}>
+                        <Label className="form-label">
+                          URL Foto Banner (Otomatis terisi saat upload)
+                        </Label>
+                        <Input
+                          value={bcastForm.bannerUrl}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              bannerUrl: e.target.value,
+                            }))
+                          }
+                          placeholder="https://sadar-finance.web.id/api/v1/app/banners/..."
+                        />
+                      </Col>
+                      <Col md={12}>
+                        <Label className="form-label">Isi Pesan Broadcast</Label>
+                        <Input
+                          type="textarea"
+                          rows={2}
+                          value={bcastForm.message}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              message: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </Col>
+                      <Col md={6}>
+                        <Label className="form-label">Teks Tombol Aksi</Label>
+                        <Input
+                          value={bcastForm.actionLabel}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              actionLabel: e.target.value,
+                            }))
+                          }
+                          placeholder="Contoh: Buka Rencana & Dana Darurat"
+                        />
+                      </Col>
+                      <Col md={6}>
+                        <Label className="form-label">Rute Tombol Aksi</Label>
+                        <Input
+                          value={bcastForm.actionRoute}
+                          onChange={(e) =>
+                            setBcastForm((curr) => ({
+                              ...curr,
+                              actionRoute: e.target.value,
+                            }))
+                          }
+                          placeholder="/financial-plans"
+                        />
+                      </Col>
+                      <Col xs={12}>
+                        <Button
+                          type="submit"
+                          color="primary"
+                          className="px-4 py-2 fw-semibold"
+                          disabled={isSavingBcast || isUploadingBanner}
+                        >
+                          <i className="ri-broadcast-line me-1"></i>
+                          {isSavingBcast
+                            ? "Menyimpan..."
+                            : "Tayangkan Broadcast Sekarang"}
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Form>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        )}
       </Container>
 
       <AccountFormModal

@@ -182,6 +182,131 @@ const TransactionInput = () => {
   const [isUploadingManual, setIsUploadingManual] = useState(false);
   const [manualUploadNotice, setManualUploadNotice] = useState(null);
 
+  // Zero-token local smart sentence & Web Speech API dictation state
+  const [quickSentence, setQuickSentence] = useState("");
+  const [isListeningVoice, setIsListeningVoice] = useState(false);
+
+  const applySmartQuickSentence = (rawInput) => {
+    const raw = String(rawInput ?? quickSentence ?? "").trim();
+    if (!raw) {
+      setNotice({
+        color: "warning",
+        message: 'Ketik atau dikte kalimat dulu, contoh: "Kopi Kenangan 35rb pakai GoPay".',
+      });
+      return;
+    }
+
+    let parsedAmount = 0;
+    let working = raw;
+
+    const shorthandMatch = working.match(/(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(rb|ribu|k|jt|juta)\b/i);
+    if (shorthandMatch) {
+      const numPart = parseFloat(shorthandMatch[1].replace(",", ".")) || 0;
+      const unit = shorthandMatch[2].toLowerCase();
+      parsedAmount = unit === "jt" || unit === "juta" ? Math.round(numPart * 1000000) : Math.round(numPart * 1000);
+      working = working.replace(shorthandMatch[0], " ");
+    } else {
+      const plainMatch = working.match(/(?:rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})+|\d{4,})/i);
+      if (plainMatch) {
+        parsedAmount = Number(plainMatch[1].replace(/[^\d]/g, "")) || 0;
+        working = working.replace(plainMatch[0], " ");
+      }
+    }
+
+    let matchedAccount = null;
+    for (const acc of accounts) {
+      const accLower = String(acc.name || "").toLowerCase();
+      const tokens = accLower.split(/\s+/).filter((t) => t.length >= 3 && t !== "bank");
+      for (const token of [accLower, ...tokens]) {
+        const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`\\b(?:pakai|via|dari|ke|dengan|di)?\\s*${escaped}\\b`, "i");
+        if (regex.test(working)) {
+          matchedAccount = acc;
+          working = working.replace(regex, " ");
+          break;
+        }
+      }
+      if (matchedAccount) break;
+    }
+
+    working = working
+      .replace(/\b(beli|bayar|buat|untuk|pakai|via|dari|ke|dengan|sebesar|senilai|rp)\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const cleanTitle = working ? working.charAt(0).toUpperCase() + working.slice(1) : "";
+
+    if (entryType === "income") {
+      setIncomeForm((curr) => ({
+        ...curr,
+        accountId: matchedAccount ? matchedAccount.id : curr.accountId,
+        source: cleanTitle || curr.source || "Gaji & Pemasukan",
+        amount: parsedAmount > 0 ? String(parsedAmount) : curr.amount,
+        note: raw,
+      }));
+      setNotice({
+        color: "success",
+        message: `Kalimat pintar diterapkan ke Pemasukan${matchedAccount ? ` (Akun: ${matchedAccount.name})` : ""} — Hemat 0 Kuota AI!`,
+      });
+      return;
+    }
+
+    const lower = raw.toLowerCase();
+    let categoryGroup = "needs";
+    if (/kopi|cafe|starbucks|kenangan|janji jiwa|fore|boba|mixue|snack|cemilan|bioskop|xxi|netflix|spotify|game|nongkrong|mall|shopee|tokopedia|lazada|tiktok|baju|sepatu|liburan|hotel/.test(lower)) {
+      categoryGroup = "wants";
+    } else if (/tabung|nabung|invest|reksadana|bibit|ajaib|emas|deposito|dana darurat|saham/.test(lower)) {
+      categoryGroup = "savings";
+    }
+
+    setForm((curr) => ({
+      ...curr,
+      accountId: matchedAccount ? matchedAccount.id : curr.accountId,
+      merchant: cleanTitle || curr.merchant,
+      categoryGroup,
+      amount: parsedAmount > 0 ? String(parsedAmount) : curr.amount,
+      description: cleanTitle ? `${cleanTitle} (${raw})` : curr.description,
+    }));
+
+    setNotice({
+      color: "success",
+      message: `Kalimat pintar diterapkan otomatis${matchedAccount ? ` • Akun: ${matchedAccount.name}` : ""} • Kategori: ${
+        categoryGroup === "wants" ? "Keinginan" : categoryGroup === "savings" ? "Tabungan" : "Kebutuhan"
+      } (0 Kuota AI).`,
+    });
+  };
+
+  const handleVoiceDictation = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setNotice({
+        color: "warning",
+        message: "Browser Anda belum mendukung Web Speech API. Ketik kalimat langsung pada kolom Kalimat Pintar.",
+      });
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "id-ID";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      setIsListeningVoice(true);
+      recognition.onresult = (event) => {
+        const transcript = event.results?.[0]?.[0]?.transcript || "";
+        setIsListeningVoice(false);
+        if (transcript) {
+          setQuickSentence(transcript);
+          applySmartQuickSentence(transcript);
+        }
+      };
+      recognition.onerror = () => setIsListeningVoice(false);
+      recognition.onend = () => setIsListeningVoice(false);
+      recognition.start();
+    } catch {
+      setIsListeningVoice(false);
+    }
+  };
+
   useEffect(() => {
     document.title = "Catat Keuangan | SADAR Finance";
   }, []);
@@ -797,6 +922,66 @@ const TransactionInput = () => {
               </CardHeader>
               <CardBody>
                 {notice && <Alert color={notice.color} className="sadar-notice">{notice.message}</Alert>}
+
+                <div
+                  className="p-3 mb-3 rounded-3 border"
+                  style={{
+                    background: "rgba(20, 184, 166, 0.06)",
+                    borderColor: "rgba(20, 184, 166, 0.28)",
+                  }}
+                >
+                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+                    <div className="d-flex align-items-center gap-2">
+                      <i className="ri-mic-line text-teal fs-16"></i>
+                      <strong className="fs-13">
+                        Isi Cepat dengan Kalimat Pintar / Dikte Suara (Hemat 0 Kuota AI)
+                      </strong>
+                    </div>
+                    <Badge color="success" pill>
+                      Instan & Gratis
+                    </Badge>
+                  </div>
+                  <p className="text-muted fs-12 mb-2">
+                    Ketik satu kalimat atau klik tombol Suara, sistem otomatis mendeteksi nominal, akun dompet/bank, nama transaksi, dan kategori 50/30/20 tanpa memakai kuota Groq AI.
+                  </p>
+                  <div className="d-flex gap-2 flex-wrap flex-md-nowrap">
+                    <Input
+                      type="text"
+                      value={quickSentence}
+                      onChange={(e) => setQuickSentence(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          applySmartQuickSentence();
+                        }
+                      }}
+                      placeholder={
+                        entryType === "income"
+                          ? 'Contoh: "Gaji bulanan 6,5jt ke Bank Mandiri"'
+                          : 'Contoh: "Beli Kopi Kenangan 35rb pakai GoPay"'
+                      }
+                    />
+                    <Button
+                      type="button"
+                      color={isListeningVoice ? "danger" : "light"}
+                      className="text-nowrap"
+                      onClick={handleVoiceDictation}
+                      title="Dikte dengan suara (Web Speech API)"
+                    >
+                      <i className={`${isListeningVoice ? "ri-mic-fill" : "ri-mic-line"} me-1`}></i>
+                      {isListeningVoice ? "Mendengarkan..." : "Suara"}
+                    </Button>
+                    <Button
+                      type="button"
+                      color="primary"
+                      className="text-nowrap"
+                      onClick={() => applySmartQuickSentence()}
+                    >
+                      <i className="ri-magic-line me-1"></i>
+                      Terapkan
+                    </Button>
+                  </div>
+                </div>
 
                 {entryType === "transaction" ? (
                 <Form onSubmit={handleSubmit} className="sadar-transaction-form">

@@ -264,6 +264,17 @@ export const authApi = {
 export const appApi = {
   broadcasts: () => apiClient.get("/app/broadcasts").then(unwrapData),
   version: () => apiClient.get("/app/version").then(unwrapData),
+  adminBroadcasts: () => apiClient.get("/app/admin/broadcasts").then(unwrapData),
+  saveBroadcast: (payload) =>
+    apiClient.post("/app/admin/broadcasts", payload).then(unwrapData),
+  deleteBroadcast: (id) =>
+    apiClient.delete(`/app/admin/broadcasts/${id}`).then(unwrapData),
+  uploadBanner: (formData) =>
+    apiClient
+      .post("/app/admin/banner-upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then(unwrapData),
 };
 
 export const plansApi = {

@@ -1,13 +1,13 @@
 {
-  "latestVersion": "1.2.1",
-  "buildNumber": 7,
+  "latestVersion": "1.2.2",
+  "buildNumber": 8,
   "minVersion": "1.0.0",
   "forceUpdate": false,
   "downloadUrl": "https://sadar-finance.web.id/downloads/sadar-finance-latest.apk",
   "releaseNotes": [
-    "Sinkronisasi Cloud Penuh untuk Target Tabungan, Tagihan Rutin, Utang/Piutang & Riwayat Transfer",
-    "Laporan e-Statement Bulanan Resmi (Kirim ke Email noreply@sadar-finance.web.id & Cetak PDF)",
-    "Pengecekan Pembaruan Aplikasi Otomatis (In-App Update Checker) & Penyelarasan Penuh Web App",
-    "Integrasi Hybrid Hugging Face AI + Groq AI (OCR Struk, Klasifikasi 50/30/20 & Insight Perilaku)"
+    "Pencatatan Cepat Kalimat & Dikte Suara Pintar (Hemat Kuota Free-Tier + Deteksi Akun & Nominal Otomatis)",
+    "Panel Admin Broadcast & Upload Foto Banner Real-Time Langsung dari Aplikasi & Web",
+    "Halaman Rencana Keuangan, Simulasi Dana Darurat & Kalkulator Split Bill di Web App",
+    "Sinkronisasi Cloud Penuh Target Tabungan, Jadwal Rutin, Piutang & e-Statement Resmi via Email"
   ]
 }

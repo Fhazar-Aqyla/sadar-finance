@@ -4,20 +4,73 @@
  */
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 const { Router } = require('express');
+const authenticate = require('../middlewares/authenticate');
+const userRepository = require('../repositories/user.repository');
 const { success } = require('../utils/response');
 
 const router = Router();
 const BROADCASTS_PATH = path.join(__dirname, '../config/broadcasts.json');
+const BANNERS_DIR = path.join(__dirname, '../assets/banners');
 
-function loadActiveBroadcasts() {
+if (!fs.existsSync(BANNERS_DIR)) {
+  fs.mkdirSync(BANNERS_DIR, { recursive: true });
+}
+
+const bannerUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, BANNERS_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname || '.jpg').toLowerCase() || '.jpg';
+      const safeExt = ['.png', '.jpg', '.jpeg', '.webp'].includes(ext) ? ext : '.jpg';
+      cb(null, `banner-${Date.now()}${safeExt}`);
+    },
+  }),
+  limits: { fileSize: 8 * 1024 * 1024 },
+});
+
+function loadAllBroadcasts() {
   try {
     const raw = fs.readFileSync(BROADCASTS_PATH, 'utf8');
     const parsed = JSON.parse(raw);
-    const list = Array.isArray(parsed.broadcasts) ? parsed.broadcasts : [];
-    return list.filter((b) => b && b.active === true);
+    return Array.isArray(parsed.broadcasts) ? parsed.broadcasts : [];
   } catch (_) {
     return [];
+  }
+}
+
+function saveAllBroadcasts(list) {
+  fs.writeFileSync(
+    BROADCASTS_PATH,
+    JSON.stringify({ broadcasts: list }, null, 2),
+    'utf8'
+  );
+}
+
+function loadActiveBroadcasts() {
+  return loadAllBroadcasts().filter((b) => b && b.active === true);
+}
+
+async function requireAdminUser(req, res, next) {
+  try {
+    const user = await userRepository.findById(req.user.id);
+    const adminEmails = (
+      process.env.ADMIN_EMAILS || 'mhmdhabibrafi@gmail.com'
+    )
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (!user || !adminEmails.includes(String(user.email || '').toLowerCase())) {
+      return res.status(403).json({
+        success: false,
+        message: 'Akses ditolak: Hanya Admin resmi SADAR Finance yang dapat mengelola broadcast.',
+      });
+    }
+    req.adminUser = user;
+    return next();
+  } catch (err) {
+    return next(err);
   }
 }
 
@@ -93,7 +146,7 @@ router.get('/version', (_req, res) => {
     message: 'App version info',
     data: {
       latestVersion,
-      buildNumber: Number.isFinite(buildNumber) ? buildNumber : 7,
+      buildNumber: Number.isFinite(buildNumber) ? buildNumber : 8,
       minVersion,
       forceUpdate,
       otaChannel: 'stable',
@@ -103,5 +156,98 @@ router.get('/version', (_req, res) => {
     },
   });
 });
+
+// ── ADMIN BROADCAST & BANNER MANAGEMENT ───────────────────────
+
+router.get(
+  '/admin/broadcasts',
+  authenticate,
+  requireAdminUser,
+  (_req, res) => {
+    return success(res, {
+      message: 'All broadcasts retrieved',
+      data: { broadcasts: loadAllBroadcasts() },
+    });
+  }
+);
+
+router.post(
+  '/admin/broadcasts',
+  authenticate,
+  requireAdminUser,
+  (req, res) => {
+    const body = req.body || {};
+    const list = loadAllBroadcasts();
+    const id = String(body.id || `bcast-${Date.now()}`).trim();
+    const item = {
+      id,
+      active: body.active !== false,
+      type: ['info', 'promo', 'maintenance', 'urgent'].includes(body.type)
+        ? body.type
+        : 'info',
+      badge: String(body.badge || 'PENGUMUMAN RESMI').trim(),
+      title: String(body.title || 'Pengumuman SADAR Finance').trim(),
+      message: String(body.message || '').trim(),
+      imageUrl: String(body.imageUrl || '').trim(),
+      actionLabel: String(body.actionLabel || '').trim(),
+      actionRoute: String(body.actionRoute || '').trim(),
+      affectedFeature: String(body.affectedFeature || 'none').trim(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const existingIdx = list.findIndex((b) => b && b.id === id);
+    if (existingIdx >= 0) {
+      list[existingIdx] = item;
+    } else {
+      list.unshift(item);
+    }
+    saveAllBroadcasts(list);
+
+    return success(res, {
+      message: 'Broadcast berhasil disimpan',
+      data: { broadcast: item, broadcasts: list },
+    });
+  }
+);
+
+router.delete(
+  '/admin/broadcasts/:id',
+  authenticate,
+  requireAdminUser,
+  (req, res) => {
+    const targetId = String(req.params.id || '').trim();
+    const nextList = loadAllBroadcasts().filter((b) => b && b.id !== targetId);
+    saveAllBroadcasts(nextList);
+    return success(res, {
+      message: 'Broadcast berhasil dihapus',
+      data: { broadcasts: nextList },
+    });
+  }
+);
+
+router.post(
+  '/admin/banner-upload',
+  authenticate,
+  requireAdminUser,
+  bannerUpload.single('image'),
+  (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'File gambar banner wajib diunggah',
+      });
+    }
+    const baseUrl =
+      process.env.PUBLIC_API_BASE_URL || 'https://sadar-finance.web.id/api/v1';
+    const imageUrl = `${baseUrl.replace(/\/$/, '')}/app/banners/${req.file.filename}`;
+    return success(res, {
+      message: 'Gambar banner berhasil diunggah',
+      data: {
+        filename: req.file.filename,
+        imageUrl,
+      },
+    });
+  }
+);
 
 module.exports = router;

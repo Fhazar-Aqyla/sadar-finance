@@ -9,6 +9,7 @@ import {
   LogOut,
   ReceiptText,
   User,
+  Wallet,
   X,
 } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -23,6 +24,7 @@ const navigationItems = [
   { id: "catat-keuangan", name: "Catat Keuangan", icon: Edit3, href: "/catat-keuangan" },
   { id: "behavior-insight", name: "Insight Perilaku", icon: Activity, href: "/behavior-insight" },
   { id: "financial-score", name: "Skor Finansial", icon: BarChart3, href: "/financial-score" },
+  { id: "financial-plans", name: "Rencana & Piutang", icon: Wallet, href: "/financial-plans" },
   { id: "financial-history", name: "Riwayat Keuangan", icon: ReceiptText, href: "/financial-history" },
 ];
 

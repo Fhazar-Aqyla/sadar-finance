@@ -29,6 +29,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
 
   // Expense form
   final _expFormKey = GlobalKey<FormState>();
+  final _quickSentenceCtrl = TextEditingController();
   final _expAmountCtrl = TextEditingController();
   final _expDescCtrl = TextEditingController();
   final _expDetailCtrl = TextEditingController();
@@ -86,6 +87,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _quickSentenceCtrl.dispose();
     _expAmountCtrl.dispose();
     _expDescCtrl.dispose();
     _expDetailCtrl.dispose();
@@ -94,6 +96,146 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
     _trfAmountCtrl.dispose();
     _trfNoteCtrl.dispose();
     super.dispose();
+  }
+
+  void _applySmartQuickSentence(List accounts) {
+    final raw = _quickSentenceCtrl.text.trim();
+    if (raw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Ketik atau dikte kalimat dulu, misal: "Kopi Kenangan 35rb pakai GoPay"',
+          ),
+        ),
+      );
+      return;
+    }
+
+    double parsedAmount = 0;
+    String working = raw;
+
+    // 1. Extract amount with Indonesian shorthand (rb, ribu, k, jt, juta) or formatted numbers
+    final shorthandRegex = RegExp(
+      r'(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(rb|ribu|k|jt|juta)\b',
+      caseSensitive: false,
+    );
+    final shorthandMatch = shorthandRegex.firstMatch(working);
+    if (shorthandMatch != null) {
+      final numPart =
+          double.tryParse(shorthandMatch.group(1)!.replaceAll(',', '.')) ?? 0;
+      final unit = shorthandMatch.group(2)!.toLowerCase();
+      if (unit == 'jt' || unit == 'juta') {
+        parsedAmount = numPart * 1000000;
+      } else {
+        parsedAmount = numPart * 1000;
+      }
+      working = working.replaceFirst(shorthandMatch.group(0)!, ' ');
+    } else {
+      final plainNumRegex = RegExp(
+        r'(?:rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})+|\d{4,})',
+        caseSensitive: false,
+      );
+      final plainMatch = plainNumRegex.firstMatch(working);
+      if (plainMatch != null) {
+        final digits = plainMatch.group(1)!.replaceAll(RegExp(r'[^\d]'), '');
+        parsedAmount = double.tryParse(digits) ?? 0;
+        working = working.replaceFirst(plainMatch.group(0)!, ' ');
+      }
+    }
+
+    // 2. Match account name from user's accounts list
+    String? matchedAccId;
+    String? matchedAccName;
+    for (final acc in accounts.cast<AccountModel>()) {
+      final accNameLower = acc.name.toLowerCase();
+      final tokens = accNameLower
+          .split(RegExp(r'\s+'))
+          .where((t) => t.length >= 3 && t != 'bank')
+          .toList();
+      final candidates = <String>[accNameLower, ...tokens];
+      for (final token in candidates) {
+        final accRegex = RegExp(
+          r'\b(?:pakai|via|dari|ke|dengan|di)?\s*' +
+              RegExp.escape(token) +
+              r'\b',
+          caseSensitive: false,
+        );
+        if (accRegex.hasMatch(working)) {
+          matchedAccId = acc.id;
+          matchedAccName = acc.name;
+          working = working.replaceFirst(accRegex, ' ');
+          break;
+        }
+      }
+      if (matchedAccId != null) break;
+    }
+
+    // 3. Clean remaining prepositions to get merchant/description
+    working = working
+        .replaceAll(
+          RegExp(
+            r'\b(beli|bayar|buat|untuk|pakai|via|dari|dengan|sebesar|senilai|rp)\b',
+            caseSensitive: false,
+          ),
+          ' ',
+        )
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+
+    final lowerRaw = raw.toLowerCase();
+    String group = 'Needs';
+    String detail = 'Kebutuhan Harian';
+    if (RegExp(
+      r'kopi|cafe|starbucks|kenangan|janji jiwa|fore|boba|mixue|eskrim|snack|cemilan|bioskop|xxi|cgv|netflix|spotify|game|topup|skin|nongkrong|mall|shopee|tokopedia|lazada|tiktok|baju|sepatu|liburan|staycation|hotel',
+    ).hasMatch(lowerRaw)) {
+      group = 'Wants';
+      detail = 'Gaya Hidup & Hiburan';
+    } else if (RegExp(
+      r'tabung|nabung|invest|reksadana|bibit|ajaib|emas|antam|deposito|dana darurat|sbn|saham',
+    ).hasMatch(lowerRaw)) {
+      group = 'Savings';
+      detail = 'Tabungan & Investasi';
+    } else if (RegExp(
+      r'makan|sarapan|siang|malam|nasi|ayam|warteg|padang|indomaret|alfamart|superindo|sayur|sembako|beras|galon|gas',
+    ).hasMatch(lowerRaw)) {
+      group = 'Needs';
+      detail = 'Makan & Kebutuhan Pokok';
+    } else if (RegExp(
+      r'bensin|pertamina|pertalite|pertamax|shell|parkir|tol|grab|gojek|maxim|kereta|krl|mrt|transjakarta|angkot|ojek|servis|oli',
+    ).hasMatch(lowerRaw)) {
+      group = 'Needs';
+      detail = 'Transportasi';
+    } else if (RegExp(
+      r'listrik|pln|token|air|pdam|wifi|indihome|biznet|pulsa|kuota|paket data|telkomsel|xl|indosat|kos|kontrakan|sewa|iuran',
+    ).hasMatch(lowerRaw)) {
+      group = 'Needs';
+      detail = 'Tagihan & Utilitas';
+    }
+
+    setState(() {
+      if (parsedAmount > 0) {
+        _expAmountCtrl.text = AppFormatters.number(parsedAmount);
+      }
+      if (matchedAccId != null) {
+        _expAccountId = matchedAccId;
+      }
+      if (working.isNotEmpty) {
+        final capitalized = working[0].toUpperCase() + working.substring(1);
+        _expDescCtrl.text = capitalized;
+      }
+      _expCategoryGroup = group;
+      _expDetailCtrl.text = detail;
+      _aiCategoryBadge = 'Pintar Lokal (0 Kuota)';
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.success,
+        content: Text(
+          'Kalimat diterapkan otomatis${matchedAccName != null ? " • Akun: $matchedAccName" : ""} • Kategori: ${CategoryHelpers.labelForGroup(group)} (Hemat 0 Kuota AI)',
+        ),
+      ),
+    );
   }
 
   Future<void> _pickAndScanReceipt(ImageSource source) async {
@@ -607,6 +749,106 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
                   const Text(
                     'Detail Pengeluaran',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: AppColors.accent.withValues(alpha: 0.28),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.mic_none_rounded,
+                              size: 17,
+                              color: AppColors.accent,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Kalimat Pintar & Dikte Suara (0 Kuota AI)',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textPrimaryOf(context),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.success.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: const Text(
+                                'INSTAN & GRATIS',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.success,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Ketik atau gunakan tombol mikrofon keyboard HP Anda, lalu ketuk Terapkan untuk mengisi otomatis.',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: AppColors.textSecondaryOf(context),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _quickSentenceCtrl,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) =>
+                                    _applySmartQuickSentence(accounts),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  hintText:
+                                      'Contoh: "Kopi Kenangan 35rb pakai GoPay"',
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _applySmartQuickSentence(accounts),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.accentDark,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 11,
+                                ),
+                              ),
+                              child: const Text(
+                                'Terapkan',
+                                style: TextStyle(fontSize: 12.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 14),
                   if (accounts.isNotEmpty) ...[
