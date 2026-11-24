@@ -15,7 +15,7 @@ import { FooterSection } from "./OnePage/components/FooterSection";
 const DEFAULT_META = {
   latestVersion: "1.2.2",
   buildNumber: 8,
-  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-latest.apk",
+  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v1.2.2.apk?build=8",
   releaseNotes: [
     "Pencatatan Cepat Kalimat & Dikte Suara Pintar (Hemat Kuota Free-Tier + Deteksi Akun & Nominal Otomatis)",
     "Panel Admin Broadcast & Upload Foto Banner Real-Time Langsung dari Aplikasi & Web",

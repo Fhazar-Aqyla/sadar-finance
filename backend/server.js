@@ -135,11 +135,19 @@ app.use('/uploads', express.static(uploadDir, {
   setHeaders: setUploadResponseHeaders,
 }));
 app.use('/downloads', express.static(downloadsDir, {
+  etag: false,
+  lastModified: true,
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.apk')) {
+      const baseName = path.basename(filePath);
+      const downloadName = baseName.includes('1.2.2')
+        ? 'SADAR-Finance-v1.2.2.apk'
+        : 'SADAR-Finance-v1.2.2.apk';
       res.setHeader('Content-Type', 'application/vnd.android.package-archive');
-      res.setHeader('Content-Disposition', 'attachment; filename="SADAR-Finance-latest.apk"');
-      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      res.setHeader('CDN-Cache-Control', 'no-store');
+      res.setHeader('Cloudflare-CDN-Cache-Control', 'no-store');
     }
   },
 }));
