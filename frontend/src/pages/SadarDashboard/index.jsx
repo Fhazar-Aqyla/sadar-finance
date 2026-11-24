@@ -1019,6 +1019,7 @@ const DashboardWithData = () => {
   });
   const [sendingStatement, setSendingStatement] = useState(false);
   const [statementMessage, setStatementMessage] = useState("");
+  const [dismissedBroadcastIds, setDismissedBroadcastIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const displayProfile = apiRows.profile;
@@ -1343,81 +1344,74 @@ const DashboardWithData = () => {
     return <NewUserDashboard profileName={displayProfile.name} />;
   }
 
+  const visibleBroadcasts = (apiRows.broadcasts || []).filter(
+    (b) => !dismissedBroadcastIds.includes(b.id || b.title)
+  );
+
   return (
     <div className="page-content sadar-dashboard">
       <Container fluid>
-        {apiRows.broadcasts && apiRows.broadcasts.length > 0 && (
-          <div className="mb-3">
-            {apiRows.broadcasts.map((b) => (
-              <Card
-                key={b.id || b.title}
-                className="border-0 shadow-sm mb-2"
-                style={{
-                  borderRadius: "16px",
-                  background: "linear-gradient(135deg, #0a1e36 0%, #102a4c 60%, #1e3a8a 100%)",
-                  color: "#ffffff",
-                }}
+        {visibleBroadcasts.length > 0 &&
+          visibleBroadcasts.map((b) => {
+            const bId = b.id || b.title;
+            const isMaint = b.type === "maintenance" || b.type === "urgent";
+            return (
+              <div
+                key={bId}
+                className={`sadar-broadcast-banner ${isMaint ? "is-maintenance" : ""}`}
               >
-                <CardBody className="p-3 p-md-4">
-                  <Row className="align-items-center g-3">
-                    {b.imageUrl && (
-                      <Col md={4} lg={3}>
-                        <img
-                          src={b.imageUrl}
-                          alt={b.title}
-                          style={{
-                            width: "100%",
-                            height: "120px",
-                            objectFit: "cover",
-                            borderRadius: "12px",
-                          }}
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </Col>
-                    )}
-                    <Col md={b.imageUrl ? 8 : 12} lg={b.imageUrl ? 9 : 12}>
-                      <span
-                        className="badge mb-2"
-                        style={{
-                          backgroundColor: "rgba(20,184,166,0.2)",
-                          color: "#5eead4",
-                          border: "1px solid rgba(94,234,212,0.4)",
-                        }}
-                      >
-                        {b.badge || "PENGUMUMAN RESMI"}
-                      </span>
-                      <h5 className="fw-bold text-white mb-1">{b.title}</h5>
-                      <p
-                        className="mb-2"
-                        style={{
-                          fontSize: "13.5px",
-                          color: "#cbd5e1",
-                          textAlign: "justify",
-                          lineHeight: 1.55,
-                        }}
-                      >
-                        {b.message}
-                      </p>
-                      {b.actionLabel && b.actionRoute && (
-                        <Button
-                          tag={Link}
-                          to={b.actionRoute}
-                          size="sm"
-                          color="info"
-                          className="fw-semibold"
-                        >
-                          {b.actionLabel}
-                        </Button>
-                      )}
-                    </Col>
-                  </Row>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        )}
+                <div className="sadar-broadcast-left">
+                  {b.imageUrl ? (
+                    <img
+                      src={b.imageUrl}
+                      alt={b.title}
+                      className="sadar-broadcast-thumb"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <span className="sadar-broadcast-icon">
+                      <i
+                        className={
+                          isMaint ? "ri-tools-line" : "ri-megaphone-line"
+                        }
+                      ></i>
+                    </span>
+                  )}
+                  <div className="flex-grow-1 min-width-0">
+                    <span className="sadar-broadcast-badge">
+                      {b.badge || "PENGUMUMAN RESMI"}
+                    </span>
+                    <h5 className="sadar-broadcast-title">{b.title}</h5>
+                    <p className="sadar-broadcast-msg">{b.message}</p>
+                  </div>
+                </div>
+                <div className="sadar-broadcast-actions">
+                  {b.actionLabel && b.actionRoute && (
+                    <Button
+                      tag={Link}
+                      to={b.actionRoute}
+                      color="primary"
+                      size="sm"
+                    >
+                      {b.actionLabel}
+                    </Button>
+                  )}
+                  <button
+                    type="button"
+                    className="sadar-broadcast-close"
+                    aria-label="Tutup pengumuman"
+                    onClick={() =>
+                      setDismissedBroadcastIds((prev) => [...prev, bId])
+                    }
+                  >
+                    <i className="ri-close-line"></i>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         <section className="sadar-overview">
           <div className="sadar-overview-main">
             <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow">
@@ -1438,32 +1432,7 @@ const DashboardWithData = () => {
                 <i className="ri-lightbulb-flash-line align-bottom me-1"></i>
                 Lihat Insight
               </Button>
-              <Button
-                color="light"
-                className="sadar-ghost-btn"
-                disabled={sendingStatement}
-                onClick={async () => {
-                  setSendingStatement(true);
-                  setStatementMessage("");
-                  try {
-                    const res = await analyticsApi.sendStatementEmail();
-                    setStatementMessage(
-                      `e-Statement ${res?.periodLabel || "Bulan Ini"} berhasil dikirim ke ${res?.email || "email Anda"}!`
-                    );
-                  } catch (e) {
-                    setStatementMessage(e?.message || "Gagal mengirim e-Statement.");
-                  } finally {
-                    setSendingStatement(false);
-                  }
-                }}
-              >
-                <i className="ri-mail-send-line align-bottom me-1"></i>
-                {sendingStatement ? "Mengirim e-Statement..." : "Kirim e-Statement ke Email"}
-              </Button>
             </div>
-            {statementMessage && (
-              <div className="mt-2 small fw-semibold text-info">{statementMessage}</div>
-            )}
           </div>
           <div className="sadar-overview-note">
             <span className="sadar-note-icon bg-warning-subtle text-warning">
@@ -1644,10 +1613,40 @@ const DashboardWithData = () => {
               <h4 className="card-title mb-1">Riwayat Terbaru</h4>
               <p className="text-muted mb-0">Pratinjau 5 catatan keuangan terakhir</p>
             </div>
-            <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/financial-history">
-              Lihat Semua
-            </Button>
+            <div className="d-flex align-items-center gap-2 flex-wrap">
+              <Button
+                color="light"
+                size="sm"
+                className="sadar-table-action"
+                disabled={sendingStatement}
+                onClick={async () => {
+                  setSendingStatement(true);
+                  setStatementMessage("");
+                  try {
+                    const res = await analyticsApi.sendStatementEmail();
+                    setStatementMessage(
+                      `e-Statement ${res?.periodLabel || "Bulan Ini"} berhasil dikirim ke ${res?.email || "email Anda"}`
+                    );
+                  } catch (e) {
+                    setStatementMessage(e?.message || "Gagal mengirim e-Statement.");
+                  } finally {
+                    setSendingStatement(false);
+                  }
+                }}
+              >
+                <i className="ri-mail-send-line align-bottom me-1"></i>
+                {sendingStatement ? "Mengirim..." : "Kirim e-Statement Email"}
+              </Button>
+              <Button color="light" size="sm" className="sadar-table-action" tag={Link} to="/financial-history">
+                Lihat Semua
+              </Button>
+            </div>
           </CardHeader>
+          {statementMessage && (
+            <div className="px-4 pb-2 small fw-semibold text-success">
+              {statementMessage}
+            </div>
+          )}
           <CardBody className="pt-0">
             <div className="table-responsive sadar-table-wrap">
               <Table className="align-middle mb-0 sadar-table">

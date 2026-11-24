@@ -110,6 +110,151 @@
   background: #f0fdfa;
 }
 
+.sadar-broadcast-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.15rem;
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.35rem;
+  border: 1px solid #c7eee8;
+  border-left: 4px solid #14b8a6;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.035);
+}
+
+.sadar-broadcast-banner.is-maintenance {
+  border-color: #f4dfb8;
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #fffaf0 0%, #f8fafc 100%);
+}
+
+.sadar-broadcast-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.sadar-broadcast-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.14);
+  color: #0f766e;
+  font-size: 1.25rem;
+}
+
+.sadar-broadcast-banner.is-maintenance .sadar-broadcast-icon {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+.sadar-broadcast-thumb {
+  width: 112px;
+  height: 74px;
+  flex: 0 0 112px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.sadar-broadcast-badge {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.14);
+  color: #0f766e;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sadar-broadcast-banner.is-maintenance .sadar-broadcast-badge {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+.sadar-broadcast-title {
+  margin: 0 0 0.25rem 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 780;
+  line-height: 1.3;
+}
+
+.sadar-broadcast-msg {
+  margin: 0;
+  color: #475569;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: justify;
+}
+
+.sadar-broadcast-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.sadar-broadcast-close {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-banner {
+  border-color: rgba(20, 184, 166, 0.3);
+  border-left-color: #14b8a6;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.16) 0%, #182232 100%);
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-banner.is-maintenance {
+  border-color: rgba(245, 158, 11, 0.32);
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(180, 83, 9, 0.16) 0%, #182232 100%);
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-icon {
+  background: rgba(20, 184, 166, 0.2);
+  color: #5eead4;
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-badge {
+  background: rgba(20, 184, 166, 0.2);
+  color: #5eead4;
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-title {
+  color: #f8fafc;
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-msg {
+  color: #cbd5e1;
+}
+
+html[data-bs-theme="dark"] .sadar-broadcast-close {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: #1e293b;
+  color: #94a3b8;
+}
+
 .sadar-overview-note .sadar-note-icon {
   width: 34px;
   height: 34px;

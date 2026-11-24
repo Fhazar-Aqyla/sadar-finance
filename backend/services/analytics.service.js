@@ -689,8 +689,8 @@ class AnalyticsService {
       await Promise.all([
         userRepository.findById(userId),
         accountRepository.findByUser(userId),
-        transactionRepository.findByUser(userId, { page: 1, limit: 50 }),
-        incomeRepository.findByUser(userId, { page: 1, limit: 50 }),
+        transactionRepository.findAll(userId, { page: 1, limit: 50 }).catch(() => ({ data: [] })),
+        incomeRepository.findAll(userId, { page: 1, limit: 50 }).catch(() => ({ data: [] })),
         this.getLatestBudget(userId).catch(() => null),
         this.calculateHealthScore(userId, { period: '1m' }).catch(() => null),
         plansRepository.getByUser(userId).catch(() => ({ savingsGoals: [], debts: [] })),
@@ -703,12 +703,17 @@ class AnalyticsService {
       0
     );
 
+    const safeIso = (val) => {
+      const d = new Date(val || 0);
+      return Number.isNaN(d.getTime()) ? '' : d.toISOString();
+    };
+
     const monthTrx = transactions.filter((t) => {
-      const d = new Date(t.transaction_date || t.transactionDate || 0).toISOString();
+      const d = safeIso(t.transaction_date || t.transactionDate);
       return d >= startOfMonth && d <= endOfMonth;
     });
     const monthInc = incomes.filter((i) => {
-      const d = new Date(i.income_date || i.incomeDate || 0).toISOString();
+      const d = safeIso(i.income_date || i.incomeDate);
       return d >= startOfMonth && d <= endOfMonth;
     });
 

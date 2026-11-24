@@ -3,7 +3,7 @@ import { Col, Dropdown, DropdownMenu, DropdownToggle, Row } from "reactstrap";
 import { Link } from "react-router-dom";
 import SimpleBar from "simplebar-react";
 
-import { analyticsApi } from "../services/api";
+import { analyticsApi, appApi } from "../services/api";
 
 const translateMessage = (msg) => {
   if (!msg) return "";
@@ -33,20 +33,57 @@ const NotificationDropdown = () => {
     let isMounted = true;
     const fetchNotifications = async () => {
       try {
-        const response = await analyticsApi.alerts();
-        const rawAlerts = response?.data || response || [];
+        const [alertsRes, bcastRes] = await Promise.all([
+          analyticsApi.alerts().catch(() => []),
+          appApi.broadcasts().catch(() => ({ broadcasts: [] })),
+        ]);
+        const rawAlerts = alertsRes?.data || alertsRes || [];
+        const rawBroadcasts = Array.isArray(bcastRes?.broadcasts)
+          ? bcastRes.broadcasts
+          : [];
         if (!isMounted) return;
 
-        if (Array.isArray(rawAlerts)) {
-          const mapped = rawAlerts.map((alert) => ({
-            icon: alert.alert_type === "warning" || alert.alertType === "warning" ? "ri-alert-line" : "ri-information-line",
-            tone: alert.alert_type === "warning" || alert.alertType === "warning" ? "warning" : "info",
-            title: alert.alert_type === "warning" || alert.alertType === "warning" ? "Peringatan Anggaran" : "Informasi Keuangan",
-            message: translateMessage(alert.message || ""),
-            time: alert.created_at ? new Intl.DateTimeFormat("id-ID", { dateStyle: "short", timeStyle: "short" }).format(new Date(alert.created_at)) : "Baru saja",
-          }));
-          setNotifications(mapped);
-        }
+        const mappedBroadcasts = rawBroadcasts.map((b) => ({
+          icon:
+            b.type === "maintenance" || b.type === "urgent"
+              ? "ri-tools-line"
+              : "ri-megaphone-line",
+          tone:
+            b.type === "maintenance" || b.type === "urgent"
+              ? "warning"
+              : "primary",
+          title: b.title || "Pengumuman SADAR Finance",
+          message: b.message || "",
+          time: b.badge || "PENGUMUMAN RESMI",
+          route: b.actionRoute || "/dashboard",
+        }));
+
+        const mappedAlerts = Array.isArray(rawAlerts)
+          ? rawAlerts.map((alert) => ({
+              icon:
+                alert.alert_type === "warning" || alert.alertType === "warning"
+                  ? "ri-alert-line"
+                  : "ri-information-line",
+              tone:
+                alert.alert_type === "warning" || alert.alertType === "warning"
+                  ? "warning"
+                  : "primary",
+              title:
+                alert.alert_type === "warning" || alert.alertType === "warning"
+                  ? "Peringatan Anggaran"
+                  : "Informasi Keuangan",
+              message: translateMessage(alert.message || ""),
+              time: alert.created_at
+                ? new Intl.DateTimeFormat("id-ID", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  }).format(new Date(alert.created_at))
+                : "Baru saja",
+              route: "/behavior-insight",
+            }))
+          : [];
+
+        setNotifications([...mappedBroadcasts, ...mappedAlerts]);
       } catch {
         if (!isMounted) return;
         setNotifications([]);
@@ -69,7 +106,12 @@ const NotificationDropdown = () => {
         )}
       </DropdownToggle>
       <DropdownMenu className="dropdown-menu-end p-0 sadar-notification-menu">
-        <div className="dropdown-head bg-primary bg-pattern rounded-top">
+        <div
+          className="dropdown-head rounded-top"
+          style={{
+            background: "linear-gradient(135deg, #0a1e36 0%, #1e3a8a 100%)",
+          }}
+        >
           <div className="p-3">
             <Row className="align-items-center">
               <Col>

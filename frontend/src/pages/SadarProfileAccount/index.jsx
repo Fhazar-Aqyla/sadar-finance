@@ -88,16 +88,38 @@ const showAccountAlert = ({ icon, title, text }) =>
     },
   });
 
+const buildAvatar2dDataUri = (avatarId) => {
+  const id = String(avatarId || "").replace(/^avatar2d:/, "");
+  const palettes = {
+    freelancer: ["#6366f1", "#4338ca"],
+    student: ["#3b82f6", "#1d4ed8"],
+    executive: ["#0f172a", "#1e3a8a"],
+    investor: ["#10b981", "#047857"],
+    saver: ["#14b8a6", "#0f766e"],
+  };
+  const [c1, c2] = palettes[id] || ["#1e3a8a", "#14b8a6"];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><circle cx="60" cy="60" r="60" fill="url(#g)"/><circle cx="60" cy="46" r="21" fill="#fde68a"/><path d="M40 36c4-10 36-10 40 0 0-8-8-16-20-16s-20 8-20 16z" fill="#1e293b"/><circle cx="53" cy="46" r="2.6" fill="#0f172a"/><circle cx="67" cy="46" r="2.6" fill="#0f172a"/><path d="M54 54q6 5 12 0" stroke="#0f172a" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M28 106c4-22 20-32 32-32s28 10 32 32" fill="#ffffff" fill-opacity="0.9"/></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
+const resolveProfileAvatar = (url) => {
+  if (!url) return "";
+  if (String(url).startsWith("avatar2d:")) return buildAvatar2dDataUri(url);
+  if (/^(https?:|data:)/i.test(url)) return url;
+  return `https://sadar-finance.web.id${url.startsWith("/") ? "" : "/"}${url}`;
+};
+
 const getStoredUserProfile = () => {
   try {
     const authUser = getStoredAuthUser();
     const user = authUser?.user || authUser?.data?.user || {};
     const firstName = user.first_name || user.firstName || "";
+    const middleName = user.middle_name || user.middleName || "";
     const lastName = user.last_name || user.lastName || "";
     const cleanLastName =
       lastName === "User" || lastName === "user" ? "" : lastName;
     const name =
-      `${firstName} ${cleanLastName}`.trim() ||
+      [firstName, middleName, cleanLastName].filter(Boolean).join(" ") ||
       user.name ||
       user.username ||
       user.email ||
@@ -106,8 +128,10 @@ const getStoredUserProfile = () => {
     return {
       id: user.users_id || user.id || defaultProfile.id,
       name,
+      username: user.username || "",
+      nickname: middleName || firstName || "",
       email: user.email || defaultProfile.email,
-      avatar: user.profile_picture || user.profilePicture || "",
+      avatar: resolveProfileAvatar(user.profile_picture || user.profilePicture || ""),
     };
   } catch {
     return defaultProfile;
@@ -116,17 +140,20 @@ const getStoredUserProfile = () => {
 
 const normalizeProfile = (user) => {
   const firstName = user?.first_name || user?.firstName || "";
+  const middleName = user?.middle_name || user?.middleName || "";
   const lastName = user?.last_name || user?.lastName || "";
   const cleanLastName =
     lastName === "User" || lastName === "user" ? "" : lastName;
   return {
     id: user?.users_id || user?.id || defaultProfile.id,
     name:
-      `${firstName} ${cleanLastName}`.trim() ||
+      [firstName, middleName, cleanLastName].filter(Boolean).join(" ") ||
       user?.email ||
       defaultProfile.name,
+    username: user?.username || "",
+    nickname: middleName || firstName || "",
     email: user?.email || defaultProfile.email,
-    avatar: user?.profile_picture || user?.profilePicture || "",
+    avatar: resolveProfileAvatar(user?.profile_picture || user?.profilePicture || ""),
   };
 };
 
@@ -340,6 +367,12 @@ const EmptyProfileAccount = () => {
                   </div>
                   <div className="sadar-profile-photo-copy">
                     <h5>{profile.name}</h5>
+                    {profile.username && (
+                      <div className="small fw-semibold text-teal mb-1">
+                        @{profile.username}
+                        {profile.nickname ? ` - Panggilan: ${profile.nickname}` : ""}
+                      </div>
+                    )}
                     <p>{profile.email}</p>
                   </div>
                 </div>
@@ -997,6 +1030,12 @@ const ProfileAccountWithData = () => {
                   </div>
                   <div className="sadar-profile-photo-copy">
                     <h5>{profile.name}</h5>
+                    {profile.username && (
+                      <div className="small fw-semibold text-teal mb-1">
+                        @{profile.username}
+                        {profile.nickname ? ` - Panggilan: ${profile.nickname}` : ""}
+                      </div>
+                    )}
                     <p>{profile.email}</p>
                   </div>
                 </div>
@@ -1047,7 +1086,9 @@ const ProfileAccountWithData = () => {
                       ? inst.icon
                       : account.type === "Bank"
                         ? "🏦"
-                        : "💳";
+                        : account.type === "Tunai" || account.type === "Cash"
+                          ? "💵"
+                          : "💳";
                     return (
                       <div
                         className="sadar-insight-item sadar-account-item d-flex align-items-center justify-content-between gap-3 p-3 mb-2 rounded-3 border"

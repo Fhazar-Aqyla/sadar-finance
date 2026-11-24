@@ -6,6 +6,7 @@
 export const INSTITUTION_TYPES = {
   BANK: "Bank",
   E_WALLET: "E-wallet",
+  CASH: "Tunai",
 };
 
 export const FINANCIAL_INSTITUTIONS = [
@@ -85,6 +86,13 @@ export const inferAccountType = (institutionName) => {
   if (found) return found.type;
 
   const lower = String(institutionName || "").toLowerCase();
+  if (
+    lower.includes("tunai") ||
+    lower.includes("cash") ||
+    lower.includes("dompet fisik")
+  ) {
+    return INSTITUTION_TYPES.CASH;
+  }
   if (
     lower.includes("gopay") ||
     lower.includes("ovo") ||

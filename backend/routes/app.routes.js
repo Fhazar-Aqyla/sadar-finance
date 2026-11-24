@@ -61,30 +61,31 @@ router.get('/version', (_req, res) => {
   } catch (_) {}
 
   const latestVersion =
-    process.env.APP_LATEST_VERSION || fileConfig.latestVersion || '1.2.1';
+    fileConfig.latestVersion || process.env.APP_LATEST_VERSION || '1.2.1';
   const buildNumber = Number(
-    process.env.APP_BUILD_NUMBER || fileConfig.buildNumber || 7
+    fileConfig.buildNumber || process.env.APP_BUILD_NUMBER || 7
   );
   const minVersion =
-    process.env.APP_MIN_VERSION || fileConfig.minVersion || '1.0.0';
+    fileConfig.minVersion || process.env.APP_MIN_VERSION || '1.0.0';
   const forceUpdate =
     String(
-      process.env.APP_FORCE_UPDATE || fileConfig.forceUpdate || 'false'
+      fileConfig.forceUpdate ?? process.env.APP_FORCE_UPDATE ?? 'false'
     ).toLowerCase() === 'true';
   const downloadUrl =
-    process.env.APP_DOWNLOAD_URL ||
     fileConfig.downloadUrl ||
+    process.env.APP_DOWNLOAD_URL ||
     `https://sadar-finance.web.id/downloads/sadar-finance-v${latestVersion}.apk`;
   const rawNotes = process.env.APP_RELEASE_NOTES || '';
-  const releaseNotes = rawNotes
-    ? rawNotes.split('|').map((s) => s.trim()).filter(Boolean)
-    : Array.isArray(fileConfig.releaseNotes) && fileConfig.releaseNotes.length > 0
+  const releaseNotes =
+    Array.isArray(fileConfig.releaseNotes) && fileConfig.releaseNotes.length > 0
       ? fileConfig.releaseNotes
-      : [
-          'Sinkronisasi Cloud Penuh untuk Target Tabungan, Tagihan Rutin, Utang/Piutang & Riwayat Transfer',
-          'Laporan e-Statement Bulanan Resmi (Kirim ke Email & Cetak PDF)',
-          'Integrasi Hybrid Hugging Face AI + Groq AI (OCR Struk, Klasifikasi 50/30/20 & Insight Perilaku)',
-        ];
+      : rawNotes
+        ? rawNotes.split('|').map((s) => s.trim()).filter(Boolean)
+        : [
+            'Sinkronisasi Cloud Penuh untuk Target Tabungan, Tagihan Rutin, Utang/Piutang & Riwayat Transfer',
+            'Laporan e-Statement Bulanan Resmi (Kirim ke Email & Cetak PDF)',
+            'Integrasi Hybrid Hugging Face AI + Groq AI (OCR Struk, Klasifikasi 50/30/20 & Insight Perilaku)',
+          ];
 
   const broadcasts = loadActiveBroadcasts();
 
