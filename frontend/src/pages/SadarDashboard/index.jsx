@@ -1692,12 +1692,9 @@ const DashboardWithData = () => {
               <div>
                 <h4 className="card-title mb-1">Papan Peringkat Streak (Leaderboard)</h4>
                 <p className="text-muted mb-0">
-                  Konsistensi pencatatan keuangan dari akun pengguna aktif SADAR Finance
+                  Peringkat konsistensi pencatatan keuangan harian pengguna SADAR Finance
                 </p>
               </div>
-              <Badge color="warning" className="bg-warning-subtle text-warning">
-                100% Akun Aktif Database
-              </Badge>
             </CardHeader>
             <CardBody className="pt-0">
               <div className="table-responsive sadar-table-wrap">
@@ -1720,7 +1717,14 @@ const DashboardWithData = () => {
                       return (
                         <tr key={u.users_id || idx}>
                           <td>
-                            <Badge color={idx === 0 ? "warning" : idx === 1 ? "secondary" : idx === 2 ? "info" : "light"}>
+                            <Badge
+                              color={idx === 0 ? "warning" : "secondary"}
+                              className={
+                                idx === 0
+                                  ? "bg-warning-subtle text-warning"
+                                  : "bg-secondary-subtle text-secondary"
+                              }
+                            >
                               #{idx + 1}
                             </Badge>
                           </td>

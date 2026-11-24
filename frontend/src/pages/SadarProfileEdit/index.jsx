@@ -1094,14 +1094,23 @@ const ProfileEdit = () => {
                       </Col>
 
                       <Col md={12}>
-                        <div className="d-flex justify-content-between align-items-center mb-1">
-                          <Label htmlFor="profile-address" className="form-label mb-0">
-                            Alamat Lengkap
-                          </Label>
-                          <Button
-                            color="info"
-                            size="sm"
-                            outline
+                        <Label htmlFor="profile-address" className="form-label">
+                          Alamat Lengkap
+                        </Label>
+                        <InputGroup>
+                          <Input
+                            id="profile-address"
+                            value={profile.address}
+                            onChange={(e) =>
+                              handleChange("address", e.target.value)
+                            }
+                            placeholder="Contoh: Jl. Cipta Karya Ujung, Perumahan Karya Gading Permai No. B14"
+                          />
+                          <InputGroupText
+                            tag="button"
+                            type="button"
+                            className="sadar-password-toggle btn btn-light d-flex align-items-center gap-1 px-3 fw-semibold"
+                            style={{ color: "#1e3a8a", fontSize: "12.5px" }}
                             disabled={isLocatingGps}
                             onClick={() => {
                               if (!navigator.geolocation) return;
@@ -1115,14 +1124,27 @@ const ProfileEdit = () => {
                                     );
                                     const data = await res.json();
                                     const addr = data?.address || {};
-                                    const road = addr.road || addr.suburb || addr.village || "";
-                                    const city = addr.city || addr.town || addr.county || "";
+                                    const road =
+                                      addr.road ||
+                                      addr.suburb ||
+                                      addr.village ||
+                                      "";
+                                    const city =
+                                      addr.city ||
+                                      addr.town ||
+                                      addr.county ||
+                                      "";
                                     const province = addr.state || "";
                                     const postcode = addr.postcode || "";
-                                    handleChange("address", road || data?.display_name || "");
+                                    handleChange(
+                                      "address",
+                                      road || data?.display_name || ""
+                                    );
                                     if (city) handleChange("city", city);
-                                    if (province) handleChange("province", province);
-                                    if (postcode) handleChange("postalCode", postcode);
+                                    if (province)
+                                      handleChange("province", province);
+                                    if (postcode)
+                                      handleChange("postalCode", postcode);
                                   } catch (_) {
                                   } finally {
                                     setIsLocatingGps(false);
@@ -1133,18 +1155,12 @@ const ProfileEdit = () => {
                               );
                             }}
                           >
-                            <i className="ri-map-pin-user-line me-1"></i>
-                            {isLocatingGps ? "Melacak GPS..." : "Lacak Alamat via GPS"}
-                          </Button>
-                        </div>
-                        <Input
-                          id="profile-address"
-                          value={profile.address}
-                          onChange={(e) =>
-                            handleChange("address", e.target.value)
-                          }
-                          placeholder="Contoh: Jl. Cipta Karya Ujung, Perumahan Karya Gading Permai No. B14"
-                        />
+                            <i className="ri-map-pin-line"></i>
+                            <span>
+                              {isLocatingGps ? "Melacak..." : "Titik GPS"}
+                            </span>
+                          </InputGroupText>
+                        </InputGroup>
                       </Col>
 
                       <Col md={4}>
