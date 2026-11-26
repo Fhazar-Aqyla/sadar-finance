@@ -894,26 +894,30 @@ const FinancialScoreWithData = () => {
                     </Button>
                   ))}
                 </ButtonGroup>
-                <ReactApexChart
-                  key={scoreTone.chartColor}
-                  type="radialBar"
-                  height={250}
-                  series={[data.score]}
-                  options={{
-                    chart: { sparkline: { enabled: true } },
-                    colors: [scoreTone.chartColor],
-                    plotOptions: {
-                      radialBar: {
-                        hollow: { size: "70%" },
-                        track: { background: "#e8edf5" },
-                        dataLabels: { show: false },
+                <div className="sadar-score-ring-wrap">
+                  <ReactApexChart
+                    key={scoreTone.chartColor}
+                    type="radialBar"
+                    height={220}
+                    series={[data.score]}
+                    options={{
+                      chart: { sparkline: { enabled: true } },
+                      colors: [scoreTone.chartColor],
+                      plotOptions: {
+                        radialBar: {
+                          hollow: { size: "72%" },
+                          track: { background: "#e8edf5" },
+                          dataLabels: { show: false },
+                        },
                       },
-                    },
-                  }}
-                />
-                <div className={`sadar-score-number ${scoreTone.className}`}>
-                  {data.score}
-                  <span>/100</span>
+                    }}
+                  />
+                  <div className="sadar-score-ring-center">
+                    <div className={`sadar-score-number ${scoreTone.className}`}>
+                      {data.score}
+                    </div>
+                    <span className="sadar-score-sub">/ 100 Poin</span>
+                  </div>
                 </div>
                 <span className={`sadar-score-status ${scoreTone.className}`}>
                   {data.status}

@@ -34,6 +34,31 @@ const rupiah = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const formatCompactRupiahAxis = (value) => {
+  const num = Number(value || 0);
+  if (num <= 0) return "0";
+  if (num >= 1000000) {
+    const jt = num / 1000000;
+    const formatted = Number.isInteger(jt) ? String(jt) : jt.toFixed(1).replace(".", ",");
+    return `${formatted} jt`;
+  }
+  if (num >= 1000) {
+    return `${Math.round(num / 1000)} rb`;
+  }
+  return String(Math.round(num));
+};
+
+const computeNiceAxisMax = (rawMax) => {
+  const val = Number(rawMax || 0);
+  if (val <= 0) return 100000;
+  const padded = val * 1.25;
+  let step = 50000;
+  if (padded > 5000000) step = 2000000;
+  else if (padded > 1000000) step = 500000;
+  else if (padded > 250000) step = 100000;
+  return Math.max(step * 2, Math.ceil(padded / step) * step);
+};
+
 const sumBy = (rows, getValue) => rows.reduce((total, row) => total + getValue(row), 0);
 
 const groupSumBy = (rows, key) =>
@@ -299,7 +324,7 @@ const newUserSummaryCards = [
   {
     label: "Total Saldo",
     value: "Rp 0",
-    helper: "Belum ada akun",
+    helper: "Belum ada rekening • 0 catatan",
     icon: "ri-wallet-3-line",
     tone: "primary",
   },
@@ -319,17 +344,10 @@ const newUserSummaryCards = [
   },
   {
     label: "Sisa Anggaran",
-    value: "Belum diatur",
-    helper: "Atur anggaran 50/30/20",
+    value: "Belum Diatur",
+    helper: "Atur alokasi anggaran 50/30/20",
     icon: "ri-pie-chart-2-line",
     tone: "teal",
-  },
-  {
-    label: "Jumlah Transaksi",
-    value: "0",
-    helper: "Belum ada catatan",
-    icon: "ri-file-list-3-line",
-    tone: "sand",
   },
 ];
 
@@ -563,16 +581,16 @@ const NewUserDashboard = ({ profileName = "SADAR" }) => {
           </div>
         </section>
 
-        <Row className="g-3 row-cols-1 row-cols-md-2 row-cols-xl-5 mt-3">
+        <Row className="g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4 mt-3">
           {newUserSummaryCards.map((item) => (
             <Col key={item.label}>
               <Card className="metric-card h-100">
                 <CardBody>
                   <div className="metric-card-top">
+                    <span className="metric-label">{item.label}</span>
                     <span className={`metric-icon bg-${item.tone}-subtle text-${item.tone}`}>
                       <i className={item.icon}></i>
                     </span>
-                    <span>{item.label}</span>
                   </div>
                   <h2>{item.value}</h2>
                   <p>{item.helper}</p>
@@ -588,7 +606,7 @@ const NewUserDashboard = ({ profileName = "SADAR" }) => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Arus Kas Bulanan</h4>
-                  <p className="text-muted mb-0">Diambil dari catatan pemasukan dan pengeluaran 6 bulan terakhir</p>
+                  <p className="text-muted mb-0">Perbandingan 6 bulan terakhir</p>
                 </div>
               </CardHeader>
               <CardBody>
@@ -605,32 +623,37 @@ const NewUserDashboard = ({ profileName = "SADAR" }) => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Skor Finansial</h4>
-                  <p className="text-muted mb-0">Ringkasan kesehatan keuangan saat ini</p>
+                  <p className="text-muted mb-0">Kesehatan keuangan bulan ini</p>
                 </div>
+                <Link to="/financial-score" className="fs-12 fw-semibold text-primary text-decoration-none">
+                  Detail →
+                </Link>
               </CardHeader>
-              <CardBody className="sadar-score-main d-flex flex-column align-items-center justify-content-center">
-                <ReactApexChart
-                  type="radialBar"
-                  height={250}
-                  series={[0]}
-                  options={{
-                    chart: { sparkline: { enabled: true } },
-                    colors: ["#e8edf5"],
-                    plotOptions: {
-                      radialBar: {
-                        hollow: { size: "70%" },
-                        track: { background: "#e8edf5" },
-                        dataLabels: { show: false },
+              <CardBody className="sadar-score-main">
+                <div className="sadar-score-ring-wrap">
+                  <ReactApexChart
+                    type="radialBar"
+                    height={210}
+                    series={[0]}
+                    options={{
+                      chart: { sparkline: { enabled: true } },
+                      colors: ["#e8edf5"],
+                      plotOptions: {
+                        radialBar: {
+                          hollow: { size: "72%" },
+                          track: { background: "#e8edf5" },
+                          dataLabels: { show: false },
+                        },
                       },
-                    },
-                  }}
-                />
-                <div className="sadar-score-number text-muted">
-                  -
-                  <span>/100</span>
+                    }}
+                  />
+                  <div className="sadar-score-ring-center">
+                    <div className="sadar-score-number text-muted">-</div>
+                    <span className="sadar-score-sub">/ 100 Poin</span>
+                  </div>
                 </div>
                 <span className="sadar-score-status text-muted">Belum Tersedia</span>
-                <p className="sadar-score-note text-center mt-2 mb-0">
+                <p className="sadar-score-note text-center mt-1 mb-0">
                   Skor akan dihitung otomatis setelah data mulai terisi.
                 </p>
               </CardBody>
@@ -739,9 +762,9 @@ const cashflowOptions = {
   colors: ["#22C55E", "#1E3A8A"],
   plotOptions: {
     bar: {
-      borderRadius: 8,
+      borderRadius: 6,
       borderRadiusApplication: "end",
-      columnWidth: "34%",
+      columnWidth: "42%",
       dataLabels: {
         position: "top",
       },
@@ -777,7 +800,7 @@ const cashflowOptions = {
   },
   yaxis: {
     min: 0,
-    max: 10,
+    max: 100000,
     tickAmount: 5,
     labels: {
       offsetX: -4,
@@ -786,7 +809,7 @@ const cashflowOptions = {
         fontSize: "12px",
         fontWeight: 600,
       },
-      formatter: (value) => `${value} jt`,
+      formatter: formatCompactRupiahAxis,
     },
   },
   tooltip: {
@@ -794,7 +817,7 @@ const cashflowOptions = {
     intersect: false,
     marker: { show: true },
     y: {
-      formatter: (value) => rupiah(value * 1000000),
+      formatter: (value) => rupiah(value),
     },
   },
   states: {
@@ -886,10 +909,10 @@ const createTrendOptions = (categories, maxValue) => ({
       offsetX: -4,
       style: {
         colors: "#687385",
-        fontSize: "13px",
+        fontSize: "12px",
         fontWeight: 700,
       },
-      formatter: (value) => Math.round(value).toLocaleString("id-ID"),
+      formatter: formatCompactRupiahAxis,
     },
     axisBorder: {
       show: true,
@@ -904,7 +927,7 @@ const createTrendOptions = (categories, maxValue) => ({
   tooltip: {
     marker: { show: false },
     y: {
-      formatter: (value) => rupiah(value * 100),
+      formatter: (value) => rupiah(value),
     },
   },
   responsive: [
@@ -1197,9 +1220,9 @@ const DashboardWithData = () => {
       }
     });
 
-    const cashflowIncomeData = cashflowMonths.map((month) => Number((monthlyIncome[month.key] / 1000000).toFixed(2)));
-    const cashflowExpenseData = cashflowMonths.map((month) => Number((monthlyExpense[month.key] / 1000000).toFixed(2)));
-    const cashflowMax = Math.max(10, Math.ceil(Math.max(...cashflowIncomeData, ...cashflowExpenseData) / 2) * 2);
+    const cashflowIncomeData = cashflowMonths.map((month) => monthlyIncome[month.key]);
+    const cashflowExpenseData = cashflowMonths.map((month) => monthlyExpense[month.key]);
+    const cashflowMax = computeNiceAxisMax(Math.max(...cashflowIncomeData, ...cashflowExpenseData, 0));
     const trendRows = Object.entries(
       expenseTransactions.reduce((result, transaction) => {
         result[transaction.date] = (result[transaction.date] || 0) + transaction.amount;
@@ -1209,15 +1232,16 @@ const DashboardWithData = () => {
       .sort(([a], [b]) => new Date(`${a}T00:00:00`) - new Date(`${b}T00:00:00`))
       .map(([date, amount]) => ({ date, amount }))
       .slice(-10);
-    const trendSeriesData = trendRows.map((item) => Math.round(item.amount / 1000));
-    const trendMaxValue = Math.max(100, Math.ceil((Math.max(...trendSeriesData, 0) * 1.2) / 500) * 500);
+    const trendSeriesData = trendRows.map((item) => item.amount);
+    const trendMaxValue = computeNiceAxisMax(Math.max(...trendSeriesData, 0));
     const dominantCategoryEntry = Object.entries(categoryRows).sort((a, b) => b[1] - a[1])[0] || ["-", 0];
     const dominantCategory = {
       label: dominantCategoryEntry[0],
       amount: dominantCategoryEntry[1],
       percent: totalExpense ? (dominantCategoryEntry[1] / totalExpense) * 100 : 0,
     };
-    const budgetAlert = mostUsedBudget
+    const hasBudget = budgetLimit > 0;
+    const budgetAlert = hasBudget && mostUsedBudget
       ? {
         label: mostUsedBudget.label || mostUsedBudget.category,
         usage: mostUsedBudget.usage,
@@ -1240,6 +1264,7 @@ const DashboardWithData = () => {
       budgetUsage,
       expenseRatio,
       remainingBudget,
+      hasBudget,
       daysRemaining,
       dailySafeToSpend,
       transactionCount: userTransactions.length + userIncomes.length,
@@ -1269,14 +1294,14 @@ const DashboardWithData = () => {
     {
       label: "Total Saldo",
       value: rupiah(dashboardData.totalSaldo),
-      helper: `${dashboardData.accountCount} rekening aktif`,
+      helper: `${dashboardData.accountCount} rekening aktif • ${dashboardData.transactionCount} catatan`,
       icon: "ri-wallet-3-line",
       tone: "primary",
     },
     {
       label: "Pemasukan Bulan Ini",
       value: rupiah(dashboardData.totalIncome),
-      helper: "Dari pemasukan yang tercatat",
+      helper: "Total pemasukan tercatat",
       icon: "ri-arrow-down-circle-line",
       tone: "success",
     },
@@ -1289,20 +1314,15 @@ const DashboardWithData = () => {
     },
     {
       label: "Sisa Anggaran",
-      value: rupiah(dashboardData.remainingBudget),
+      value: dashboardData.hasBudget ? rupiah(dashboardData.remainingBudget) : "Belum Diatur",
       helper:
-        dashboardData.dailySafeToSpend > 0
-          ? `Aman: ${rupiah(dashboardData.dailySafeToSpend)}/hari (${dashboardData.daysRemaining} hr)`
-          : "Dari alokasi bulan ini",
+        !dashboardData.hasBudget
+          ? "Atur alokasi anggaran 50/30/20"
+          : dashboardData.dailySafeToSpend > 0
+            ? `Aman: ${rupiah(dashboardData.dailySafeToSpend)}/hari (${dashboardData.daysRemaining} hr)`
+            : "Batas anggaran bulan ini tercapai",
       icon: "ri-pie-chart-2-line",
-      tone: getBudgetTone(dashboardData.budgetUsage),
-    },
-    {
-      label: "Jumlah Catatan",
-      value: `${dashboardData.transactionCount} catatan`,
-      helper: "Pemasukan dan pengeluaran",
-      icon: "ri-file-list-3-line",
-      tone: "sand",
+      tone: dashboardData.hasBudget ? getBudgetTone(dashboardData.budgetUsage) : "teal",
     },
   ];
 
@@ -1339,11 +1359,11 @@ const DashboardWithData = () => {
         : "Masih dalam batas aman, tetap pantau pemakaiannya.",
     }
     : {
-      title: "Anggaran belum tersedia",
-      message: "Atur anggaran 50/30/20 untuk melihat peringatan.",
+      title: "Anggaran 50/30/20 Belum Diatur",
+      message: "Tetapkan batas bulanan agar sisa kuota harian tampil otomatis.",
       progress: 0,
-      tone: "success",
-      detail: "Anggaran membantu memberi sinyal sebelum pengeluaran melewati batas.",
+      tone: "warning",
+      detail: "Klik 'Atur Budget' untuk mengatur alokasi Kebutuhan, Keinginan, & Tabungan.",
     };
 
   if (isLoading) {
@@ -1424,11 +1444,16 @@ const DashboardWithData = () => {
           })}
         <section className="sadar-overview">
           <div className="sadar-overview-main">
-            <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow">
-              Ringkasan {getCurrentPeriodLabel()}
-            </Badge>
+            <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+              <Badge color="primary" className="bg-primary-subtle text-primary sadar-eyebrow mb-0">
+                Ringkasan {getCurrentPeriodLabel()}
+              </Badge>
+              <Badge color="light" className="bg-light text-secondary border sadar-eyebrow mb-0">
+                {dashboardData.transactionCount} Catatan Tercatat
+              </Badge>
+            </div>
             <h1>Halo, {displayProfile.name}</h1>
-            <p>Yuk lihat kondisi keuanganmu hari ini.</p>
+            <p>Yuk pantau arus kas, anggaran 50/30/20, dan kesehatan finansialmu hari ini.</p>
             <div className="sadar-overview-actions">
               <Button color="primary" tag={Link} to="/catat-keuangan">
                 <i className="ri-add-line align-bottom me-1"></i>
@@ -1447,49 +1472,59 @@ const DashboardWithData = () => {
           <div
             className={`sadar-overview-note tone-${dashboardAlert.tone}`}
           >
-            <div className="d-flex align-items-start gap-2.5 w-100">
+            <div className="d-flex align-items-start gap-3 w-100">
               <span
                 className={`sadar-note-icon bg-${dashboardAlert.tone}-subtle text-${dashboardAlert.tone}`}
               >
                 <i
                   className={
-                    dashboardAlert.tone === "success"
+                    dashboardData.hasBudget && dashboardAlert.tone === "success"
                       ? "ri-shield-check-line"
-                      : "ri-alert-line"
+                      : dashboardData.hasBudget
+                        ? "ri-alert-line"
+                        : "ri-pie-chart-2-line"
                   }
                 ></i>
               </span>
               <div className="sadar-alert-copy flex-grow-1 min-width-0">
                 <div className="d-flex align-items-center justify-content-between gap-2">
                   <span className="sadar-section-label">
-                    {dashboardAlert.tone === "success"
-                      ? "Status Anggaran 50/30/20"
-                      : "Peringatan Anggaran"}
+                    {!dashboardData.hasBudget
+                      ? "Anggaran 50/30/20"
+                      : dashboardAlert.tone === "success"
+                        ? "Status Anggaran 50/30/20"
+                        : "Peringatan Anggaran"}
                   </span>
                   <Link to="/profile-account#atur-budget" className="m-0 fs-12">
                     Atur Budget →
                   </Link>
                 </div>
                 <p className="mt-1 mb-1 fw-semibold text-dark">
-                  {dashboardAlert.title}: {dashboardAlert.message}
+                  {dashboardData.hasBudget
+                    ? `${dashboardAlert.title}: ${dashboardAlert.message}`
+                    : dashboardAlert.title}
                 </p>
-                <Progress
-                  value={dashboardAlert.progress}
-                  color={dashboardAlert.tone}
-                  style={{ height: 6 }}
-                  className="my-1.5"
-                />
-                <span className="text-muted fs-11 d-block">
-                  {dashboardData.dailySafeToSpend > 0
-                    ? `Batas aman belanja harian: ${rupiah(dashboardData.dailySafeToSpend)}/hari (${dashboardData.daysRemaining} hari tersisa)`
-                    : dashboardAlert.detail}
+                {dashboardData.hasBudget && (
+                  <Progress
+                    value={dashboardAlert.progress}
+                    color={dashboardAlert.tone}
+                    style={{ height: 6 }}
+                    className="my-2"
+                  />
+                )}
+                <span className="text-muted fs-12 d-block">
+                  {!dashboardData.hasBudget
+                    ? dashboardAlert.message
+                    : dashboardData.dailySafeToSpend > 0
+                      ? `Batas aman belanja harian: ${rupiah(dashboardData.dailySafeToSpend)}/hari (${dashboardData.daysRemaining} hari tersisa)`
+                      : dashboardAlert.detail}
                 </span>
               </div>
             </div>
           </div>
         </section>
 
-        <Row className="g-2.5 row-cols-1 row-cols-sm-2 row-cols-xl-5 mt-2.5">
+        <Row className="g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4 mt-3">
           {summaryCards.map((item) => (
             <Col key={item.label}>
               <Card className="metric-card h-100">
@@ -1514,7 +1549,7 @@ const DashboardWithData = () => {
               <CardHeader>
                 <div>
                   <h4 className="card-title mb-1">Arus Kas Bulanan</h4>
-                  <p className="text-muted mb-0">Diambil dari catatan pemasukan dan pengeluaran 6 bulan terakhir</p>
+                  <p className="text-muted mb-0">Perbandingan 6 bulan terakhir</p>
                 </div>
                 <div className="sadar-chart-legend" aria-label="Legenda cashflow">
                   <span>
@@ -1528,7 +1563,7 @@ const DashboardWithData = () => {
                 </div>
               </CardHeader>
               <CardBody className="cashflow-chart-body">
-                <ReactApexChart options={dynamicCashflowOptions} series={dashboardData.cashflowSeries} type="bar" height={390} />
+                <ReactApexChart options={dynamicCashflowOptions} series={dashboardData.cashflowSeries} type="bar" height={295} />
               </CardBody>
             </Card>
           </Col>
@@ -1541,34 +1576,41 @@ const DashboardWithData = () => {
                     <CardHeader>
                       <div>
                         <h4 className="card-title mb-1">Skor Finansial</h4>
-                        <p className="text-muted mb-0">Ringkasan kesehatan keuangan saat ini</p>
+                        <p className="text-muted mb-0">Kesehatan keuangan bulan ini</p>
                       </div>
+                      <Link to="/financial-score" className="fs-12 fw-semibold text-primary text-decoration-none">
+                        Detail →
+                      </Link>
                     </CardHeader>
-                    <CardBody className="sadar-score-main d-flex flex-column align-items-center justify-content-center">
-                      <ReactApexChart
-                        key={scoreTone.chartColor}
-                        type="radialBar"
-                        height={250}
-                        series={[dashboardData.score]}
-                        options={{
-                          chart: { sparkline: { enabled: true } },
-                          colors: [scoreTone.chartColor],
-                          plotOptions: {
-                            radialBar: {
-                              hollow: { size: "70%" },
-                              track: { background: "#e8edf5" },
-                              dataLabels: { show: false },
+                    <CardBody className="sadar-score-main">
+                      <div className="sadar-score-ring-wrap">
+                        <ReactApexChart
+                          key={scoreTone.chartColor}
+                          type="radialBar"
+                          height={210}
+                          series={[dashboardData.score]}
+                          options={{
+                            chart: { sparkline: { enabled: true } },
+                            colors: [scoreTone.chartColor],
+                            plotOptions: {
+                              radialBar: {
+                                hollow: { size: "72%" },
+                                track: { background: "#e8edf5" },
+                                dataLabels: { show: false },
+                              },
                             },
-                          },
-                        }}
-                      />
-                      <div className={`sadar-score-number ${scoreTone.className}`}>
-                        {dashboardData.score}
-                        <span>/100</span>
+                          }}
+                        />
+                        <div className="sadar-score-ring-center">
+                          <div className={`sadar-score-number ${scoreTone.className}`}>
+                            {dashboardData.score}
+                          </div>
+                          <span className="sadar-score-sub">/ 100 Poin</span>
+                        </div>
                       </div>
                       <span className={`sadar-score-status ${scoreTone.className}`}>{dashboardData.scoreStatus}</span>
-                      <p className="sadar-score-note text-center mt-2 mb-0">
-                        Skor ini membantu membaca pola pemasukan, pengeluaran, anggaran, dan tabunganmu.
+                      <p className="sadar-score-note text-center mt-1 mb-0">
+                        Mengukur rasio pemasukan, pengeluaran, dan alokasi tabunganmu.
                       </p>
                     </CardBody>
                   </Card>
@@ -1579,32 +1621,37 @@ const DashboardWithData = () => {
                 <CardHeader>
                   <div>
                     <h4 className="card-title mb-1">Skor Finansial</h4>
-                    <p className="text-muted mb-0">Ringkasan kesehatan keuangan saat ini</p>
+                    <p className="text-muted mb-0">Kesehatan keuangan bulan ini</p>
                   </div>
+                  <Link to="/financial-score" className="fs-12 fw-semibold text-primary text-decoration-none">
+                    Detail →
+                  </Link>
                 </CardHeader>
-                <CardBody className="sadar-score-main d-flex flex-column align-items-center justify-content-center">
-                  <ReactApexChart
-                    type="radialBar"
-                    height={250}
-                    series={[0]}
-                    options={{
-                      chart: { sparkline: { enabled: true } },
-                      colors: ["#e8edf5"],
-                      plotOptions: {
-                        radialBar: {
-                          hollow: { size: "70%" },
-                          track: { background: "#e8edf5" },
-                          dataLabels: { show: false },
+                <CardBody className="sadar-score-main">
+                  <div className="sadar-score-ring-wrap">
+                    <ReactApexChart
+                      type="radialBar"
+                      height={210}
+                      series={[0]}
+                      options={{
+                        chart: { sparkline: { enabled: true } },
+                        colors: ["#e8edf5"],
+                        plotOptions: {
+                          radialBar: {
+                            hollow: { size: "72%" },
+                            track: { background: "#e8edf5" },
+                            dataLabels: { show: false },
+                          },
                         },
-                      },
-                    }}
-                  />
-                  <div className="sadar-score-number text-muted">
-                    -
-                    <span>/100</span>
+                      }}
+                    />
+                    <div className="sadar-score-ring-center">
+                      <div className="sadar-score-number text-muted">-</div>
+                      <span className="sadar-score-sub">/ 100 Poin</span>
+                    </div>
                   </div>
                   <span className="sadar-score-status text-muted">Belum Tersedia</span>
-                  <p className="sadar-score-note text-center mt-2 mb-0">
+                  <p className="sadar-score-note text-center mt-1 mb-0">
                     Skor akan dihitung otomatis setelah data mulai terisi.
                   </p>
                 </CardBody>

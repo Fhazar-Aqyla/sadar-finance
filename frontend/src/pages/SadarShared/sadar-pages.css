@@ -1282,12 +1282,44 @@ html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
 
 .sadar-score-main {
   display: flex;
-  min-height: 320px;
+  min-height: 295px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
+  padding: 0.75rem 1.25rem 1.25rem !important;
   text-align: center;
+}
+
+.sadar-score-ring-wrap {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.sadar-score-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sadar-score-ring-center .sadar-score-number {
+  font-size: 2.5rem;
+}
+
+.sadar-score-ring-center .sadar-score-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-top: 2px;
 }
 
 .sadar-score-heading span {
@@ -3570,11 +3602,10 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
 
   html:not([data-bs-theme="dark"]) .sadar-sidebar-link-active {
     color: #1e3a8a !important;
-    background: #eef2f8 !important;
-    box-shadow:
-      inset 3px 0 0 0 #1e3a8a,
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      0 4px 12px rgba(30, 58, 138, 0.08) !important;
+    background: #eff6ff !important;
+    border-radius: 10px !important;
+    border: 1px solid #dbeafe !important;
+    box-shadow: 0 2px 8px rgba(30, 58, 138, 0.06) !important;
   }
 
   html:not([data-bs-theme="dark"]) .sadar-sidebar-link-active .sadar-sidebar-icon {

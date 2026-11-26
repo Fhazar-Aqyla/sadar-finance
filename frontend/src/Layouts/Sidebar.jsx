@@ -87,18 +87,21 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
 
   const userName = useMemo(() => {
     const storedUser = getStoredUser();
+    const u =
+      storedUser?.user || storedUser?.data?.user || storedUser?.data || storedUser;
 
     return normalizeAccountName(
+      profileUser?.middle_name ||
+      profileUser?.middleName ||
       profileUser?.first_name ||
+      profileUser?.firstName ||
       profileUser?.username ||
-      storedUser?.user?.first_name ||
-      storedUser?.user?.username ||
-      storedUser?.data?.first_name ||
-      storedUser?.data?.username ||
-      storedUser?.first_name ||
-      storedUser?.username ||
-      storedUser?.user?.email ||
-      storedUser?.email ||
+      u?.middle_name ||
+      u?.middleName ||
+      u?.first_name ||
+      u?.firstName ||
+      u?.username ||
+      u?.email ||
       "Aqyla"
     );
   }, [profileUser]);
@@ -221,9 +224,15 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
           style={{ height: 70 }}
         >
           {!isCollapsed && (
-            <Link to="/landing" title="Buka Halaman Landing Page" className="flex min-w-0 items-center no-underline">
-              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto object-contain" style={{ width: 98 }} />
-              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto object-contain" style={{ width: 98 }} />
+            <Link to="/landing" title="Buka Halaman Landing Page" className="flex min-w-0 items-center gap-2 no-underline">
+              <img
+                src="/browser-tab-icon.png?v=3"
+                alt="A"
+                className="rounded-lg flex-shrink-0"
+                style={{ width: 28, height: 28, objectFit: "contain" }}
+              />
+              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto object-contain" style={{ width: 84 }} />
+              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto object-contain" style={{ width: 84 }} />
             </Link>
           )}
 
