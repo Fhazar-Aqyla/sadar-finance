@@ -455,87 +455,61 @@ const SadarDeveloperPanel = () => {
   return (
     <div className="page-content sadar-page">
       <Container fluid>
-        {/* Header Hero Panel Developer */}
-        <Card
-          className="sadar-panel mb-3 border-0 text-white"
-          style={{
-            background:
-              "linear-gradient(135deg, #0F172A 0%, #1E3A8A 62%, #0D9488 100%)",
-          }}
-        >
-          <CardBody className="p-4">
-            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-              <div className="d-flex align-items-center gap-3">
-                <div
-                  className="d-flex align-items-center justify-content-center rounded-3"
-                  style={{
-                    width: 52,
-                    height: 52,
-                    background: "rgba(255,255,255,0.14)",
-                    border: "1px solid rgba(255,255,255,0.22)",
-                  }}
-                >
-                  <Terminal size={26} />
-                </div>
-                <div>
-                  <div className="d-flex align-items-center gap-2 flex-wrap">
-                    <h4 className="mb-0 text-white fw-bold">
-                      Panel Developer & Control Center
-                    </h4>
-                    <Badge color="success" pill>
-                      V {srv.apiVersion || "2.0.0"} Live
-                    </Badge>
-                    <Badge color="info" pill>
-                      Developer Eksklusif
-                    </Badge>
-                  </div>
-                  <p className="mb-0 mt-1 text-white-50 fs-13">
-                    Pusat kendali OTA Update APK, Telemetri Server & PostgreSQL,
-                    Status AI Engine, Feature Maintenance Gate, dan Broadcast
-                    Real-Time.
-                  </p>
-                </div>
-              </div>
-
-              <div className="d-flex align-items-center gap-2 flex-wrap">
-                <Button
-                  color="light"
-                  size="sm"
-                  className="fw-semibold d-flex align-items-center gap-1"
-                  onClick={handleTestWebPush}
-                >
-                  <Bell size={15} />
-                  Tes Push Browser
-                </Button>
-                <Button
-                  color="light"
-                  size="sm"
-                  className="fw-semibold d-flex align-items-center gap-1"
-                  onClick={() => loadAllDeveloperData(true)}
-                  disabled={isRefreshing}
-                >
-                  <RefreshCw
-                    size={15}
-                    className={isRefreshing ? "spin" : ""}
-                  />
-                  {isRefreshing ? "Menyegarkan..." : "Refresh Telemetri"}
-                </Button>
-                <Button
-                  tag="a"
-                  href="/api-docs"
-                  target="_blank"
-                  rel="noreferrer"
-                  color="warning"
-                  size="sm"
-                  className="fw-semibold d-flex align-items-center gap-1 text-dark"
-                >
-                  <ExternalLink size={15} />
-                  Swagger API Docs
-                </Button>
-              </div>
+        {/* Header Panel Developer — Unified with SADAR Page Header Design */}
+        <div className="sadar-page-header">
+          <div>
+            <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+              <Badge color="primary" className="bg-primary-subtle text-primary">
+                SADAR Finance V {srv.apiVersion || "2.0.0"}
+              </Badge>
+              <Badge color="success" className="bg-success-subtle text-success">
+                Developer Control Center
+              </Badge>
             </div>
-          </CardBody>
-        </Card>
+            <h1>Panel Developer &amp; Pusat Kendali</h1>
+            <p>
+              Pusat kendali OTA Update APK, Telemetri Server &amp; PostgreSQL,
+              Status AI Engine, Feature Maintenance Gate, dan Broadcast
+              Real-Time.
+            </p>
+          </div>
+          <div className="d-flex align-items-center gap-2 flex-wrap">
+            <Button
+              color="light"
+              size="sm"
+              className="sadar-table-action fw-semibold d-flex align-items-center gap-1"
+              onClick={handleTestWebPush}
+            >
+              <Bell size={15} />
+              Tes Push Browser
+            </Button>
+            <Button
+              color="light"
+              size="sm"
+              className="sadar-table-action fw-semibold d-flex align-items-center gap-1"
+              onClick={() => loadAllDeveloperData(true)}
+              disabled={isRefreshing}
+            >
+              <RefreshCw
+                size={15}
+                className={isRefreshing ? "spin" : ""}
+              />
+              {isRefreshing ? "Menyegarkan..." : "Refresh"}
+            </Button>
+            <Button
+              tag="a"
+              href="/api-docs"
+              target="_blank"
+              rel="noreferrer"
+              color="primary"
+              size="sm"
+              className="fw-semibold d-flex align-items-center gap-1"
+            >
+              <ExternalLink size={15} />
+              Swagger API Docs
+            </Button>
+          </div>
+        </div>
 
         {notice && (
           <Alert

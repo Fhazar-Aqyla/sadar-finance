@@ -8,6 +8,7 @@ import {
   Home,
   LogOut,
   ReceiptText,
+  Terminal,
   User,
   Wallet,
   X,
@@ -19,18 +20,19 @@ import sadarLogoLight from "../assets/images/landing/logo-sadar-light.png";
 import dummyAvatar from "../assets/images/users/user-dummy-img.jpg";
 import { getStoredAuthUser } from "../helpers/auth-storage";
 
-const navigationItems = [
+const baseNavigationItems = [
   { id: "dashboard", name: "Dashboard", icon: Home, href: "/dashboard" },
   { id: "catat-keuangan", name: "Catat Keuangan", icon: Edit3, href: "/catat-keuangan" },
   { id: "behavior-insight", name: "Insight Perilaku", icon: Activity, href: "/behavior-insight" },
   { id: "financial-score", name: "Skor Finansial", icon: BarChart3, href: "/financial-score" },
   { id: "financial-plans", name: "Rencana & Piutang", icon: Wallet, href: "/financial-plans" },
   { id: "financial-history", name: "Riwayat Keuangan", icon: ReceiptText, href: "/financial-history" },
+  { id: "profile-account", name: "Profil & Akun", icon: User, href: "/profile-account" },
 ];
 
 const sidebarWidths = {
-  expanded: 280,
-  collapsed: 84,
+  expanded: 252,
+  collapsed: 80,
 };
 
 const getStoredUser = () => {
@@ -112,6 +114,15 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
       "aqyla@example.com"
     );
   }, [profileUser]);
+
+  const navigationItems = useMemo(() => {
+    const isDev = String(userEmail || "").trim().toLowerCase() === "mhmdhabibrafi@gmail.com";
+    if (!isDev) return baseNavigationItems;
+    return [
+      ...baseNavigationItems,
+      { id: "developer-panel", name: "Panel Developer", icon: Terminal, href: "/developer-panel" },
+    ];
+  }, [userEmail]);
 
   const userAvatar = useMemo(() => {
     const rawAvatar =
@@ -204,14 +215,14 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
         <div
-          className={`sadar-sidebar-brand relative flex h-[104px] shrink-0 items-center justify-center border-b border-slate-200 bg-slate-50/60 ${
+          className={`sadar-sidebar-brand relative flex h-[70px] shrink-0 items-center justify-center border-b border-slate-200 bg-white ${
             isCollapsed ? "sadar-sidebar-brand-collapsed" : "px-5"
           }`}
         >
           {!isCollapsed && (
             <Link to="/landing" title="Buka Halaman Landing Page" className="flex min-w-0 items-center no-underline">
-              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[104px] object-contain" />
-              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto w-[104px] object-contain" />
+              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[96px] object-contain" />
+              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto w-[96px] object-contain" />
             </Link>
           )}
 

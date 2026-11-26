@@ -43,13 +43,14 @@
 
 .sadar-overview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+  align-items: center;
   gap: 1rem;
-  padding: 1.25rem;
-  border: 1px solid #e4e9f2;
-  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
   background: #ffffff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
 }
 
 .sadar-overview-main {
@@ -57,35 +58,43 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  min-height: 150px;
+  min-height: auto;
 }
 
 .sadar-eyebrow {
-  margin-bottom: 1rem;
+  margin-bottom: 0.45rem;
   border-radius: 999px;
   font-weight: 600;
+  font-size: 0.72rem;
 }
 
 .sadar-overview h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 2rem;
-  font-weight: 750;
-  line-height: 1.15;
+  font-size: 1.55rem;
+  font-weight: 780;
+  line-height: 1.2;
 }
 
 .sadar-overview p {
   max-width: 620px;
-  margin: 0.65rem 0 0;
+  margin: 0.25rem 0 0;
   color: #64748b;
-  font-size: 0.98rem;
+  font-size: 0.88rem;
 }
 
 .sadar-overview-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-top: 1.25rem;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.sadar-overview-actions .btn {
+  padding: 0.42rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 9px;
 }
 
 .sadar-ghost-btn {
@@ -97,12 +106,27 @@
 .sadar-overview-note {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  min-height: 150px;
-  padding: 1.15rem 1.35rem;
-  border: 1px solid #f4dfb8;
+  gap: 0.85rem;
+  min-height: auto;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  background: #fffaf0;
+  background: #f8fafc;
+}
+
+.sadar-overview-note.tone-success {
+  border-color: #bbf7d0;
+  background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%);
+}
+
+.sadar-overview-note.tone-warning {
+  border-color: #fde68a;
+  background: linear-gradient(135deg, #fffbeb 0%, #f8fafc 100%);
+}
+
+.sadar-overview-note.tone-danger {
+  border-color: #fecaca;
+  background: linear-gradient(135deg, #fef2f2 0%, #f8fafc 100%);
 }
 
 .sadar-new-user-note {
@@ -114,14 +138,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.15rem;
-  margin-bottom: 1rem;
-  padding: 1.1rem 1.35rem;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1.15rem;
   border: 1px solid #c7eee8;
   border-left: 4px solid #14b8a6;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.035);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
 }
 
 .sadar-broadcast-banner.is-maintenance {
@@ -302,44 +326,47 @@ html[data-bs-theme="dark"] .sadar-broadcast-close {
 }
 
 .metric-card {
-  min-height: 148px;
+  min-height: 118px;
 }
 
 .metric-card .card-body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 0.9rem 1.05rem;
 }
 
 .metric-card-top {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.75rem;
+  justify-content: space-between;
+  gap: 0.5rem;
   color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
   text-align: left;
   text-transform: uppercase;
 }
 
-.metric-card-top span:not(.metric-icon) {
+.metric-card-top .metric-label {
   flex: 1;
   min-width: 0;
-  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .metric-icon {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
-  flex: 0 0 38px;
+  flex: 0 0 32px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  font-size: 1.2rem;
+  border-radius: 9px;
+  font-size: 1.05rem;
 }
 
 .metric-icon.bg-primary-subtle,
@@ -397,17 +424,21 @@ html[data-bs-theme="dark"] .sadar-broadcast-close {
 }
 
 .metric-card h2 {
-  margin: 1.05rem 0 0.25rem;
+  margin: 0.55rem 0 0.2rem;
   color: #0f172a;
-  font-size: 1.22rem;
-  font-weight: 750;
+  font-size: 1.24rem;
+  font-weight: 800;
   line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .metric-card p {
   margin: 0;
   color: #64748b;
-  font-size: 0.84rem;
+  font-size: 0.76rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dashboard-panel .card-body {

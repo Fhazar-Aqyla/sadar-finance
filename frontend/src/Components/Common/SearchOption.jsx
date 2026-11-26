@@ -50,12 +50,20 @@ const quickActions = [
     keywords: "financial score skor kesehatan keuangan",
   },
   {
-    title: "Profil",
-    description: "Akun, anggaran, dan riwayat",
+    title: "Rencana & Piutang",
+    description: "Target tabungan, jadwal rutin & split bill",
+    icon: "ri-safe-2-line",
+    color: "primary",
+    link: "/financial-plans",
+    keywords: "rencana piutang utang split bill dana darurat tabungan",
+  },
+  {
+    title: "Profil & Akun",
+    description: "Rekening, anggaran 50/30/20, dan kekayaan bersih",
     icon: "ri-user-settings-line",
     color: "secondary",
     link: "/profile-account",
-    keywords: "profile account akun budget riwayat transaksi",
+    keywords: "profile account akun budget riwayat transaksi net worth",
   },
 ];
 
@@ -132,7 +140,7 @@ const buildSearchItems = () => {
   ];
 };
 
-const SearchOption = ({ className = "d-none d-md-block", autoFocus = false, inputId = "search-options", onNavigate, placeholder = "Cari transaksi, kategori, atau account..." }) => {
+const SearchOption = ({ className = "d-none d-md-block", autoFocus = false, inputId = "search-options", onNavigate, placeholder = "Cari transaksi, kategori, atau rekening..." }) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);

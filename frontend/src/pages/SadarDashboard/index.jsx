@@ -1269,7 +1269,7 @@ const DashboardWithData = () => {
     {
       label: "Total Saldo",
       value: rupiah(dashboardData.totalSaldo),
-      helper: `${dashboardData.accountCount} account aktif`,
+      helper: `${dashboardData.accountCount} rekening aktif`,
       icon: "ri-wallet-3-line",
       tone: "primary",
     },
@@ -1444,28 +1444,61 @@ const DashboardWithData = () => {
               </Button>
             </div>
           </div>
-          <div className="sadar-overview-note">
-            <span className="sadar-note-icon bg-warning-subtle text-warning">
-              <i className="ri-alert-line"></i>
-            </span>
-            <div className="sadar-alert-copy">
-              <span className="sadar-section-label">Peringatan Anggaran</span>
-              <p>{dashboardAlert.title}: {dashboardAlert.message}</p>
-              <Link to="/behavior-insight">Lihat detail</Link>
+          <div
+            className={`sadar-overview-note tone-${dashboardAlert.tone}`}
+          >
+            <div className="d-flex align-items-start gap-2.5 w-100">
+              <span
+                className={`sadar-note-icon bg-${dashboardAlert.tone}-subtle text-${dashboardAlert.tone}`}
+              >
+                <i
+                  className={
+                    dashboardAlert.tone === "success"
+                      ? "ri-shield-check-line"
+                      : "ri-alert-line"
+                  }
+                ></i>
+              </span>
+              <div className="sadar-alert-copy flex-grow-1 min-width-0">
+                <div className="d-flex align-items-center justify-content-between gap-2">
+                  <span className="sadar-section-label">
+                    {dashboardAlert.tone === "success"
+                      ? "Status Anggaran 50/30/20"
+                      : "Peringatan Anggaran"}
+                  </span>
+                  <Link to="/profile-account#atur-budget" className="m-0 fs-12">
+                    Atur Budget →
+                  </Link>
+                </div>
+                <p className="mt-1 mb-1 fw-semibold text-dark">
+                  {dashboardAlert.title}: {dashboardAlert.message}
+                </p>
+                <Progress
+                  value={dashboardAlert.progress}
+                  color={dashboardAlert.tone}
+                  style={{ height: 6 }}
+                  className="my-1.5"
+                />
+                <span className="text-muted fs-11 d-block">
+                  {dashboardData.dailySafeToSpend > 0
+                    ? `Batas aman belanja harian: ${rupiah(dashboardData.dailySafeToSpend)}/hari (${dashboardData.daysRemaining} hari tersisa)`
+                    : dashboardAlert.detail}
+                </span>
+              </div>
             </div>
           </div>
         </section>
 
-        <Row className="g-3 row-cols-1 row-cols-md-2 row-cols-xl-5 mt-3">
+        <Row className="g-2.5 row-cols-1 row-cols-sm-2 row-cols-xl-5 mt-2.5">
           {summaryCards.map((item) => (
             <Col key={item.label}>
               <Card className="metric-card h-100">
                 <CardBody>
                   <div className="metric-card-top">
+                    <span className="metric-label">{item.label}</span>
                     <span className={`metric-icon bg-${item.tone}-subtle text-${item.tone}`}>
                       <i className={item.icon}></i>
                     </span>
-                    <span>{item.label}</span>
                   </div>
                   <h2>{item.value}</h2>
                   <p>{item.helper}</p>

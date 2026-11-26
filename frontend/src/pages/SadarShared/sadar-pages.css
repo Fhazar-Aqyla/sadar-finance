@@ -3122,47 +3122,45 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     z-index: 1;
   }
 
-  html:not([data-bs-theme="dark"]) .sadar-page .card,
-  html:not([data-bs-theme="dark"]) .sadar-dashboard .card,
+  html:not([data-bs-theme="dark"]) .sadar-page .card:not(.sadar-dark-hero-card),
+  html:not([data-bs-theme="dark"]) .sadar-dashboard .card:not(.sadar-dark-hero-card),
   html:not([data-bs-theme="dark"]) .sadar-page-header,
   html:not([data-bs-theme="dark"]) .sadar-overview,
-  html:not([data-bs-theme="dark"]) .sadar-panel,
+  html:not([data-bs-theme="dark"]) .sadar-panel:not(.sadar-dark-hero-card),
   html:not([data-bs-theme="dark"]) .sadar-input-card,
   html:not([data-bs-theme="dark"]) .sadar-detail-card {
-    border: 1px solid rgba(91, 134, 171, 0.22) !important;
-    border-radius: 18px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
     overflow: hidden;
     color: var(--sadar-glass-ink);
-    background: var(--sadar-glass-surface) !important;
-    box-shadow: var(--sadar-glass-shadow) !important;
-    backdrop-filter: blur(12px) saturate(165%);
-    -webkit-backdrop-filter: blur(12px) saturate(165%);
+    background: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.035) !important;
   }
 
   html:not([data-bs-theme="dark"]) .sadar-page-header,
   html:not([data-bs-theme="dark"]) .sadar-overview {
-    background: var(--sadar-glass-surface-raised) !important;
+    background: #ffffff !important;
   }
 
   html:not([data-bs-theme="dark"]) .sadar-page .card-header,
   html:not([data-bs-theme="dark"]) .sadar-dashboard .card-header {
-    border-bottom: 1px solid rgba(91, 134, 171, 0.1) !important;
+    border-bottom: 1px solid #f1f5f9 !important;
     background: transparent !important;
   }
 
   html:not([data-bs-theme="dark"])
     .sadar-page
-    :where(.card-title, h1, h2, h3, h4, h5, h6, strong),
+    :where(.card-title, h1, h2, h3, h4, h5, h6, strong):not(.text-white),
   html:not([data-bs-theme="dark"])
     .sadar-dashboard
-    :where(.card-title, h1, h2, h3, h4, h5, h6, strong) {
+    :where(.card-title, h1, h2, h3, h4, h5, h6, strong):not(.text-white) {
     color: var(--sadar-glass-ink);
   }
 
-  html:not([data-bs-theme="dark"]) .sadar-page :where(p, .text-muted, small),
+  html:not([data-bs-theme="dark"]) .sadar-page :where(p, .text-muted, small):not(.text-white-50),
   html:not([data-bs-theme="dark"])
     .sadar-dashboard
-    :where(p, .text-muted, small) {
+    :where(p, .text-muted, small):not(.text-white-50) {
     color: var(--sadar-glass-muted) !important;
   }
 
@@ -3185,26 +3183,21 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     .sadar-table
     tbody
     tr:not(.sadar-table-empty-row) {
-    border: 1px solid rgba(91, 134, 171, 0.18) !important;
-    border-radius: 15px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
     color: var(--sadar-glass-ink);
-    background: var(--sadar-glass-surface-soft) !important;
-    box-shadow: var(--sadar-glass-shadow-soft) !important;
-    backdrop-filter: blur(16px) saturate(150%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    background: #f8fafc !important;
+    box-shadow: none !important;
   }
 
   html:not([data-bs-theme="dark"]) .sadar-card-icon,
   html:not([data-bs-theme="dark"]) .sadar-header-icon,
-  html:not([data-bs-theme="dark"]) .metric-icon,
   html:not([data-bs-theme="dark"]) .sadar-recommend-icon,
   html:not([data-bs-theme="dark"]) .sadar-factor-icon-wrapper,
   html:not([data-bs-theme="dark"]) .sadar-empty-state-icon {
-    border: 1px solid rgba(30, 58, 138, 0.14);
-    background: #eef2f8 !important;
-    box-shadow:
-      0 8px 18px rgba(30, 58, 138, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(30, 58, 138, 0.12);
+    background: #eff6ff !important;
+    box-shadow: none;
   }
 
   html:not([data-bs-theme="dark"])

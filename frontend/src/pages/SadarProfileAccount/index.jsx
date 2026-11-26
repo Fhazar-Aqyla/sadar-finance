@@ -1164,56 +1164,76 @@ const ProfileAccountWithData = () => {
           };
 
           return (
-            <div className="sadar-networth-banner mb-3">
-              <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <Card className="sadar-panel mb-3">
+              <CardHeader className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div>
-                  <div className="d-flex align-items-center gap-2 mb-1">
-                    <span className="badge bg-light text-dark fw-bold">
-                      POSISI KEKAYAAN BERSIH (NET WORTH)
-                    </span>
-                    <span className="badge bg-info-subtle text-info">
+                  <div className="d-flex align-items-center gap-2">
+                    <h4 className="card-title mb-0">
+                      Posisi Kekayaan Bersih (Net Worth)
+                    </h4>
+                    <Badge color="primary" className="bg-primary-subtle text-primary">
                       Real-Time V 2.0
-                    </span>
+                    </Badge>
                   </div>
-                  <h2 className="text-white fw-bold mb-1">
-                    {rupiah(netWorth)}
-                  </h2>
-                  <p className="text-white-50 fs-12 mb-0">
-                    (Total Saldo Rekening + Tabungan Impian + Piutang Aktif) −
-                    Utang Aktif
+                  <p className="text-muted mb-0 mt-1">
+                    Akumulasi saldo seluruh rekening, tabungan impian, dan selisih piutang/utang aktif Anda.
                   </p>
                 </div>
-                <div className="d-flex flex-wrap align-items-center gap-2">
-                  <div className="sadar-networth-pill">
-                    <div className="text-white-50 fs-11">Kas &amp; Tabungan</div>
-                    <strong className="fs-13 text-white">
-                      {rupiah(totalBalance + savingsTotal)}
-                    </strong>
-                  </div>
-                  <div className="sadar-networth-pill">
-                    <div className="text-white-50 fs-11">Piutang Aktif (+)</div>
-                    <strong className="fs-13 text-info">
-                      +{rupiah(activeReceivables)}
-                    </strong>
-                  </div>
-                  <div className="sadar-networth-pill">
-                    <div className="text-white-50 fs-11">Utang Aktif (−)</div>
-                    <strong className="fs-13 text-warning">
-                      −{rupiah(activePayables)}
-                    </strong>
-                  </div>
-                  <Button
-                    color="light"
-                    size="sm"
-                    className="fw-semibold ms-1"
-                    onClick={handleExportBackupJson}
-                  >
-                    <i className="ri-download-cloud-2-line me-1"></i>
-                    Backup Data (.JSON)
-                  </Button>
-                </div>
-              </div>
-            </div>
+                <Button
+                  color="light"
+                  size="sm"
+                  className="sadar-table-action fw-semibold"
+                  onClick={handleExportBackupJson}
+                >
+                  <i className="ri-download-cloud-2-line me-1 text-primary"></i>
+                  Ekspor Backup (.JSON)
+                </Button>
+              </CardHeader>
+              <CardBody>
+                <Row className="g-3">
+                  <Col md={3} sm={6}>
+                    <div className="sadar-insight-item d-block h-100">
+                      <span className="text-muted fs-11 fw-bold text-uppercase">
+                        Total Kekayaan Bersih
+                      </span>
+                      <h4 className="fw-bold text-primary mt-1 mb-0">
+                        {rupiah(netWorth)}
+                      </h4>
+                    </div>
+                  </Col>
+                  <Col md={3} sm={6}>
+                    <div className="sadar-insight-item d-block h-100">
+                      <span className="text-muted fs-11 fw-bold text-uppercase">
+                        Kas &amp; Tabungan Impian
+                      </span>
+                      <h4 className="fw-bold text-dark mt-1 mb-0">
+                        {rupiah(totalBalance + savingsTotal)}
+                      </h4>
+                    </div>
+                  </Col>
+                  <Col md={3} sm={6}>
+                    <div className="sadar-insight-item d-block h-100">
+                      <span className="text-muted fs-11 fw-bold text-uppercase">
+                        Piutang Aktif (+)
+                      </span>
+                      <h4 className="fw-bold text-success mt-1 mb-0">
+                        +{rupiah(activeReceivables)}
+                      </h4>
+                    </div>
+                  </Col>
+                  <Col md={3} sm={6}>
+                    <div className="sadar-insight-item d-block h-100">
+                      <span className="text-muted fs-11 fw-bold text-uppercase">
+                        Utang Aktif (−)
+                      </span>
+                      <h4 className="fw-bold text-danger mt-1 mb-0">
+                        −{rupiah(activePayables)}
+                      </h4>
+                    </div>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
           );
         })()}
         <Row className="g-3">
@@ -1498,190 +1518,29 @@ const ProfileAccountWithData = () => {
           <Row className="g-3 mt-1">
             <Col xl={12}>
               <Card className="sadar-panel" id="admin-broadcast-panel">
-                <CardHeader className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <CardBody className="d-flex align-items-center justify-content-between flex-wrap gap-3">
                   <div>
-                    <div className="d-flex align-items-center gap-2 flex-wrap">
+                    <div className="d-flex align-items-center gap-2">
                       <h4 className="card-title mb-0">
-                        Panel Admin Broadcast & Banner
+                        Panel Developer &amp; Control Center V 2.0
                       </h4>
-                      <Badge color="info" pill>
-                        Admin Eksklusif
+                      <Badge color="primary" className="bg-primary-subtle text-primary">
+                        Developer Eksklusif
                       </Badge>
-                      <Button
-                        tag={Link}
-                        to="/developer-panel"
-                        color="primary"
-                        size="sm"
-                        className="ms-2 fw-semibold"
-                      >
-                        <i className="ri-terminal-box-line me-1"></i>
-                        Buka Panel Developer Lengkap
-                      </Button>
                     </div>
                     <p className="text-muted mb-0 mt-1">
-                      Tayangkan pengumuman & foto banner secara real-time ke Beranda Web App dan Aplikasi Android semua pengguna.
+                      Kelola Telemetri Server &amp; Database, Rilis OTA APK, Broadcast Banner, serta Feature Maintenance Gate di halaman khusus Panel Developer.
                     </p>
                   </div>
-                  <div className="form-check form-switch">
-                    <Input
-                      type="switch"
-                      id="bcast-active-switch"
-                      checked={bcastForm.active}
-                      onChange={(e) =>
-                        setBcastForm((curr) => ({
-                          ...curr,
-                          active: e.target.checked,
-                        }))
-                      }
-                    />
-                    <Label
-                      className="form-check-label fw-semibold"
-                      htmlFor="bcast-active-switch"
-                    >
-                      {bcastForm.active ? "Broadcast Aktif" : "Nonaktif"}
-                    </Label>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  {bcastNotice && (
-                    <div
-                      className={`alert alert-${bcastNotice.color} py-2 mb-3`}
-                    >
-                      {bcastNotice.text}
-                    </div>
-                  )}
-                  <Form onSubmit={handleSaveBroadcast}>
-                    <Row className="g-3">
-                      <Col md={4}>
-                        <Label className="form-label">Label Badge</Label>
-                        <Input
-                          value={bcastForm.badge}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              badge: e.target.value,
-                            }))
-                          }
-                          placeholder="PENGUMUMAN & FITUR BARU"
-                        />
-                      </Col>
-                      <Col md={4}>
-                        <Label className="form-label">Tema Warna</Label>
-                        <Input
-                          type="select"
-                          value={bcastForm.type}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              type: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="info">Info Resmi (Navy & Teal)</option>
-                          <option value="promo">Update & Fitur (Hijau)</option>
-                          <option value="maintenance">
-                            Peringatan / Maintenance (Amber)
-                          </option>
-                        </Input>
-                      </Col>
-                      <Col md={4}>
-                        <Label className="form-label">
-                          Unggah Foto Banner (Opsional)
-                        </Label>
-                        <div className="d-flex gap-2">
-                          <Input
-                            type="file"
-                            accept="image/png,image/jpeg,image/webp"
-                            onChange={handleUploadBroadcastBanner}
-                            disabled={isUploadingBanner}
-                          />
-                        </div>
-                      </Col>
-                      <Col md={6}>
-                        <Label className="form-label">Judul Pengumuman</Label>
-                        <Input
-                          value={bcastForm.title}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              title: e.target.value,
-                            }))
-                          }
-                          placeholder="Contoh: Rilis SADAR Finance v1.2.2"
-                          required
-                        />
-                      </Col>
-                      <Col md={6}>
-                        <Label className="form-label">
-                          URL Foto Banner (Otomatis terisi saat upload)
-                        </Label>
-                        <Input
-                          value={bcastForm.bannerUrl}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              bannerUrl: e.target.value,
-                            }))
-                          }
-                          placeholder="https://sadar-finance.web.id/api/v1/app/banners/..."
-                        />
-                      </Col>
-                      <Col md={12}>
-                        <Label className="form-label">Isi Pesan Broadcast</Label>
-                        <Input
-                          type="textarea"
-                          rows={2}
-                          value={bcastForm.message}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              message: e.target.value,
-                            }))
-                          }
-                          required
-                        />
-                      </Col>
-                      <Col md={6}>
-                        <Label className="form-label">Teks Tombol Aksi</Label>
-                        <Input
-                          value={bcastForm.actionLabel}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              actionLabel: e.target.value,
-                            }))
-                          }
-                          placeholder="Contoh: Buka Rencana & Dana Darurat"
-                        />
-                      </Col>
-                      <Col md={6}>
-                        <Label className="form-label">Rute Tombol Aksi</Label>
-                        <Input
-                          value={bcastForm.actionRoute}
-                          onChange={(e) =>
-                            setBcastForm((curr) => ({
-                              ...curr,
-                              actionRoute: e.target.value,
-                            }))
-                          }
-                          placeholder="/financial-plans"
-                        />
-                      </Col>
-                      <Col xs={12}>
-                        <Button
-                          type="submit"
-                          color="primary"
-                          className="px-4 py-2 fw-semibold"
-                          disabled={isSavingBcast || isUploadingBanner}
-                        >
-                          <i className="ri-broadcast-line me-1"></i>
-                          {isSavingBcast
-                            ? "Menyimpan..."
-                            : "Tayangkan Broadcast Sekarang"}
-                        </Button>
-                      </Col>
-                    </Row>
-                  </Form>
+                  <Button
+                    tag={Link}
+                    to="/developer-panel"
+                    color="primary"
+                    className="px-4 py-2 fw-semibold"
+                  >
+                    <i className="ri-terminal-box-line me-1"></i>
+                    Buka Panel Developer
+                  </Button>
                 </CardBody>
               </Card>
             </Col>
