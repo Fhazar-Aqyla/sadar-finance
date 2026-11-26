@@ -117,20 +117,15 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
           children: [
             ?child,
             Positioned.fill(
-              child: IgnorePointer(
-                ignoring: !(_inBackground &&
-                    !_locked &&
-                    uiPrefs.privacyShieldEnabled),
-                child: AnimatedOpacity(
-                  opacity: (_inBackground &&
-                          !_locked &&
-                          uiPrefs.privacyShieldEnabled)
-                      ? 1.0
-                      : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  child: const _PrivacyShieldOverlay(),
-                ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                child: (_inBackground &&
+                        !_locked &&
+                        uiPrefs.privacyShieldEnabled)
+                    ? const _PrivacyShieldOverlay()
+                    : const SizedBox.shrink(),
               ),
             ),
             if (_locked)

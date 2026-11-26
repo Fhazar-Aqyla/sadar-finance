@@ -113,7 +113,8 @@ class AppTheme {
         builders: {
           TargetPlatform.android:
               ZoomPageTransitionsBuilder(allowEnterRouteSnapshotting: false),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS:
+              ZoomPageTransitionsBuilder(allowEnterRouteSnapshotting: false),
         },
       ),
       textTheme: _buildTextTheme(
@@ -337,7 +338,8 @@ class AppTheme {
         builders: {
           TargetPlatform.android:
               ZoomPageTransitionsBuilder(allowEnterRouteSnapshotting: false),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS:
+              ZoomPageTransitionsBuilder(allowEnterRouteSnapshotting: false),
         },
       ),
       textTheme: _buildTextTheme(
