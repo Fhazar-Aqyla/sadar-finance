@@ -1,44 +1,18 @@
 {
-  "_panduan": "File konfigurasi Broadcast Resmi SADAR Finance. Anda bebas mengubah 'active' (true/false), 'type' ('info' | 'promo' | 'maintenance' | 'urgent'), 'badge', 'title', 'message', 'imageUrl' (URL gambar banner atau '/api/v1/app/banners/namafile.png' dari folder backend/assets/banners/), serta 'actionLabel' & 'actionRoute' (mis. '/profile-account/edit' atau '/debt-split'). Semua perubahan langsung tampil di aplikasi tanpa perlu update APK!",
   "broadcasts": [
     {
-      "id": "bcast-v120-release",
+      "id": "bcast-v200-release",
       "active": true,
       "type": "promo",
-      "badge": "PENGUMUMAN & FITUR BARU",
-      "title": "SADAR Finance V 1.2.0 Resmi Hadir!",
-      "message": "Kini dilengkapi Katalog 16 Karakter Avatar 2D, Papan Peringkat (Leaderboard) Streak, Kalkulator Split Bill & Piutang Teman, serta Pelacak Alamat GPS Otomatis.",
+      "badge": "RILIS UTAMA V 2.0.0",
+      "title": "SADAR Finance V 2.0.0 Resmi Hadir di Web & Android!",
+      "message": "Kini dilengkapi Push Notification Android, Kartu Posisi Kekayaan Bersih (Net Worth), Batas Aman Belanja Harian, Mode Kalender Arus Kas, & Cetak e-Statement PDF.",
       "imageUrl": "",
-      "actionLabel": "Coba Avatar 2D & Profil Baru",
-      "actionRoute": "/profile-account/edit",
+      "bannerUrl": "",
+      "actionLabel": "Jelajahi Rencana & Piutang",
+      "actionRoute": "/financial-plans",
       "affectedFeature": "none",
-      "updatedAt": "2026-11-24T01:15:00+07:00"
-    },
-    {
-      "id": "bcast-custom-banner-template",
-      "active": false,
-      "type": "info",
-      "badge": "EVENT & EDUKASI FINANSIAL",
-      "title": "Tips Disiplin Anggaran 50/30/20 Bulan Ini",
-      "message": "Jaga porsi tabungan minimal 20% dari pemasukan bulanan Anda dan pantau posisi Streak harian Anda di Leaderboard Nasional SADAR Finance.",
-      "imageUrl": "https://sadar-finance.web.id/api/v1/app/banners/promo-banner.png",
-      "actionLabel": "Lihat Leaderboard Streak",
-      "actionRoute": "/profile-account",
-      "affectedFeature": "none",
-      "updatedAt": "2026-11-24T01:15:00+07:00"
-    },
-    {
-      "id": "bcast-ai-ocr-maintenance",
-      "active": false,
-      "type": "maintenance",
-      "badge": "PEMELIHARAAN SISTEM AI",
-      "title": "Optimalisasi Layanan AI Scan Struk (OCR) & Smart Insight",
-      "message": "Tim teknis SADAR Finance sedang melakukan pemeliharaan terjadwal pada mesin AI OCR dan analisis Insight Perilaku. Fitur pencatatan manual dan transfer rekening tetap berfungsi normal.",
-      "imageUrl": "",
-      "actionLabel": "",
-      "actionRoute": "",
-      "affectedFeature": "ocr_insight",
-      "updatedAt": "2026-11-24T01:15:00+07:00"
+      "updatedAt": "2026-11-26T07:25:00Z"
     }
   ]
 }
