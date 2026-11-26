@@ -25,7 +25,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterFragmentActivity() {
     private val locationChannelName = "com.sadarfinance.sadar_finance/location"
     private val notificationChannelName = "com.sadarfinance.sadar_finance/notifications"
-    private val pushChannelId = "sadar_finance_push_v3_high"
+    private val pushChannelId = "sadar_finance_push_v4_urgent"
     private val locationPermissionRequestCode = 7401
     private val notifPermissionRequestCode = 7402
     private var pendingLocationResult: MethodChannel.Result? = null
@@ -154,14 +154,9 @@ class MainActivity : FlutterFragmentActivity() {
             }
             val pendingIntent = PendingIntent.getActivity(this, id, launchIntent, pendingFlags)
 
-            val smallIconRes = if (applicationInfo.icon != 0) {
-                applicationInfo.icon
-            } else {
-                android.R.drawable.ic_dialog_info
-            }
-
             val notification = NotificationCompat.Builder(this, pushChannelId)
-                .setSmallIcon(smallIconRes)
+                .setSmallIcon(R.drawable.ic_stat_sadar)
+                .setColor(0xFF1E3A8A.toInt())
                 .setContentTitle(title)
                 .setContentText(body)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
@@ -175,7 +170,8 @@ class MainActivity : FlutterFragmentActivity() {
 
             NotificationManagerCompat.from(this).notify(id, notification)
             true
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            android.util.Log.e("SadarPush", "Failed to display notification: ${e.message}", e)
             false
         }
     }

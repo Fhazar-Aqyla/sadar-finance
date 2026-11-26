@@ -1,7 +1,7 @@
 name: sadar_finance
 description: "SADAR Finance - Smart AI-Driven Automated Receipt & Personal Finance Management (iOS & Android)"
 publish_to: 'none'
-version: 2.0.0+12
+version: 2.0.0+13
 
 environment:
   sdk: ^3.13.3

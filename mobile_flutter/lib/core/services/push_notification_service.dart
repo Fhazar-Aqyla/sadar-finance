@@ -8,7 +8,7 @@ class PushNotificationService {
   static const MethodChannel _channel = MethodChannel(
     'com.sadarfinance.sadar_finance/notifications',
   );
-  static const String _dispatchedKey = 'sadar_dispatched_push_keys_v2';
+  static const String _dispatchedKey = 'sadar_dispatched_push_keys_v3';
 
   static Future<bool> requestPermission() async {
     try {
@@ -165,8 +165,8 @@ class PushNotificationService {
     final newlyDispatched = <Map<String, String>>[];
     try {
       final res = await api.get('/app/push-feed');
-      final data = res['data'];
-      if (data is! Map) return newlyDispatched;
+      if (res is! Map) return newlyDispatched;
+      final data = (res['data'] is Map) ? res['data'] as Map : res;
       final list = data['notifications'];
       if (list is! List || list.isEmpty) return newlyDispatched;
 
@@ -175,7 +175,16 @@ class PushNotificationService {
           (prefs.getStringList(_dispatchedKey) ?? const <String>[]).toSet();
       bool changed = false;
 
-      for (final raw in list.take(5)) {
+      // Mark older items beyond the latest 2 as already seen so we never flood the tray
+      for (final oldRaw in list.skip(2)) {
+        if (oldRaw is! Map) continue;
+        final oldId = (oldRaw['id'] ?? '').toString();
+        if (oldId.isNotEmpty && dispatched.add('remote_$oldId')) {
+          changed = true;
+        }
+      }
+
+      for (final raw in list.take(2)) {
         if (raw is! Map) continue;
         final target = (raw['target'] ?? 'all').toString();
         if (target == 'web') continue;
@@ -193,8 +202,10 @@ class PushNotificationService {
           title: title,
           body: body,
         );
-        dispatched.add(key);
-        changed = true;
+        if (ok) {
+          dispatched.add(key);
+          changed = true;
+        }
         newlyDispatched.add({
           'id': idStr,
           'title': title,

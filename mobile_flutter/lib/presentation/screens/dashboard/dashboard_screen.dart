@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/bank_data.dart';
 import '../../../core/constants/category_helpers.dart';
-import '../../../core/network/api_client.dart';
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';

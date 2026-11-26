@@ -1,9 +1,9 @@
 {
   "latestVersion": "2.0.0",
-  "buildNumber": 12,
+  "buildNumber": 13,
   "minVersion": "1.0.0",
   "forceUpdate": false,
-  "downloadUrl": "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b12",
+  "downloadUrl": "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b13",
   "releaseNotes": [
     "Rilis Utama SADAR Finance V 2.0.0: Push Notification Android Native (Broadcast, Budget 50/30/20 & Tagihan)",
     "Kartu Posisi Kekayaan Bersih (Net Worth Tracker) & Indikator Batas Aman Belanja Harian",

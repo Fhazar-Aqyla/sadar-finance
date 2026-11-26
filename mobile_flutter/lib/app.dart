@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config/app_config.dart';
-import 'core/network/api_client.dart';
 import 'core/services/app_lock_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
@@ -46,7 +45,7 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
         await _checkRemotePushQueue();
       });
       _globalPushTimer = Timer.periodic(
-        const Duration(seconds: 8),
+        const Duration(seconds: 4),
         (_) => _checkRemotePushQueue(),
       );
     }

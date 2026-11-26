@@ -149,7 +149,10 @@ router.get('/push-feed', (_req, res) => {
   const notifications = loadPushFeed();
   return success(res, {
     message: 'Active push notification feed',
-    data: { notifications },
+    data: {
+      notifications,
+      data: { notifications },
+    },
   });
 });
 
