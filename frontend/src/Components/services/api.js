@@ -291,6 +291,11 @@ export const appApi = {
         onUploadProgress,
       })
       .then(unwrapData),
+  pushFeed: () => apiClient.get("/app/push-feed").then(unwrapData),
+  adminSendPush: (payload) =>
+    apiClient.post("/app/admin/push-send", payload).then(unwrapData),
+  adminDeletePush: (id) =>
+    apiClient.delete(`/app/admin/push-send/${id}`).then(unwrapData),
 };
 
 export const plansApi = {

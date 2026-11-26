@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/bank_data.dart';
 import '../../../core/constants/category_helpers.dart';
+import '../../../core/network/api_client.dart';
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
@@ -30,6 +32,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _tourChecked = false;
   bool _otaChecked = false;
+  Timer? _pushPollTimer;
   final Set<String> _dismissedBroadcastIds = <String>{};
 
   @override
@@ -44,12 +47,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       await _maybeShowTourGuide(auth.user?.id);
       await _maybeCheckSilentOta();
       if (mounted) {
+        final pushOn = ref.read(uiPreferencesProvider).pushNotificationsEnabled;
         await PushNotificationService.evaluateAndDispatch(
           ref.read(financeProvider),
-          enabled: ref.read(uiPreferencesProvider).pushNotificationsEnabled,
+          enabled: pushOn,
+        );
+        await PushNotificationService.pollRemotePushFeed(
+          ref.read(apiClientProvider),
+          enabled: pushOn,
         );
       }
     });
+    _pushPollTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      if (!mounted) return;
+      final pushOn = ref.read(uiPreferencesProvider).pushNotificationsEnabled;
+      PushNotificationService.pollRemotePushFeed(
+        ref.read(apiClientProvider),
+        enabled: pushOn,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _pushPollTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _maybeShowTourGuide(String? userId) async {

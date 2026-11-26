@@ -15,6 +15,7 @@ const { success } = require('../utils/response');
 
 const router = Router();
 const BROADCASTS_PATH = path.join(__dirname, '../config/broadcasts.json');
+const PUSH_FEED_PATH = path.join(__dirname, '../config/push-notifications.json');
 const BANNERS_DIR = path.join(__dirname, '../assets/banners');
 
 const APK_DIR = path.join(__dirname, '../downloads');
@@ -71,6 +72,25 @@ function loadActiveBroadcasts() {
   return loadAllBroadcasts().filter((b) => b && b.active === true);
 }
 
+function loadPushFeed() {
+  try {
+    if (!fs.existsSync(PUSH_FEED_PATH)) return [];
+    const raw = fs.readFileSync(PUSH_FEED_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed.notifications) ? parsed.notifications : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function savePushFeed(list) {
+  fs.writeFileSync(
+    PUSH_FEED_PATH,
+    JSON.stringify({ notifications: list.slice(0, 50) }, null, 2),
+    'utf8'
+  );
+}
+
 function extractLocalBannerFilename(bannerUrl) {
   const raw = String(bannerUrl || '').trim();
   if (!raw || !raw.includes('/app/banners/')) return '';
@@ -122,6 +142,14 @@ router.get('/broadcasts', (_req, res) => {
   return success(res, {
     message: 'Active app broadcasts',
     data: { broadcasts },
+  });
+});
+
+router.get('/push-feed', (_req, res) => {
+  const notifications = loadPushFeed();
+  return success(res, {
+    message: 'Active push notification feed',
+    data: { notifications },
   });
 });
 
@@ -635,6 +663,97 @@ router.post(
         sha256,
         updatedAt: st.mtime.toISOString(),
       },
+    });
+  }
+);
+
+// ── REMOTE PUSH NOTIFICATION BLASTER (ANDROID APK + WEB) ──────
+
+router.post(
+  '/admin/push-send',
+  authenticate,
+  requireAdminUser,
+  (req, res) => {
+    const body = req.body || {};
+    const title = String(body.title || 'Notifikasi SADAR Finance').trim().slice(0, 140);
+    const message = String(body.body || body.message || '').trim().slice(0, 600);
+    if (!title || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Judul dan isi pesan Push Notification wajib diisi',
+      });
+    }
+    const target = ['all', 'android', 'web'].includes(body.target) ? body.target : 'all';
+    const category = ['info', 'budget', 'recurring', 'debt', 'promo', 'urgent'].includes(
+      body.category
+    )
+      ? body.category
+      : 'info';
+    const rawRoute = String(body.actionRoute || '/dashboard').trim();
+    const actionRoute = rawRoute.startsWith('/') ? rawRoute : '/dashboard';
+
+    const pushItem = {
+      id: `push-${Date.now()}`,
+      title,
+      body: message,
+      message,
+      target,
+      category,
+      actionRoute,
+      sentAt: new Date().toISOString(),
+    };
+
+    const feed = loadPushFeed();
+    feed.unshift(pushItem);
+    savePushFeed(feed);
+
+    if (body.alsoBroadcast === true) {
+      const bList = loadAllBroadcasts();
+      bList.unshift({
+        id: pushItem.id,
+        active: true,
+        type: category === 'urgent' ? 'urgent' : category === 'promo' ? 'promo' : 'info',
+        badge:
+          category === 'budget'
+            ? 'PERINGATAN BUDGET 50/30/20'
+            : category === 'recurring'
+              ? 'PENGINGAT TAGIHAN RUTIN'
+              : category === 'debt'
+                ? 'PENGINGAT PIUTANG'
+                : 'PUSH NOTIFICATION RESMI',
+        title,
+        message,
+        imageUrl: '',
+        bannerUrl: '',
+        actionLabel: 'Lihat Detail',
+        actionRoute,
+        affectedFeature: 'none',
+        updatedAt: pushItem.sentAt,
+      });
+      saveAllBroadcasts(bList);
+    }
+
+    return success(res, {
+      message: 'Push Notification berhasil dikirim ke antrean perangkat Android & Web',
+      data: {
+        pushed: pushItem,
+        notifications: feed,
+      },
+    });
+  }
+);
+
+router.delete(
+  '/admin/push-send/:id',
+  authenticate,
+  requireAdminUser,
+  (req, res) => {
+    const targetId = String(req.params.id || '').trim();
+    const nextFeed = loadPushFeed().filter((p) => p && p.id !== targetId);
+    savePushFeed(nextFeed);
+    return success(res, {
+      message: 'Riwayat push notification dihapus',
+      data: { notifications: nextFeed },
     });
   }
 );

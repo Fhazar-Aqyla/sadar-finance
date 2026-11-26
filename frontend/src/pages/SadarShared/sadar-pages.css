@@ -3166,19 +3166,13 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     background: transparent !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(.card-title, h1, h2, h3, h4, h5, h6, strong):not(.text-white),
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(.card-title, h1, h2, h3, h4, h5, h6, strong):not(.text-white) {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.card-title, h1, h2, h3, h4, h5, h6, strong):not(.text-white),
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.card-title, h1, h2, h3, h4, h5, h6, strong):not(.text-white) {
     color: var(--sadar-glass-ink);
   }
 
   html:not([data-bs-theme="dark"]) .sadar-page :where(p, .text-muted, small):not(.text-white-50),
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(p, .text-muted, small):not(.text-white-50) {
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(p, .text-muted, small):not(.text-white-50) {
     color: var(--sadar-glass-muted) !important;
   }
 

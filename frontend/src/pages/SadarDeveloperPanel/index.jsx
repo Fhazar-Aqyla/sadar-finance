@@ -20,6 +20,9 @@ import {
   UploadCloud,
   Users,
   Wrench,
+  Send,
+  Mail,
+  Smartphone,
 } from "lucide-react";
 import {
   Alert,
@@ -42,7 +45,7 @@ import {
   Spinner,
   Table,
 } from "reactstrap";
-import { appApi, authApi } from "../../Components/services/api";
+import { analyticsApi, appApi, authApi } from "../../Components/services/api";
 import { getStoredAuthUser } from "../../helpers/auth-storage";
 import "../SadarShared/sadar-pages.css";
 
@@ -168,6 +171,28 @@ const SadarDeveloperPanel = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [isSavingUser, setIsSavingUser] = useState(false);
 
+  // Remote Push Notification Blaster & Sandbox Testing Lab state
+  const [pushHistory, setPushHistory] = useState([]);
+  const [pushForm, setPushForm] = useState({
+    title: "Peringatan Budget 50/30/20 SADAR Finance",
+    body: "Kuota Keinginan (30%) Anda bulan ini sudah menyentuh 88%. Yuk tahan belanja impulsif agar target tabungan tetap aman!",
+    category: "budget",
+    target: "all",
+    actionRoute: "/behavior-insight",
+    alsoBroadcast: false,
+  });
+  const [isSendingPush, setIsSendingPush] = useState(false);
+
+  // AI Categorizer & Email e-Statement Sandbox state
+  const [aiTestInput, setAiTestInput] = useState({
+    description: "Kopi Kenangan Gula Aren & Croissant",
+    amount: "48000",
+  });
+  const [aiTestResult, setAiTestResult] = useState(null);
+  const [isTestingAi, setIsTestingAi] = useState(false);
+  const [isTestingEmail, setIsTestingEmail] = useState(false);
+  const [emailTestResult, setEmailTestResult] = useState(null);
+
   const storedEmail = useMemo(() => {
     const authUser = getStoredAuthUser();
     const u = authUser?.user || authUser?.data?.user || {};
@@ -227,12 +252,18 @@ const SadarDeveloperPanel = () => {
           return;
         }
 
-        const [statusData, verData, bcastData, usersData] = await Promise.all([
-          appApi.adminSystemStatus().catch(() => null),
-          appApi.version().catch(() => null),
-          appApi.adminBroadcasts().catch(() => null),
-          appApi.adminUsers().catch(() => null),
-        ]);
+        const [statusData, verData, bcastData, usersData, pushData] =
+          await Promise.all([
+            appApi.adminSystemStatus().catch(() => null),
+            appApi.version().catch(() => null),
+            appApi.adminBroadcasts().catch(() => null),
+            appApi.adminUsers().catch(() => null),
+            appApi.pushFeed().catch(() => null),
+          ]);
+
+        if (pushData && Array.isArray(pushData.notifications)) {
+          setPushHistory(pushData.notifications);
+        }
 
         if (statusData) {
           setSysStatus(statusData);
@@ -289,6 +320,125 @@ const SadarDeveloperPanel = () => {
     loadAllDeveloperData();
     handleRunDiagnostics();
   }, [loadAllDeveloperData, handleRunDiagnostics]);
+
+  const handleSendRemotePush = async (customPayload = null) => {
+    const payload = customPayload || pushForm;
+    if (!payload.title?.trim() || !payload.body?.trim()) {
+      setNotice({
+        color: "warning",
+        text: "Judul dan isi pesan Push Notification wajib diisi.",
+      });
+      return;
+    }
+    setIsSendingPush(true);
+    setNotice(null);
+    try {
+      const res = await appApi.adminSendPush(payload);
+      if (Array.isArray(res?.notifications)) {
+        setPushHistory(res.notifications);
+      }
+      // Also trigger local browser notification immediately if target includes web/all
+      if (payload.target !== "android" && "Notification" in window) {
+        let perm = Notification.permission;
+        if (perm !== "granted") {
+          perm = await Notification.requestPermission();
+        }
+        if (perm === "granted") {
+          new Notification(payload.title, {
+            body: payload.body,
+            icon: "/favicon.png",
+          });
+        }
+      }
+      window.dispatchEvent(new CustomEvent("sadar-push-sent"));
+      setNotice({
+        color: "success",
+        text: `Push Notification "${payload.title}" berhasil dikirim ke antrean ${
+          payload.target === "all"
+            ? "Android APK & Web Browser"
+            : payload.target === "android"
+              ? "Android APK"
+              : "Web Browser"
+        }!`,
+      });
+      if (payload.alsoBroadcast) {
+        loadAllDeveloperData(true);
+      }
+    } catch (err) {
+      setNotice({
+        color: "danger",
+        text: err?.message || "Gagal mengirim Push Notification.",
+      });
+    } finally {
+      setIsSendingPush(false);
+    }
+  };
+
+  const handleDeletePushItem = async (id) => {
+    try {
+      const res = await appApi.adminDeletePush(id);
+      if (Array.isArray(res?.notifications)) {
+        setPushHistory(res.notifications);
+      }
+      window.dispatchEvent(new CustomEvent("sadar-push-sent"));
+    } catch (err) {
+      setNotice({
+        color: "danger",
+        text: err?.message || "Gagal menghapus riwayat push.",
+      });
+    }
+  };
+
+  const handleRunAiSandboxTest = async (e) => {
+    if (e) e.preventDefault();
+    if (!aiTestInput.description.trim()) return;
+    setIsTestingAi(true);
+    const t0 = performance.now();
+    try {
+      const res = await analyticsApi.categorize({
+        description: aiTestInput.description.trim(),
+        amount: Number(String(aiTestInput.amount).replace(/\D/g, "")) || 25000,
+      });
+      const ms = Math.round(performance.now() - t0);
+      setAiTestResult({
+        ok: true,
+        latencyMs: ms,
+        data: res,
+      });
+    } catch (err) {
+      setAiTestResult({
+        ok: false,
+        latencyMs: Math.round(performance.now() - t0),
+        error: err?.message || "Gagal menguji AI Categorizer.",
+      });
+    } finally {
+      setIsTestingAi(false);
+    }
+  };
+
+  const handleRunEmailStatementTest = async () => {
+    setIsTestingEmail(true);
+    setEmailTestResult(null);
+    const t0 = performance.now();
+    try {
+      const res = await analyticsApi.sendStatementEmail();
+      setEmailTestResult({
+        ok: true,
+        latencyMs: Math.round(performance.now() - t0),
+        message: `e-Statement ${
+          res?.periodLabel || "Bulan Ini"
+        } berhasil dikirim ke ${res?.email || "email terdaftar"}!`,
+      });
+    } catch (err) {
+      setEmailTestResult({
+        ok: false,
+        latencyMs: Math.round(performance.now() - t0),
+        message: err?.message || "Gagal mengirim e-Statement email.",
+      });
+    } finally {
+      setIsTestingEmail(false);
+    }
+  };
 
   const handleTestWebPush = async () => {
     if (!("Notification" in window)) {
@@ -661,6 +811,11 @@ const SadarDeveloperPanel = () => {
       id: "telemetry",
       label: "Telemetri & Server",
       icon: Server,
+    },
+    {
+      id: "pushlab",
+      label: `Push Notif & Testing Lab (${pushHistory.length})`,
+      icon: Bell,
     },
     {
       id: "ota",
@@ -1926,6 +2081,564 @@ const SadarDeveloperPanel = () => {
               </div>
             </CardBody>
           </Card>
+        )}
+
+        {/* TAB 5: PUSH NOTIFICATION BLASTER & SANDBOX TESTING LAB */}
+        {activeTab === "pushlab" && (
+          <>
+            {/* 4 Quick 1-Click Push Simulation Presets */}
+            <Card className="sadar-panel mb-3">
+              <CardHeader>
+                <div>
+                  <h4 className="card-title mb-1">
+                    Simulasi Cepat Push Notification 1-Klik (Android APK &amp; Web)
+                  </h4>
+                  <p className="text-muted mb-0">
+                    Uji coba pengiriman pop-up notifikasi bilah status HP Android,
+                    Notifikasi Desktop Browser, dan Lonceng Web App secara
+                    instan
+                  </p>
+                </div>
+                <Badge color="primary" className="bg-primary-subtle text-primary">
+                  Real-Time Push Queue
+                </Badge>
+              </CardHeader>
+              <CardBody>
+                <Row className="g-3">
+                  {[
+                    {
+                      badge: "Budget 50/30/20",
+                      tone: "danger",
+                      title: "Waspada Anggaran 50/30/20 (92%)",
+                      body: "Pengeluaran Keinginan (30%) Anda sudah mencapai 92% dari batas bulan ini. Yuk jaga batas aman belanja harianmu!",
+                      category: "budget",
+                      actionRoute: "/behavior-insight",
+                    },
+                    {
+                      badge: "Tagihan Rutin",
+                      tone: "warning",
+                      title: "Pengingat Tagihan Rutin: Listrik & WiFi",
+                      body: "Jadwal tagihan rutin bulanan sebesar Rp 450.000 jatuh tempo besok. Ketuk untuk mencatat pembayaran 1-klik.",
+                      category: "recurring",
+                      actionRoute: "/financial-plans",
+                    },
+                    {
+                      badge: "Piutang & Split Bill",
+                      tone: "primary",
+                      title: "Jatuh Tempo Piutang: Patungan Makan Malam",
+                      body: "Catatan piutang patungan sebesar Rp 125.000 jatuh tempo hari ini. Kirim pengingat WhatsApp dari menu Piutang.",
+                      category: "debt",
+                      actionRoute: "/financial-plans",
+                    },
+                    {
+                      badge: "Pengumuman Resmi",
+                      tone: "success",
+                      title: "SADAR Finance V 2.0.0 Aktif!",
+                      body: "Selamat! Fitur Kartu Net Worth, Kalender Arus Kas, Cetak e-Statement PDF, dan Push Notification siap digunakan.",
+                      category: "promo",
+                      actionRoute: "/dashboard",
+                    },
+                  ].map((preset) => (
+                    <Col xl={3} md={6} key={preset.title}>
+                      <div className="sadar-insight-item d-flex flex-column justify-content-between h-100">
+                        <div>
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <Badge
+                              color={preset.tone}
+                              className={`bg-${preset.tone}-subtle text-${preset.tone}`}
+                            >
+                              {preset.badge}
+                            </Badge>
+                            <Smartphone size={15} className="text-muted" />
+                          </div>
+                          <strong className="fs-13 d-block mb-1">
+                            {preset.title}
+                          </strong>
+                          <p className="text-muted fs-12 mb-3">{preset.body}</p>
+                        </div>
+                        <Button
+                          color="primary"
+                          size="sm"
+                          className="w-100 fw-semibold d-flex align-items-center justify-content-center gap-1"
+                          disabled={isSendingPush}
+                          onClick={() =>
+                            handleSendRemotePush({
+                              title: preset.title,
+                              body: preset.body,
+                              category: preset.category,
+                              target: "all",
+                              actionRoute: preset.actionRoute,
+                              alsoBroadcast: false,
+                            })
+                          }
+                        >
+                          <Send size={13} />
+                          <span>Kirim Simulasi ke HP &amp; Web</span>
+                        </Button>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              </CardBody>
+            </Card>
+
+            <Row className="g-3 mb-3">
+              {/* Custom Push Notification Blaster Form */}
+              <Col lg={7}>
+                <Card className="sadar-panel h-100">
+                  <CardHeader>
+                    <div>
+                      <h4 className="card-title mb-1">
+                        Kirim Push Notification Kustom (Blaster)
+                      </h4>
+                      <p className="text-muted mb-0">
+                        Tulis dan kirimkan Push Notification khusus ke seluruh
+                        perangkat Android APK &amp; Web Browser yang aktif
+                      </p>
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <Form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSendRemotePush();
+                      }}
+                    >
+                      <Row className="g-3">
+                        <Col md={4}>
+                          <Label className="form-label">Target Perangkat</Label>
+                          <Input
+                            type="select"
+                            value={pushForm.target}
+                            onChange={(e) =>
+                              setPushForm((prev) => ({
+                                ...prev,
+                                target: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="all">
+                              Android APK + Web Browser
+                            </option>
+                            <option value="android">
+                              Khusus Aplikasi Android (APK)
+                            </option>
+                            <option value="web">
+                              Khusus Web Browser &amp; Lonceng
+                            </option>
+                          </Input>
+                        </Col>
+                        <Col md={4}>
+                          <Label className="form-label">
+                            Kategori Notifikasi
+                          </Label>
+                          <Input
+                            type="select"
+                            value={pushForm.category}
+                            onChange={(e) =>
+                              setPushForm((prev) => ({
+                                ...prev,
+                                category: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="info">Informasi Umum</option>
+                            <option value="budget">
+                              Peringatan Budget 50/30/20
+                            </option>
+                            <option value="recurring">
+                              Tagihan &amp; Gaji Rutin
+                            </option>
+                            <option value="debt">
+                              Piutang &amp; Split Bill
+                            </option>
+                            <option value="promo">Rilis Fitur / Promo</option>
+                            <option value="urgent">Darurat / Keamanan</option>
+                          </Input>
+                        </Col>
+                        <Col md={4}>
+                          <Label className="form-label">
+                            Rute Tujuan Saat Diklik
+                          </Label>
+                          <Input
+                            value={pushForm.actionRoute}
+                            onChange={(e) =>
+                              setPushForm((prev) => ({
+                                ...prev,
+                                actionRoute: e.target.value,
+                              }))
+                            }
+                            placeholder="/dashboard"
+                          />
+                        </Col>
+
+                        <Col md={12}>
+                          <Label className="form-label">
+                            Judul Push Notification
+                          </Label>
+                          <Input
+                            value={pushForm.title}
+                            onChange={(e) =>
+                              setPushForm((prev) => ({
+                                ...prev,
+                                title: e.target.value,
+                              }))
+                            }
+                            placeholder="Contoh: Peringatan Budget 50/30/20 Bulanan"
+                            required
+                          />
+                        </Col>
+
+                        <Col md={12}>
+                          <Label className="form-label">
+                            Isi Pesan Push Notification
+                          </Label>
+                          <Input
+                            type="textarea"
+                            rows={3}
+                            value={pushForm.body}
+                            onChange={(e) =>
+                              setPushForm((prev) => ({
+                                ...prev,
+                                body: e.target.value,
+                              }))
+                            }
+                            placeholder="Tulis isi pesan yang akan tampil di bilah status HP Android dan pop-up browser..."
+                            required
+                          />
+                        </Col>
+
+                        <Col md={12}>
+                          <div className="form-check">
+                            <Input
+                              type="checkbox"
+                              id="also-pin-broadcast"
+                              checked={pushForm.alsoBroadcast}
+                              onChange={(e) =>
+                                setPushForm((prev) => ({
+                                  ...prev,
+                                  alsoBroadcast: e.target.checked,
+                                }))
+                              }
+                            />
+                            <Label
+                              className="form-check-label fs-13"
+                              htmlFor="also-pin-broadcast"
+                            >
+                              Sematkan juga sebagai Banner Pengumuman di atas
+                              Beranda Dashboard Web &amp; Android
+                            </Label>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} className="d-flex flex-wrap gap-2">
+                          <Button
+                            type="submit"
+                            color="primary"
+                            className="px-4 fw-semibold d-inline-flex align-items-center gap-1.5"
+                            disabled={isSendingPush}
+                          >
+                            <Send size={15} />
+                            <span>
+                              {isSendingPush
+                                ? "Mengirim Push..."
+                                : "Kirim Push Notification Sekarang"}
+                            </span>
+                          </Button>
+                          <Button
+                            type="button"
+                            color="light"
+                            className="sadar-table-action fw-semibold"
+                            onClick={handleTestWebPush}
+                          >
+                            Tes Izin Notifikasi Browser Lokal
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                  </CardBody>
+                </Card>
+              </Col>
+
+              {/* Sandbox Testing Lab: AI Categorizer 50/30/20 & Email e-Statement SMTP */}
+              <Col lg={5}>
+                <Card className="sadar-panel h-100">
+                  <CardHeader>
+                    <div>
+                      <h4 className="card-title mb-1">
+                        Sandbox Testing Lab (AI 50/30/20 &amp; Email SMTP)
+                      </h4>
+                      <p className="text-muted mb-0">
+                        Uji mesin klasifikasi transaksi AI dan pengiriman
+                        e-Statement email secara langsung
+                      </p>
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <Form onSubmit={handleRunAiSandboxTest} className="mb-3">
+                      <strong className="fs-13 d-block mb-2">
+                        1. Penguji Klasifikasi AI 50/30/20 (`/analytics/categorize`)
+                      </strong>
+                      <Row className="g-2 mb-2">
+                        <Col sm={7}>
+                          <Input
+                            value={aiTestInput.description}
+                            onChange={(e) =>
+                              setAiTestInput((prev) => ({
+                                ...prev,
+                                description: e.target.value,
+                              }))
+                            }
+                            placeholder="Nama transaksi (misal: Kopi Kenangan)"
+                          />
+                        </Col>
+                        <Col sm={5}>
+                          <Input
+                            value={aiTestInput.amount}
+                            onChange={(e) =>
+                              setAiTestInput((prev) => ({
+                                ...prev,
+                                amount: e.target.value,
+                              }))
+                            }
+                            placeholder="Nominal (Rp)"
+                          />
+                        </Col>
+                      </Row>
+                      <Button
+                        type="submit"
+                        color="primary"
+                        size="sm"
+                        className="w-100 fw-semibold"
+                        disabled={isTestingAi}
+                      >
+                        <Sparkles size={14} className="me-1" />
+                        {isTestingAi
+                          ? "Memproses Klasifikasi AI..."
+                          : "Uji Klasifikasi AI 50/30/20"}
+                      </Button>
+                    </Form>
+
+                    {aiTestResult && (
+                      <div className="sadar-insight-item d-block mb-3">
+                        <div className="d-flex justify-content-between align-items-center mb-1">
+                          <Badge
+                            color={aiTestResult.ok ? "success" : "danger"}
+                            className={`bg-${
+                              aiTestResult.ok ? "success" : "danger"
+                            }-subtle text-${
+                              aiTestResult.ok ? "success" : "danger"
+                            }`}
+                          >
+                            {aiTestResult.ok ? "AI Berhasil" : "Gagal"}
+                          </Badge>
+                          <span className="text-muted fs-11">
+                            Latensi: {aiTestResult.latencyMs} ms
+                          </span>
+                        </div>
+                        {aiTestResult.ok ? (
+                          <div className="fs-12">
+                            <div>
+                              Kelompok 50/30/20:{" "}
+                              <strong className="text-primary d-inline">
+                                {aiTestResult.data?.category_group ||
+                                  aiTestResult.data?.categoryGroup ||
+                                  aiTestResult.data?.budget_group ||
+                                  "Wants (Keinginan)"}
+                              </strong>
+                            </div>
+                            <div className="text-muted mt-0.5">
+                              Sub-Kategori:{" "}
+                              {aiTestResult.data?.category_detail ||
+                                aiTestResult.data?.categoryDetail ||
+                                aiTestResult.data?.category ||
+                                "Makanan & Minuman"}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-danger fs-12">
+                            {aiTestResult.error}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <hr className="my-3" />
+
+                    <div>
+                      <strong className="fs-13 d-block mb-1">
+                        2. Penguji Pengiriman Email e-Statement (`/statement/email`)
+                      </strong>
+                      <p className="text-muted fs-12 mb-2">
+                        Kirim laporan e-Statement resmi bulan berjalan ke email
+                        Developer untuk memastikan layanan email berfungsi.
+                      </p>
+                      <Button
+                        color="light"
+                        size="sm"
+                        className="sadar-table-action w-100 fw-semibold d-flex align-items-center justify-content-center gap-1.5"
+                        onClick={handleRunEmailStatementTest}
+                        disabled={isTestingEmail}
+                      >
+                        <Mail size={14} />
+                        <span>
+                          {isTestingEmail
+                            ? "Mengirim e-Statement..."
+                            : "Tes Kirim e-Statement ke Email"}
+                        </span>
+                      </Button>
+                      {emailTestResult && (
+                        <div
+                          className={`mt-2 p-2 rounded-2 fs-12 ${
+                            emailTestResult.ok
+                              ? "bg-success-subtle text-success"
+                              : "bg-danger-subtle text-danger"
+                          }`}
+                        >
+                          {emailTestResult.message} ({emailTestResult.latencyMs}{" "}
+                          ms)
+                        </div>
+                      )}
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+
+            {/* Sent Push Notifications Log Table */}
+            <Card className="sadar-panel">
+              <CardHeader>
+                <div>
+                  <h4 className="card-title mb-1">
+                    Riwayat Push Notification Terkirim ({pushHistory.length})
+                  </h4>
+                  <p className="text-muted mb-0">
+                    Daftar antrean Push Notification aktif yang diambil otomatis
+                    oleh Aplikasi Android V 2.0 dan Lonceng Web App
+                  </p>
+                </div>
+              </CardHeader>
+              <CardBody className="pt-0">
+                <div className="table-responsive sadar-table-wrap">
+                  <Table className="sadar-table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Waktu Kirim</th>
+                        <th>Target</th>
+                        <th>Kategori</th>
+                        <th>Judul &amp; Isi Pesan Push</th>
+                        <th>Rute</th>
+                        <th className="text-end">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pushHistory.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="text-center py-4 text-muted"
+                          >
+                            Belum ada riwayat Push Notification. Klik salah satu
+                            tombol Simulasi di atas untuk mengirim uji coba!
+                          </td>
+                        </tr>
+                      ) : (
+                        pushHistory.map((p) => (
+                          <tr key={p.id}>
+                            <td className="text-muted fs-12 whitespace-nowrap">
+                              {formatDateTime(p.sentAt)}
+                            </td>
+                            <td>
+                              <Badge
+                                color="primary"
+                                className="bg-primary-subtle text-primary"
+                              >
+                                {p.target === "all"
+                                  ? "Android + Web"
+                                  : p.target === "android"
+                                    ? "Android APK"
+                                    : "Web Browser"}
+                              </Badge>
+                            </td>
+                            <td>
+                              <Badge
+                                color={
+                                  p.category === "budget" ||
+                                  p.category === "urgent"
+                                    ? "danger"
+                                    : p.category === "recurring"
+                                      ? "warning"
+                                      : "success"
+                                }
+                                className={`bg-${
+                                  p.category === "budget" ||
+                                  p.category === "urgent"
+                                    ? "danger"
+                                    : p.category === "recurring"
+                                      ? "warning"
+                                      : "success"
+                                }-subtle text-${
+                                  p.category === "budget" ||
+                                  p.category === "urgent"
+                                    ? "danger"
+                                    : p.category === "recurring"
+                                      ? "warning"
+                                      : "success"
+                                }`}
+                              >
+                                {p.category || "info"}
+                              </Badge>
+                            </td>
+                            <td>
+                              <div className="fw-bold text-dark fs-13">
+                                {p.title}
+                              </div>
+                              <div className="text-muted fs-12">
+                                {p.body || p.message}
+                              </div>
+                            </td>
+                            <td className="font-monospace fs-12 text-muted">
+                              {p.actionRoute || "/dashboard"}
+                            </td>
+                            <td className="text-end">
+                              <div className="d-inline-flex align-items-center gap-1">
+                                <Button
+                                  size="sm"
+                                  color="light"
+                                  className="sadar-table-action py-1 px-2 fs-12"
+                                  onClick={() =>
+                                    handleSendRemotePush({
+                                      title: p.title,
+                                      body: p.body || p.message,
+                                      category: p.category,
+                                      target: p.target,
+                                      actionRoute: p.actionRoute,
+                                      alsoBroadcast: false,
+                                    })
+                                  }
+                                  disabled={isSendingPush}
+                                >
+                                  Kirim Ulang
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  color="light"
+                                  className="text-danger py-1 px-2"
+                                  onClick={() => handleDeletePushItem(p.id)}
+                                >
+                                  <Trash2 size={14} />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              </CardBody>
+            </Card>
+          </>
         )}
       </Container>
 

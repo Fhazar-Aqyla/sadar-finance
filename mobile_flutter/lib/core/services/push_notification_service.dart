@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/finance_provider.dart';
+import '../network/api_client.dart';
 import '../utils/formatters.dart';
 
 class PushNotificationService {
@@ -140,6 +141,60 @@ class PushNotificationService {
             body:
                 'Catatan ${d.title} sebesar ${AppFormatters.rupiah(d.amount)} jatuh tempo pada ${AppFormatters.shortDate(due)}.',
           );
+        }
+      }
+
+      if (changed) {
+        final trimmed = dispatched.toList();
+        if (trimmed.length > 150) {
+          trimmed.removeRange(0, trimmed.length - 150);
+        }
+        await prefs.setStringList(_dispatchedKey, trimmed);
+      }
+    } catch (_) {}
+  }
+
+  /// Polls `/app/push-feed` so remote Push Notifications sent from the
+  /// Web Developer Panel (`/developer-panel`) immediately trigger a
+  /// native Android heads-up status bar notification on the phone.
+  static Future<void> pollRemotePushFeed(
+    ApiClient api, {
+    required bool enabled,
+  }) async {
+    if (!enabled) return;
+    try {
+      final res = await api.get('/app/push-feed');
+      final data = res['data'];
+      if (data is! Map) return;
+      final list = data['notifications'];
+      if (list is! List || list.isEmpty) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final dispatched =
+          (prefs.getStringList(_dispatchedKey) ?? const <String>[]).toSet();
+      bool changed = false;
+
+      for (final raw in list.take(5)) {
+        if (raw is! Map) continue;
+        final target = (raw['target'] ?? 'all').toString();
+        if (target == 'web') continue;
+        final idStr = (raw['id'] ?? '').toString();
+        if (idStr.isEmpty) continue;
+        final key = 'remote_$idStr';
+        if (dispatched.contains(key)) continue;
+
+        final title = (raw['title'] ?? 'SADAR Finance V 2.0').toString();
+        final body = (raw['body'] ?? raw['message'] ?? '').toString();
+        if (body.isEmpty) continue;
+
+        final ok = await showNotification(
+          id: 6100 + (idStr.hashCode.abs() % 800),
+          title: title,
+          body: body,
+        );
+        if (ok) {
+          dispatched.add(key);
+          changed = true;
         }
       }
 

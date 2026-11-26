@@ -33,17 +33,74 @@ const NotificationDropdown = () => {
     let isMounted = true;
     const fetchNotifications = async () => {
       try {
-        const [alertsRes, bcastRes] = await Promise.all([
+        const [alertsRes, bcastRes, pushRes] = await Promise.all([
           analyticsApi.alerts().catch(() => []),
           appApi.broadcasts().catch(() => ({ broadcasts: [] })),
+          appApi.pushFeed().catch(() => ({ notifications: [] })),
         ]);
         const rawAlerts = alertsRes?.data || alertsRes || [];
         const rawBroadcasts = Array.isArray(bcastRes?.broadcasts)
           ? bcastRes.broadcasts
           : [];
+        const rawPushes = Array.isArray(pushRes?.notifications)
+          ? pushRes.notifications.filter((p) => p && p.target !== "android")
+          : [];
         if (!isMounted) return;
 
+        // Fire browser desktop notification for newly arrived remote pushes
+        try {
+          const seenRaw = localStorage.getItem("sadar_seen_push_ids_v2");
+          const seenSet = new Set(seenRaw ? JSON.parse(seenRaw) : []);
+          let changed = false;
+          for (const p of rawPushes.slice(0, 5)) {
+            if (p.id && !seenSet.has(p.id)) {
+              seenSet.add(p.id);
+              changed = true;
+              if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(p.title || "SADAR Finance V 2.0", {
+                  body: p.body || p.message || "",
+                  icon: "/favicon.png",
+                });
+              }
+            }
+          }
+          if (changed) {
+            localStorage.setItem(
+              "sadar_seen_push_ids_v2",
+              JSON.stringify([...seenSet].slice(-60))
+            );
+          }
+        } catch (_) {}
+
+        const mappedPushes = rawPushes.map((p) => ({
+          id: p.id,
+          icon:
+            p.category === "budget" || p.category === "urgent"
+              ? "ri-alarm-warning-line"
+              : p.category === "recurring"
+                ? "ri-calendar-event-line"
+                : p.category === "debt"
+                  ? "ri-team-line"
+                  : "ri-notification-badge-line",
+          tone:
+            p.category === "budget" || p.category === "urgent"
+              ? "danger"
+              : p.category === "recurring" || p.category === "debt"
+                ? "warning"
+                : "success",
+          title: p.title || "Push Notification SADAR",
+          message: p.body || p.message || "",
+          time: p.sentAt
+            ? new Intl.DateTimeFormat("id-ID", {
+                dateStyle: "short",
+                timeStyle: "short",
+              }).format(new Date(p.sentAt))
+            : "Baru saja",
+          route: p.actionRoute || "/dashboard",
+        }));
+
         const mappedBroadcasts = rawBroadcasts.map((b) => ({
+          id: b.id || b.title,
           icon:
             b.type === "maintenance" || b.type === "urgent"
               ? "ri-tools-line"
@@ -59,7 +116,8 @@ const NotificationDropdown = () => {
         }));
 
         const mappedAlerts = Array.isArray(rawAlerts)
-          ? rawAlerts.map((alert) => ({
+          ? rawAlerts.map((alert, idx) => ({
+              id: alert.alert_id || `alert-${idx}`,
               icon:
                 alert.alert_type === "warning" || alert.alertType === "warning"
                   ? "ri-alert-line"
@@ -83,15 +141,20 @@ const NotificationDropdown = () => {
             }))
           : [];
 
-        setNotifications([...mappedBroadcasts, ...mappedAlerts]);
+        setNotifications([...mappedPushes, ...mappedBroadcasts, ...mappedAlerts]);
       } catch {
         if (!isMounted) return;
         setNotifications([]);
       }
     };
     fetchNotifications();
+    const timer = window.setInterval(fetchNotifications, 15000);
+    const onPushSent = () => fetchNotifications();
+    window.addEventListener("sadar-push-sent", onPushSent);
     return () => {
       isMounted = false;
+      window.clearInterval(timer);
+      window.removeEventListener("sadar-push-sent", onPushSent);
     };
   }, []);
 
