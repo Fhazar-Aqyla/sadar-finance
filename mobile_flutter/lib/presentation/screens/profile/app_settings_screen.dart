@@ -154,20 +154,8 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                               throw Exception('Format JSON tidak valid.');
                             }
                             await ref
-                                .read(sadarApiServiceProvider)
-                                .syncFinancialPlans(
-                                  savingsGoals:
-                                      (decoded['savingsGoals'] as List?) ??
-                                          const [],
-                                  recurringItems:
-                                      (decoded['recurringItems'] as List?) ??
-                                          const [],
-                                  debts:
-                                      (decoded['debts'] as List?) ?? const [],
-                                  transfers: (decoded['transfers'] as List?) ??
-                                      const [],
-                                );
-                            await ref.read(financeProvider.notifier).loadAll();
+                                .read(financeProvider.notifier)
+                                .restoreFromBackupMap(decoded);
                             if (ctx.mounted) Navigator.pop(ctx);
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -773,6 +761,29 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                   onChanged: (v) => ref
                       .read(uiPreferencesProvider.notifier)
                       .setHideBalances(v),
+                ),
+                const Divider(),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: Icon(
+                    Icons.security_update_good_rounded,
+                    color: primaryColor,
+                  ),
+                  title: Text(
+                    'Layar Privasi Saat Keluar Aplikasi',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Tampilkan logo SADAR saja saat aplikasi di Recent Apps / latar belakang',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  value: uiPrefs.privacyShieldEnabled,
+                  onChanged: (v) => ref
+                      .read(uiPreferencesProvider.notifier)
+                      .setPrivacyShieldEnabled(v),
                 ),
               ],
             ),

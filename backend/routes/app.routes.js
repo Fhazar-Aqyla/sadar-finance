@@ -27,6 +27,13 @@ const bannerUpload = multer({
       cb(null, `banner-${Date.now()}${safeExt}`);
     },
   }),
+  fileFilter: (_req, file, cb) => {
+    const allowedMimes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (allowedMimes.includes(String(file.mimetype || '').toLowerCase())) {
+      return cb(null, true);
+    }
+    return cb(new Error('Format file banner harus PNG, JPG, atau WEBP'));
+  },
   limits: { fileSize: 8 * 1024 * 1024 },
 });
 
@@ -179,18 +186,22 @@ router.post(
     const body = req.body || {};
     const list = loadAllBroadcasts();
     const id = String(body.id || `bcast-${Date.now()}`).trim();
+    const resolvedBanner = String(body.imageUrl || body.bannerUrl || '').trim();
+    const rawRoute = String(body.actionRoute || '').trim();
+    const safeRoute = rawRoute.startsWith('/') ? rawRoute : '';
     const item = {
       id,
       active: body.active !== false,
       type: ['info', 'promo', 'maintenance', 'urgent'].includes(body.type)
         ? body.type
         : 'info',
-      badge: String(body.badge || 'PENGUMUMAN RESMI').trim(),
-      title: String(body.title || 'Pengumuman SADAR Finance').trim(),
-      message: String(body.message || '').trim(),
-      imageUrl: String(body.imageUrl || '').trim(),
-      actionLabel: String(body.actionLabel || '').trim(),
-      actionRoute: String(body.actionRoute || '').trim(),
+      badge: String(body.badge || 'PENGUMUMAN RESMI').trim().slice(0, 80),
+      title: String(body.title || 'Pengumuman SADAR Finance').trim().slice(0, 160),
+      message: String(body.message || '').trim().slice(0, 1000),
+      imageUrl: resolvedBanner,
+      bannerUrl: resolvedBanner,
+      actionLabel: String(body.actionLabel || '').trim().slice(0, 60),
+      actionRoute: safeRoute,
       affectedFeature: String(body.affectedFeature || 'none').trim(),
       updatedAt: new Date().toISOString(),
     };
@@ -229,9 +240,11 @@ router.post(
   '/admin/banner-upload',
   authenticate,
   requireAdminUser,
-  bannerUpload.single('image'),
+  bannerUpload.any(),
   (req, res) => {
-    if (!req.file) {
+    const uploadedFile =
+      req.file || (Array.isArray(req.files) && req.files.length > 0 ? req.files[0] : null);
+    if (!uploadedFile) {
       return res.status(400).json({
         success: false,
         message: 'File gambar banner wajib diunggah',
@@ -239,12 +252,13 @@ router.post(
     }
     const baseUrl =
       process.env.PUBLIC_API_BASE_URL || 'https://sadar-finance.web.id/api/v1';
-    const imageUrl = `${baseUrl.replace(/\/$/, '')}/app/banners/${req.file.filename}`;
+    const imageUrl = `${baseUrl.replace(/\/$/, '')}/app/banners/${uploadedFile.filename}`;
     return success(res, {
       message: 'Gambar banner berhasil diunggah',
       data: {
-        filename: req.file.filename,
+        filename: uploadedFile.filename,
         imageUrl,
+        bannerUrl: imageUrl,
       },
     });
   }

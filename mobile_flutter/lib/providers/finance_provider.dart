@@ -1822,6 +1822,48 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
     return true;
   }
 
+  Future<void> restoreFromBackupMap(Map<String, dynamic> decoded) async {
+    final rawGoals = (decoded['savingsGoals'] is List)
+        ? (decoded['savingsGoals'] as List).take(200).toList()
+        : const [];
+    final rawRec = (decoded['recurringItems'] is List)
+        ? (decoded['recurringItems'] as List).take(200).toList()
+        : const [];
+    final rawDebts = (decoded['debts'] is List)
+        ? (decoded['debts'] as List).take(200).toList()
+        : const [];
+    final rawTransfers = (decoded['transfers'] is List)
+        ? (decoded['transfers'] as List).take(200).toList()
+        : const [];
+
+    final goals = rawGoals
+        .whereType<Map>()
+        .map((e) => SavingsGoalModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+    final recs = rawRec
+        .whereType<Map>()
+        .map((e) => RecurringItemModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+    final debts = rawDebts
+        .whereType<Map>()
+        .map((e) => DebtItemModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+    final transfers = rawTransfers
+        .whereType<Map>()
+        .map((e) => TransferLogModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+
+    state = state.copyWith(
+      savingsGoals: goals.isNotEmpty ? goals : state.savingsGoals,
+      recurringItems: recs.isNotEmpty ? recs : state.recurringItems,
+      debts: debts.isNotEmpty ? debts : state.debts,
+      transfers: transfers.isNotEmpty ? transfers : state.transfers,
+    );
+    await _persistState();
+    await _syncPlansToCloud();
+    await loadAll();
+  }
+
   void clear() {
     _activeUserId = null;
     _historyPage = 1;

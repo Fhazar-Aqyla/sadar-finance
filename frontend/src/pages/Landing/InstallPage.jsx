@@ -14,8 +14,8 @@ import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
   latestVersion: "2.0.0",
-  buildNumber: 10,
-  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0",
+  buildNumber: 11,
+  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b11",
   releaseNotes: [
     "Rilis Utama SADAR Finance V 2.0.0: Pratinjau & Cetak e-Statement Bulanan Resmi di Dalam Aplikasi",
     "Mode Kalender Arus Kas Bulanan Interaktif di Halaman Riwayat Keuangan",

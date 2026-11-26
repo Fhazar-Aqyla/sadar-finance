@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
-class SadarCard extends StatelessWidget {
+class SadarCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final Color? color;
@@ -18,14 +18,23 @@ class SadarCard extends StatelessWidget {
   });
 
   @override
+  State<SadarCard> createState() => _SadarCardState();
+}
+
+class _SadarCardState extends State<SadarCard> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
     final isDark = AppColors.isDark(context);
-    final container = Container(
+    final container = AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
-        color: color ?? AppColors.surfaceOf(context),
+        color: widget.color ?? AppColors.surfaceOf(context),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: borderColor ?? AppColors.borderOf(context),
+          color: widget.borderColor ?? AppColors.borderOf(context),
         ),
         boxShadow: isDark
             ? [
@@ -43,16 +52,26 @@ class SadarCard extends StatelessWidget {
                 ),
               ],
       ),
-      child: Padding(padding: padding, child: child),
+      child: Padding(padding: widget.padding, child: widget.child),
     );
 
-    if (onTap == null) return container;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: container,
+    if (widget.onTap == null) return container;
+    return AnimatedScale(
+      scale: _pressed ? 0.984 : 1.0,
+      duration: const Duration(milliseconds: 130),
+      curve: Curves.easeOutCubic,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          onHighlightChanged: (v) {
+            if (_pressed != v && mounted) {
+              setState(() => _pressed = v);
+            }
+          },
+          borderRadius: BorderRadius.circular(18),
+          child: container,
+        ),
       ),
     );
   }

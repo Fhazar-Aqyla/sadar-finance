@@ -116,10 +116,23 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
         return Stack(
           children: [
             ?child,
-            if (_inBackground && !_locked)
-              const Positioned.fill(
-                child: _PrivacyShieldOverlay(),
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: !(_inBackground &&
+                    !_locked &&
+                    uiPrefs.privacyShieldEnabled),
+                child: AnimatedOpacity(
+                  opacity: (_inBackground &&
+                          !_locked &&
+                          uiPrefs.privacyShieldEnabled)
+                      ? 1.0
+                      : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  child: const _PrivacyShieldOverlay(),
+                ),
               ),
+            ),
             if (_locked)
               Positioned.fill(
                 child: _AppLockOverlay(
@@ -225,49 +238,14 @@ class _PrivacyShieldOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0xFF0F172A),
+    return const Material(
+      color: Color(0xFF0F172A),
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SadarLogo(
-              variant: SadarLogoVariant.light,
-              height: 34,
-              showFinanceSubtitle: true,
-              alignment: CrossAxisAlignment.center,
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(99),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.16),
-                ),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.shield_outlined,
-                    color: Color(0xFF5EEAD4),
-                    size: 16,
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    'Pelindung Privasi Aktif • Nominal Disembunyikan',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        child: SadarLogo(
+          variant: SadarLogoVariant.light,
+          height: 38,
+          showFinanceSubtitle: true,
+          alignment: CrossAxisAlignment.center,
         ),
       ),
     );

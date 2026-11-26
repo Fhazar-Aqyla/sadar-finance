@@ -24,12 +24,18 @@ router.get(
 router.put(
   '/',
   asyncHandler(async (req, res) => {
-    const { savingsGoals, recurringItems, debts, transfers } = req.body || {};
+    const body = req.body || {};
+    const sanitizeList = (arr) =>
+      Array.isArray(arr)
+        ? arr
+            .filter((item) => item && typeof item === 'object' && !Array.isArray(item))
+            .slice(0, 200)
+        : undefined;
     const data = await plansRepository.upsertByUser(req.user.id, {
-      savingsGoals,
-      recurringItems,
-      debts,
-      transfers,
+      savingsGoals: sanitizeList(body.savingsGoals),
+      recurringItems: sanitizeList(body.recurringItems),
+      debts: sanitizeList(body.debts),
+      transfers: sanitizeList(body.transfers),
     });
     return success(res, {
       data,

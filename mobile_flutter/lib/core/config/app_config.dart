@@ -22,7 +22,7 @@ class AppConfig {
 
   static const String appName = 'SADAR Finance';
   static const String appVersion = '2.0.0';
-  static const int appBuildNumber = 10;
+  static const int appBuildNumber = 11;
   static const String appTagline = 'Kelola Keuangan Pribadi Lebih Sadar';
 
   static String resolveUploadUrl(String? path, String activeApiBaseUrl) {

@@ -108,6 +108,14 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
       canvasColor: AppColors.surface,
+      splashFactory: InkSparkle.splashFactory,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android:
+              ZoomPageTransitionsBuilder(allowEnterRouteSnapshotting: false),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       textTheme: _buildTextTheme(
         AppColors.textPrimary,
         AppColors.textSecondary,
@@ -324,6 +332,14 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.darkBackground,
       canvasColor: AppColors.darkSurface,
+      splashFactory: InkSparkle.splashFactory,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android:
+              ZoomPageTransitionsBuilder(allowEnterRouteSnapshotting: false),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       textTheme: _buildTextTheme(
         AppColors.darkTextPrimary,
         AppColors.darkTextSecondary,

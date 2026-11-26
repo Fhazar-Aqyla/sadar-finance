@@ -136,8 +136,11 @@ app.use('/uploads', express.static(uploadDir, {
 }));
 app.get('/downloads/:filename', (req, res) => {
   const safeName = path.basename(req.params.filename || '');
+  if (!safeName.endsWith('.apk') || !/^[a-zA-Z0-9._-]+$/.test(safeName)) {
+    return res.status(404).json({ success: false, message: 'Download file not found' });
+  }
   const filePath = path.join(downloadsDir, safeName);
-  if (!safeName || !fs.existsSync(filePath)) {
+  if (!fs.existsSync(filePath)) {
     return res.status(404).json({ success: false, message: 'Download file not found' });
   }
   const stat = fs.statSync(filePath);

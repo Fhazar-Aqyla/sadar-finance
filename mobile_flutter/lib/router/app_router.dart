@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/screens/auth/forgot_password_screen.dart';
@@ -90,19 +90,31 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (_, _) => const OnboardingScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: '/login',
-        builder: (_, _) => const LoginScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const LoginScreen(),
+        ),
       ),
       GoRoute(
         path: '/register',
-        builder: (_, _) => const RegisterScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const RegisterScreen(),
+        ),
       ),
       GoRoute(
         path: '/forgot-password',
-        builder: (_, _) => const ForgotPasswordScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const ForgotPasswordScreen(),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => AppShell(
@@ -155,44 +167,95 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/financial-history',
-        builder: (_, _) => const FinancialHistoryScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const FinancialHistoryScreen(),
+        ),
       ),
       GoRoute(
         path: '/financial-plans',
-        builder: (_, state) => FinancialPlansScreen(
-          initialTab:
-              int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: FinancialPlansScreen(
+            initialTab:
+                int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
+          ),
         ),
       ),
       GoRoute(
         path: '/debt-split',
-        builder: (_, state) => DebtSplitScreen(
-          initialTab:
-              int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: DebtSplitScreen(
+            initialTab:
+                int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0,
+          ),
         ),
       ),
       GoRoute(
         path: '/profile-account/edit',
-        builder: (_, _) => const EditProfileScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const EditProfileScreen(),
+        ),
       ),
       GoRoute(
         path: '/settings',
-        builder: (_, _) => const AppSettingsScreen(),
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const AppSettingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/privacy-policy',
-        builder: (_, _) => const LegalScreen(
-          title: 'Kebijakan Privasi',
-          isPrivacy: true,
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const LegalScreen(
+            title: 'Kebijakan Privasi',
+            isPrivacy: true,
+          ),
         ),
       ),
       GoRoute(
         path: '/terms-conditions',
-        builder: (_, _) => const LegalScreen(
-          title: 'Syarat & Ketentuan',
-          isPrivacy: false,
+        pageBuilder: (_, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const LegalScreen(
+            title: 'Syarat & Ketentuan',
+            isPrivacy: false,
+          ),
         ),
       ),
     ],
   );
 });
+
+CustomTransitionPage<void> _buildSmoothTransitionPage({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 260),
+    reverseTransitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+      final offsetAnimation = Tween<Offset>(
+        begin: const Offset(0.0, 0.025),
+        end: Offset.zero,
+      ).animate(curved);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        ),
+      );
+    },
+  );
+}

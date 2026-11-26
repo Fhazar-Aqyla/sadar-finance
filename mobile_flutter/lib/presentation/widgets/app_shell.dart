@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -11,6 +12,9 @@ class AppShell extends StatelessWidget {
   });
 
   void _onTap(int index) {
+    if (index != navigationShell.currentIndex) {
+      HapticFeedback.selectionClick();
+    }
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
@@ -152,19 +156,26 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-              decoration: BoxDecoration(
-                color: selected
-                    ? activeColor.withValues(alpha: 0.13)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                selected ? icon : inactiveIcon,
-                color: color,
-                size: 22,
+            AnimatedScale(
+              scale: selected ? 1.06 : 1.0,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutBack,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? activeColor.withValues(alpha: 0.13)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  selected ? icon : inactiveIcon,
+                  color: color,
+                  size: 22,
+                ),
               ),
             ),
             const SizedBox(height: 2),
