@@ -114,7 +114,7 @@ const formatDateTime = (iso) => {
 
 const SadarDeveloperPanel = () => {
   useEffect(() => {
-    document.title = "Panel Developer | SADAR Finance V 2.0";
+    document.title = "Panel Developer | SADAR Finance V 3.0";
   }, []);
 
   const [activeTab, setActiveTab] = useState("telemetry");
@@ -127,20 +127,23 @@ const SadarDeveloperPanel = () => {
   const [sysStatus, setSysStatus] = useState(null);
   const [pingResult, setPingResult] = useState(null);
   const [isPinging, setIsPinging] = useState(false);
+  const [apiLogs, setApiLogs] = useState([]);
+  const [isRunningCron, setIsRunningCron] = useState(false);
+  const [isExportingBackup, setIsExportingBackup] = useState(false);
 
   // OTA Version Manager & APK Upload state
   const [versionForm, setVersionForm] = useState({
-    latestVersion: "2.0.0",
-    buildNumber: 11,
+    latestVersion: "3.0.0",
+    buildNumber: 14,
     minVersion: "1.0.0",
     forceUpdate: false,
     downloadUrl:
-      "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b11",
+      "https://sadar-finance.web.id/downloads/sadar-finance-v3.0.0.apk?v=3.0.0-b14",
     releaseNotesText: [
-      "Rilis Utama SADAR Finance V 2.0.0: Push Notification Android Native (Broadcast, Budget 50/30/20 & Tagihan)",
-      "Kartu Posisi Kekayaan Bersih (Net Worth Tracker) & Indikator Batas Aman Belanja Harian",
-      "Pratinjau & Cetak e-Statement Bulanan Resmi (PDF) serta Mode Kalender Arus Kas Interaktif",
-      "Penjaga Duplikat Transaksi Pintar, Tanggal Jatuh Tempo Piutang, & 1-Tap Split Bill ke Piutang",
+      "Rilis Utama SADAR Finance V 3.0.0 Stable: Push Notification Android Native dengan Deep-Link Navigasi Instan",
+      "Mesin Pengingat Otomatis Terjadwal (Tagihan Rutin & Jatuh Tempo Piutang) + Kartu Pencapaian Skor Finansial (PNG)",
+      "Kartu Posisi Kekayaan Bersih (Net Worth Tracker), Batas Aman Belanja Harian, & Mode Kalender Arus Kas Interaktif",
+      "Panel Developer V 3.0 Penuh: Live API Request Logs, 1-Klik Backup Database JSON, & Pengujian Push Real-Time",
     ].join("\n"),
   });
   const [isSavingVersion, setIsSavingVersion] = useState(false);
@@ -252,14 +255,19 @@ const SadarDeveloperPanel = () => {
           return;
         }
 
-        const [statusData, verData, bcastData, usersData, pushData] =
+        const [statusData, verData, bcastData, usersData, pushData, logsData] =
           await Promise.all([
             appApi.adminSystemStatus().catch(() => null),
             appApi.version().catch(() => null),
             appApi.adminBroadcasts().catch(() => null),
             appApi.adminUsers().catch(() => null),
             appApi.pushFeed().catch(() => null),
+            appApi.adminApiLogs().catch(() => null),
           ]);
+
+        if (logsData && Array.isArray(logsData.logs)) {
+          setApiLogs(logsData.logs);
+        }
 
         if (pushData && Array.isArray(pushData.notifications)) {
           setPushHistory(pushData.notifications);
@@ -453,8 +461,8 @@ const SadarDeveloperPanel = () => {
       perm = await Notification.requestPermission();
     }
     if (perm === "granted") {
-      new Notification("SADAR Finance V 2.0 Developer Push", {
-        body: "Notifikasi sistem Web & Broadcast SADAR Finance berfungsi normal!",
+      new Notification("SADAR Finance V 3.0 Developer Push", {
+        body: "Notifikasi sistem Web & Broadcast SADAR Finance V 3.0 berfungsi normal!",
         icon: "/favicon.png",
       });
       setNotice({
@@ -466,6 +474,57 @@ const SadarDeveloperPanel = () => {
         color: "warning",
         text: "Izin notifikasi browser belum diberikan.",
       });
+    }
+  };
+
+  const handleRunCronReminders = async () => {
+    setIsRunningCron(true);
+    setNotice(null);
+    try {
+      const res = await appApi.adminRunReminders();
+      if (Array.isArray(res?.notifications)) {
+        setPushHistory(res.notifications);
+      }
+      window.dispatchEvent(new CustomEvent("sadar-push-sent"));
+      setNotice({
+        color: "success",
+        text: `Mesin Cron Pengingat Otomatis selesai memeriksa ${res?.scannedUsers ?? 0} akun pengguna dan mengirim ${res?.dispatchedCount ?? 0} notifikasi ke Android & Web!`,
+      });
+    } catch (err) {
+      setNotice({
+        color: "danger",
+        text: err?.message || "Gagal menjalankan mesin pengingat otomatis.",
+      });
+    } finally {
+      setIsRunningCron(false);
+    }
+  };
+
+  const handleExportDbBackup = async () => {
+    setIsExportingBackup(true);
+    setNotice(null);
+    try {
+      const backup = await appApi.adminDbBackup();
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `SADAR-Finance-V3-Backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setNotice({
+        color: "success",
+        text: "Snapshot Backup Database & Konfigurasi (JSON) berhasil diunduh!",
+      });
+    } catch (err) {
+      setNotice({
+        color: "danger",
+        text: err?.message || "Gagal mengekspor backup database.",
+      });
+    } finally {
+      setIsExportingBackup(false);
     }
   };
 
@@ -856,6 +915,26 @@ const SadarDeveloperPanel = () => {
             </p>
           </div>
           <div className="d-flex align-items-center gap-2 flex-shrink-0 flex-wrap">
+            <Button
+              color="light"
+              size="sm"
+              className="sadar-table-action fw-semibold d-inline-flex align-items-center gap-1"
+              onClick={handleRunCronReminders}
+              disabled={isRunningCron}
+            >
+              <Sparkles size={14} className="text-warning" />
+              <span>{isRunningCron ? "Memeriksa..." : "Jalankan Cron Reminder"}</span>
+            </Button>
+            <Button
+              color="light"
+              size="sm"
+              className="sadar-table-action fw-semibold d-inline-flex align-items-center gap-1"
+              onClick={handleExportDbBackup}
+              disabled={isExportingBackup}
+            >
+              <Download size={14} className="text-primary" />
+              <span>{isExportingBackup ? "Mengekspor..." : "Backup DB (JSON)"}</span>
+            </Button>
             <Button
               color="light"
               size="sm"
@@ -1262,6 +1341,108 @@ const SadarDeveloperPanel = () => {
                 </Card>
               </Col>
             </Row>
+
+            {/* Live API Request Telemetry Log Table (V 3.0) */}
+            <Card className="sadar-panel mt-3">
+              <CardHeader>
+                <div>
+                  <h4 className="card-title mb-1">
+                    Log Aktivitas Request API Real-Time ({apiLogs.length})
+                  </h4>
+                  <p className="text-muted mb-0">
+                    Rekaman trafik langsung dari Aplikasi Android APK &amp; Web
+                    Browser ke server produksi
+                  </p>
+                </div>
+                <Badge color="info" className="bg-info-subtle text-info">
+                  Ring Buffer (80 Terakhir)
+                </Badge>
+              </CardHeader>
+              <CardBody className="p-0">
+                <div
+                  className="table-responsive"
+                  style={{ maxHeight: 320, overflowY: "auto" }}
+                >
+                  <Table className="table-hover align-middle mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th className="ps-3">Waktu</th>
+                        <th>Klien</th>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Status</th>
+                        <th className="pe-3 text-end">Latensi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {apiLogs.length > 0 ? (
+                        apiLogs.slice(0, 25).map((log) => (
+                          <tr key={log.id}>
+                            <td className="ps-3 fs-12 text-muted">
+                              {formatDateTime(log.timestamp)}
+                            </td>
+                            <td>
+                              <Badge
+                                color={
+                                  log.client === "Android APK"
+                                    ? "success"
+                                    : "primary"
+                                }
+                                className={`bg-${
+                                  log.client === "Android APK"
+                                    ? "success"
+                                    : "primary"
+                                }-subtle text-${
+                                  log.client === "Android APK"
+                                    ? "success"
+                                    : "primary"
+                                }`}
+                              >
+                                {log.client}
+                              </Badge>
+                            </td>
+                            <td>
+                              <span className="font-monospace fw-bold fs-12">
+                                {log.method}
+                              </span>
+                            </td>
+                            <td className="font-monospace fs-12">
+                              {log.path}
+                            </td>
+                            <td>
+                              <Badge
+                                color={
+                                  log.status < 400 ? "success" : "danger"
+                                }
+                                className={`bg-${
+                                  log.status < 400 ? "success" : "danger"
+                                }-subtle text-${
+                                  log.status < 400 ? "success" : "danger"
+                                }`}
+                              >
+                                HTTP {log.status}
+                              </Badge>
+                            </td>
+                            <td className="pe-3 text-end font-monospace fs-12">
+                              {log.latencyMs} ms
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="text-center text-muted py-4"
+                          >
+                            Belum ada log request API yang tercatat.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              </CardBody>
+            </Card>
           </>
         )}
 

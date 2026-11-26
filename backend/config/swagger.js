@@ -8,8 +8,8 @@ const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
     title: 'SADAR Finance API',
-    version: '2.0.0',
-    description: 'Smart AI-Driven Automated Receipt & Finance Management API (V 2.0).\n\nFeatures: Auth, Accounts, Transactions, Incomes, OCR, AI Categorization, Behavior Analysis, Overspending Prediction, Health Score, Budgets, Cloud Financial Plans, OTA Updates & Broadcasts.',
+    version: '3.0.0',
+    description: 'Smart AI-Driven Automated Receipt & Finance Management API (V 3.0).\n\nFeatures: Auth, Accounts, Transactions, Incomes, OCR, AI Categorization, Behavior Analysis, Overspending Prediction, Health Score, Budgets, Cloud Financial Plans, OTA Updates, Remote Push & Broadcasts.',
     contact: { name: 'SADAR Finance Team' },
   },
   servers: [

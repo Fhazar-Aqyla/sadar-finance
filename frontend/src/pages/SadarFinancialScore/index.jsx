@@ -732,6 +732,128 @@ const FinancialScoreWithData = () => {
   const scoreTone = getScoreTone(data.score);
   const budgetTone = getBudgetTone(data.budgetUsage);
 
+  const handleDownloadScoreCardPng = () => {
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1350;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Background gradient (Deep Navy to Slate)
+      const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1350);
+      bgGrad.addColorStop(0, "#0f172a");
+      bgGrad.addColorStop(0.5, "#1e3a8a");
+      bgGrad.addColorStop(1, "#0f172a");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 1080, 1350);
+
+      // Decorative glow circles
+      ctx.fillStyle = "rgba(20, 184, 166, 0.14)";
+      ctx.beginPath();
+      ctx.arc(920, 180, 260, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Main Card Surface
+      ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(70, 80, 940, 1190, 36);
+      ctx.fill();
+      ctx.stroke();
+
+      // Brand Header
+      ctx.fillStyle = "#14b8a6";
+      ctx.font = "bold 26px Inter, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("SADAR FINANCE V 3.0 • KARTU KESEHATAN FINANSIAL", 540, 165);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 44px Inter, system-ui, sans-serif";
+      ctx.fillText("Skor Kesehatan Keuangan", 540, 230);
+
+      // Score Ring
+      const centerX = 540;
+      const centerY = 470;
+      const radius = 165;
+      ctx.lineWidth = 26;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = scoreTone.chartColor || "#22c55e";
+      ctx.lineCap = "round";
+      const endAngle = -Math.PI / 2 + (Math.PI * 2 * Math.min(100, Math.max(0, data.score))) / 100;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, -Math.PI / 2, endAngle);
+      ctx.stroke();
+
+      // Score Value
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 110px Inter, system-ui, sans-serif";
+      ctx.fillText(`${data.score}`, centerX, centerY + 25);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "600 26px Inter, system-ui, sans-serif";
+      ctx.fillText("DARI 100 POIN", centerX, centerY + 72);
+
+      // Status Pill
+      ctx.fillStyle = scoreTone.chartColor || "#22c55e";
+      ctx.beginPath();
+      ctx.roundRect(370, 680, 340, 58, 29);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 26px Inter, system-ui, sans-serif";
+      ctx.fillText(String(data.status || "Sehat").toUpperCase(), 540, 718);
+
+      // 50/30/20 Breakdown Boxes
+      const ratios = data.ratioSeries || [50, 30, 20];
+      const boxes = [
+        { label: "KEBUTUHAN (50%)", val: `${Number(ratios[0] || 0).toFixed(1)}%`, x: 120 },
+        { label: "KEINGINAN (30%)", val: `${Number(ratios[1] || 0).toFixed(1)}%`, x: 405 },
+        { label: "TABUNGAN (20%)", val: `${Number(ratios[2] || 0).toFixed(1)}%`, x: 690 },
+      ];
+      boxes.forEach((b) => {
+        ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
+        ctx.beginPath();
+        ctx.roundRect(b.x, 800, 270, 150, 22);
+        ctx.fill();
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "bold 20px Inter, system-ui, sans-serif";
+        ctx.fillText(b.label, b.x + 135, 855);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "800 40px Inter, system-ui, sans-serif";
+        ctx.fillText(b.val, b.x + 135, 915);
+      });
+
+      // Summary Row
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "600 24px Inter, system-ui, sans-serif";
+      ctx.fillText(
+        `Pemasukan: ${rupiah(data.totalIncome)}   •   Pengeluaran: ${rupiah(data.totalExpense)}`,
+        540,
+        1035
+      );
+      ctx.fillStyle = "#14b8a6";
+      ctx.font = "600 22px Inter, system-ui, sans-serif";
+      ctx.fillText(
+        `sadar-finance.web.id • Dicetak ${new Intl.DateTimeFormat("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }).format(new Date())}`,
+        540,
+        1195
+      );
+
+      const link = document.createElement("a");
+      link.download = `SADAR-Skor-Finansial-${data.score}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (_) {}
+  };
+
   return (
     <div className="page-content sadar-page">
       <Container fluid>
@@ -739,9 +861,21 @@ const FinancialScoreWithData = () => {
           <Col xl={4} className="d-flex">
             <Card className="sadar-panel flex-fill">
               <CardBody className="sadar-score-main">
-                <div className="sadar-score-heading">
-                  <span>Skor Finansial</span>
-                  <p>Ringkasan kesehatan keuangan bulan ini</p>
+                <div className="sadar-score-heading d-flex align-items-start justify-content-between gap-2 w-100">
+                  <div>
+                    <span>Skor Finansial</span>
+                    <p>Ringkasan kesehatan keuangan bulan ini</p>
+                  </div>
+                  <Button
+                    color="primary"
+                    size="sm"
+                    outline
+                    onClick={handleDownloadScoreCardPng}
+                    title="Unduh Kartu Pencapaian Skor Finansial (PNG)"
+                  >
+                    <i className="ri-download-2-line me-1"></i>
+                    Kartu PNG
+                  </Button>
                 </div>
                 <ButtonGroup
                   size="sm"

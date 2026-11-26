@@ -13,14 +13,14 @@ import sadarLogo from "@/assets/images/landing/sadar-logo.png";
 import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
-  latestVersion: "2.0.0",
-  buildNumber: 13,
-  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b13",
+  latestVersion: "3.0.0",
+  buildNumber: 14,
+  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v3.0.0.apk?v=3.0.0-b14",
   releaseNotes: [
-    "Rilis Utama SADAR Finance V 2.0.0: Push Notification Android Native (Broadcast, Budget 50/30/20 & Tagihan)",
-    "Kartu Posisi Kekayaan Bersih (Net Worth Tracker) & Indikator Batas Aman Belanja Harian",
-    "Pratinjau & Cetak e-Statement Bulanan Resmi (PDF) serta Mode Kalender Arus Kas Interaktif",
-    "Penjaga Duplikat Transaksi Pintar, Tanggal Jatuh Tempo Piutang, & 1-Tap Split Bill ke Piutang",
+    "Rilis Utama SADAR Finance V 3.0.0 Stable: Push Notification Android Native dengan Deep-Link Navigasi Instan",
+    "Mesin Pengingat Otomatis Terjadwal (Tagihan Rutin & Jatuh Tempo Piutang) + Kartu Pencapaian Skor Finansial (PNG)",
+    "Kartu Posisi Kekayaan Bersih (Net Worth Tracker), Batas Aman Belanja Harian, & Mode Kalender Arus Kas Interaktif",
+    "Panel Developer V 3.0 Penuh: Live API Request Logs, 1-Klik Backup Database JSON, & Pengujian Push Real-Time",
   ],
 };
 

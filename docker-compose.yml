@@ -47,6 +47,11 @@ services:
       GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
       GROQ_TIMEOUT_MS: ${GROQ_TIMEOUT_MS:-15000}
       GROQ_REASONING_EFFORT: ${GROQ_REASONING_EFFORT:-low}
+    volumes:
+      - ./backend/config:/app/config
+      - ./backend/assets/banners:/app/assets/banners
+      - ./backend/uploads:/app/uploads
+      - ./downloads:/app/downloads
 
   desktop:
     build:

@@ -10,6 +10,33 @@ class PushNotificationService {
   );
   static const String _dispatchedKey = 'sadar_dispatched_push_keys_v3';
 
+  static void initTapHandler(void Function(String route) onTap) {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'onNotificationTapped') {
+        final args = call.arguments;
+        if (args is Map) {
+          final route = (args['route'] ?? '').toString().trim();
+          if (route.startsWith('/')) {
+            onTap(route);
+          }
+        }
+      }
+      return null;
+    });
+  }
+
+  static Future<String?> consumeInitialRoute() async {
+    try {
+      final route = await _channel.invokeMethod<String>('consumeInitialRoute');
+      if (route != null && route.trim().startsWith('/')) {
+        return route.trim();
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<bool> requestPermission() async {
     try {
       final granted = await _channel.invokeMethod<bool>('requestPermission');
@@ -23,6 +50,7 @@ class PushNotificationService {
     required int id,
     required String title,
     required String body,
+    String route = '/dashboard',
   }) async {
     try {
       final shown = await _channel.invokeMethod<bool>(
@@ -31,6 +59,7 @@ class PushNotificationService {
           'id': id,
           'title': title,
           'body': body,
+          'route': route,
         },
       );
       return shown ?? false;
@@ -193,14 +222,17 @@ class PushNotificationService {
         final key = 'remote_$idStr';
         if (dispatched.contains(key)) continue;
 
-        final title = (raw['title'] ?? 'SADAR Finance V 2.0').toString();
+        final title = (raw['title'] ?? 'SADAR Finance V 3.0').toString();
         final body = (raw['body'] ?? raw['message'] ?? '').toString();
+        final rawRoute = (raw['actionRoute'] ?? '/dashboard').toString().trim();
+        final actionRoute = rawRoute.startsWith('/') ? rawRoute : '/dashboard';
         if (body.isEmpty) continue;
 
         final ok = await showNotification(
           id: 6100 + (idStr.hashCode.abs() % 800),
           title: title,
           body: body,
+          route: actionRoute,
         );
         if (ok) {
           dispatched.add(key);
@@ -210,6 +242,7 @@ class PushNotificationService {
           'id': idStr,
           'title': title,
           'body': body,
+          'actionRoute': actionRoute,
           'nativeShown': ok ? 'true' : 'false',
         });
       }

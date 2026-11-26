@@ -31,6 +31,32 @@ class MainActivity : FlutterFragmentActivity() {
     private var pendingLocationResult: MethodChannel.Result? = null
     private val pendingNotifResults = mutableListOf<MethodChannel.Result>()
     private var queuedNotification: Triple<Int, String, String>? = null
+    private var queuedNotificationRoute: String = "/dashboard"
+    private var notifMethodChannel: MethodChannel? = null
+    private var pendingLaunchRoute: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        extractPushRouteFromIntent(intent, dispatchImmediately = false)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        extractPushRouteFromIntent(intent, dispatchImmediately = true)
+    }
+
+    private fun extractPushRouteFromIntent(intent: Intent?, dispatchImmediately: Boolean) {
+        val route = intent?.getStringExtra("action_route")?.trim()
+        if (!route.isNullOrEmpty() && route.startsWith("/")) {
+            intent.removeExtra("action_route")
+            if (dispatchImmediately && notifMethodChannel != null) {
+                notifMethodChannel?.invokeMethod("onNotificationTapped", mapOf("route" to route))
+            } else {
+                pendingLaunchRoute = route
+            }
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -58,9 +84,15 @@ class MainActivity : FlutterFragmentActivity() {
                 }
             }
 
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, notificationChannelName)
-            .setMethodCallHandler { call, result ->
+        val nChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, notificationChannelName)
+        notifMethodChannel = nChannel
+        nChannel.setMethodCallHandler { call, result ->
                 when (call.method) {
+                    "consumeInitialRoute" -> {
+                        val route = pendingLaunchRoute
+                        pendingLaunchRoute = null
+                        result.success(route)
+                    }
                     "requestPermission" -> {
                         ensureNotificationChannel()
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -89,6 +121,7 @@ class MainActivity : FlutterFragmentActivity() {
                         val id = (call.argument<Number>("id") ?: 1001).toInt()
                         val title = call.argument<String>("title") ?: "SADAR Finance"
                         val body = call.argument<String>("body") ?: ""
+                        val route = call.argument<String>("route") ?: "/dashboard"
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             val granted = ContextCompat.checkSelfPermission(
                                 this,
@@ -96,6 +129,7 @@ class MainActivity : FlutterFragmentActivity() {
                             ) == PackageManager.PERMISSION_GRANTED
                             if (!granted) {
                                 queuedNotification = Triple(id, title, body)
+                                queuedNotificationRoute = route
                                 val shouldAsk = pendingNotifResults.isEmpty()
                                 pendingNotifResults.add(result)
                                 if (shouldAsk) {
@@ -108,7 +142,7 @@ class MainActivity : FlutterFragmentActivity() {
                                 return@setMethodCallHandler
                             }
                         }
-                        val shown = showNativePushNotification(id, title, body)
+                        val shown = showNativePushNotification(id, title, body, route)
                         result.success(shown)
                     }
                     else -> result.notImplemented()
@@ -133,7 +167,12 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun showNativePushNotification(id: Int, title: String, body: String): Boolean {
+    private fun showNativePushNotification(
+        id: Int,
+        title: String,
+        body: String,
+        route: String = "/dashboard"
+    ): Boolean {
         return try {
             ensureNotificationChannel()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -146,6 +185,7 @@ class MainActivity : FlutterFragmentActivity() {
 
             val launchIntent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("action_route", route)
             }
             val pendingFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -203,8 +243,9 @@ class MainActivity : FlutterFragmentActivity() {
                     grantResults[0] == PackageManager.PERMISSION_GRANTED
             if (granted && queuedNotification != null) {
                 val q = queuedNotification!!
+                val qRoute = queuedNotificationRoute
                 queuedNotification = null
-                showNativePushNotification(q.first, q.second, q.third)
+                showNativePushNotification(q.first, q.second, q.third, qRoute)
             } else {
                 queuedNotification = null
             }

@@ -702,16 +702,36 @@ const SadarFinancialPlans = () => {
                               <p className="small text-muted mb-0 mt-1">
                                 Nominal: <strong>{rupiah(d.amount)}</strong>
                                 {d.note ? ` - ${d.note}` : ""}
-                                {d.dueDate && (
-                                  <span className="ms-2 badge bg-info-subtle text-info">
-                                    Jatuh Tempo:{" "}
-                                    {new Intl.DateTimeFormat("id-ID", {
-                                      day: "2-digit",
-                                      month: "short",
-                                      year: "numeric",
-                                    }).format(new Date(d.dueDate))}
-                                  </span>
-                                )}
+                                {d.dueDate && (() => {
+                                  const dueD = new Date(`${String(d.dueDate).slice(0, 10)}T00:00:00`);
+                                  const nowD = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00`);
+                                  const diffDays = Math.round((dueD - nowD) / (1000 * 60 * 60 * 24));
+                                  const tone = d.isSettled
+                                    ? "secondary"
+                                    : diffDays < 0
+                                      ? "danger"
+                                      : diffDays <= 3
+                                        ? "warning"
+                                        : "info";
+                                  const suffix = d.isSettled
+                                    ? ""
+                                    : diffDays < 0
+                                      ? ` • Terlambat ${Math.abs(diffDays)}h`
+                                      : diffDays === 0
+                                        ? " • Hari Ini!"
+                                        : ` • H-${diffDays}`;
+                                  return (
+                                    <span className={`ms-2 badge bg-${tone}-subtle text-${tone}`}>
+                                      Jatuh Tempo:{" "}
+                                      {new Intl.DateTimeFormat("id-ID", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                      }).format(dueD)}
+                                      {suffix}
+                                    </span>
+                                  );
+                                })()}
                               </p>
                             </div>
                             <div className="d-flex align-items-center gap-2">

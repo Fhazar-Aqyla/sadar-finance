@@ -296,6 +296,12 @@ export const appApi = {
     apiClient.post("/app/admin/push-send", payload).then(unwrapData),
   adminDeletePush: (id) =>
     apiClient.delete(`/app/admin/push-send/${id}`).then(unwrapData),
+  adminRunReminders: () =>
+    apiClient.post("/app/admin/run-reminders").then(unwrapData),
+  adminApiLogs: () =>
+    apiClient.get("/app/admin/api-logs").then(unwrapData),
+  adminDbBackup: () =>
+    apiClient.get("/app/admin/db-backup").then(unwrapData),
 };
 
 export const plansApi = {

@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
@@ -7,11 +7,25 @@ import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import dummyAvatar from "../../assets/images/users/user-dummy-img.jpg";
 import { getStoredAuthUserRaw } from "../../helpers/auth-storage";
 
+const buildAvatar2dDataUri = (avatarId) => {
+  const id = String(avatarId || "").replace(/^avatar2d:/, "");
+  const palettes = {
+    freelancer: ["#6366f1", "#4338ca", "FL"],
+    student: ["#3b82f6", "#1d4ed8", "MH"],
+    executive: ["#0f172a", "#1e3a8a", "EX"],
+    investor: ["#10b981", "#047857", "IV"],
+    saver: ["#14b8a6", "#0f766e", "SV"],
+  };
+  const [c1, c2] = palettes[id] || ["#1e3a8a", "#14b8a6", "SD"];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><circle cx="60" cy="60" r="60" fill="url(#g)"/><circle cx="60" cy="46" r="21" fill="#fde68a"/><path d="M40 36c4-10 36-10 40 0 0-8-8-16-20-16s-20 8-20 16z" fill="#1e293b"/><circle cx="53" cy="46" r="2.6" fill="#0f172a"/><circle cx="67" cy="46" r="2.6" fill="#0f172a"/><path d="M54 54q6 5 12 0" stroke="#0f172a" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M28 106c4-22 20-32 32-32s28 10 32 32" fill="#ffffff" fill-opacity="0.9"/></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
 const resolveAvatarUrl = (url) => {
   if (!url) return dummyAvatar;
+  if (String(url).startsWith("avatar2d:")) return buildAvatar2dDataUri(url);
   if (/^(https?:|data:)/i.test(url)) return url;
-  const serverUrl = "https://sadar-finance.up.railway.app";
-  return `${serverUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  return `${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
 const normalizeAccountName = (value) => {
@@ -145,39 +159,4 @@ const ProfileDropdown = ({ onLogoutClick }) => {
             <i className="mdi mdi-chevron-down d-none d-xl-inline-block fs-14 ms-1 text-muted"></i>
           </span>
         </span>
-      </DropdownToggle>
-      <DropdownMenu className="dropdown-menu-end sadar-profile-menu" style={{ minWidth: "220px" }}>
-        <div className="d-flex align-items-center gap-2 px-3 py-2 border-bottom">
-          <img
-            className="rounded-circle header-profile-user"
-            src={avatarUrl}
-            alt="Avatar"
-          />
-          <div className="flex-grow-1 min-width-0">
-            <h6 className="m-0 text-truncate fs-14">{userName}</h6>
-            <p className="m-0 text-truncate fs-12 text-muted">{userEmail}</p>
-          </div>
-        </div>
-        <Link
-          to="/profile-account"
-          className="dropdown-item d-flex align-items-center gap-2"
-          onClick={() => setIsOpen(false)}
-        >
-          <i className="ri-user-settings-line fs-15"></i>
-          <span>Profil & Akun</span>
-        </Link>
-        <div className="dropdown-divider"></div>
-        <button
-          type="button"
-          className="dropdown-item d-flex align-items-center gap-2 text-danger"
-          onClick={handleLogoutClick}
-        >
-          <i className="ri-logout-box-r-line fs-15"></i>
-          <span>Keluar</span>
-        </button>
-      </DropdownMenu>
-    </Dropdown>
-  );
-};
-
-export default ProfileDropdown;
+      </D

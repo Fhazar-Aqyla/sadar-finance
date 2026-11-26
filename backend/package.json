@@ -1,7 +1,7 @@
 {
   "name": "sadar-finance-api",
-  "version": "2.0.0",
-  "description": "SADAR Finance V 2.0 — Production-ready RESTful API for fintech application",
+  "version": "3.0.0",
+  "description": "SADAR Finance V 3.0 — Production-ready RESTful API for fintech application",
   "main": "server.js",
   "engines": {
     "node": ">=18"

@@ -140,11 +140,38 @@ app.use((req, res, next) => {
   return next();
 });
 
-app.use('/api/v1', (_req, res, next) => {
+app.use('/api/v1', (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   res.setHeader('Surrogate-Control', 'no-store');
+
+  // Record live API request telemetry ring buffer for Developer Panel V 3.0
+  const reqStart = Date.now();
+  res.on('finish', () => {
+    try {
+      if (req.path === '/app/push-feed' || req.path === '/app/admin/api-logs') return;
+      if (!Array.isArray(global.__sadarApiLogs)) {
+        global.__sadarApiLogs = [];
+      }
+      global.__sadarApiLogs.unshift({
+        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        path: `/api/v1${req.path}`,
+        status: res.statusCode,
+        latencyMs: Date.now() - reqStart,
+        ip: String(req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim(),
+        client: String(req.headers['user-agent'] || '').includes('Dart')
+          ? 'Android APK'
+          : 'Web Browser',
+      });
+      if (global.__sadarApiLogs.length > 80) {
+        global.__sadarApiLogs.length = 80;
+      }
+    } catch (_) {}
+  });
+
   next();
 });
 
@@ -186,7 +213,7 @@ app.get('/downloads/:filename', (req, res) => {
   res.status(200);
   res.setHeader('Content-Type', 'application/vnd.android.package-archive');
   res.setHeader('Content-Length', String(stat.size));
-  res.setHeader('Content-Disposition', 'attachment; filename="SADAR-Finance-v2.0.0.apk"');
+  res.setHeader('Content-Disposition', 'attachment; filename="SADAR-Finance-v3.0.0.apk"');
   res.setHeader('Accept-Ranges', 'none');
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   res.setHeader('CDN-Cache-Control', 'no-store');
@@ -245,7 +272,7 @@ app.get('/', (req, res) => {
     success: true,
     message: 'SADAR Finance API',
     data: {
-      version: '2.0.0',
+      version: '3.0.0',
       environment: config.env,
       docs: '/api-docs',
       health: '/health',
@@ -260,7 +287,7 @@ app.get('/health', (_req, res) => {
     success: true,
     message: 'SADAR Finance API is running',
     data: {
-      version: '2.0.0',
+      version: '3.0.0',
       environment: config.env,
       timestamp: new Date().toISOString(),
     },

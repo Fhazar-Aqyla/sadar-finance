@@ -40,8 +40,14 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
     WidgetsBinding.instance.addObserver(this);
     final isTest = Platform.environment.containsKey('FLUTTER_TEST');
     if (!isTest) {
+      PushNotificationService.initTapHandler(_navigateFromPushRoute);
       Future.microtask(() async {
         await PushNotificationService.requestPermission();
+        final initialRoute =
+            await PushNotificationService.consumeInitialRoute();
+        if (initialRoute != null) {
+          _navigateFromPushRoute(initialRoute);
+        }
         await _checkRemotePushQueue();
       });
       _globalPushTimer = Timer.periodic(
@@ -49,6 +55,16 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
         (_) => _checkRemotePushQueue(),
       );
     }
+  }
+
+  void _navigateFromPushRoute(String route) {
+    if (!mounted) return;
+    final clean = route.trim();
+    if (clean.isEmpty || !clean.startsWith('/')) return;
+    final target = clean == '/' ? '/dashboard' : clean;
+    try {
+      ref.read(routerProvider).go(target);
+    } catch (_) {}
   }
 
   Future<void> _checkRemotePushQueue() async {
@@ -61,13 +77,19 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
     );
     if (!mounted || items.isEmpty) return;
     final latest = items.first;
+    final targetRoute = (latest['actionRoute'] ?? '/dashboard').trim();
     rootScaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.primary,
-        duration: const Duration(seconds: 5),
+        duration: const Duration(seconds: 6),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 18),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        action: SnackBarAction(
+          label: 'Buka',
+          textColor: AppColors.accent,
+          onPressed: () => _navigateFromPushRoute(targetRoute),
+        ),
         content: Row(
           children: [
             const Icon(
@@ -82,7 +104,7 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    latest['title'] ?? 'SADAR Finance V 2.0',
+                    latest['title'] ?? 'SADAR Finance V 3.0',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,

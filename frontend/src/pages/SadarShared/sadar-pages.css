@@ -3768,3 +3768,47 @@ html[data-bs-theme="dark"] .sadar-calendar-cell.is-selected {
   background: rgba(30, 58, 138, 0.45);
   border-color: #60a5fa;
 }
+
+/* =========================================================
+   SADAR V 3.0 COMPREHENSIVE DARK MODE PARITY
+   ========================================================= */
+
+html[data-bs-theme="dark"] .sadar-page .sadar-insight-item,
+html[data-layout-mode="dark"] .sadar-page .sadar-insight-item {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-page .sadar-insight-item strong,
+html[data-bs-theme="dark"] .sadar-page .sadar-summary-card h2,
+html[data-bs-theme="dark"] .sadar-page .sadar-panel .card-title,
+html[data-bs-theme="dark"] .sadar-page .text-dark {
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .sadar-profile-photo-row,
+html[data-bs-theme="dark"] .sadar-profile-summary-item {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-bs-theme="dark"] .sadar-profile-photo-copy h5,
+html[data-bs-theme="dark"] .sadar-profile-summary-item strong {
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .sadar-mode-toggle {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+html[data-bs-theme="dark"] .sadar-mode-toggle .btn:not(.active) {
+  color: #cbd5e1 !important;
+}
+
+html[data-bs-theme="dark"] .sadar-page .table thead.table-light th {
+  background-color: rgba(15, 23, 42, 0.9) !important;
+  color: #94a3b8 !important;
+  border-bottom-color: rgba(148, 163, 184, 0.2) !important;
+}

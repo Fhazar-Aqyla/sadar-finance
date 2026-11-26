@@ -188,9 +188,9 @@ router.get('/version', (_req, res) => {
   } catch (_) {}
 
   const latestVersion =
-    fileConfig.latestVersion || process.env.APP_LATEST_VERSION || '2.0.0';
+    fileConfig.latestVersion || process.env.APP_LATEST_VERSION || '3.0.0';
   const buildNumber = Number(
-    fileConfig.buildNumber || process.env.APP_BUILD_NUMBER || 11
+    fileConfig.buildNumber || process.env.APP_BUILD_NUMBER || 14
   );
   const minVersion =
     fileConfig.minVersion || process.env.APP_MIN_VERSION || '1.0.0';
@@ -410,7 +410,7 @@ router.get(
         message: 'Developer system status',
         data: {
           server: {
-            apiVersion: '2.0.0',
+            apiVersion: '3.0.0',
             nodeVersion: process.version,
             platform: `${os.type()} ${os.release()} (${os.arch()})`,
             environment: process.env.NODE_ENV || 'development',
@@ -648,9 +648,11 @@ router.post(
         message: 'File paket .apk wajib dipilih',
       });
     }
-    const finalPath = path.join(APK_DIR, 'sadar-finance-v2.0.0.apk');
+    const finalPath = path.join(APK_DIR, 'sadar-finance-v3.0.0.apk');
+    const v2Path = path.join(APK_DIR, 'sadar-finance-v2.0.0.apk');
     const latestPath = path.join(APK_DIR, 'sadar-finance-latest.apk');
     fs.renameSync(uploadedFile.path, finalPath);
+    fs.copyFileSync(finalPath, v2Path);
     fs.copyFileSync(finalPath, latestPath);
     const st = fs.statSync(finalPath);
     const hash = crypto.createHash('sha256');
@@ -658,9 +660,9 @@ router.post(
     const sha256 = hash.digest('hex');
 
     return success(res, {
-      message: 'Paket APK baru berhasil diunggah dan diaktifkan di server',
+      message: 'Paket APK V 3.0.0 baru berhasil diunggah dan diaktifkan di server',
       data: {
-        filename: 'sadar-finance-v2.0.0.apk',
+        filename: 'sadar-finance-v3.0.0.apk',
         sizeBytes: st.size,
         sizeMb: Number((st.size / (1024 * 1024)).toFixed(2)),
         sha256,
@@ -758,6 +760,196 @@ router.delete(
       message: 'Riwayat push notification dihapus',
       data: { notifications: nextFeed },
     });
+  }
+);
+
+// ── AUTOMATED DAILY REMINDER ENGINE, API LOGS & DB BACKUP (V 3.0) ───
+
+async function runAutomatedDailyReminders({ force = false } = {}) {
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const currentMonthKey = todayStr.slice(0, 7);
+  const currentDay = now.getDate();
+
+  let rows = [];
+  try {
+    const res = await dbQuery(`
+      SELECT p.user_id, p.recurring_items, p.debts, u.first_name, u.email
+      FROM user_financial_plans p
+      LEFT JOIN users u ON u.users_id = p.user_id
+    `);
+    rows = res.rows || [];
+  } catch (_) {
+    rows = [];
+  }
+
+  const feed = loadPushFeed();
+  const existingAutoKeys = new Set(
+    feed.map((f) => String(f?.autoKey || '')).filter(Boolean)
+  );
+  const dispatched = [];
+
+  for (const row of rows) {
+    const recurringList = Array.isArray(row.recurring_items) ? row.recurring_items : [];
+    const debtList = Array.isArray(row.debts) ? row.debts : [];
+
+    for (const rec of recurringList) {
+      if (!rec || rec.lastPaidPeriod === currentMonthKey) continue;
+      const dayOfMonth = Number(rec.dayOfMonth || 1);
+      const diff = dayOfMonth - currentDay;
+      if (diff >= -1 && diff <= 2) {
+        const autoKey = `auto_rec_${rec.id || rec.title}_${todayStr}`;
+        if (!force && existingAutoKeys.has(autoKey)) continue;
+        const amt = new Intl.NumberFormat('id-ID').format(Number(rec.amount || 0));
+        const item = {
+          id: `push-auto-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          autoKey,
+          title: `Pengingat ${rec.isIncome ? 'Jadwal Pemasukan' : 'Tagihan Rutin'}: ${rec.title || 'Bulanan'}`,
+          body: `Jadwal tanggal ${dayOfMonth} sebesar Rp ${amt} belum dicatat bulan ini. Ketuk untuk catat 1-klik.`,
+          message: `Jadwal tanggal ${dayOfMonth} sebesar Rp ${amt} belum dicatat bulan ini. Ketuk untuk catat 1-klik.`,
+          target: 'all',
+          category: 'recurring',
+          actionRoute: '/financial-plans',
+          sentAt: new Date().toISOString(),
+        };
+        feed.unshift(item);
+        existingAutoKeys.add(autoKey);
+        dispatched.push(item);
+      }
+    }
+
+    for (const d of debtList) {
+      if (!d || d.isSettled || !d.dueDate) continue;
+      const dueStr = String(d.dueDate).slice(0, 10);
+      const dueDate = new Date(`${dueStr}T00:00:00`);
+      if (Number.isNaN(dueDate.getTime())) continue;
+      const todayDate = new Date(`${todayStr}T00:00:00`);
+      const diffDays = Math.round((dueDate - todayDate) / (1000 * 60 * 60 * 24));
+      if (diffDays >= -3 && diffDays <= 3) {
+        const autoKey = `auto_debt_${d.id || d.personName}_${todayStr}`;
+        if (!force && existingAutoKeys.has(autoKey)) continue;
+        const amt = new Intl.NumberFormat('id-ID').format(Number(d.amount || 0));
+        const label = d.isReceivable !== false ? 'Piutang' : 'Utang';
+        const item = {
+          id: `push-auto-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          autoKey,
+          title: `Jatuh Tempo ${label}: ${d.personName || 'Kontak'}`,
+          body: `Catatan ${label.toLowerCase()} Rp ${amt} ${diffDays < 0 ? `terlambat ${Math.abs(diffDays)} hari` : diffDays === 0 ? 'jatuh tempo HARI INI' : `jatuh tempo ${diffDays} hari lagi`} (${dueStr}).`,
+          message: `Catatan ${label.toLowerCase()} Rp ${amt} (${dueStr}) segera jatuh tempo.`,
+          target: 'all',
+          category: 'debt',
+          actionRoute: '/financial-plans',
+          sentAt: new Date().toISOString(),
+        };
+        feed.unshift(item);
+        existingAutoKeys.add(autoKey);
+        dispatched.push(item);
+      }
+    }
+  }
+
+  // If force-triggered from Developer Panel and no user items matched today, dispatch a smart daily check notification
+  if (force && dispatched.length === 0) {
+    const item = {
+      id: `push-cron-${Date.now()}`,
+      autoKey: `auto_daily_${todayStr}_${Date.now()}`,
+      title: 'Pemeriksaan Harian Otomatis SADAR V 3.0',
+      body: 'Semua jadwal tagihan rutin & piutang sudah diperiksa. Yuk cek batas aman belanja harian 50/30/20 Anda hari ini!',
+      message: 'Semua jadwal tagihan rutin & piutang sudah diperiksa. Yuk cek batas aman belanja harian 50/30/20 Anda hari ini!',
+      target: 'all',
+      category: 'info',
+      actionRoute: '/dashboard',
+      sentAt: new Date().toISOString(),
+    };
+    feed.unshift(item);
+    dispatched.push(item);
+  }
+
+  if (dispatched.length > 0) {
+    savePushFeed(feed);
+  }
+
+  return {
+    scannedUsers: rows.length,
+    dispatchedCount: dispatched.length,
+    dispatched,
+    notifications: feed,
+  };
+}
+
+// Automatically run scheduled reminders every 6 hours in background
+setInterval(() => {
+  runAutomatedDailyReminders({ force: false }).catch(() => {});
+}, 6 * 60 * 60 * 1000);
+
+router.post(
+  '/admin/run-reminders',
+  authenticate,
+  requireAdminUser,
+  async (_req, res, next) => {
+    try {
+      const result = await runAutomatedDailyReminders({ force: true });
+      return success(res, {
+        message: `Mesin Cron Pengingat Otomatis selesai memeriksa ${result.scannedUsers} akun dan mengirim ${result.dispatchedCount} notifikasi.`,
+        data: result,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+router.get(
+  '/admin/api-logs',
+  authenticate,
+  requireAdminUser,
+  (_req, res) => {
+    const logs = Array.isArray(global.__sadarApiLogs) ? global.__sadarApiLogs : [];
+    return success(res, {
+      message: 'Recent API request telemetry logs',
+      data: { logs },
+    });
+  }
+);
+
+router.get(
+  '/admin/db-backup',
+  authenticate,
+  requireAdminUser,
+  async (_req, res, next) => {
+    try {
+      const [usersRes, accountsRes, plansRes, txCountRes, incCountRes] = await Promise.all([
+        dbQuery('SELECT users_id, first_name, middle_name, last_name, username, email, occupation, city, status, streak_days, xp_points, financial_level, created_at FROM users ORDER BY created_at DESC').catch(() => ({ rows: [] })),
+        dbQuery('SELECT account_id, user_id, account_name, account_type, balance, created_at FROM accounts ORDER BY created_at DESC').catch(() => ({ rows: [] })),
+        dbQuery('SELECT user_id, savings_goals, recurring_items, debts, transfers, updated_at FROM user_financial_plans').catch(() => ({ rows: [] })),
+        dbQuery('SELECT COUNT(*)::int AS cnt, COALESCE(SUM(amount),0)::numeric AS total FROM transactions').catch(() => ({ rows: [{ cnt: 0, total: 0 }] })),
+        dbQuery('SELECT COUNT(*)::int AS cnt, COALESCE(SUM(amount),0)::numeric AS total FROM incomes').catch(() => ({ rows: [{ cnt: 0, total: 0 }] })),
+      ]);
+
+      return success(res, {
+        message: 'Database & configuration snapshot exported',
+        data: {
+          exportedAt: new Date().toISOString(),
+          version: '3.0.0',
+          summary: {
+            usersCount: usersRes.rows.length,
+            accountsCount: accountsRes.rows.length,
+            plansCount: plansRes.rows.length,
+            transactionsCount: txCountRes.rows[0]?.cnt || 0,
+            transactionsTotal: Number(txCountRes.rows[0]?.total || 0),
+            incomesCount: incCountRes.rows[0]?.cnt || 0,
+            incomesTotal: Number(incCountRes.rows[0]?.total || 0),
+          },
+          users: usersRes.rows,
+          accounts: accountsRes.rows,
+          financialPlans: plansRes.rows,
+          broadcasts: loadAllBroadcasts(),
+          pushFeed: loadPushFeed(),
+        },
+      });
+    } catch (err) {
+      return next(err);
+    }
   }
 );
 
