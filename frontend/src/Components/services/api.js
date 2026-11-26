@@ -280,6 +280,17 @@ export const appApi = {
   adminUpdateVersion: (payload) =>
     apiClient.put("/app/admin/version", payload).then(unwrapData),
   adminUsers: () => apiClient.get("/app/admin/users").then(unwrapData),
+  adminUpdateUser: (id, payload) =>
+    apiClient.put(`/app/admin/users/${id}`, payload).then(unwrapData),
+  adminDeleteUser: (id) =>
+    apiClient.delete(`/app/admin/users/${id}`).then(unwrapData),
+  adminUploadApk: (formData, onUploadProgress) =>
+    apiClient
+      .post("/app/admin/apk-upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress,
+      })
+      .then(unwrapData),
 };
 
 export const plansApi = {

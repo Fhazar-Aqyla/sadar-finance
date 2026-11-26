@@ -215,14 +215,15 @@ const Sidebar = ({ className = "", onLogoutClick }) => {
         style={{ width: isCollapsed ? sidebarWidths.collapsed : sidebarWidths.expanded }}
       >
         <div
-          className={`sadar-sidebar-brand relative flex h-[70px] shrink-0 items-center justify-center border-b border-slate-200 bg-white ${
+          className={`sadar-sidebar-brand relative flex shrink-0 items-center justify-center border-b border-slate-200 bg-white ${
             isCollapsed ? "sadar-sidebar-brand-collapsed" : "px-5"
           }`}
+          style={{ height: 70 }}
         >
           {!isCollapsed && (
             <Link to="/landing" title="Buka Halaman Landing Page" className="flex min-w-0 items-center no-underline">
-              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto w-[96px] object-contain" />
-              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto w-[96px] object-contain" />
+              <img src={sadarLogo} alt="SADAR" className="sadar-logo-light-mode h-auto object-contain" style={{ width: 98 }} />
+              <img src={sadarLogoLight} alt="SADAR" className="sadar-logo-dark-mode h-auto object-contain" style={{ width: 98 }} />
             </Link>
           )}
 

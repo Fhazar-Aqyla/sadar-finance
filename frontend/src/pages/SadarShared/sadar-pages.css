@@ -284,7 +284,7 @@
   line-height: 1.45;
 }
 
-.sadar-recommend-card div > span {
+.sadar-recommend-card div>span {
   margin-top: 0.55rem;
   color: #1e3a8a;
   font-size: 0.76rem;
@@ -1003,8 +1003,7 @@ html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
 
 .sadar-account-form-grid {
   grid-template-columns:
-    minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1fr)
-    max-content;
+    minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1fr) max-content;
   gap: 0.75rem;
   align-items: end;
 }
@@ -1108,8 +1107,8 @@ html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
   flex: 0 0 40px;
 }
 
-.sadar-edit-top-row > [class*="col-"],
-.sadar-edit-detail-row > [class*="col-"] {
+.sadar-edit-top-row>[class*="col-"],
+.sadar-edit-detail-row>[class*="col-"] {
   display: flex;
 }
 
@@ -1304,7 +1303,7 @@ html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
   font-size: 0.86rem;
 }
 
-.sadar-score-row > [class*="col-"] {
+.sadar-score-row>[class*="col-"] {
   display: flex;
 }
 
@@ -1318,7 +1317,7 @@ html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
   flex-direction: column;
 }
 
-.sadar-score-detail-row > [class*="col-"] {
+.sadar-score-detail-row>[class*="col-"] {
   display: flex;
 }
 
@@ -1344,7 +1343,7 @@ html[data-bs-theme="dark"] .sadar-account-item .sadar-card-icon {
   padding: 0.75rem 1.25rem 1.25rem !important;
 }
 
-.sadar-score-chart-body > div {
+.sadar-score-chart-body>div {
   width: 100%;
 }
 
@@ -1642,14 +1641,12 @@ html[data-bs-theme="dark"] .sadar-recommend-card p {
   color: var(--sadar-dark-muted);
 }
 
-html[data-bs-theme="dark"] .sadar-recommend-card div > span {
+html[data-bs-theme="dark"] .sadar-recommend-card div>span {
   color: #93c5fd;
 }
 
 html[data-bs-theme="dark"] .sadar-progress,
-html[data-bs-theme="dark"]
-  .sadar-stepper-progress
-  span:not(.is-active):not(.is-completed) {
+html[data-bs-theme="dark"] .sadar-stepper-progress span:not(.is-active):not(.is-completed) {
   background-color: #334155;
 }
 
@@ -1694,19 +1691,13 @@ html[data-bs-theme="dark"] .sadar-password-toggle:hover {
   background: var(--sadar-dark-surface-soft) !important;
 }
 
-html[data-bs-theme="dark"]
-  .sadar-table-pagination
-  .page-item.active
-  .page-link {
+html[data-bs-theme="dark"] .sadar-table-pagination .page-item.active .page-link {
   border-color: #38bdf8 !important;
   color: #0f172a !important;
   background: #38bdf8 !important;
 }
 
-html[data-bs-theme="dark"]
-  .sadar-table-pagination
-  .page-item.disabled
-  .page-link {
+html[data-bs-theme="dark"] .sadar-table-pagination .page-item.disabled .page-link {
   color: #64748b !important;
   background: #1a2430 !important;
 }
@@ -1821,9 +1812,7 @@ html[data-bs-theme="dark"] .sadar-history-modal label {
 }
 
 html[data-bs-theme="dark"] .sadar-history-edit-grid .form-control::placeholder,
-html[data-bs-theme="dark"]
-  .sadar-history-edit-grid
-  .sadar-modal-input::placeholder {
+html[data-bs-theme="dark"] .sadar-history-edit-grid .sadar-modal-input::placeholder {
   color: #94a3b8;
 }
 
@@ -2008,6 +1997,7 @@ html[data-bs-theme="dark"] .sadar-period-toggle .btn.active {
 }
 
 @media (max-width: 991.98px) {
+
   .sadar-form-grid,
   .sadar-history-edit-grid,
   .sadar-budget-grid,
@@ -2082,6 +2072,7 @@ html[data-bs-theme="dark"] .sadar-period-toggle .btn.active {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2597,6 +2588,7 @@ html[data-bs-theme="dark"] .sadar-table-filter-btn strong {
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2790,10 +2782,7 @@ html[data-bs-theme="dark"] .modal .form-control::placeholder {
   opacity: 1 !important;
 }
 
-html[data-bs-theme="dark"]
-  .sadar-account-form-grid
-  .input-group
-  .input-group-text,
+html[data-bs-theme="dark"] .sadar-account-form-grid .input-group .input-group-text,
 html[data-bs-theme="dark"] .modal .input-group-text {
   border-color: rgba(148, 163, 184, 0.3) !important;
   background-color: #24344d !important;
@@ -2876,6 +2865,7 @@ html[data-bs-theme="dark"] .sadar-search-desc {
 .sadar-onboarding-progress-section {
   width: 100%;
 }
+
 .sadar-progress-bar-track {
   width: 100%;
   height: 8px;
@@ -2883,12 +2873,14 @@ html[data-bs-theme="dark"] .sadar-search-desc {
   border-radius: 999px;
   overflow: hidden;
 }
+
 .sadar-progress-bar-fill {
   height: 100%;
   background-color: var(--sadar-primary);
   border-radius: 999px;
   transition: width 0.4s ease;
 }
+
 .sadar-step-card {
   display: flex;
   padding: 1.15rem;
@@ -2898,20 +2890,24 @@ html[data-bs-theme="dark"] .sadar-search-desc {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
   transition: all 0.25s ease;
 }
+
 .sadar-step-card.active {
   border-color: #b9cbe7;
   background-color: #fcfdfe;
   box-shadow: 0 4px 12px rgba(30, 58, 138, 0.04);
 }
+
 .sadar-step-card.active:hover {
   border-color: #93b2e0;
   box-shadow: 0 6px 16px rgba(30, 58, 138, 0.06);
 }
+
 .sadar-step-card.completed {
   background-color: #f8fafc;
   border-color: #e2e8f0;
   opacity: 0.9;
 }
+
 .sadar-step-icon-wrapper {
   flex-shrink: 0;
   display: flex;
@@ -2920,40 +2916,49 @@ html[data-bs-theme="dark"] .sadar-search-desc {
   width: 24px;
   height: 24px;
 }
+
 .sadar-step-status-icon {
   font-size: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .sadar-step-status-icon.success-icon {
   color: var(--sadar-success);
 }
+
 .sadar-step-status-icon.pending-icon {
   color: #94a3b8;
 }
+
 .sadar-step-status-icon.pending-icon.pulse {
   color: var(--sadar-primary);
   animation: sadar-pulse-icon 2s infinite ease-in-out;
 }
+
 @keyframes sadar-pulse-icon {
   0% {
     transform: scale(1);
     opacity: 0.8;
   }
+
   50% {
     transform: scale(1.15);
     opacity: 1;
   }
+
   100% {
     transform: scale(1);
     opacity: 0.8;
   }
 }
+
 .sadar-step-title {
   color: #0f172a;
   font-size: 0.95rem;
 }
+
 .sadar-step-desc {
   color: #64748b;
   font-size: 0.825rem;
@@ -2965,6 +2970,7 @@ html[data-bs-theme="dark"] .sadar-search-desc {
   display: flex;
   flex-direction: column;
 }
+
 .sadar-factor-icon-wrapper {
   display: flex;
   align-items: center;
@@ -2975,14 +2981,17 @@ html[data-bs-theme="dark"] .sadar-search-desc {
   font-size: 1.2rem;
   flex-shrink: 0;
 }
+
 .sadar-factor-icon-wrapper.teal {
   color: var(--sadar-teal);
   background-color: rgba(20, 184, 166, 0.1);
 }
+
 .sadar-factor-icon-wrapper.blue {
   color: var(--sadar-primary);
   background-color: rgba(30, 58, 138, 0.1);
 }
+
 .sadar-factor-icon-wrapper.orange {
   color: var(--sadar-warning);
   background-color: rgba(245, 158, 11, 0.1);
@@ -2994,12 +3003,15 @@ html[data-bs-theme="dark"] .sadar-search-desc {
   height: 8px;
   border-radius: 50%;
 }
+
 .dot-indicator.success {
   background-color: var(--sadar-success);
 }
+
 .dot-indicator.warning {
   background-color: var(--sadar-warning);
 }
+
 .dot-indicator.danger {
   background-color: var(--sadar-danger);
 }
@@ -3007,6 +3019,7 @@ html[data-bs-theme="dark"] .sadar-search-desc {
 .font-size-12 {
   font-size: 12px !important;
 }
+
 .font-size-13 {
   font-size: 13px !important;
 }
@@ -3015,31 +3028,39 @@ html[data-bs-theme="dark"] .sadar-search-desc {
 html[data-bs-theme="dark"] .sadar-progress-bar-track {
   background-color: #334155;
 }
+
 html[data-bs-theme="dark"] .sadar-progress-bar-fill {
   background-color: #38bdf8;
 }
+
 html[data-bs-theme="dark"] .sadar-step-card {
   background-color: #1e293b;
   border-color: #334155;
 }
+
 html[data-bs-theme="dark"] .sadar-step-card.active {
   background-color: #1e2e4a;
   border-color: #3b82f6;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
 }
+
 html[data-bs-theme="dark"] .sadar-step-card.completed {
   background-color: #131b2e;
   border-color: #1e293b;
 }
+
 html[data-bs-theme="dark"] .sadar-step-title {
   color: #f1f5f9;
 }
+
 html[data-bs-theme="dark"] .sadar-step-desc {
   color: #94a3b8;
 }
+
 html[data-bs-theme="dark"] .sadar-step-status-icon.pending-icon.pulse {
   color: #38bdf8;
 }
+
 html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   color: #38bdf8;
   background-color: rgba(56, 189, 248, 0.15);
@@ -3049,6 +3070,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
    Scoped to light theme (html:not([data-bs-theme="dark"])) and ≥992px so dark
    mode and the mobile glass theme keep their existing look. */
 @media (min-width: 992px) {
+
   html:not([data-bs-theme="dark"]) .sadar-page,
   html:not([data-bs-theme="dark"]) .sadar-dashboard {
     --sadar-glass-page: #f3f8ff;
@@ -3074,16 +3096,12 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     isolation: isolate;
     color: var(--sadar-glass-ink);
     background:
-      radial-gradient(
-        circle at 75% 12%,
+      radial-gradient(circle at 75% 12%,
         rgba(56, 189, 248, 0.07),
-        transparent 32rem
-      ),
-      radial-gradient(
-        circle at 10% 60%,
+        transparent 32rem),
+      radial-gradient(circle at 10% 60%,
         rgba(45, 212, 191, 0.05),
-        transparent 30rem
-      ),
+        transparent 30rem),
       linear-gradient(160deg, #f8fbff 0%, #eff6ff 55%, #f2fbf9 100%) !important;
   }
 
@@ -3116,8 +3134,8 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     background: #7fe0d2;
   }
 
-  html:not([data-bs-theme="dark"]) .sadar-page > .container-fluid,
-  html:not([data-bs-theme="dark"]) .sadar-dashboard > .container-fluid {
+  html:not([data-bs-theme="dark"]) .sadar-page>.container-fluid,
+  html:not([data-bs-theme="dark"]) .sadar-dashboard>.container-fluid {
     position: relative;
     z-index: 1;
   }
@@ -3178,11 +3196,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   html:not([data-bs-theme="dark"]) .sadar-receipt-viewer,
   html:not([data-bs-theme="dark"]) .sadar-file-meta,
   html:not([data-bs-theme="dark"]) .sadar-manual-state,
-  html:not([data-bs-theme="dark"])
-    .sadar-history-page
-    .sadar-table
-    tbody
-    tr:not(.sadar-table-empty-row) {
+  html:not([data-bs-theme="dark"]) .sadar-history-page .sadar-table tbody tr:not(.sadar-table-empty-row) {
     border: 1px solid #e2e8f0 !important;
     border-radius: 12px !important;
     color: var(--sadar-glass-ink);
@@ -3200,12 +3214,8 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     box-shadow: none;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(.form-control, .form-select, .form-check-input),
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(.form-control, .form-select, .form-check-input),
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.form-control, .form-select, .form-check-input),
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.form-control, .form-select, .form-check-input),
   html:not([data-bs-theme="dark"]) .sadar-searchable-select-trigger,
   html:not([data-bs-theme="dark"]) .sadar-select-search-input {
     border: 1px solid rgba(91, 134, 171, 0.24) !important;
@@ -3218,12 +3228,8 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     -webkit-backdrop-filter: blur(14px) saturate(145%);
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(.form-control, .form-select):focus,
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(.form-control, .form-select):focus,
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.form-control, .form-select):focus,
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.form-control, .form-select):focus,
   html:not([data-bs-theme="dark"]) .sadar-searchable-select-trigger:focus,
   html:not([data-bs-theme="dark"]) .sadar-select-search-input:focus {
     border-color: rgba(14, 165, 233, 0.58) !important;
@@ -3233,31 +3239,19 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
       inset 0 1px 0 #ffffff !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(.form-control, .form-select)::placeholder,
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(.form-control, .form-select)::placeholder {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.form-control, .form-select)::placeholder,
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.form-control, .form-select)::placeholder {
     color: #8293a8 !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(
-      .btn-primary,
-      .sadar-save-button,
-      .sadar-ocr-button,
-      .sadar-add-account-btn
-    ),
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(
-      .btn-primary,
-      .sadar-save-button,
-      .sadar-ocr-button,
-      .sadar-add-account-btn
-    ) {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.btn-primary,
+    .sadar-save-button,
+    .sadar-ocr-button,
+    .sadar-add-account-btn),
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.btn-primary,
+    .sadar-save-button,
+    .sadar-ocr-button,
+    .sadar-add-account-btn) {
     border-color: #1e3a8a !important;
     color: #ffffff !important;
     background: #1e3a8a !important;
@@ -3266,22 +3260,14 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
       inset 0 -1px 0 rgba(0, 0, 0, 0.12) !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(
-      .btn-primary,
-      .sadar-save-button,
-      .sadar-ocr-button,
-      .sadar-add-account-btn
-    ):hover,
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(
-      .btn-primary,
-      .sadar-save-button,
-      .sadar-ocr-button,
-      .sadar-add-account-btn
-    ):hover {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.btn-primary,
+    .sadar-save-button,
+    .sadar-ocr-button,
+    .sadar-add-account-btn):hover,
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.btn-primary,
+    .sadar-save-button,
+    .sadar-ocr-button,
+    .sadar-add-account-btn):hover {
     border-color: #142a63 !important;
     background: #142a63 !important;
     box-shadow:
@@ -3289,12 +3275,8 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
       inset 0 -1px 0 rgba(0, 0, 0, 0.14) !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(.sadar-save-button.income),
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(.sadar-save-button.income) {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.sadar-save-button.income),
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.sadar-save-button.income) {
     border-color: #16a34a !important;
     color: #ffffff !important;
     background: #16a34a !important;
@@ -3303,12 +3285,8 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
       inset 0 -1px 0 rgba(0, 0, 0, 0.12) !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(.sadar-save-button.income):hover,
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(.sadar-save-button.income):hover {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.sadar-save-button.income):hover,
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.sadar-save-button.income):hover {
     border-color: #15803d !important;
     color: #ffffff !important;
     background: #15803d !important;
@@ -3317,26 +3295,18 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
       inset 0 -1px 0 rgba(0, 0, 0, 0.14) !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-page
-    :where(
-      .btn-light,
-      .btn-secondary,
-      .sadar-reset-button,
-      .sadar-ghost-btn,
-      .sadar-table-action,
-      .sadar-row-action-toggle
-    ),
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    :where(
-      .btn-light,
-      .btn-secondary,
-      .sadar-reset-button,
-      .sadar-ghost-btn,
-      .sadar-table-action,
-      .sadar-row-action-toggle
-    ) {
+  html:not([data-bs-theme="dark"]) .sadar-page :where(.btn-light,
+    .btn-secondary,
+    .sadar-reset-button,
+    .sadar-ghost-btn,
+    .sadar-table-action,
+    .sadar-row-action-toggle),
+  html:not([data-bs-theme="dark"]) .sadar-dashboard :where(.btn-light,
+    .btn-secondary,
+    .sadar-reset-button,
+    .sadar-ghost-btn,
+    .sadar-table-action,
+    .sadar-row-action-toggle) {
     border-color: rgba(91, 134, 171, 0.26) !important;
     color: #1e3a8a !important;
     background: #ffffff !important;
@@ -3395,9 +3365,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   }
 
   html:not([data-bs-theme="dark"]) .sadar-page .sadar-save-button.income:hover,
-  html:not([data-bs-theme="dark"])
-    .sadar-dashboard
-    .sadar-save-button.income:hover {
+  html:not([data-bs-theme="dark"]) .sadar-dashboard .sadar-save-button.income:hover {
     border-color: #15803d !important;
     color: #ffffff !important;
     background: #15803d !important;
@@ -3419,9 +3387,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     -webkit-backdrop-filter: blur(16px) saturate(150%);
   }
 
-  html:not([data-bs-theme="dark"])
-    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
-    .btn:not(.active):not(.btn-primary) {
+  html:not([data-bs-theme="dark"]) :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary) {
     border: 0 !important;
     color: #64748b !important;
     background: transparent !important;
@@ -3429,9 +3395,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     box-shadow: none !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle)
-    .btn:not(.active):not(.btn-primary):hover {
+  html:not([data-bs-theme="dark"]) :where(.sadar-entry-tabs, .sadar-mode-toggle, .sadar-period-toggle) .btn:not(.active):not(.btn-primary):hover {
     color: #1e293b !important;
     background: rgba(255, 255, 255, 0.45) !important;
   }
@@ -3486,10 +3450,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-table-pagination
-    .page-item.active
-    .page-link {
+  html:not([data-bs-theme="dark"]) .sadar-table-pagination .page-item.active .page-link {
     color: #ffffff !important;
     background: #1e3a8a !important;
     box-shadow: 0 7px 16px rgba(30, 58, 138, 0.2);
@@ -3534,7 +3495,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     box-shadow: inset 0 1px 2px rgba(37, 76, 119, 0.1);
   }
 
-  html:not([data-bs-theme="dark"]) .main-content > .footer {
+  html:not([data-bs-theme="dark"]) .main-content>.footer {
     position: relative;
     left: auto;
     right: auto;
@@ -3589,8 +3550,11 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
   }
 
   html:not([data-bs-theme="dark"]) .sadar-sidebar-brand {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
     border-color: rgba(148, 163, 184, 0.16) !important;
-    background: #f8fbff !important;
+    background: #ffffff !important;
   }
 
   html:not([data-bs-theme="dark"]) .sadar-sidebar-link {
@@ -3606,9 +3570,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
     background: #eef2f8 !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-sidebar-link:hover
-    .sadar-sidebar-icon {
+  html:not([data-bs-theme="dark"]) .sadar-sidebar-link:hover .sadar-sidebar-icon {
     color: #1e3a8a !important;
   }
 
@@ -3621,9 +3583,7 @@ html[data-bs-theme="dark"] .sadar-factor-icon-wrapper.blue {
       0 4px 12px rgba(30, 58, 138, 0.08) !important;
   }
 
-  html:not([data-bs-theme="dark"])
-    .sadar-sidebar-link-active
-    .sadar-sidebar-icon {
+  html:not([data-bs-theme="dark"]) .sadar-sidebar-link-active .sadar-sidebar-icon {
     color: #1e3a8a !important;
   }
 
@@ -3714,6 +3674,7 @@ html[data-bs-theme="dark"] .sadar-apply-rule-btn {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

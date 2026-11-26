@@ -17,9 +17,18 @@ const router = Router();
 const BROADCASTS_PATH = path.join(__dirname, '../config/broadcasts.json');
 const BANNERS_DIR = path.join(__dirname, '../assets/banners');
 
-if (!fs.existsSync(BANNERS_DIR)) {
-  fs.mkdirSync(BANNERS_DIR, { recursive: true });
+const APK_DIR = path.join(__dirname, '../downloads');
+if (!fs.existsSync(APK_DIR)) {
+  fs.mkdirSync(APK_DIR, { recursive: true });
 }
+
+const apkUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, APK_DIR),
+    filename: (_req, _file, cb) => cb(null, 'sadar-finance-v2.0.0.apk.upload.tmp'),
+  }),
+  limits: { fileSize: 150 * 1024 * 1024 },
+});
 
 const bannerUpload = multer({
   storage: multer.diskStorage({
@@ -492,6 +501,7 @@ router.get(
   requireAdminUser,
   async (_req, res, next) => {
     try {
+      await userRepository._ensureColumns();
       const result = await dbQuery(`
         SELECT
           u.users_id AS id,
@@ -501,10 +511,16 @@ router.get(
           u.username,
           u.email,
           u.occupation,
+          u.city,
+          COALESCE(u.status, 'active') AS status,
+          COALESCE(u.streak_days, 1)::int AS streak_days,
+          COALESCE(u.xp_points, 50)::int AS xp_points,
+          COALESCE(u.financial_level, 1)::int AS financial_level,
           u.created_at,
-          (SELECT COUNT(*)::int FROM accounts a WHERE a.users_id = u.users_id) AS accounts_count,
-          (SELECT COUNT(*)::int FROM transactions t WHERE t.users_id = u.users_id) AS transactions_count,
-          (SELECT COUNT(*)::int FROM incomes i WHERE i.users_id = u.users_id) AS incomes_count
+          (SELECT COUNT(*)::int FROM accounts a WHERE a.user_id = u.users_id) AS accounts_count,
+          COALESCE((SELECT SUM(a.balance)::numeric FROM accounts a WHERE a.user_id = u.users_id), 0) AS total_balance,
+          (SELECT COUNT(*)::int FROM transactions t WHERE t.user_id = u.users_id) AS transactions_count,
+          (SELECT COUNT(*)::int FROM incomes i WHERE i.user_id = u.users_id) AS incomes_count
         FROM users u
         ORDER BY u.created_at DESC
         LIMIT 100
@@ -516,6 +532,110 @@ router.get(
     } catch (err) {
       return next(err);
     }
+  }
+);
+
+router.put(
+  '/admin/users/:id',
+  authenticate,
+  requireAdminUser,
+  async (req, res, next) => {
+    try {
+      await userRepository._ensureColumns();
+      const targetId = String(req.params.id || '').trim();
+      const body = req.body || {};
+      const status = ['active', 'suspended'].includes(body.status) ? body.status : 'active';
+      const level = Math.max(1, Math.min(99, Number(body.financial_level) || 1));
+      const xp = Math.max(0, Number(body.xp_points) || 0);
+      const streak = Math.max(0, Number(body.streak_days) || 0);
+      const occupation = body.occupation !== undefined ? String(body.occupation || '').trim().slice(0, 120) : null;
+
+      const updated = await dbQuery(
+        `UPDATE users
+         SET status = $2,
+             financial_level = $3,
+             xp_points = $4,
+             streak_days = $5,
+             occupation = COALESCE($6, occupation),
+             updated_at = NOW()
+         WHERE users_id = $1
+         RETURNING users_id AS id, first_name, middle_name, last_name, username, email, occupation, status, streak_days, xp_points, financial_level`,
+        [targetId, status, level, xp, streak, occupation]
+      );
+      if (updated.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+      }
+      return success(res, {
+        message: 'Data pengguna berhasil diperbarui',
+        data: { user: updated.rows[0] },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+router.delete(
+  '/admin/users/:id',
+  authenticate,
+  requireAdminUser,
+  async (req, res, next) => {
+    try {
+      const targetId = String(req.params.id || '').trim();
+      const targetUser = await userRepository.findById(targetId);
+      if (!targetUser) {
+        return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+      }
+      if (String(targetUser.email || '').toLowerCase() === 'mhmdhabibrafi@gmail.com') {
+        return res.status(400).json({
+          success: false,
+          message: 'Akun Developer Utama tidak dapat dihapus.',
+        });
+      }
+      await dbQuery('DELETE FROM users WHERE users_id = $1', [targetId]);
+      return success(res, {
+        message: `Akun pengguna ${targetUser.email} berhasil dihapus`,
+        data: { deletedId: targetId },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+router.post(
+  '/admin/apk-upload',
+  authenticate,
+  requireAdminUser,
+  apkUpload.any(),
+  (req, res) => {
+    const uploadedFile =
+      req.file || (Array.isArray(req.files) && req.files.length > 0 ? req.files[0] : null);
+    if (!uploadedFile) {
+      return res.status(400).json({
+        success: false,
+        message: 'File paket .apk wajib dipilih',
+      });
+    }
+    const finalPath = path.join(APK_DIR, 'sadar-finance-v2.0.0.apk');
+    const latestPath = path.join(APK_DIR, 'sadar-finance-latest.apk');
+    fs.renameSync(uploadedFile.path, finalPath);
+    fs.copyFileSync(finalPath, latestPath);
+    const st = fs.statSync(finalPath);
+    const hash = crypto.createHash('sha256');
+    hash.update(fs.readFileSync(finalPath));
+    const sha256 = hash.digest('hex');
+
+    return success(res, {
+      message: 'Paket APK baru berhasil diunggah dan diaktifkan di server',
+      data: {
+        filename: 'sadar-finance-v2.0.0.apk',
+        sizeBytes: st.size,
+        sizeMb: Number((st.size / (1024 * 1024)).toFixed(2)),
+        sha256,
+        updatedAt: st.mtime.toISOString(),
+      },
+    });
   }
 );
 
