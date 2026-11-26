@@ -1,7 +1,8 @@
 /**
- * Database Seed Script
- * Populates tables with balanced, realistic financial data for the DEMO user
- * from January through August 2026.
+ * Database Seed Script (V 3.0 — Powered by SADAR-Finance-Dashboard Dataset)
+ * Populates tables with rich, realistic Indonesian financial data for the DEMO user
+ * using real merchant transactions from `backend/data/main_transactions_clean.csv`
+ * shifted dynamically to the last 6 months up to the current date.
  *
  * Scope: Strictly targets only demo@sadarfinance.com without affecting other users.
  *
@@ -13,7 +14,22 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const { pool } = require('../config/database');
 
-// Default embedded realistic avatar data URI for demo account
+const DATASET_PATH = path.join(__dirname, '../data/main_transactions_clean.csv');
+
+const DETAIL_TO_LABEL = {
+  food: 'Makanan & Minuman',
+  groceries: 'Belanja Harian & Sembako',
+  utilities: 'Tagihan & Utilitas',
+  transport: 'Transportasi',
+  health: 'Kesehatan & Kebugaran',
+  education: 'Pendidikan & Kursus',
+  entertainment: 'Hiburan & Langganan',
+  shopping: 'Belanja & Gaya Hidup',
+  travel: 'Perjalanan & Liburan',
+  self_care: 'Perawatan Diri',
+  investment: 'Tabungan & Investasi',
+};
+
 const DEFAULT_DEMO_AVATAR = (() => {
   try {
     const candidatePath = path.join(__dirname, '../../frontend/src/assets/images/users/avatar-1.jpg');
@@ -26,6 +42,100 @@ const DEFAULT_DEMO_AVATAR = (() => {
   }
   return '';
 })();
+
+function loadDatasetDemoSlice() {
+  if (!fs.existsSync(DATASET_PATH)) return [];
+  const lines = fs.readFileSync(DATASET_PATH, 'utf8').trim().split(/\r?\n/);
+  const parsed = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(',');
+    if (c.length < 9) continue;
+    const amount = Math.round(Number(c[4] || 0));
+    if (!Number.isFinite(amount) || amount <= 0) continue;
+    const rawPrimary = String(c[6] || '').trim();
+    const detailKey = String(c[5] || '').trim().toLowerCase();
+    const group =
+      rawPrimary.toLowerCase() === 'investment' || detailKey === 'investment'
+        ? 'Savings'
+        : rawPrimary.toLowerCase() === 'needs'
+          ? 'Needs'
+          : 'Wants';
+    parsed.push({
+      user: c[1],
+      rawDate: c[2],
+      merchant: c[3].trim(),
+      amount,
+      detailKey,
+      detail: DETAIL_TO_LABEL[detailKey] || c[5].trim(),
+      group,
+      method: c[7].trim(),
+      media: c[8].trim(),
+    });
+  }
+
+  // Pick a balanced, rich 6-month slice (~150 real transactions across all 11 categories)
+  const now = new Date();
+  const selected = [];
+  const byCat = {};
+  for (const row of parsed) {
+    if (!byCat[row.detailKey]) byCat[row.detailKey] = [];
+    if (byCat[row.detailKey].length < 24) {
+      byCat[row.detailKey].push(row);
+    }
+  }
+
+  const perMonthTargets = [
+    { detailKey: 'groceries', count: 3 },
+    { detailKey: 'food', count: 5 },
+    { detailKey: 'utilities', count: 2 },
+    { detailKey: 'transport', count: 4 },
+    { detailKey: 'health', count: 1 },
+    { detailKey: 'education', count: 1 },
+    { detailKey: 'entertainment', count: 2 },
+    { detailKey: 'shopping', count: 2 },
+    { detailKey: 'self_care', count: 1 },
+    { detailKey: 'travel', count: 1 },
+    { detailKey: 'investment', count: 2 },
+  ];
+
+  const cursors = {};
+  for (let mOffset = 5; mOffset >= 0; mOffset--) {
+    const baseDate = new Date(now.getFullYear(), now.getMonth() - mOffset, 1);
+    const maxDay =
+      mOffset === 0
+        ? Math.max(1, now.getDate())
+        : new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0).getDate();
+
+    let daySlot = 1;
+    for (const target of perMonthTargets) {
+      const poolRows = byCat[target.detailKey] || [];
+      if (poolRows.length === 0) continue;
+      for (let k = 0; k < target.count; k++) {
+        const idx = (cursors[target.detailKey] || 0) % poolRows.length;
+        cursors[target.detailKey] = idx + 1;
+        const src = poolRows[idx];
+        const day = Math.min(maxDay, ((daySlot * 3 + k * 5) % maxDay) + 1);
+        daySlot++;
+        const txDate = new Date(
+          baseDate.getFullYear(),
+          baseDate.getMonth(),
+          day,
+          9 + ((daySlot * 2) % 12),
+          (daySlot * 11) % 60,
+          0
+        );
+        selected.push({
+          ...src,
+          dateIso: txDate.toISOString(),
+          monthOffset: mOffset,
+        });
+      }
+    }
+  }
+
+  return selected.sort((a, b) => new Date(a.dateIso) - new Date(b.dateIso));
+}
 
 const seed = async () => {
   const client = await pool.connect();
@@ -64,7 +174,7 @@ const seed = async () => {
     );
     const userId = userResult.rows[0].users_id;
 
-    // Clear old data ONLY for demo user to ensure accurate balance & transaction history
+    // Clear old data ONLY for demo user
     await client.query('DELETE FROM alerts WHERE user_id = $1', [userId]);
     await client.query('DELETE FROM insights WHERE user_id = $1', [userId]);
     await client.query('DELETE FROM scores WHERE user_id = $1', [userId]);
@@ -73,163 +183,81 @@ const seed = async () => {
     await client.query('DELETE FROM incomes WHERE user_id = $1', [userId]);
     await client.query('DELETE FROM accounts WHERE user_id = $1', [userId]);
 
-    // ── 2. Seed Demo Accounts (Bank DBS Indonesia & GoPay only, NO Dana Darurat) ─
+    // ── 2. Seed Demo Accounts (Matching Dataset Payment Medias) ────
     const accountResult = await client.query(
       `INSERT INTO accounts (user_id, account_name, account_number, balance)
        VALUES
-         ($1, 'Bank DBS Indonesia', '1234-5678-90', 26407000),
-         ($1, 'Gopay', '0812-3456-78', 1450000)
+         ($1, 'Bank BCA', '5410-8821-09', 18500000),
+         ($1, 'Bank DBS Indonesia', '1234-5678-90', 14250000),
+         ($1, 'GoPay', '0812-3456-78', 2450000),
+         ($1, 'DANA', '0812-3456-78', 1350000)
        RETURNING account_id, account_name`,
       [userId]
     );
-    const dbsAccountId = accountResult.rows.find((r) => r.account_name.includes('DBS')).account_id;
-    const gopayAccountId = accountResult.rows.find((r) => r.account_name.includes('Gopay')).account_id;
+    const bcaId = accountResult.rows.find((r) => r.account_name.includes('BCA')).account_id;
+    const dbsId = accountResult.rows.find((r) => r.account_name.includes('DBS')).account_id;
+    const gopayId = accountResult.rows.find((r) => r.account_name.includes('GoPay')).account_id;
+    const danaId = accountResult.rows.find((r) => r.account_name.includes('DANA')).account_id;
 
-    // ── 3. Seed Realistic Incomes (Jan - Aug 2026) ──────────────────
-    const incomeData = [
-      // January 2026 (DBS: 9.000.000, Gopay: 400.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-01-01T09:00:00.000Z', source: 'Gaji Bulanan Jan' },
-      { acc: dbsAccountId, amount: 2000000, date: '2026-01-15T14:00:00.000Z', source: 'Bonus Awal Tahun' },
-      { acc: gopayAccountId, amount: 400000, date: '2026-01-20T10:00:00.000Z', source: 'Topup GoPay' },
+    const mapMediaToAccount = (media) => {
+      const m = String(media || '').toLowerCase();
+      if (m.includes('gopay') || m.includes('ovo') || m.includes('linkaja')) return gopayId;
+      if (m.includes('dana') || m.includes('shopee')) return danaId;
+      if (m.includes('bca') || m.includes('mandiri') || m.includes('bni') || m.includes('bri')) return bcaId;
+      return dbsId;
+    };
 
-      // February 2026 (DBS: 8.500.000, Gopay: 450.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-02-01T09:00:00.000Z', source: 'Gaji Bulanan Feb' },
-      { acc: dbsAccountId, amount: 1500000, date: '2026-02-15T14:00:00.000Z', source: 'Freelance Web Design' },
-      { acc: gopayAccountId, amount: 450000, date: '2026-02-18T10:00:00.000Z', source: 'Topup GoPay' },
-
-      // March 2026 (DBS: 8.500.000, Gopay: 450.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-03-01T09:00:00.000Z', source: 'Gaji Bulanan Mar' },
-      { acc: dbsAccountId, amount: 1500000, date: '2026-03-20T16:30:00.000Z', source: 'Bonus Performance Q1' },
-      { acc: gopayAccountId, amount: 450000, date: '2026-03-22T10:00:00.000Z', source: 'Topup GoPay' },
-
-      // April 2026 (DBS: 8.850.000, Gopay: 450.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-04-01T09:00:00.000Z', source: 'Gaji Bulanan Apr' },
-      { acc: dbsAccountId, amount: 1500000, date: '2026-04-18T11:15:00.000Z', source: 'Side Project API' },
-      { acc: dbsAccountId, amount: 350000,  date: '2026-04-28T17:00:00.000Z', source: 'Cashback Tokopedia' },
-      { acc: gopayAccountId, amount: 450000, date: '2026-04-22T10:00:00.000Z', source: 'Topup GoPay' },
-
-      // May 2026 (DBS: 10.500.000, Gopay: 800.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-05-01T09:00:00.000Z', source: 'Gaji Bulanan Mei' },
-      { acc: dbsAccountId, amount: 3500000, date: '2026-05-15T10:00:00.000Z', source: 'THR Lebaran' },
-      { acc: gopayAccountId, amount: 800000, date: '2026-05-20T10:00:00.000Z', source: 'Topup GoPay' },
-
-      // June 2026 (DBS: 8.800.000, Gopay: 700.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-06-01T09:00:00.000Z', source: 'Gaji Bulanan Jun' },
-      { acc: dbsAccountId, amount: 1800000, date: '2026-06-22T13:45:00.000Z', source: 'Freelance Mobile App' },
-      { acc: gopayAccountId, amount: 700000, date: '2026-06-25T10:00:00.000Z', source: 'Topup GoPay' },
-
-      // July 2026 (DBS: 8.494.000, Gopay: 600.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-07-01T09:00:00.000Z', source: 'Gaji Bulanan Jul' },
-      { acc: dbsAccountId, amount: 1250000, date: '2026-07-15T14:00:00.000Z', source: 'Consulting Session' },
-      { acc: dbsAccountId, amount: 244000,  date: '2026-07-25T18:20:00.000Z', source: 'Cashback Promo' },
-      { acc: gopayAccountId, amount: 600000, date: '2026-07-20T10:00:00.000Z', source: 'Topup GoPay' },
-
-      // August 2026 (DBS: 8.000.000, Gopay: 849.000)
-      { acc: dbsAccountId, amount: 7000000, date: '2026-08-01T09:00:00.000Z', source: 'Gaji Bulanan Ags' },
-      { acc: dbsAccountId, amount: 1000000, date: '2026-08-10T14:00:00.000Z', source: 'Project Maintenance' },
-      { acc: gopayAccountId, amount: 849000, date: '2026-08-12T10:00:00.000Z', source: 'Topup GoPay' },
-    ];
-
+    // ── 3. Seed Realistic Monthly Incomes (Last 6 Months) ──────────
+    const now = new Date();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
     let lastIncomeId = null;
-    for (const inc of incomeData) {
-      const res = await client.query(
-        `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING income_id`,
-        [userId, inc.acc, inc.amount, inc.date, inc.source]
-      );
-      lastIncomeId = res.rows[0].income_id;
+
+    for (let mOffset = 5; mOffset >= 0; mOffset--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - mOffset, 1, 9, 0, 0);
+      const mLabel = monthNames[d.getMonth()];
+      const monthlyIncomes = [
+        { acc: bcaId, amount: 9500000, date: new Date(d.getFullYear(), d.getMonth(), 1, 9, 0).toISOString(), source: `Gaji Bulanan ${mLabel}` },
+        { acc: dbsId, amount: 2200000 + (mOffset % 3) * 450000, date: new Date(d.getFullYear(), d.getMonth(), Math.min(15, mOffset === 0 ? Math.max(1, now.getDate()) : 15), 14, 0).toISOString(), source: `Project Freelance ${mLabel}` },
+        { acc: gopayId, amount: 750000, date: new Date(d.getFullYear(), d.getMonth(), Math.min(10, mOffset === 0 ? Math.max(1, now.getDate()) : 10), 11, 0).toISOString(), source: `Topup GoPay ${mLabel}` },
+      ];
+      for (const inc of monthlyIncomes) {
+        const res = await client.query(
+          `INSERT INTO incomes (user_id, account_id, amount, income_date, source)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING income_id`,
+          [userId, inc.acc, inc.amount, inc.date, inc.source]
+        );
+        lastIncomeId = res.rows[0].income_id;
+      }
     }
 
-    // ── 4. Seed Realistic Transactions (Jan - Aug 2026) ────────────
-    const transactionsData = [
-      // January 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-01-03T12:00:00.000Z', desc: 'Belanja Awal Tahun Sembako', acc: dbsAccountId, amount: 800000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-01-05T08:30:00.000Z', desc: 'Tagihan Listrik & WiFi', acc: dbsAccountId, amount: 500000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-01-09T17:00:00.000Z', desc: 'Bensin & Transportasi Kantor', acc: dbsAccountId, amount: 350000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-01-14T15:00:00.000Z', desc: 'Beli Jaket Musim Hujan', acc: dbsAccountId, amount: 650000 },
-      { group: 'Wants', detail: 'Food & Dining', date: '2026-01-21T13:00:00.000Z', desc: 'Makan Bersama Teman Cafe', acc: gopayAccountId, amount: 180000 },
-      { group: 'Wants', detail: 'Entertainment', date: '2026-01-26T20:00:00.000Z', desc: 'Nonton Bioskop & Popcorn', acc: gopayAccountId, amount: 120000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-01-29T15:00:00.000Z', desc: 'Investasi Deposito Bank DBS', acc: dbsAccountId, amount: 2500000 },
-
-      // February 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-02-02T12:30:00.000Z', desc: 'Belanja Sembako Supermarket', acc: dbsAccountId, amount: 850000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-02-05T08:00:00.000Z', desc: 'Tagihan Listrik & WiFi', acc: dbsAccountId, amount: 520000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-02-08T17:30:00.000Z', desc: 'Bensin Mobil & Toll', acc: dbsAccountId, amount: 350000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-02-12T19:15:00.000Z', desc: 'Beli Sepatu Nike', acc: dbsAccountId, amount: 1299000 },
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-02-16T13:00:00.000Z', desc: 'Makan Malam Resto Solaria', acc: gopayAccountId, amount: 185000 },
-      { group: 'Wants', detail: 'Entertainment', date: '2026-02-20T20:00:00.000Z', desc: 'Nonton Bioskop XXI', acc: gopayAccountId, amount: 120000 },
-      { group: 'Needs', detail: 'Healthcare', date: '2026-02-25T10:45:00.000Z', desc: 'Vitamin & Obat Apotek', acc: dbsAccountId, amount: 210000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-02-27T15:00:00.000Z', desc: 'Investasi Deposito Bank', acc: dbsAccountId, amount: 2000000 },
-
-      // March 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-03-03T11:30:00.000Z', desc: 'Belanja Fresh Market', acc: dbsAccountId, amount: 780000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-03-05T09:10:00.000Z', desc: 'Tagihan Listrik & Air', acc: dbsAccountId, amount: 480000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-03-10T18:00:00.000Z', desc: 'Servis Berkala Motor', acc: dbsAccountId, amount: 280000 },
-      { group: 'Needs', detail: 'Education', date: '2026-03-14T14:00:00.000Z', desc: 'Buku & Course Udemy', acc: dbsAccountId, amount: 350000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-03-18T16:45:00.000Z', desc: 'Kemeja Uniqlo', acc: dbsAccountId, amount: 499000 },
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-03-24T12:15:00.000Z', desc: 'Kopi Kenangan & Snack', acc: gopayAccountId, amount: 95000 },
-      { group: 'Wants', detail: 'Entertainment', date: '2026-03-28T21:00:00.000Z', desc: 'Langganan Spotify & Netflix', acc: gopayAccountId, amount: 175000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-03-29T16:00:00.000Z', desc: 'Investasi Reksa Dana Saham', acc: dbsAccountId, amount: 2500000 },
-
-      // April 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-04-02T10:00:00.000Z', desc: 'Stok Sembako Bulanan', acc: dbsAccountId, amount: 950000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-04-05T08:30:00.000Z', desc: 'Listrik, Air & Indihome', acc: dbsAccountId, amount: 550000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-04-09T17:00:00.000Z', desc: 'E-Toll & Bensin', acc: dbsAccountId, amount: 400000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-04-15T15:20:00.000Z', desc: 'Gadget Anker Powerbank', acc: dbsAccountId, amount: 650000 },
-      { group: 'Needs', detail: 'Healthcare', date: '2026-04-20T11:00:00.000Z', desc: 'Checkup Gigi Dokter', acc: dbsAccountId, amount: 450000 },
-      { group: 'Wants', detail: 'Food & Dining', date: '2026-04-25T19:30:00.000Z', desc: 'Buka Bersama Teman', acc: gopayAccountId, amount: 320000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-04-27T18:00:00.000Z', desc: 'Belanja Online HNM', acc: dbsAccountId, amount: 490000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-04-29T10:00:00.000Z', desc: 'Tabungan Emas Antam', acc: dbsAccountId, amount: 2000000 },
-
-      // May 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-05-02T12:00:00.000Z', desc: 'Belanja Makanan Lebaran', acc: dbsAccountId, amount: 1450000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-05-05T09:00:00.000Z', desc: 'Tagihan PLN & PAM', acc: dbsAccountId, amount: 510000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-05-10T14:30:00.000Z', desc: 'Baju Lebaran Keluarga', acc: dbsAccountId, amount: 2150000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-05-14T06:00:00.000Z', desc: 'Tiket Mudik & Bensin', acc: dbsAccountId, amount: 1800000 },
-      { group: 'Wants', detail: 'Food & Dining', date: '2026-05-22T18:45:00.000Z', desc: 'Kuliner Kampung Halaman', acc: gopayAccountId, amount: 580000 },
-      { group: 'Needs', detail: 'Education', date: '2026-05-25T11:00:00.000Z', desc: 'Zakat & Donasi', acc: dbsAccountId, amount: 1000000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-05-28T16:00:00.000Z', desc: 'Tabungan Lebaran', acc: dbsAccountId, amount: 2000000 },
-
-      // June 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-06-03T10:30:00.000Z', desc: 'Belanja Bulanan Hypermart', acc: dbsAccountId, amount: 890000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-06-05T08:15:00.000Z', desc: 'Listrik & Internet', acc: dbsAccountId, amount: 490000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-06-11T17:15:00.000Z', desc: 'Bensin & Transport Kantor', acc: dbsAccountId, amount: 320000 },
-      { group: 'Wants', detail: 'Entertainment', date: '2026-06-16T20:00:00.000Z', desc: 'Tiket Konser Musik', acc: dbsAccountId, amount: 850000 },
-      { group: 'Needs', detail: 'Education', date: '2026-06-21T14:00:00.000Z', desc: 'Sertifikasi AWS Cloud', acc: dbsAccountId, amount: 1500000 },
-      { group: 'Wants', detail: 'Food & Dining', date: '2026-06-27T13:10:00.000Z', desc: 'Pepper Lunch & Cafe', acc: gopayAccountId, amount: 245000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-06-28T19:00:00.000Z', desc: 'Game Steam Summer Sale', acc: gopayAccountId, amount: 350000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-06-29T15:00:00.000Z', desc: 'SBN Ritel Obligasi', acc: dbsAccountId, amount: 2000000 },
-
-      // July 2026
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-07-02T11:00:00.000Z', desc: 'Belanja Bulanan Super Indo', acc: dbsAccountId, amount: 920000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-07-05T09:30:00.000Z', desc: 'Tagihan Listrik & WiFi', acc: dbsAccountId, amount: 530000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-07-08T17:00:00.000Z', desc: 'GrabCar & Bensin', acc: gopayAccountId, amount: 280000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-07-12T16:00:00.000Z', desc: 'Headphones Bluetooth', acc: dbsAccountId, amount: 799000 },
-      { group: 'Needs', detail: 'Healthcare', date: '2026-07-18T10:15:00.000Z', desc: 'Vitamin & Supplemen', acc: dbsAccountId, amount: 310000 },
-      { group: 'Wants', detail: 'Food & Dining', date: '2026-07-24T19:00:00.000Z', desc: 'Makan Malam Sushi Tei', acc: dbsAccountId, amount: 320000 },
-      { group: 'Wants', detail: 'Entertainment', date: '2026-07-29T21:00:00.000Z', desc: 'Streaming Subscriptions', acc: gopayAccountId, amount: 154000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-07-30T14:00:00.000Z', desc: 'Tabungan Masa Depan', acc: dbsAccountId, amount: 2000000 },
-
-      // August 2026 (Bulan Berjalan)
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-08-03T11:00:00.000Z', desc: 'Belanja Sembako Mingguan', acc: dbsAccountId, amount: 820000 },
-      { group: 'Needs', detail: 'Bills & Utilities', date: '2026-08-05T09:00:00.000Z', desc: 'Tagihan Listrik PLN & Internet', acc: dbsAccountId, amount: 540000 },
-      { group: 'Needs', detail: 'Transportation', date: '2026-08-08T16:30:00.000Z', desc: 'Bensin Pertamax & Tol', acc: dbsAccountId, amount: 380000 },
-      { group: 'Wants', detail: 'Shopping', date: '2026-08-12T14:00:00.000Z', desc: 'Belanja Diskon Kemerdekaan', acc: dbsAccountId, amount: 750000 },
-      { group: 'Wants', detail: 'Food & Dining', date: '2026-08-15T19:30:00.000Z', desc: 'Makan Bareng Resto', acc: gopayAccountId, amount: 360000 },
-      { group: 'Needs', detail: 'Food & Dining', date: '2026-08-16T15:00:00.000Z', desc: 'Kopi & Camilan Sore', acc: gopayAccountId, amount: 85000 },
-      { group: 'Savings', detail: 'Investment', date: '2026-08-17T10:00:00.000Z', desc: 'Reksadana Pasar Uang DBS', acc: dbsAccountId, amount: 1500000 },
-    ];
-
-    for (const tx of transactionsData) {
+    // ── 4. Seed Real Merchant Transactions from CSV Dataset ────────
+    const datasetRows = loadDatasetDemoSlice();
+    let currentMonthExpense = 0;
+    for (const tx of datasetRows) {
+      if (tx.monthOffset === 0) currentMonthExpense += tx.amount;
       await client.query(
         `INSERT INTO transactions (user_id, account_id, category_group, category_detail, transaction_date, description, source, amount)
          VALUES ($1, $2, $3, $4, $5, $6, 'manual', $7)`,
-        [userId, tx.acc, tx.group, tx.detail, tx.date, tx.desc, tx.amount]
+        [
+          userId,
+          mapMediaToAccount(tx.media),
+          tx.group,
+          tx.detail,
+          tx.dateIso,
+          `${tx.merchant} (${tx.method})`,
+          tx.amount,
+        ]
       );
     }
 
-    // ── 5. Seed Demo Budget (August 2026 50/30/20) ───────────────────
+    // ── 5. Seed Active 50/30/20 Budget ─────────────────────────────
+    const budgetIncome = 12450000;
+    const needsBudget = Math.round(budgetIncome * 0.5);
+    const wantsBudget = Math.round(budgetIncome * 0.3);
+    const savingsBudget = Math.round(budgetIncome * 0.2);
+    const totalLimit = needsBudget + wantsBudget;
+
     await client.query(
       `INSERT INTO budgets (
          user_id, income_id,
@@ -238,40 +266,47 @@ const seed = async () => {
          needs_amount, wants_amount, savings_amount, investment_amount,
          percentage, limit_amount
        )
-       VALUES ($1, $2, 4250000, 2550000, 1700000, 8500000, 6800000, 'Gaji Bulanan Ags', '2026-08-01T09:00:00.000Z',
-               4250000, 2550000, 1700000, 1700000, 50, 6800000)`,
-      [userId, lastIncomeId]
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'Gaji & Freelance Bulanan', $8,
+               $3, $4, $5, $5, 50, $7)`,
+      [
+        userId,
+        lastIncomeId,
+        needsBudget,
+        wantsBudget,
+        savingsBudget,
+        budgetIncome,
+        totalLimit,
+        new Date(now.getFullYear(), now.getMonth(), 1, 9, 0).toISOString(),
+      ]
     );
 
-    // ── 6. Seed Demo Insights ───────────────────────────────────────
+    // ── 6. Seed Dataset-Backed Demo Insights & Score ───────────────
     await client.query(
       `INSERT INTO insights (user_id, title, description)
        VALUES
-         ($1, 'Arus Kas Sehat & Seimbang (Jan - Ags 2026)', 'Pemasukan rata-rata Rp 9,4 juta/bulan dengan pengeluaran Rp 5,9 juta/bulan. Rasio tabungan dan investasi konsisten di atas 20%.'),
-         ($1, 'Kategori Utama: Food & Dining', 'Kategori Kebutuhan (Makanan & Sembako) menyumbang 34% dari total pengeluaran 8 bulan terakhir.'),
-         ($1, 'Performa Anggaran 50/30/20', 'Alokasi 50% Needs, 30% Wants, dan 20% Investment berhasil dipertahankan secara seimbang.')`,
+         ($1, 'Arus Kas 6 Bulan Terkendali (Dataset SADAR)', 'Data 6 bulan terakhir berisi ${datasetRows.length} transaksi riil merchant Indonesia di 11 kategori utama dengan rasio tabungan & investasi terjaga di atas 20%.'),
+         ($1, 'Klasifikasi Otomatis 187 Merchant Indonesia', 'Seluruh transaksi merchant seperti Alfamidi, First Media, Fore Coffee, Netflix, dan Pintu Crypto telah terkalibrasi otomatis pada pos 50/30/20.')`,
       [userId]
     );
 
-    // ── 7. Seed Demo Alerts ─────────────────────────────────────────
+    const usedPct = Math.round((currentMonthExpense / totalLimit) * 100);
     await client.query(
       `INSERT INTO alerts (user_id, message, alert_type)
-       VALUES
-         ($1, 'Pengeluaran Agustus berjalan sebesar Rp 4.435.000 dari alokasi Rp 6.800.000 (65% terpakai).', 'reminder')`,
-      [userId]
+       VALUES ($1, $2, 'reminder')`,
+      [
+        userId,
+        `Pengeluaran bulan berjalan Rp ${currentMonthExpense.toLocaleString('id-ID')} dari batas anggaran Rp ${totalLimit.toLocaleString('id-ID')} (${usedPct}% terpakai).`,
+      ]
     );
 
-    // ── 8. Seed Demo Score ──────────────────────────────────────────
     await client.query(
-      `INSERT INTO scores (user_id, score)
-       VALUES ($1, 92)`,
+      `INSERT INTO scores (user_id, score) VALUES ($1, 88)`,
       [userId]
     );
 
     await client.query('COMMIT');
-    console.log('✅ Realistic demo database seeded successfully (Jan - Aug 2026).');
-    console.log(`   Demo account: demo@sadarfinance.com / Demo@12345`);
-    console.log(`   Accounts: Bank DBS Indonesia (Rp 26.407.000), Gopay (Rp 1.450.000)`);
+    console.log(`✅ Demo database seeded with ${datasetRows.length} real dataset transactions (6 months).`);
+    console.log('   Demo account: demo@sadarfinance.com / Demo@12345');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('❌ Seeding failed:', err.message);

@@ -11,6 +11,7 @@ const userRepository = require('../repositories/user.repository');
 const plansRepository = require('../repositories/plans.repository');
 const emailService = require('./email.service');
 const aiClient = require('./aiClient.service');
+const datasetKnowledge = require('./datasetKnowledge.service');
 const { BadRequestError } = require('../utils/errors');
 
 class AnalyticsService {
@@ -40,9 +41,36 @@ class AnalyticsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   /**
-   * Categorize a transaction description using AI.
+   * Categorize a transaction description using SADAR Dataset Knowledge Base (9,579 rows, 187 Indonesian merchants)
+   * + Hybrid Hugging Face / Groq AI for novel descriptions.
    */
   async categorize(userId, { text, transactionId, merchant, amount, items }) {
+    // Tier 1: Instant high-confidence lookup from SADAR official 9,579-transaction dataset (187 Indonesian merchants)
+    const datasetMatch = datasetKnowledge.lookupMerchant(text, merchant);
+    if (datasetMatch && datasetMatch.confidence >= 0.85) {
+      return {
+        inputText: text || merchant || '',
+        predictedCategory: datasetMatch.categoryGroup,
+        categoryGroup: datasetMatch.categoryGroup,
+        categoryDetail: datasetMatch.categoryDetail,
+        categoryDetailKey: datasetMatch.categoryDetailKey,
+        matchedMerchant: datasetMatch.merchantName,
+        merchantBenchmark: {
+          sampleCount: datasetMatch.sampleCount,
+          avgAmount: datasetMatch.avgAmount,
+          p50Amount: datasetMatch.p50Amount,
+          p90Amount: datasetMatch.p90Amount,
+        },
+        decisionSource: 'sadar-dataset-kb',
+        needsReview: false,
+        confidence: datasetMatch.confidence,
+        modelVersion: 'v3.0-sadar-dataset-9579',
+        transactionId: transactionId || null,
+        source: 'sadar-dataset-kb',
+      };
+    }
+
+    // Tier 2: Hybrid External AI (Hugging Face + Groq AI) for novel/free-text descriptions
     try {
       const result = await aiClient.categorize({ text, transactionId, merchant, amount, items });
       return {
@@ -50,48 +78,17 @@ class AnalyticsService {
         source: 'ai-service',
       };
     } catch (err) {
+      // Tier 3: Dataset-calibrated keyword & merchant token fallback
       return {
-        ...this._categorizeWithRules(text, transactionId),
-        source: 'rule-based-fallback',
+        ...this._categorizeWithRules(text, transactionId, merchant),
+        source: 'dataset-rules-fallback',
         fallbackReason: err.message,
       };
     }
   }
 
-  _categorizeWithRules(text, transactionId) {
-    // Simulated AI categorization based on keywords
-    const categoryMap = {
-      'food|makan|resto|cafe|coffee|indomaret|alfamart|warung': 'Food & Dining',
-      'grab|gojek|uber|taxi|bensin|fuel|parkir|toll|ojol': 'Transportation',
-      'beli|shop|toko|mall|online|shopee|tokopedia': 'Shopping',
-      'movie|bioskop|netflix|spotify|game|hiburan': 'Entertainment',
-      'listrik|air|internet|pulsa|token|wifi|pdam': 'Bills & Utilities',
-      'rumah sakit|dokter|obat|apotek|health|klinik': 'Healthcare',
-      'kuliah|buku|course|sekolah|kursus|udemy': 'Education',
-      'gaji|salary|freelance|bonus|transfer masuk': 'Salary',
-      'invest|saham|reksadana|crypto|deposito': 'Investment',
-    };
-
-    let predictedCategory = 'Other';
-    let confidence = 0.5;
-    const lowerText = text.toLowerCase();
-
-    for (const [keywords, category] of Object.entries(categoryMap)) {
-      const pattern = new RegExp(keywords, 'i');
-      if (pattern.test(lowerText)) {
-        predictedCategory = category;
-        confidence = 0.85 + Math.random() * 0.1;
-        break;
-      }
-    }
-
-    return {
-      inputText: text,
-      predictedCategory,
-      confidence: parseFloat(confidence.toFixed(4)),
-      modelVersion: 'v1.0-keyword-baseline',
-      transactionId: transactionId || null,
-    };
+  _categorizeWithRules(text, transactionId, merchant = '') {
+    return datasetKnowledge.classifyFallback(text, merchant, transactionId);
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -218,48 +215,28 @@ class AnalyticsService {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   async predictBehavior(_userId, payload) {
+    const empirical = datasetKnowledge.evaluateEmpiricalSpike(payload);
     try {
-      const result = await aiClient.predictBehavior(payload);
+      const result = await aiClient.predictBehavior({
+        ...payload,
+        datasetBenchmark: empirical.benchmark,
+      });
       return {
         ...result,
-        source: 'ai-service',
+        benchmark: empirical.benchmark,
+        source: 'ai-service+sadar-dataset',
       };
     } catch (err) {
       return {
-        ...this._predictBehaviorWithRules(payload),
-        source: 'rule-based-fallback',
+        ...empirical,
+        source: 'sadar-dataset-empirical',
         fallbackReason: err.message,
       };
     }
   }
 
   _predictBehaviorWithRules(payload) {
-    const amount = Number(payload.amount || 0);
-    const categoryPrimary = payload.categoryPrimary || payload.categoryGroup || 'Wants';
-    const rolling7dSpending = Number(payload.rolling7dSpending || amount);
-    const ratio = rolling7dSpending > 0 ? amount / rolling7dSpending : 0;
-    const spikeProbability = Math.max(
-      0.1,
-      Math.min(0.9, amount >= 1000000 ? 0.78 : amount >= 500000 || ratio >= 0.5 ? 0.55 : 0.24)
-    );
-    const riskLevel = spikeProbability >= 0.7 ? 'high' : spikeProbability >= 0.4 ? 'medium' : 'low';
-
-    return {
-      spikeProbability: parseFloat(spikeProbability.toFixed(4)),
-      predictedSpike: spikeProbability >= 0.5,
-      riskLevel,
-      categoryPrimary,
-      budgetBucket: {
-        name: categoryPrimary,
-        recommendedAllocation: categoryPrimary === 'Needs' ? 0.5 : categoryPrimary === 'Investment' ? 0.2 : 0.3,
-      },
-      modelName: 'rule-based-behavior',
-      modelVersion: 'v1.0-behavior-fallback',
-      recommendation:
-        riskLevel === 'high'
-          ? 'Transaksi ini terlihat lebih tinggi dari pola normal. Cek ulang prioritas dan sisa budget sebelum melanjutkan.'
-          : 'Risiko transaksi masih terkendali. Tetap pantau pola harian agar pengeluaran tidak melonjak.',
-    };
+    return datasetKnowledge.evaluateEmpiricalSpike(payload);
   }
 
   async predictOverspending(userId, { month, budgetLimit }) {

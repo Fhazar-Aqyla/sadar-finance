@@ -10,6 +10,7 @@ const multer = require('multer');
 const { Router } = require('express');
 const authenticate = require('../middlewares/authenticate');
 const userRepository = require('../repositories/user.repository');
+const datasetKnowledge = require('../services/datasetKnowledge.service');
 const { query: dbQuery } = require('../config/database');
 const { success } = require('../utils/response');
 
@@ -153,6 +154,13 @@ router.get('/push-feed', (_req, res) => {
       notifications,
       data: { notifications },
     },
+  });
+});
+
+router.get('/dataset-benchmarks', (_req, res) => {
+  return success(res, {
+    message: 'SADAR Dataset Knowledge & Empirical Benchmarks (9,579 transactions)',
+    data: datasetKnowledge.getSummary(),
   });
 });
 
