@@ -65,14 +65,14 @@ export const ScrollShowcase = () => {
       >
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#1E3A8A] dark:bg-blue-950/60 dark:text-sky-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs border border-blue-100 dark:border-blue-900/40">
           <Layers className="w-3.5 h-3.5" />
-          Dashboard Preview
+          SADAR Finance V 3.0 • Dashboard Preview
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
           <span className="text-slate-900 dark:text-white">Semua dalam Satu </span>
           <span className="bg-gradient-to-r from-[#1E3A8A] to-sky-400 bg-clip-text text-transparent dark:from-sky-300 dark:to-blue-400">Dashboard Modern.</span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-slate-500 dark:text-slate-400">
-          Ringkasan pengeluaran, skor finansial, dan peringatan anggaran, semuanya dalam satu tampilan bersih dan responsif.
+          Didukung benchmark 9.579 transaksi Indonesia, 187 merchant otomatis, skor finansial kartu PNG, kalender arus kas, dan notifikasi Android native.
         </p>
       </motion.div>
 
@@ -159,10 +159,10 @@ export const ScrollShowcase = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                  Peringatan Anggaran
+                  Benchmark AI SADAR
                 </p>
                 <p className="text-sm font-black text-amber-700 dark:text-amber-400 whitespace-nowrap">
-                  Anggaran Tabungan Capai 80%
+                  9.579 Transaksi • 187 Merchant
                 </p>
               </div>
             </motion.div>
@@ -185,10 +185,10 @@ export const ScrollShowcase = () => {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                  Skor Finansial
+                  Skor Finansial V 3.0
                 </p>
                 <p className="text-sm font-black text-[#1E3A8A] dark:text-sky-300 whitespace-nowrap">
-                  71 / 100
+                  88 / 100 • Sehat
                 </p>
               </div>
             </motion.div>

@@ -302,6 +302,10 @@ export const appApi = {
     apiClient.get("/app/admin/api-logs").then(unwrapData),
   adminDbBackup: () =>
     apiClient.get("/app/admin/db-backup").then(unwrapData),
+  datasetBenchmarks: () =>
+    apiClient.get("/app/dataset-benchmarks").then(unwrapData),
+  adminReseedDemo: () =>
+    apiClient.post("/app/admin/reseed-demo").then(unwrapData),
 };
 
 export const plansApi = {

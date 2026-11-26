@@ -128,8 +128,10 @@ const SadarDeveloperPanel = () => {
   const [pingResult, setPingResult] = useState(null);
   const [isPinging, setIsPinging] = useState(false);
   const [apiLogs, setApiLogs] = useState([]);
+  const [datasetStats, setDatasetStats] = useState(null);
   const [isRunningCron, setIsRunningCron] = useState(false);
   const [isExportingBackup, setIsExportingBackup] = useState(false);
+  const [isReseedingDemo, setIsReseedingDemo] = useState(false);
 
   // OTA Version Manager & APK Upload state
   const [versionForm, setVersionForm] = useState({
@@ -255,7 +257,7 @@ const SadarDeveloperPanel = () => {
           return;
         }
 
-        const [statusData, verData, bcastData, usersData, pushData, logsData] =
+        const [statusData, verData, bcastData, usersData, pushData, logsData, dsData] =
           await Promise.all([
             appApi.adminSystemStatus().catch(() => null),
             appApi.version().catch(() => null),
@@ -263,10 +265,14 @@ const SadarDeveloperPanel = () => {
             appApi.adminUsers().catch(() => null),
             appApi.pushFeed().catch(() => null),
             appApi.adminApiLogs().catch(() => null),
+            appApi.datasetBenchmarks().catch(() => null),
           ]);
 
         if (logsData && Array.isArray(logsData.logs)) {
           setApiLogs(logsData.logs);
+        }
+        if (dsData) {
+          setDatasetStats(dsData);
         }
 
         if (pushData && Array.isArray(pushData.notifications)) {
@@ -525,6 +531,29 @@ const SadarDeveloperPanel = () => {
       });
     } finally {
       setIsExportingBackup(false);
+    }
+  };
+
+  const handleReseedDemo = async () => {
+    if (!window.confirm("Isi ulang data akun demo@sadarfinance.com dengan 144 transaksi riil dari dataset SADAR?")) {
+      return;
+    }
+    setIsReseedingDemo(true);
+    setNotice(null);
+    try {
+      const res = await appApi.adminReseedDemo();
+      setNotice({
+        color: "success",
+        text: `Akun demo (${res?.demoEmail || "demo@sadarfinance.com"}) berhasil diisi ulang dengan ${res?.seededTransactions || 144} transaksi riil dataset SADAR!`,
+      });
+      loadAllDeveloperData(true);
+    } catch (err) {
+      setNotice({
+        color: "danger",
+        text: err?.message || "Gagal mengisi ulang akun demo.",
+      });
+    } finally {
+      setIsReseedingDemo(false);
     }
   };
 
@@ -939,6 +968,16 @@ const SadarDeveloperPanel = () => {
               color="light"
               size="sm"
               className="sadar-table-action fw-semibold d-inline-flex align-items-center gap-1"
+              onClick={handleReseedDemo}
+              disabled={isReseedingDemo}
+            >
+              <Database size={14} className="text-success" />
+              <span>{isReseedingDemo ? "Memproses..." : "Re-Seed Demo"}</span>
+            </Button>
+            <Button
+              color="light"
+              size="sm"
+              className="sadar-table-action fw-semibold d-inline-flex align-items-center gap-1"
               onClick={handleTestWebPush}
             >
               <Bell size={14} />
@@ -1341,6 +1380,80 @@ const SadarDeveloperPanel = () => {
                 </Card>
               </Col>
             </Row>
+
+            {/* SADAR Dataset Knowledge Engine Monitor (9,579 Transactions) */}
+            {datasetStats?.loaded && (
+              <Card className="sadar-panel mt-3">
+                <CardHeader>
+                  <div>
+                    <h4 className="card-title mb-1">
+                      SADAR Dataset Knowledge Engine ({Number(datasetStats.totalTransactions || 0).toLocaleString("id-ID")} Transaksi)
+                    </h4>
+                    <p className="text-muted mb-0">
+                      Benchmark empiris aktif untuk auto-kategorisasi {datasetStats.uniqueMerchants} merchant Indonesia, kalibrasi OCR struk, dan prediksi lonjakan belanja
+                    </p>
+                  </div>
+                  <Badge color="success" className="bg-success-subtle text-success">
+                    {datasetStats.uniqueMerchants} Merchant • {datasetStats.categoriesCount} Kategori
+                  </Badge>
+                </CardHeader>
+                <CardBody className="p-0">
+                  <div className="table-responsive">
+                    <Table className="table-hover align-middle mb-0">
+                      <thead className="table-light">
+                        <tr>
+                          <th className="ps-3">Kategori</th>
+                          <th>Pos 50/30/20</th>
+                          <th className="text-end">Sampel</th>
+                          <th className="text-end">Rata-rata</th>
+                          <th className="text-end">Median (P50)</th>
+                          <th className="pe-3 text-end">Batas Spike (P90)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.values(datasetStats.categoryBenchmarks || {})
+                          .sort((a, b) => (b.count || 0) - (a.count || 0))
+                          .map((cat) => (
+                            <tr key={cat.detail}>
+                              <td className="ps-3 fw-semibold">{cat.label}</td>
+                              <td>
+                                <Badge
+                                  color={
+                                    cat.primary === "Needs"
+                                      ? "primary"
+                                      : cat.primary === "Savings"
+                                        ? "success"
+                                        : "warning"
+                                  }
+                                  className={`bg-${
+                                    cat.primary === "Needs"
+                                      ? "primary"
+                                      : cat.primary === "Savings"
+                                        ? "success"
+                                        : "warning"
+                                  }-subtle text-${
+                                    cat.primary === "Needs"
+                                      ? "primary"
+                                      : cat.primary === "Savings"
+                                        ? "success"
+                                        : "warning"
+                                  }`}
+                                >
+                                  {cat.primary}
+                                </Badge>
+                              </td>
+                              <td className="text-end font-monospace fs-12">{cat.count}</td>
+                              <td className="text-end font-monospace fs-12">{rupiah(cat.avg)}</td>
+                              <td className="text-end font-monospace fs-12 fw-semibold text-primary">{rupiah(cat.p50)}</td>
+                              <td className="pe-3 text-end font-monospace fs-12 fw-semibold text-danger">{rupiah(cat.p90)}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </CardBody>
+              </Card>
+            )}
 
             {/* Live API Request Telemetry Log Table (V 3.0) */}
             <Card className="sadar-panel mt-3">

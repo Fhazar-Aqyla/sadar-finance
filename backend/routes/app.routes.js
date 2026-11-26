@@ -11,6 +11,7 @@ const { Router } = require('express');
 const authenticate = require('../middlewares/authenticate');
 const userRepository = require('../repositories/user.repository');
 const datasetKnowledge = require('../services/datasetKnowledge.service');
+const runDemoSeed = require('../db/seed');
 const { query: dbQuery } = require('../config/database');
 const { success } = require('../utils/response');
 
@@ -954,6 +955,23 @@ router.get(
           broadcasts: loadAllBroadcasts(),
           pushFeed: loadPushFeed(),
         },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+router.post(
+  '/admin/reseed-demo',
+  authenticate,
+  requireAdminUser,
+  async (_req, res, next) => {
+    try {
+      const result = await runDemoSeed({ closePool: false });
+      return success(res, {
+        message: `Akun demo (${result.demoEmail}) berhasil diisi ulang dengan ${result.seededTransactions} transaksi riil dari dataset SADAR.`,
+        data: result,
       });
     } catch (err) {
       return next(err);

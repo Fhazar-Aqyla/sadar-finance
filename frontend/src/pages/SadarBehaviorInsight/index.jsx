@@ -12,6 +12,7 @@ import {
 } from "reactstrap";
 import {
   analyticsApi,
+  appApi,
   incomeApi,
   transactionApi,
 } from "../../Components/services/api";
@@ -25,6 +26,31 @@ const rupiah = (value) =>
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(value);
+
+const formatCompactRupiahAxis = (value) => {
+  const num = Number(value || 0);
+  if (num <= 0) return "0";
+  if (num >= 1000000) {
+    const jt = num / 1000000;
+    const formatted = Number.isInteger(jt) ? String(jt) : jt.toFixed(1).replace(".", ",");
+    return `${formatted} jt`;
+  }
+  if (num >= 1000) {
+    return `${Math.round(num / 1000)} rb`;
+  }
+  return String(Math.round(num));
+};
+
+const computeNiceAxisMax = (rawMax) => {
+  const val = Number(rawMax || 0);
+  if (val <= 0) return 100000;
+  const padded = val * 1.25;
+  let step = 50000;
+  if (padded > 5000000) step = 2000000;
+  else if (padded > 1000000) step = 500000;
+  else if (padded > 250000) step = 100000;
+  return Math.max(step * 2, Math.ceil(padded / step) * step);
+};
 
 const sumBy = (rows, getValue) =>
   rows.reduce((total, row) => total + getValue(row), 0);
@@ -531,10 +557,10 @@ const createTrendOptions = (categories, maxValue) => ({
       offsetX: -4,
       style: {
         colors: "#687385",
-        fontSize: "13px",
+        fontSize: "12px",
         fontWeight: 700,
       },
-      formatter: (value) => Math.round(value).toLocaleString("id-ID"),
+      formatter: formatCompactRupiahAxis,
     },
     axisBorder: {
       show: true,
@@ -549,7 +575,7 @@ const createTrendOptions = (categories, maxValue) => ({
   tooltip: {
     marker: { show: false },
     y: {
-      formatter: (value) => rupiah(value * 1000),
+      formatter: (value) => rupiah(value),
     },
   },
   responsive: [
@@ -586,6 +612,7 @@ const BehaviorInsightWithData = () => {
   const [backendTransactions, setBackendTransactions] = useState([]);
   const [backendIncomes, setBackendIncomes] = useState([]);
   const [behaviorPrediction, setBehaviorPrediction] = useState(null);
+  const [datasetBenchmarks, setDatasetBenchmarks] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [checklist, setChecklist] = useState({
     hasIncome: false,
@@ -735,10 +762,11 @@ const BehaviorInsightWithData = () => {
 
     const fetchApiData = async () => {
       try {
-        const [rows, incomeRows, budgetResponse] = await Promise.all([
+        const [rows, incomeRows, budgetResponse, dsBench] = await Promise.all([
           transactionApi.list({ limit: 100 }).catch(() => []),
           incomeApi.list({ limit: 100 }).catch(() => []),
           analyticsApi.latestBudget().catch(() => null),
+          appApi.datasetBenchmarks().catch(() => null),
         ]);
         if (isMounted) {
           const mappedTransactions = (rows || []).map(normalizeBackendTransaction);
@@ -746,6 +774,9 @@ const BehaviorInsightWithData = () => {
           
           setBackendTransactions(mappedTransactions);
           setBackendIncomes(mappedIncomes);
+          if (dsBench?.loaded) {
+            setDatasetBenchmarks(dsBench);
+          }
 
           const hasIncome = mappedIncomes.length > 0;
           const hasBudget = budgetResponse !== null && (
@@ -830,13 +861,8 @@ const BehaviorInsightWithData = () => {
   const categoryRows = toDashboardCategoryRows(data.byCategory);
   const categoryLabels = dashboardCategoryLabels;
   const categoryValues = categoryLabels.map((label) => categoryRows[label]);
-  const trendSeriesData = data.trendRows.map((item) =>
-    Math.round(item.amount / 1000),
-  );
-  const trendMaxValue = Math.max(
-    100,
-    Math.ceil((Math.max(...trendSeriesData, 0) * 1.2) / 500) * 500,
-  );
+  const trendSeriesData = data.trendRows.map((item) => item.amount);
+  const trendMaxValue = computeNiceAxisMax(Math.max(...trendSeriesData, 0));
   const trendOptions = createTrendOptions(
     data.trendRows.map((item) => formatShortDate(item.date)),
     trendMaxValue,
@@ -857,11 +883,15 @@ const BehaviorInsightWithData = () => {
       : null;
   const modelRiskTone = getRiskTone(normalizedPrediction?.riskLevel);
   const predictionSourceLabel =
-    normalizedPrediction?.source === "ai-service"
-      ? "Model AI"
-      : normalizedPrediction?.source === "rule-based-fallback"
-        ? "Cadangan berbasis aturan"
-        : "Prediksi otomatis";
+    normalizedPrediction?.source === "ai-service+sadar-dataset"
+      ? "Model AI + Dataset 9.579"
+      : normalizedPrediction?.source === "sadar-dataset-empirical"
+        ? "Benchmark 9.579 Transaksi"
+        : normalizedPrediction?.source === "ai-service"
+          ? "Model AI"
+          : normalizedPrediction?.source === "rule-based-fallback"
+            ? "Cadangan berbasis aturan"
+            : "Prediksi otomatis";
   const insightItems = normalizedPrediction
     ? [
         {
@@ -882,11 +912,45 @@ const BehaviorInsightWithData = () => {
     : data.recommendations;
   const recommendationCards = recommendations.map(toRecommendationCard);
 
+  // Compare user's average spend per transaction in Needs/Wants/Savings vs SADAR 9,579-row dataset benchmarks
+  const benchmarkComparisons = useMemo(() => {
+    const primaryBench = datasetBenchmarks?.primaryBenchmarks;
+    if (!primaryBench) return [];
+    const buckets = [
+      { key: "Needs", label: "Kebutuhan (50%)", match: (t) => normalizeCategoryToDashboard(t.category) === "Kebutuhan" },
+      { key: "Wants", label: "Keinginan (30%)", match: (t) => normalizeCategoryToDashboard(t.category) === "Keinginan" },
+      { key: "Savings", label: "Tabungan & Investasi (20%)", match: (t) => normalizeCategoryToDashboard(t.category) === "Tabungan" },
+    ];
+    return buckets.map((b) => {
+      const matched = data.userTransactions.filter(b.match);
+      const userAvg = matched.length > 0 ? Math.round(sumBy(matched, (t) => t.amount) / matched.length) : 0;
+      const bench = primaryBench[b.key] || {};
+      const p50 = Number(bench.p50 || 0);
+      const p90 = Number(bench.p90 || 0);
+      const status =
+        userAvg === 0
+          ? { text: "Belum ada catatan", tone: "secondary" }
+          : userAvg > p90
+            ? { text: "Di atas P90 (Tinggi)", tone: "danger" }
+            : userAvg > p50
+              ? { text: "Di atas Median", tone: "warning" }
+              : { text: "Lebih Hemat dari Median", tone: "success" };
+      return {
+        ...b,
+        count: matched.length,
+        userAvg,
+        p50,
+        p90,
+        status,
+      };
+    });
+  }, [datasetBenchmarks, data.userTransactions]);
+
   if (isLoading) {
     return <SadarLoadingScreen />;
   }
 
-  const isInsufficient = !checklist.hasIncome || !checklist.hasBudget || !checklist.hasTransactions;
+  const isInsufficient = !checklist.hasTransactions;
   if (isInsufficient) {
     return (
       <EmptyBehaviorInsight
@@ -900,10 +964,19 @@ const BehaviorInsightWithData = () => {
   return (
     <div className="page-content sadar-page">
       <Container fluid>
+        {!checklist.hasBudget && (
+          <div className="sadar-empty-state d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <span>
+              <strong>Anggaran 50/30/20 belum diatur.</strong> Atur batas anggaran bulanan agar analisis risiko pengeluaran makin presisi.
+            </span>
+            <Button tag={Link} to="/profile-account#atur-budget" color="primary" size="sm">
+              Atur Budget Sekarang →
+            </Button>
+          </div>
+        )}
         {!hasEnoughData && (
           <div className="sadar-empty-state mb-3">
-            Insight akan lebih akurat setelah data transaksi minimal 14 hari
-            tersedia.
+            Insight akan semakin tajam setelah data transaksi minimal 14 hari tersedia. Saat ini dilengkapi kalibrasi benchmark 9.579 transaksi SADAR.
           </div>
         )}
 
@@ -1045,6 +1118,15 @@ const BehaviorInsightWithData = () => {
                     ...chartBase,
                     colors: ["#14B8A6"],
                     xaxis: { categories: ["Hari Kerja", "Akhir Pekan"] },
+                    yaxis: {
+                      min: 0,
+                      max: computeNiceAxisMax(
+                        Math.max(data.weekdayExpense, data.weekendExpense, 0)
+                      ),
+                      labels: {
+                        formatter: formatCompactRupiahAxis,
+                      },
+                    },
                     plotOptions: {
                       bar: { borderRadius: 8, columnWidth: "42%" },
                     },
@@ -1148,6 +1230,54 @@ const BehaviorInsightWithData = () => {
             </Card>
           </Col>
         </Row>
+
+        {benchmarkComparisons.length > 0 && (
+          <Card className="sadar-panel mt-3">
+            <CardHeader>
+              <div>
+                <h4 className="card-title mb-1">
+                  Perbandingan Anda vs Benchmark SADAR (9.579 Transaksi Indonesia)
+                </h4>
+                <p className="text-muted mb-0">
+                  Bandingkan rata-rata nominal per transaksi Anda dengan median (P50) &amp; batas atas wajar (P90) dari dataset resmi SADAR
+                </p>
+              </div>
+              <span className="sadar-source-badge ai">
+                {datasetBenchmarks?.uniqueMerchants || 187} Merchant Terkalibrasi
+              </span>
+            </CardHeader>
+            <CardBody>
+              <Row className="g-3">
+                {benchmarkComparisons.map((item) => (
+                  <Col md={4} key={item.key}>
+                    <div className="sadar-insight-item d-block h-100">
+                      <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
+                        <strong className="mb-0">{item.label}</strong>
+                        <span className={`badge bg-${item.status.tone}-subtle text-${item.status.tone}`}>
+                          {item.status.text}
+                        </span>
+                      </div>
+                      <div className="d-flex justify-content-between small mb-1">
+                        <span className="text-muted">Rata-rata Anda ({item.count}x):</span>
+                        <strong className="mb-0 text-dark">
+                          {item.userAvg > 0 ? rupiah(item.userAvg) : "-"}
+                        </strong>
+                      </div>
+                      <div className="d-flex justify-content-between small mb-1">
+                        <span className="text-muted">Median SADAR (P50):</span>
+                        <span className="fw-semibold text-primary">{rupiah(item.p50)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between small">
+                        <span className="text-muted">Batas Spike (P90):</span>
+                        <span className="fw-semibold text-danger">{rupiah(item.p90)}</span>
+                      </div>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </CardBody>
+          </Card>
+        )}
       </Container>
     </div>
   );

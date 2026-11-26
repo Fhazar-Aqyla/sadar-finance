@@ -137,7 +137,7 @@ function loadDatasetDemoSlice() {
   return selected.sort((a, b) => new Date(a.dateIso) - new Date(b.dateIso));
 }
 
-const seed = async () => {
+const seed = async ({ closePool = true } = {}) => {
   const client = await pool.connect();
 
   try {
@@ -307,13 +307,20 @@ const seed = async () => {
     await client.query('COMMIT');
     console.log(`✅ Demo database seeded with ${datasetRows.length} real dataset transactions (6 months).`);
     console.log('   Demo account: demo@sadarfinance.com / Demo@12345');
+    return {
+      demoEmail: 'demo@sadarfinance.com',
+      seededTransactions: datasetRows.length,
+      accountsCount: 4,
+    };
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('❌ Seeding failed:', err.message);
     throw err;
   } finally {
     client.release();
-    await pool.end();
+    if (closePool) {
+      await pool.end();
+    }
   }
 };
 

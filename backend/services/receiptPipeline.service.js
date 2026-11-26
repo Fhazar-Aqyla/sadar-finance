@@ -3,6 +3,7 @@ const hfOcrClient = require('./hfOcrClient.service');
 const groqReceipt = require('./groqReceipt.service');
 const localOcr = require('./localOcr.service');
 const receiptDecision = require('./receiptDecision.service');
+const datasetKnowledge = require('./datasetKnowledge.service');
 
 class ReceiptPipeline {
   constructor(dependencies = {}) {
@@ -35,6 +36,30 @@ class ReceiptPipeline {
       warnings.push('Groq tidak dikonfigurasi; validator deterministik digunakan.');
     }
     const data = receiptDecision.validate(interpreted, combinedText);
+
+    // Calibrate OCR merchant & 50/30/20 category against 9,579-row SADAR Indonesian merchant dataset (187 merchants)
+    const dsMatch = datasetKnowledge.lookupMerchant(combinedText, data.merchant || '');
+    if (dsMatch) {
+      if (!data.merchant || data.merchant.length < 3) {
+        data.merchant = dsMatch.merchantName;
+      }
+      if (!data.categoryGroup || data.needsReview) {
+        data.categoryGroup = dsMatch.categoryGroup.toLowerCase();
+      }
+      if (!data.categoryDetail) {
+        data.categoryDetail = dsMatch.categoryDetail;
+      }
+      data.datasetCalibration = {
+        matchedMerchant: dsMatch.merchantName,
+        categoryGroup: dsMatch.categoryGroup,
+        categoryDetail: dsMatch.categoryDetail,
+        sampleCount: dsMatch.sampleCount,
+        p50Amount: dsMatch.p50Amount,
+        p90Amount: dsMatch.p90Amount,
+        confidence: dsMatch.confidence,
+      };
+    }
+
     if (warnings.length) {
       data.warnings = [...new Set([...data.warnings, ...warnings])];
       data.needsReview = true;
