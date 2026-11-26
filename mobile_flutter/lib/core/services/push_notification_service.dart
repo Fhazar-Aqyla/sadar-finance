@@ -25,7 +25,6 @@ class PushNotificationService {
     required String body,
   }) async {
     try {
-      await requestPermission();
       final shown = await _channel.invokeMethod<bool>(
         'showNotification',
         {
@@ -156,18 +155,20 @@ class PushNotificationService {
 
   /// Polls `/app/push-feed` so remote Push Notifications sent from the
   /// Web Developer Panel (`/developer-panel`) immediately trigger a
-  /// native Android heads-up status bar notification on the phone.
-  static Future<void> pollRemotePushFeed(
+  /// native Android heads-up status bar notification on the phone
+  /// and returns newly arrived items for in-app banner display.
+  static Future<List<Map<String, String>>> pollRemotePushFeed(
     ApiClient api, {
     required bool enabled,
   }) async {
-    if (!enabled) return;
+    if (!enabled) return const <Map<String, String>>[];
+    final newlyDispatched = <Map<String, String>>[];
     try {
       final res = await api.get('/app/push-feed');
       final data = res['data'];
-      if (data is! Map) return;
+      if (data is! Map) return newlyDispatched;
       final list = data['notifications'];
-      if (list is! List || list.isEmpty) return;
+      if (list is! List || list.isEmpty) return newlyDispatched;
 
       final prefs = await SharedPreferences.getInstance();
       final dispatched =
@@ -192,10 +193,14 @@ class PushNotificationService {
           title: title,
           body: body,
         );
-        if (ok) {
-          dispatched.add(key);
-          changed = true;
-        }
+        dispatched.add(key);
+        changed = true;
+        newlyDispatched.add({
+          'id': idStr,
+          'title': title,
+          'body': body,
+          'nativeShown': ok ? 'true' : 'false',
+        });
       }
 
       if (changed) {
@@ -206,5 +211,6 @@ class PushNotificationService {
         await prefs.setStringList(_dispatchedKey, trimmed);
       }
     } catch (_) {}
+    return newlyDispatched;
   }
 }

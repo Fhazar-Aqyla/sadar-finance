@@ -1,12 +1,19 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config/app_config.dart';
+import 'core/network/api_client.dart';
 import 'core/services/app_lock_service.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/widgets/sadar_logo.dart';
 import 'providers/auth_provider.dart';
 import 'providers/ui_preferences_provider.dart';
 import 'router/app_router.dart';
+
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 final appLockServiceProvider = Provider<AppLockService>(
   (ref) => AppLockService(),
@@ -26,15 +33,85 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
   bool _initialLockChecked = false;
   bool _authenticating = false;
   DateTime? _pausedAt;
+  Timer? _globalPushTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    final isTest = Platform.environment.containsKey('FLUTTER_TEST');
+    if (!isTest) {
+      Future.microtask(() async {
+        await PushNotificationService.requestPermission();
+        await _checkRemotePushQueue();
+      });
+      _globalPushTimer = Timer.periodic(
+        const Duration(seconds: 8),
+        (_) => _checkRemotePushQueue(),
+      );
+    }
+  }
+
+  Future<void> _checkRemotePushQueue() async {
+    if (!mounted) return;
+    final enabled = ref.read(uiPreferencesProvider).pushNotificationsEnabled;
+    if (!enabled) return;
+    final items = await PushNotificationService.pollRemotePushFeed(
+      ref.read(apiClientProvider),
+      enabled: enabled,
+    );
+    if (!mounted || items.isEmpty) return;
+    final latest = items.first;
+    rootScaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primary,
+        duration: const Duration(seconds: 5),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.notifications_active_rounded,
+              color: AppColors.accent,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    latest['title'] ?? 'SADAR Finance V 2.0',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    latest['body'] ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   void dispose() {
+    _globalPushTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -51,6 +128,10 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
       if (_inBackground != shouldShield && mounted) {
         setState(() => _inBackground = shouldShield);
       }
+    }
+
+    if (state == AppLifecycleState.resumed) {
+      _checkRemotePushQueue();
     }
 
     if (!uiPrefs.biometricLockEnabled ||
@@ -107,6 +188,7 @@ class _SadarFinanceAppState extends ConsumerState<SadarFinanceApp>
 
     return MaterialApp.router(
       title: AppConfig.appName,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

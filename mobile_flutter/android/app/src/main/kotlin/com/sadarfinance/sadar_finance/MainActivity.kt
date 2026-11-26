@@ -25,11 +25,12 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterFragmentActivity() {
     private val locationChannelName = "com.sadarfinance.sadar_finance/location"
     private val notificationChannelName = "com.sadarfinance.sadar_finance/notifications"
-    private val pushChannelId = "sadar_finance_push_v2"
+    private val pushChannelId = "sadar_finance_push_v3_high"
     private val locationPermissionRequestCode = 7401
     private val notifPermissionRequestCode = 7402
     private var pendingLocationResult: MethodChannel.Result? = null
-    private var pendingNotifResult: MethodChannel.Result? = null
+    private val pendingNotifResults = mutableListOf<MethodChannel.Result>()
+    private var queuedNotification: Triple<Int, String, String>? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -70,12 +71,15 @@ class MainActivity : FlutterFragmentActivity() {
                             if (granted) {
                                 result.success(true)
                             } else {
-                                pendingNotifResult = result
-                                ActivityCompat.requestPermissions(
-                                    this,
-                                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                                    notifPermissionRequestCode
-                                )
+                                val shouldAsk = pendingNotifResults.isEmpty()
+                                pendingNotifResults.add(result)
+                                if (shouldAsk) {
+                                    ActivityCompat.requestPermissions(
+                                        this,
+                                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                                        notifPermissionRequestCode
+                                    )
+                                }
                             }
                         } else {
                             result.success(true)
@@ -85,6 +89,25 @@ class MainActivity : FlutterFragmentActivity() {
                         val id = (call.argument<Number>("id") ?: 1001).toInt()
                         val title = call.argument<String>("title") ?: "SADAR Finance"
                         val body = call.argument<String>("body") ?: ""
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            val granted = ContextCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                            if (!granted) {
+                                queuedNotification = Triple(id, title, body)
+                                val shouldAsk = pendingNotifResults.isEmpty()
+                                pendingNotifResults.add(result)
+                                if (shouldAsk) {
+                                    ActivityCompat.requestPermissions(
+                                        this,
+                                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                                        notifPermissionRequestCode
+                                    )
+                                }
+                                return@setMethodCallHandler
+                            }
+                        }
                         val shown = showNativePushNotification(id, title, body)
                         result.success(shown)
                     }
@@ -131,12 +154,20 @@ class MainActivity : FlutterFragmentActivity() {
             }
             val pendingIntent = PendingIntent.getActivity(this, id, launchIntent, pendingFlags)
 
+            val smallIconRes = if (applicationInfo.icon != 0) {
+                applicationInfo.icon
+            } else {
+                android.R.drawable.ic_dialog_info
+            }
+
             val notification = NotificationCompat.Builder(this, pushChannelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(smallIconRes)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
@@ -172,12 +203,21 @@ class MainActivity : FlutterFragmentActivity() {
                 }
             }
         } else if (requestCode == notifPermissionRequestCode) {
-            val res = pendingNotifResult
-            pendingNotifResult = null
-            if (res != null) {
-                val granted = grantResults.isNotEmpty() &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED
-                res.success(granted)
+            val granted = grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED
+            if (granted && queuedNotification != null) {
+                val q = queuedNotification!!
+                queuedNotification = null
+                showNativePushNotification(q.first, q.second, q.third)
+            } else {
+                queuedNotification = null
+            }
+            val callbacks = pendingNotifResults.toList()
+            pendingNotifResults.clear()
+            for (cb in callbacks) {
+                try {
+                    cb.success(granted)
+                } catch (_: Exception) {}
             }
         }
     }

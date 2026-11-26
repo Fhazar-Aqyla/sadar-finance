@@ -14,8 +14,8 @@ import { FooterSection } from "./OnePage/components/FooterSection";
 
 const DEFAULT_META = {
   latestVersion: "2.0.0",
-  buildNumber: 11,
-  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b11",
+  buildNumber: 12,
+  downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b12",
   releaseNotes: [
     "Rilis Utama SADAR Finance V 2.0.0: Push Notification Android Native (Broadcast, Budget 50/30/20 & Tagihan)",
     "Kartu Posisi Kekayaan Bersih (Net Worth Tracker) & Indikator Batas Aman Belanja Harian",
