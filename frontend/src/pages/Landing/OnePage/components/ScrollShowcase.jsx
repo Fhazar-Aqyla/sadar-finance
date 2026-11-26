@@ -96,7 +96,7 @@ export const ScrollShowcase = () => {
               <span className="w-3 h-3 rounded-full bg-emerald-500/90 inline-block shadow-xs" />
             </div>
             <div className="text-[11px] font-mono text-slate-400 bg-slate-800/70 border border-slate-700/50 px-4 py-0.5 rounded-full hidden sm:flex items-center gap-2 shadow-inner">
-              <span>https://sadar.app/dashboard</span>
+              <span>https://sadar-finance.web.id/dashboard</span>
             </div>
             <div className="w-12 text-right" />
           </div>

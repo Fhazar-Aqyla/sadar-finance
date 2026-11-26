@@ -17,10 +17,10 @@ const DEFAULT_META = {
   buildNumber: 11,
   downloadUrl: "https://sadar-finance.web.id/downloads/sadar-finance-v2.0.0.apk?v=2.0.0-b11",
   releaseNotes: [
-    "Rilis Utama SADAR Finance V 2.0.0: Pratinjau & Cetak e-Statement Bulanan Resmi di Dalam Aplikasi",
-    "Mode Kalender Arus Kas Bulanan Interaktif di Halaman Riwayat Keuangan",
-    "Panel Admin Broadcast & Upload Foto Banner Real-Time Langsung dari Aplikasi & Web",
-    "Sinkronisasi Cloud Penuh Target Tabungan, Jadwal Rutin, Piutang & Simulasi Dana Darurat",
+    "Rilis Utama SADAR Finance V 2.0.0: Push Notification Android Native (Broadcast, Budget 50/30/20 & Tagihan)",
+    "Kartu Posisi Kekayaan Bersih (Net Worth Tracker) & Indikator Batas Aman Belanja Harian",
+    "Pratinjau & Cetak e-Statement Bulanan Resmi (PDF) serta Mode Kalender Arus Kas Interaktif",
+    "Penjaga Duplikat Transaksi Pintar, Tanggal Jatuh Tempo Piutang, & 1-Tap Split Bill ke Piutang",
   ],
 };
 

@@ -32,6 +32,7 @@ import {
   appApi,
   authApi,
   incomeApi,
+  plansApi,
 } from "../../Components/services/api";
 import AccountFormModal from "../../Components/AccountModal/AccountFormModal";
 import { getStoredAuthUser, updateStoredAuthUser } from "../../helpers/auth-storage";
@@ -692,6 +693,10 @@ const ProfileAccountWithData = () => {
   const [budgetNotice, setBudgetNotice] = useState("");
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
   const [monthlyIncome, setMonthlyIncome] = useState(0);
+  const [plansSnapshot, setPlansSnapshot] = useState({
+    savingsGoals: [],
+    debts: [],
+  });
 
   // Admin Broadcast & Banner state (for mhmdhabibrafi@gmail.com)
   const [adminBroadcasts, setAdminBroadcasts] = useState([]);
@@ -730,15 +735,24 @@ const ProfileAccountWithData = () => {
 
     const loadProfileAccount = async () => {
       try {
-        const [profileResponse, accountRows, budgetResponse, incomeList] =
+        const [profileResponse, accountRows, budgetResponse, incomeList, plansData] =
           await Promise.all([
             authApi.me(),
             accountApi.list(),
             analyticsApi.latestBudget().catch(() => null),
             incomeApi.list({ limit: 100 }).catch(() => []),
+            plansApi.get().catch(() => null),
           ]);
 
         if (isMounted) {
+          if (plansData) {
+            setPlansSnapshot({
+              savingsGoals: Array.isArray(plansData.savingsGoals)
+                ? plansData.savingsGoals
+                : [],
+              debts: Array.isArray(plansData.debts) ? plansData.debts : [],
+            });
+          }
           const normalizedAccounts = (accountRows || []).map(normalizeAccount);
           const apiBudgetRows = buildBudgetRows(budgetResponse);
 
@@ -1107,6 +1121,101 @@ const ProfileAccountWithData = () => {
   return (
     <div className="page-content sadar-page">
       <Container fluid>
+        {/* Net Worth Tracker Card (Posisi Kekayaan Bersih V 2.0) */}
+        {(() => {
+          const savingsTotal = (plansSnapshot.savingsGoals || []).reduce(
+            (s, g) => s + Number(g.currentAmount || 0),
+            0
+          );
+          const activeReceivables = (plansSnapshot.debts || [])
+            .filter((d) => !d.isSettled && d.isReceivable)
+            .reduce((s, d) => s + Number(d.amount || 0), 0);
+          const activePayables = (plansSnapshot.debts || [])
+            .filter((d) => !d.isSettled && !d.isReceivable)
+            .reduce((s, d) => s + Number(d.amount || 0), 0);
+          const netWorth =
+            totalBalance + savingsTotal + activeReceivables - activePayables;
+
+          const handleExportBackupJson = () => {
+            const payload = {
+              app: "SADAR Finance",
+              version: "2.0.0",
+              exportedAt: new Date().toISOString(),
+              profile: {
+                name: profile.name,
+                email: profile.email,
+                username: profile.username,
+              },
+              accounts,
+              budgets: budgetRows,
+              plans: plansSnapshot,
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `sadar-finance-backup-${new Date()
+              .toISOString()
+              .slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          };
+
+          return (
+            <div className="sadar-networth-banner mb-3">
+              <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <span className="badge bg-light text-dark fw-bold">
+                      POSISI KEKAYAAN BERSIH (NET WORTH)
+                    </span>
+                    <span className="badge bg-info-subtle text-info">
+                      Real-Time V 2.0
+                    </span>
+                  </div>
+                  <h2 className="text-white fw-bold mb-1">
+                    {rupiah(netWorth)}
+                  </h2>
+                  <p className="text-white-50 fs-12 mb-0">
+                    (Total Saldo Rekening + Tabungan Impian + Piutang Aktif) −
+                    Utang Aktif
+                  </p>
+                </div>
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                  <div className="sadar-networth-pill">
+                    <div className="text-white-50 fs-11">Kas &amp; Tabungan</div>
+                    <strong className="fs-13 text-white">
+                      {rupiah(totalBalance + savingsTotal)}
+                    </strong>
+                  </div>
+                  <div className="sadar-networth-pill">
+                    <div className="text-white-50 fs-11">Piutang Aktif (+)</div>
+                    <strong className="fs-13 text-info">
+                      +{rupiah(activeReceivables)}
+                    </strong>
+                  </div>
+                  <div className="sadar-networth-pill">
+                    <div className="text-white-50 fs-11">Utang Aktif (−)</div>
+                    <strong className="fs-13 text-warning">
+                      −{rupiah(activePayables)}
+                    </strong>
+                  </div>
+                  <Button
+                    color="light"
+                    size="sm"
+                    className="fw-semibold ms-1"
+                    onClick={handleExportBackupJson}
+                  >
+                    <i className="ri-download-cloud-2-line me-1"></i>
+                    Backup Data (.JSON)
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
         <Row className="g-3">
           <Col xl={5}>
             <Card className="sadar-panel sadar-profile-panel h-100">
@@ -1287,13 +1396,14 @@ const ProfileAccountWithData = () => {
                     ini.
                   </p>
                 </div>
-                <div
+                <button
+                  type="button"
                   className="sadar-apply-rule-btn"
-                  style={{ cursor: "default" }}
+                  onClick={_applyBudgetTarget}
                 >
                   <i className="ri-magic-line me-1"></i>
-                  Terapkan 50/30/20
-                </div>
+                  Terapkan 50/30/20 Otomatis
+                </button>
               </CardHeader>
               <CardBody>
                 {budgetNotice && (
@@ -1390,13 +1500,23 @@ const ProfileAccountWithData = () => {
               <Card className="sadar-panel" id="admin-broadcast-panel">
                 <CardHeader className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                   <div>
-                    <div className="d-flex align-items-center gap-2">
+                    <div className="d-flex align-items-center gap-2 flex-wrap">
                       <h4 className="card-title mb-0">
                         Panel Admin Broadcast & Banner
                       </h4>
                       <Badge color="info" pill>
                         Admin Eksklusif
                       </Badge>
+                      <Button
+                        tag={Link}
+                        to="/developer-panel"
+                        color="primary"
+                        size="sm"
+                        className="ms-2 fw-semibold"
+                      >
+                        <i className="ri-terminal-box-line me-1"></i>
+                        Buka Panel Developer Lengkap
+                      </Button>
                     </div>
                     <p className="text-muted mb-0 mt-1">
                       Tayangkan pengumuman & foto banner secara real-time ke Beranda Web App dan Aplikasi Android semua pengguna.

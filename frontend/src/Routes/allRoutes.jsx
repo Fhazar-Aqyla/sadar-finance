@@ -9,6 +9,7 @@ import SadarFinancialHistory from "../pages/SadarFinancialHistory";
 import SadarFinancialPlans from "../pages/SadarFinancialPlans";
 import SadarProfileAccount from "../pages/SadarProfileAccount";
 import SadarProfileEdit from "../pages/SadarProfileEdit";
+import SadarDeveloperPanel from "../pages/SadarDeveloperPanel";
 import TransactionInput from "../pages/Sadar/TransactionInput";
 
 // Auth & Profiles
@@ -35,6 +36,7 @@ const authProtectedRoutes = [
   { path: "/financial-plans", component: <SadarFinancialPlans /> },
   { path: "/profile-account", component: <SadarProfileAccount /> },
   { path: "/profile-account/edit", component: <SadarProfileEdit /> },
+  { path: "/developer-panel", component: <SadarDeveloperPanel /> },
   { path: "/index", component: <SadarDashboard /> },
   { path: "/transactions/input", component: <TransactionInput /> },
   { path: "/profile", component: <UserProfile /> },

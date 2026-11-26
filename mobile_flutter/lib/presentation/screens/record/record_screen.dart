@@ -246,6 +246,61 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
     }
   }
 
+  Future<bool> _confirmDuplicateIfNeeded({
+    required bool isIncome,
+    required double amount,
+    required String title,
+    required DateTime date,
+  }) async {
+    final finance = ref.read(financeProvider);
+    final normTitle = title.trim().toLowerCase();
+    final hasDuplicate = isIncome
+        ? finance.incomes.any(
+            (i) =>
+                i.amount == amount &&
+                i.source.trim().toLowerCase() == normTitle &&
+                i.incomeDate.year == date.year &&
+                i.incomeDate.month == date.month &&
+                i.incomeDate.day == date.day,
+          )
+        : finance.transactions.any(
+            (t) =>
+                t.amount == amount &&
+                t.displayTitle.trim().toLowerCase() == normTitle &&
+                t.transactionDate.year == date.year &&
+                t.transactionDate.month == date.month &&
+                t.transactionDate.day == date.day,
+          );
+    if (!hasDuplicate) return true;
+
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.copy_all_rounded, color: AppColors.warning),
+            SizedBox(width: 8),
+            Expanded(child: Text('Transaksi Serupa Terdeteksi')),
+          ],
+        ),
+        content: Text(
+          'Catatan "$title" sebesar ${AppFormatters.rupiah(amount)} sudah pernah dicatat pada tanggal ${AppFormatters.shortDate(date)}. Tetap simpan catatan ini?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Tetap Simpan'),
+          ),
+        ],
+      ),
+    );
+    return proceed == true;
+  }
+
   Future<void> _submitExpense() async {
     if (!_expFormKey.currentState!.validate()) return;
     final amount = AppFormatters.parseAmount(_expAmountCtrl.text);
@@ -255,6 +310,16 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
       );
       return;
     }
+    final descTitle = _expDescCtrl.text.trim().isNotEmpty
+        ? _expDescCtrl.text.trim()
+        : CategoryHelpers.labelForGroup(_expCategoryGroup);
+    final ok = await _confirmDuplicateIfNeeded(
+      isIncome: false,
+      amount: amount,
+      title: descTitle,
+      date: _expDate,
+    );
+    if (!ok || !mounted) return;
     setState(() => _expSubmitting = true);
     try {
       final syncedOnline = await ref.read(financeProvider.notifier).addTransaction(
@@ -307,6 +372,16 @@ class _RecordScreenState extends ConsumerState<RecordScreen>
       );
       return;
     }
+    final srcTitle = _incSourceCtrl.text.trim().isNotEmpty
+        ? _incSourceCtrl.text.trim()
+        : 'Pemasukan';
+    final ok = await _confirmDuplicateIfNeeded(
+      isIncome: true,
+      amount: amount,
+      title: srcTitle,
+      date: _incDate,
+    );
+    if (!ok || !mounted) return;
     setState(() => _incSubmitting = true);
     try {
       final syncedOnline = await ref.read(financeProvider.notifier).addIncome(

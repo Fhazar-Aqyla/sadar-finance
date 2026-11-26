@@ -58,6 +58,7 @@ class _DebtSplitScreenState extends ConsumerState<DebtSplitScreen>
     final amountCtrl = TextEditingController();
     final noteCtrl = TextEditingController();
     bool isReceivable = true;
+    DateTime? selectedDueDate;
 
     showModalBottomSheet(
       context: context,
@@ -143,6 +144,46 @@ class _DebtSplitScreenState extends ConsumerState<DebtSplitScreen>
                     prefixIcon: Icon(Icons.notes_rounded),
                   ),
                 ),
+                const SizedBox(height: 12),
+                InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate:
+                          selectedDueDate ?? now.add(const Duration(days: 7)),
+                      firstDate: now.subtract(const Duration(days: 365)),
+                      lastDate: now.add(const Duration(days: 365 * 3)),
+                    );
+                    if (picked != null) {
+                      setModalState(() => selectedDueDate = picked);
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Tanggal Jatuh Tempo (Opsional)',
+                      prefixIcon: const Icon(Icons.event_outlined),
+                      suffixIcon: selectedDueDate != null
+                          ? IconButton(
+                              onPressed: () =>
+                                  setModalState(() => selectedDueDate = null),
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                            )
+                          : null,
+                    ),
+                    child: Text(
+                      selectedDueDate != null
+                          ? AppFormatters.fullDate(selectedDueDate!)
+                          : 'Ketuk untuk pilih tanggal pengingat',
+                      style: TextStyle(
+                        color: selectedDueDate != null
+                            ? AppColors.textPrimaryOf(ctx)
+                            : AppColors.textMutedOf(ctx),
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 18),
                 SizedBox(
                   height: 48,
@@ -157,6 +198,7 @@ class _DebtSplitScreenState extends ConsumerState<DebtSplitScreen>
                             amount: amt,
                             isReceivable: isReceivable,
                             note: noteCtrl.text.trim(),
+                            dueDate: selectedDueDate,
                           );
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
@@ -422,13 +464,26 @@ class _DebtSplitScreenState extends ConsumerState<DebtSplitScreen>
                                   color: AppColors.textPrimaryOf(context),
                                 ),
                               ),
-                              Text(
+                               Text(
                                 '${item.isReceivable ? "Piutang (Teman Pinjam)" : "Utang (Saya Pinjam)"}${item.note.isNotEmpty ? " - ${item.note}" : ""}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondaryOf(context),
                                 ),
                               ),
+                              if (item.dueDate != null) ...[
+                                const SizedBox(height: 3),
+                                Text(
+                                  'Jatuh tempo: ${AppFormatters.fullDate(item.dueDate!)}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: item.isSettled
+                                        ? AppColors.textMutedOf(context)
+                                        : AppColors.warning,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),

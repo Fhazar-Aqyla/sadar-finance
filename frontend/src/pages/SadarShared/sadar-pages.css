@@ -3694,14 +3694,129 @@ html[data-bs-theme="dark"] .sadar-budget-clean-input:focus {
   padding: 0.42rem 0.85rem !important;
   border-radius: 8px !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-  cursor: default !important;
+  cursor: pointer !important;
   user-select: none !important;
-  pointer-events: none !important;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.sadar-apply-rule-btn:hover {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  transform: translateY(-1px);
 }
 
 html[data-bs-theme="dark"] .sadar-apply-rule-btn {
   background: rgba(30, 41, 59, 0.8) !important;
   color: #93c5fd !important;
   border-color: rgba(148, 163, 184, 0.25) !important;
-  cursor: default !important;
+  cursor: pointer !important;
+}
+
+/* =========================================================
+   SADAR V 2.0 SMOOTH TRANSITIONS, CALENDAR & NET WORTH UI
+   ========================================================= */
+
+@keyframes sadarFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sadar-page,
+.sadar-dashboard {
+  animation: sadarFadeSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sadar-page .card,
+.sadar-dashboard .card,
+.sadar-insight-item {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.22s ease;
+}
+
+.metric-card:hover,
+.sadar-summary-card:hover {
+  transform: translateY(-2px);
+}
+
+.sadar-networth-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #0d9488 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 1.35rem 1.5rem;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.14);
+}
+
+.sadar-networth-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
+}
+
+.sadar-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.sadar-calendar-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  padding: 0.35rem 0;
+  text-transform: uppercase;
+}
+
+.sadar-calendar-cell {
+  min-height: 68px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.4rem 0.5rem;
+  background: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.18s ease;
+}
+
+.sadar-calendar-cell:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.sadar-calendar-cell.is-selected {
+  border: 2px solid #1e3a8a;
+  background: #eff6ff;
+}
+
+.sadar-calendar-cell.is-today {
+  box-shadow: inset 0 0 0 1px #14b8a6;
+}
+
+.sadar-calendar-cell.is-empty {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+html[data-bs-theme="dark"] .sadar-calendar-cell {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #e2e8f0;
+}
+
+html[data-bs-theme="dark"] .sadar-calendar-cell.is-selected {
+  background: rgba(30, 58, 138, 0.45);
+  border-color: #60a5fa;
 }

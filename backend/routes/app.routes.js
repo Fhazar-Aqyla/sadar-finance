@@ -3,11 +3,14 @@
  * Public endpoint used by SADAR Finance mobile app to check for native APK updates.
  */
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const multer = require('multer');
 const { Router } = require('express');
 const authenticate = require('../middlewares/authenticate');
 const userRepository = require('../repositories/user.repository');
+const { query: dbQuery } = require('../config/database');
 const { success } = require('../utils/response');
 
 const router = Router();
@@ -57,6 +60,30 @@ function saveAllBroadcasts(list) {
 
 function loadActiveBroadcasts() {
   return loadAllBroadcasts().filter((b) => b && b.active === true);
+}
+
+function extractLocalBannerFilename(bannerUrl) {
+  const raw = String(bannerUrl || '').trim();
+  if (!raw || !raw.includes('/app/banners/')) return '';
+  const tail = raw.split('/app/banners/').pop() || '';
+  const clean = path.basename(tail.split('?')[0]);
+  return /^banner-\d+\.(png|jpg|jpeg|webp)$/i.test(clean) ? clean : '';
+}
+
+function cleanupOrphanBannerFile(bannerUrl, remainingBroadcasts) {
+  try {
+    const filename = extractLocalBannerFilename(bannerUrl);
+    if (!filename) return;
+    const stillUsed = (remainingBroadcasts || []).some((b) => {
+      const candidate = extractLocalBannerFilename(b?.imageUrl || b?.bannerUrl);
+      return candidate === filename;
+    });
+    if (stillUsed) return;
+    const targetPath = path.join(BANNERS_DIR, filename);
+    if (fs.existsSync(targetPath)) {
+      fs.unlinkSync(targetPath);
+    }
+  } catch (_) {}
 }
 
 async function requireAdminUser(req, res, next) {
@@ -121,9 +148,9 @@ router.get('/version', (_req, res) => {
   } catch (_) {}
 
   const latestVersion =
-    fileConfig.latestVersion || process.env.APP_LATEST_VERSION || '1.2.1';
+    fileConfig.latestVersion || process.env.APP_LATEST_VERSION || '2.0.0';
   const buildNumber = Number(
-    fileConfig.buildNumber || process.env.APP_BUILD_NUMBER || 7
+    fileConfig.buildNumber || process.env.APP_BUILD_NUMBER || 11
   );
   const minVersion =
     fileConfig.minVersion || process.env.APP_MIN_VERSION || '1.0.0';
@@ -207,12 +234,19 @@ router.post(
     };
 
     const existingIdx = list.findIndex((b) => b && b.id === id);
+    const oldBannerUrl =
+      existingIdx >= 0
+        ? list[existingIdx]?.imageUrl || list[existingIdx]?.bannerUrl || ''
+        : '';
     if (existingIdx >= 0) {
       list[existingIdx] = item;
     } else {
       list.unshift(item);
     }
     saveAllBroadcasts(list);
+    if (oldBannerUrl && oldBannerUrl !== resolvedBanner) {
+      cleanupOrphanBannerFile(oldBannerUrl, list);
+    }
 
     return success(res, {
       message: 'Broadcast berhasil disimpan',
@@ -227,8 +261,13 @@ router.delete(
   requireAdminUser,
   (req, res) => {
     const targetId = String(req.params.id || '').trim();
-    const nextList = loadAllBroadcasts().filter((b) => b && b.id !== targetId);
+    const allList = loadAllBroadcasts();
+    const removed = allList.find((b) => b && b.id === targetId);
+    const nextList = allList.filter((b) => b && b.id !== targetId);
     saveAllBroadcasts(nextList);
+    if (removed) {
+      cleanupOrphanBannerFile(removed.imageUrl || removed.bannerUrl, nextList);
+    }
     return success(res, {
       message: 'Broadcast berhasil dihapus',
       data: { broadcasts: nextList },
@@ -261,6 +300,222 @@ router.post(
         bannerUrl: imageUrl,
       },
     });
+  }
+);
+
+// ── DEVELOPER PANEL TELEMETRY, OTA VERSION & USER INSPECTOR ────
+
+router.get(
+  '/admin/system-status',
+  authenticate,
+  requireAdminUser,
+  async (_req, res, next) => {
+    try {
+      const dbStart = Date.now();
+      const countQuery = async (sql) => {
+        try {
+          const r = await dbQuery(sql);
+          return Number(r.rows?.[0]?.cnt || 0);
+        } catch (_) {
+          return 0;
+        }
+      };
+
+      const [
+        totalUsers,
+        totalAccounts,
+        totalTransactions,
+        totalIncomes,
+        totalOcrScans,
+        totalPlans,
+      ] = await Promise.all([
+        countQuery('SELECT COUNT(*)::int AS cnt FROM users'),
+        countQuery('SELECT COUNT(*)::int AS cnt FROM accounts'),
+        countQuery('SELECT COUNT(*)::int AS cnt FROM transactions'),
+        countQuery('SELECT COUNT(*)::int AS cnt FROM incomes'),
+        countQuery('SELECT COUNT(*)::int AS cnt FROM ocr_results'),
+        countQuery('SELECT COUNT(*)::int AS cnt FROM user_financial_plans'),
+      ]);
+      const dbLatencyMs = Date.now() - dbStart;
+
+      const mem = process.memoryUsage();
+      const downloadsDir = path.join(__dirname, '../downloads');
+      const apkFiles = [];
+      if (fs.existsSync(downloadsDir)) {
+        const entries = fs.readdirSync(downloadsDir).filter((f) => f.endsWith('.apk'));
+        for (const fname of entries) {
+          const fpath = path.join(downloadsDir, fname);
+          const st = fs.statSync(fpath);
+          let sha256 = '';
+          try {
+            const hash = crypto.createHash('sha256');
+            hash.update(fs.readFileSync(fpath));
+            sha256 = hash.digest('hex');
+          } catch (_) {}
+          apkFiles.push({
+            filename: fname,
+            sizeBytes: st.size,
+            sizeMb: Number((st.size / (1024 * 1024)).toFixed(2)),
+            updatedAt: st.mtime.toISOString(),
+            sha256,
+          });
+        }
+      }
+
+      const bannersCount = fs.existsSync(BANNERS_DIR)
+        ? fs.readdirSync(BANNERS_DIR).filter((f) => /\.(png|jpg|jpeg|webp)$/i.test(f)).length
+        : 0;
+
+      return success(res, {
+        message: 'Developer system status',
+        data: {
+          server: {
+            apiVersion: '2.0.0',
+            nodeVersion: process.version,
+            platform: `${os.type()} ${os.release()} (${os.arch()})`,
+            environment: process.env.NODE_ENV || 'development',
+            uptimeSeconds: Math.floor(process.uptime()),
+            cpuCount: os.cpus()?.length || 1,
+            loadAvg: os.loadavg(),
+            memory: {
+              rssMb: Number((mem.rss / (1024 * 1024)).toFixed(1)),
+              heapUsedMb: Number((mem.heapUsed / (1024 * 1024)).toFixed(1)),
+              heapTotalMb: Number((mem.heapTotal / (1024 * 1024)).toFixed(1)),
+              systemFreeMb: Number((os.freemem() / (1024 * 1024)).toFixed(0)),
+              systemTotalMb: Number((os.totalmem() / (1024 * 1024)).toFixed(0)),
+            },
+            timestamp: new Date().toISOString(),
+          },
+          database: {
+            status: 'healthy',
+            latencyMs: dbLatencyMs,
+            counts: {
+              users: totalUsers,
+              accounts: totalAccounts,
+              transactions: totalTransactions,
+              incomes: totalIncomes,
+              ocrScans: totalOcrScans,
+              cloudPlans: totalPlans,
+            },
+          },
+          aiEngine: {
+            groqConfigured: Boolean(process.env.GROQ_API_KEY),
+            groqTextModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+            groqVisionModel:
+              process.env.GROQ_VISION_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct',
+            hfOcrConfigured: Boolean(process.env.HF_OCR_URL || process.env.HF_SPACE_URL),
+            hfOcrUrl:
+              process.env.HF_OCR_URL ||
+              process.env.HF_SPACE_URL ||
+              'https://fhazara-sadar-ocr.hf.space',
+          },
+          storage: {
+            apkFiles,
+            bannersCount,
+            activeBroadcastsCount: loadActiveBroadcasts().length,
+            totalBroadcastsCount: loadAllBroadcasts().length,
+          },
+        },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+router.put(
+  '/admin/version',
+  authenticate,
+  requireAdminUser,
+  (req, res) => {
+    const body = req.body || {};
+    const versionFile = path.join(__dirname, '../config/app-version.json');
+    let current = {};
+    try {
+      if (fs.existsSync(versionFile)) {
+        current = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
+      }
+    } catch (_) {}
+
+    const latestVersion = String(body.latestVersion || current.latestVersion || '2.0.0')
+      .trim()
+      .slice(0, 32);
+    const buildNumber = Number(body.buildNumber ?? current.buildNumber ?? 11);
+    const minVersion = String(body.minVersion || current.minVersion || '1.0.0')
+      .trim()
+      .slice(0, 32);
+    const forceUpdate = Boolean(body.forceUpdate ?? current.forceUpdate ?? false);
+    const downloadUrl = String(
+      body.downloadUrl ||
+        current.downloadUrl ||
+        `https://sadar-finance.web.id/downloads/sadar-finance-v${latestVersion}.apk`
+    )
+      .trim()
+      .slice(0, 300);
+
+    let releaseNotes = current.releaseNotes || [];
+    if (Array.isArray(body.releaseNotes)) {
+      releaseNotes = body.releaseNotes
+        .map((s) => String(s || '').trim())
+        .filter(Boolean)
+        .slice(0, 15);
+    } else if (typeof body.releaseNotes === 'string') {
+      releaseNotes = body.releaseNotes
+        .split(/\r?\n/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 15);
+    }
+
+    const nextConfig = {
+      latestVersion,
+      buildNumber: Number.isFinite(buildNumber) ? buildNumber : 11,
+      minVersion,
+      forceUpdate,
+      downloadUrl,
+      releaseNotes,
+      updatedAt: new Date().toISOString(),
+    };
+
+    fs.writeFileSync(versionFile, JSON.stringify(nextConfig, null, 2), 'utf8');
+
+    return success(res, {
+      message: 'Konfigurasi rilis OTA berhasil diperbarui',
+      data: nextConfig,
+    });
+  }
+);
+
+router.get(
+  '/admin/users',
+  authenticate,
+  requireAdminUser,
+  async (_req, res, next) => {
+    try {
+      const result = await dbQuery(`
+        SELECT
+          u.users_id AS id,
+          u.first_name,
+          u.middle_name,
+          u.last_name,
+          u.username,
+          u.email,
+          u.occupation,
+          u.created_at,
+          (SELECT COUNT(*)::int FROM accounts a WHERE a.users_id = u.users_id) AS accounts_count,
+          (SELECT COUNT(*)::int FROM transactions t WHERE t.users_id = u.users_id) AS transactions_count,
+          (SELECT COUNT(*)::int FROM incomes i WHERE i.users_id = u.users_id) AS incomes_count
+        FROM users u
+        ORDER BY u.created_at DESC
+        LIMIT 100
+      `);
+      return success(res, {
+        message: 'Registered users list',
+        data: { users: result.rows || [] },
+      });
+    } catch (err) {
+      return next(err);
+    }
   }
 );
 

@@ -117,6 +117,7 @@ class AuthService {
 
     const delivery = await emailService.sendOtpEmail({
       toEmail: user.email,
+      name: user.first_name,
       name: greetingName,
       otp,
       purpose,
@@ -201,7 +202,7 @@ class AuthService {
           if (info.email) verifiedEmail = info.email.toLowerCase();
           if (info.sub) verifiedSub = info.sub;
         }
-      } catch (_) {}
+      } catch (_) { }
     } else if (accessToken) {
       try {
         const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
@@ -212,7 +213,7 @@ class AuthService {
           if (info.email) verifiedEmail = info.email.toLowerCase();
           if (info.sub) verifiedSub = info.sub;
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     if (!verifiedEmail) {
@@ -362,7 +363,7 @@ class AuthService {
     }
 
     const imageBuffer = await fs.readFile(file.path);
-    await fs.unlink(file.path).catch(() => {});
+    await fs.unlink(file.path).catch(() => { });
 
     const profilePicture = `data:${file.mimetype};base64,${imageBuffer.toString('base64')}`;
     const user = await userRepository.updateProfile(userId, { profilePicture });
@@ -466,9 +467,9 @@ class AuthService {
       profilePicture: r.profile_picture,
       occupation: r.occupation,
       city: r.city,
-      streakDays: Number(r.streak_days || 1),
-      xpPoints: Number(r.xp_points || 50),
-      financialLevel: Number(r.financial_level || 1),
+      streakDays: Number(r.streak_days ?? 0),
+      xpPoints: Number(r.xp_points ?? 0),
+      financialLevel: Number(r.financial_level ?? 1),
     }));
   }
 

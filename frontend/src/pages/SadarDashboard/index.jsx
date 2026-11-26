@@ -219,7 +219,7 @@ const buildBudgetRows = (budget, transactions = []) => {
   });
 
   const budgetObj = budget || { needs_amount: 0, wants_amount: 0, savings_amount: 0 };
-  
+
   let needsApiUsed = Number(budgetObj.needs_used || budgetObj.needsUsed || 0);
   let wantsApiUsed = Number(budgetObj.wants_used || budgetObj.wantsUsed || 0);
   let savingsApiUsed = Number(budgetObj.savings_used || budgetObj.savingsUsed || 0);
@@ -466,8 +466,8 @@ const SetupGuideModal = ({ isOpen, onComplete, onSkip }) => {
             const className = isCompleted
               ? "is-completed"
               : isActive
-              ? "is-active"
-              : "";
+                ? "is-active"
+                : "";
             return <span className={className} key={item.title}></span>;
           })}
         </div>
@@ -1219,14 +1219,19 @@ const DashboardWithData = () => {
     };
     const budgetAlert = mostUsedBudget
       ? {
-          label: mostUsedBudget.label || mostUsedBudget.category,
-          usage: mostUsedBudget.usage,
-          tone: getBudgetTone(mostUsedBudget.usage),
-        }
+        label: mostUsedBudget.label || mostUsedBudget.category,
+        usage: mostUsedBudget.usage,
+        tone: getBudgetTone(mostUsedBudget.usage),
+      }
       : null;
 
     const score = healthScore ? Number(healthScore?.breakdown?.overallScore ?? healthScore?.score?.score ?? 0) : 0;
     const scoreStatus = healthScore ? (healthScore?.status || getScoreStatus(score)) : "Belum Tersedia";
+
+    const nowDate = new Date();
+    const lastDayOfMonth = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0).getDate();
+    const daysRemaining = Math.max(1, lastDayOfMonth - nowDate.getDate() + 1);
+    const dailySafeToSpend = remainingBudget > 0 ? Math.floor(remainingBudget / daysRemaining) : 0;
 
     return {
       totalSaldo,
@@ -1235,6 +1240,8 @@ const DashboardWithData = () => {
       budgetUsage,
       expenseRatio,
       remainingBudget,
+      daysRemaining,
+      dailySafeToSpend,
       transactionCount: userTransactions.length + userIncomes.length,
       accountCount: userAccounts.length,
       categorySeries: categoryLabels.map((label) => categoryRows[label]),
@@ -1283,7 +1290,10 @@ const DashboardWithData = () => {
     {
       label: "Sisa Anggaran",
       value: rupiah(dashboardData.remainingBudget),
-      helper: "Dari alokasi bulan ini",
+      helper:
+        dashboardData.dailySafeToSpend > 0
+          ? `Aman: ${rupiah(dashboardData.dailySafeToSpend)}/hari (${dashboardData.daysRemaining} hr)`
+          : "Dari alokasi bulan ini",
       icon: "ri-pie-chart-2-line",
       tone: getBudgetTone(dashboardData.budgetUsage),
     },
@@ -1320,21 +1330,21 @@ const DashboardWithData = () => {
   );
   const dashboardAlert = dashboardData.budgetAlert
     ? {
-        title: `Anggaran ${dashboardData.budgetAlert.label}`,
-        message: `${dashboardData.budgetAlert.usage.toFixed(1)}% dari batas bulan ini.`,
-        progress: Math.min(dashboardData.budgetAlert.usage, 100),
-        tone: dashboardData.budgetAlert.tone,
-        detail: dashboardData.budgetAlert.usage >= 80
-          ? "Mulai tahan pengeluaran tambahan di kategori ini."
-          : "Masih dalam batas aman, tetap pantau pemakaiannya.",
-      }
+      title: `Anggaran ${dashboardData.budgetAlert.label}`,
+      message: `${dashboardData.budgetAlert.usage.toFixed(1)}% dari batas bulan ini.`,
+      progress: Math.min(dashboardData.budgetAlert.usage, 100),
+      tone: dashboardData.budgetAlert.tone,
+      detail: dashboardData.budgetAlert.usage >= 80
+        ? "Mulai tahan pengeluaran tambahan di kategori ini."
+        : "Masih dalam batas aman, tetap pantau pemakaiannya.",
+    }
     : {
-        title: "Anggaran belum tersedia",
-        message: "Atur anggaran 50/30/20 untuk melihat peringatan.",
-        progress: 0,
-        tone: "success",
-        detail: "Anggaran membantu memberi sinyal sebelum pengeluaran melewati batas.",
-      };
+      title: "Anggaran belum tersedia",
+      message: "Atur anggaran 50/30/20 untuk melihat peringatan.",
+      progress: 0,
+      tone: "success",
+      detail: "Anggaran membantu memberi sinyal sebelum pengeluaran melewati batas.",
+    };
 
   if (isLoading) {
     return <SadarLoadingScreen />;
@@ -1718,7 +1728,7 @@ const DashboardWithData = () => {
                         <tr key={u.users_id || idx}>
                           <td>
                             <Badge
-                              color={idx === 0 ? "warning" : "secondary"}
+                              color={idx === 0 ? "warning" : idx === 1 ? "secondary" : idx === 2 ? "info" : "light"}
                               className={
                                 idx === 0
                                   ? "bg-warning-subtle text-warning"

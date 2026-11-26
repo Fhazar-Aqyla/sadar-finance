@@ -223,6 +223,16 @@ const SadarFinancialHistory = () => {
   const [isSubmittingAction, setIsSubmittingAction] = useState(false);
   const [isReceiptLoading, setIsReceiptLoading] = useState(false);
   const [actionNotice, setActionNotice] = useState("");
+  const [viewMode, setViewMode] = useState("list"); // "list" | "calendar"
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(
+    () => new Date().toISOString().slice(0, 10)
+  );
+  const [receiptZoom, setReceiptZoom] = useState(1);
+  const [eStatementModalOpen, setEStatementModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Riwayat Keuangan | SADAR Finance";
@@ -593,26 +603,57 @@ const SadarFinancialHistory = () => {
         <Row className="g-3">
           <Col xl={12}>
             <Card className="sadar-panel">
-              <CardHeader>
+              <CardHeader className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div>
                   <h4 className="card-title mb-1">Riwayat Keuangan</h4>
                   <p className="text-muted mb-0">Gabungan pemasukan dan pengeluaran pribadi kamu.</p>
                 </div>
-                {userTransactions.length > 0 && (
-                  <div className="sadar-table-search">
-                    <i className="ri-search-line"></i>
-                    <Input
-                      type="search"
-                      value={searchTerm}
-                      onChange={(event) => {
-                        setSearchTerm(event.target.value);
-                        setCurrentTransactionPage(1);
-                      }}
-                      placeholder="Cari catatan, kategori, akun..."
-                      aria-label="Cari riwayat keuangan"
-                    />
-                  </div>
-                )}
+                <div className="d-flex align-items-center gap-2 flex-wrap">
+                  {userTransactions.length > 0 && (
+                    <>
+                      <ButtonGroup size="sm">
+                        <Button
+                          color={viewMode === "list" ? "primary" : "light"}
+                          onClick={() => setViewMode("list")}
+                          className="fw-semibold"
+                        >
+                          <i className="ri-list-check-2 me-1"></i>
+                          Daftar
+                        </Button>
+                        <Button
+                          color={viewMode === "calendar" ? "primary" : "light"}
+                          onClick={() => setViewMode("calendar")}
+                          className="fw-semibold"
+                        >
+                          <i className="ri-calendar-event-line me-1"></i>
+                          Kalender Arus Kas
+                        </Button>
+                      </ButtonGroup>
+                      <Button
+                        color="light"
+                        size="sm"
+                        className="fw-semibold"
+                        onClick={() => setEStatementModalOpen(true)}
+                      >
+                        <i className="ri-printer-line text-primary me-1"></i>
+                        e-Statement PDF
+                      </Button>
+                      <div className="sadar-table-search">
+                        <i className="ri-search-line"></i>
+                        <Input
+                          type="search"
+                          value={searchTerm}
+                          onChange={(event) => {
+                            setSearchTerm(event.target.value);
+                            setCurrentTransactionPage(1);
+                          }}
+                          placeholder="Cari catatan, kategori, akun..."
+                          aria-label="Cari riwayat keuangan"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </CardHeader>
               <CardBody className={userTransactions.length ? "pt-0" : ""}>
                 {notice && <div className="sadar-empty-state mb-3">{notice}</div>}
@@ -625,6 +666,204 @@ const SadarFinancialHistory = () => {
                   </div>
                 ) : (
                   <>
+                    {viewMode === "calendar" && (() => {
+                      const year = calendarMonth.getFullYear();
+                      const month = calendarMonth.getMonth();
+                      const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+                      const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7; // Monday = 0
+                      const daysInMonth = new Date(year, month + 1, 0).getDate();
+                      const dailyMap = {};
+                      let monthInc = 0;
+                      let monthExp = 0;
+
+                      userTransactions.forEach((t) => {
+                        if (!t.date || !t.date.startsWith(monthKey)) return;
+                        if (!dailyMap[t.date]) {
+                          dailyMap[t.date] = { income: 0, expense: 0, items: [] };
+                        }
+                        if (t.type === "income") {
+                          dailyMap[t.date].income += Number(t.amount || 0);
+                          monthInc += Number(t.amount || 0);
+                        } else {
+                          dailyMap[t.date].expense += Number(t.amount || 0);
+                          monthExp += Number(t.amount || 0);
+                        }
+                        dailyMap[t.date].items.push(t);
+                      });
+
+                      const cells = [];
+                      for (let i = 0; i < firstWeekday; i += 1) {
+                        cells.push(null);
+                      }
+                      for (let d = 1; d <= daysInMonth; d += 1) {
+                        const dateStr = `${monthKey}-${String(d).padStart(2, "0")}`;
+                        cells.push({
+                          day: d,
+                          dateStr,
+                          data: dailyMap[dateStr] || { income: 0, expense: 0, items: [] },
+                        });
+                      }
+
+                      const selectedData = dailyMap[selectedCalendarDate] || {
+                        income: 0,
+                        expense: 0,
+                        items: [],
+                      };
+                      const todayStr = new Date().toISOString().slice(0, 10);
+
+                      return (
+                        <div className="py-3">
+                          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3 rounded-3 border bg-light-subtle mb-3">
+                            <div className="d-flex align-items-center gap-2">
+                              <Button
+                                size="sm"
+                                color="light"
+                                onClick={() =>
+                                  setCalendarMonth(new Date(year, month - 1, 1))
+                                }
+                              >
+                                <i className="ri-arrow-left-s-line"></i>
+                              </Button>
+                              <strong className="fs-15 px-2">
+                                {new Intl.DateTimeFormat("id-ID", {
+                                  month: "long",
+                                  year: "numeric",
+                                }).format(calendarMonth)}
+                              </strong>
+                              <Button
+                                size="sm"
+                                color="light"
+                                onClick={() =>
+                                  setCalendarMonth(new Date(year, month + 1, 1))
+                                }
+                              >
+                                <i className="ri-arrow-right-s-line"></i>
+                              </Button>
+                            </div>
+                            <div className="d-flex flex-wrap align-items-center gap-3 fs-13">
+                              <span className="text-success fw-semibold">
+                                Masuk: +{rupiah(monthInc)}
+                              </span>
+                              <span className="text-danger fw-semibold">
+                                Keluar: -{rupiah(monthExp)}
+                              </span>
+                              <Badge
+                                color={monthInc - monthExp >= 0 ? "success" : "danger"}
+                                pill
+                              >
+                                Selisih: {rupiah(monthInc - monthExp)}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="sadar-calendar-grid mb-3">
+                            {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map(
+                              (w) => (
+                                <div key={w} className="sadar-calendar-weekday">
+                                  {w}
+                                </div>
+                              )
+                            )}
+                            {cells.map((cell, idx) =>
+                              !cell ? (
+                                <div
+                                  key={`empty-${idx}`}
+                                  className="sadar-calendar-cell is-empty"
+                                />
+                              ) : (
+                                <div
+                                  key={cell.dateStr}
+                                  onClick={() => setSelectedCalendarDate(cell.dateStr)}
+                                  className={`sadar-calendar-cell ${
+                                    selectedCalendarDate === cell.dateStr
+                                      ? "is-selected"
+                                      : ""
+                                  } ${todayStr === cell.dateStr ? "is-today" : ""}`}
+                                >
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <strong className="fs-12">{cell.day}</strong>
+                                    {cell.data.items.length > 0 && (
+                                      <span className="badge bg-primary-subtle text-primary rounded-pill" style={{ fontSize: 10 }}>
+                                        {cell.data.items.length}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="d-flex flex-column gap-1 mt-1">
+                                    {cell.data.income > 0 && (
+                                      <span
+                                        className="text-success fw-bold text-truncate"
+                                        style={{ fontSize: 10 }}
+                                      >
+                                        +{Math.round(cell.data.income / 1000)}rb
+                                      </span>
+                                    )}
+                                    {cell.data.expense > 0 && (
+                                      <span
+                                        className="text-danger fw-bold text-truncate"
+                                        style={{ fontSize: 10 }}
+                                      >
+                                        -{Math.round(cell.data.expense / 1000)}rb
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            )}
+                          </div>
+
+                          <div className="p-3 rounded-3 border">
+                            <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                              <strong className="fs-14">
+                                Transaksi Tanggal {selectedCalendarDate} (
+                                {selectedData.items.length} catatan)
+                              </strong>
+                              <div className="d-flex gap-3 fs-12">
+                                <span className="text-success fw-semibold">
+                                  +{rupiah(selectedData.income)}
+                                </span>
+                                <span className="text-danger fw-semibold">
+                                  -{rupiah(selectedData.expense)}
+                                </span>
+                              </div>
+                            </div>
+                            {selectedData.items.length === 0 ? (
+                              <div className="text-muted fs-12">
+                                Tidak ada transaksi tercatat pada tanggal ini.
+                              </div>
+                            ) : (
+                              <div className="d-flex flex-column gap-2">
+                                {selectedData.items.map((item) => (
+                                  <div
+                                    key={transactionKey(item)}
+                                    className="d-flex justify-content-between align-items-center p-2 rounded-2 border bg-light-subtle"
+                                  >
+                                    <div>
+                                      <strong className="fs-13 d-block">
+                                        {item.name}
+                                      </strong>
+                                      <span className="text-muted fs-11">
+                                        {item.category} •{" "}
+                                        {resolveAccountName(item.account_id)}
+                                      </span>
+                                    </div>
+                                    <strong
+                                      className={`fs-13 ${
+                                        item.type === "income"
+                                          ? "text-success"
+                                          : "text-danger"
+                                      }`}
+                                    >
+                                      {item.type === "income" ? "+" : "-"}
+                                      {rupiah(item.amount)}
+                                    </strong>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
                     <div className="sadar-table-pagination">
                       <div className="d-flex align-items-center gap-3">
                         <span>
@@ -828,26 +1067,178 @@ const SadarFinancialHistory = () => {
             </div>
           ) : receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl ? (
             <div className="sadar-receipt-viewer">
-              <img
-                src={receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl}
-                alt={`Struk ${receiptModal.transaction?.name || "transaksi"}`}
-              />
-              <div>
-                <strong>{receiptModal.transaction?.receipt?.name || "Struk transaksi"}</strong>
+              <div className="d-flex justify-content-between align-items-center w-100 mb-2">
+                <ButtonGroup size="sm">
+                  <Button
+                    color="light"
+                    onClick={() => setReceiptZoom((z) => Math.max(0.75, z - 0.25))}
+                  >
+                    - Zoom Out
+                  </Button>
+                  <Button color="light" onClick={() => setReceiptZoom(1)}>
+                    {Math.round(receiptZoom * 100)}%
+                  </Button>
+                  <Button
+                    color="light"
+                    onClick={() => setReceiptZoom((z) => Math.min(2.5, z + 0.25))}
+                  >
+                    + Zoom In
+                  </Button>
+                </ButtonGroup>
+                <a
+                  href={receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-sm btn-outline-primary"
+                >
+                  Buka Gambar Penuh
+                </a>
+              </div>
+              <div className="overflow-auto text-center w-100" style={{ maxHeight: 420 }}>
+                <img
+                  src={receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl}
+                  alt={`Struk ${receiptModal.transaction?.name || "transaksi"}`}
+                  style={{
+                    transform: `scale(${receiptZoom})`,
+                    transformOrigin: "top center",
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+              </div>
+              <div className="mt-2">
+                <strong>{receiptModal.transaction?.receipt?.name || "Struk Transaksi OCR"}</strong>
                 <span>{receiptModal.transaction?.name}</span>
-                <span className="mt-2 d-block text-muted text-break" style={{ fontSize: '10px' }}>
-                  DEBUG URL: {receiptModal.transaction?.receipt?.dataUrl || receiptModal.transaction?.receiptUrl}
-                </span>
               </div>
             </div>
           ) : (
             <div className="sadar-empty-state sadar-empty-state-center sadar-receipt-empty">
               <span className="sadar-empty-state-icon"><Receipt className="h-5 w-5" /></span>
-              <h4>No receipt</h4>
-              <p>Belum ada struk yang tersimpan untuk catatan ini.</p>
+              <h4>Belum Ada Lampiran Struk</h4>
+              <p>Belum ada struk yang tersimpan untuk catatan transaksi ini.</p>
             </div>
           )}
         </ModalBody>
+      </Modal>
+
+      {/* Official In-App e-Statement Print/PDF Preview Modal (V 2.0) */}
+      <Modal
+        isOpen={eStatementModalOpen}
+        toggle={() => setEStatementModalOpen(false)}
+        centered
+        size="lg"
+      >
+        <ModalHeader toggle={() => setEStatementModalOpen(false)}>
+          Pratinjau e-Statement Resmi SADAR Finance V 2.0
+        </ModalHeader>
+        <ModalBody>
+          {(() => {
+            const totalInc = incomesRows.reduce((s, r) => s + Number(r.amount || 0), 0);
+            const totalExp = transactionRows.reduce((s, r) => s + Number(r.amount || 0), 0);
+            const netFlow = totalInc - totalExp;
+            return (
+              <div className="p-2">
+                <div
+                  className="p-3 rounded-3 text-white mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0F172A 0%, #1E3A8A 65%, #0D9488 100%)",
+                  }}
+                >
+                  <div>
+                    <span className="badge bg-light text-dark mb-1">
+                      OFFICIAL E-STATEMENT V 2.0
+                    </span>
+                    <h5 className="text-white fw-bold mb-0">
+                      Laporan Rekening & Arus Kas SADAR Finance
+                    </h5>
+                  </div>
+                  <div className="text-end fs-12 text-white-50">
+                    Dicetak:{" "}
+                    {new Intl.DateTimeFormat("id-ID", {
+                      dateStyle: "long",
+                    }).format(new Date())}
+                  </div>
+                </div>
+
+                <Row className="g-2 mb-3">
+                  <Col sm={4}>
+                    <div className="p-2.5 rounded-3 border bg-light-subtle">
+                      <div className="text-muted fs-11">TOTAL PEMASUKAN</div>
+                      <strong className="text-success fs-15">
+                        +{rupiah(totalInc)}
+                      </strong>
+                    </div>
+                  </Col>
+                  <Col sm={4}>
+                    <div className="p-2.5 rounded-3 border bg-light-subtle">
+                      <div className="text-muted fs-11">TOTAL PENGELUARAN</div>
+                      <strong className="text-danger fs-15">
+                        -{rupiah(totalExp)}
+                      </strong>
+                    </div>
+                  </Col>
+                  <Col sm={4}>
+                    <div className="p-2.5 rounded-3 border bg-light-subtle">
+                      <div className="text-muted fs-11">ARUS KAS BERSIH</div>
+                      <strong
+                        className={`fs-15 ${
+                          netFlow >= 0 ? "text-primary" : "text-danger"
+                        }`}
+                      >
+                        {rupiah(netFlow)}
+                      </strong>
+                    </div>
+                  </Col>
+                </Row>
+
+                <div className="table-responsive" style={{ maxHeight: 300 }}>
+                  <Table size="sm" className="align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Tanggal</th>
+                        <th>Keterangan</th>
+                        <th>Kategori</th>
+                        <th>Rekening</th>
+                        <th className="text-end">Mutasi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userTransactions.slice(0, 25).map((item) => (
+                        <tr key={transactionKey(item)}>
+                          <td className="fs-12">{item.date}</td>
+                          <td className="fw-semibold fs-12">{item.name}</td>
+                          <td className="fs-12">{item.category}</td>
+                          <td className="fs-12">
+                            {resolveAccountName(item.account_id)}
+                          </td>
+                          <td
+                            className={`text-end fw-semibold fs-12 ${
+                              item.type === "income"
+                                ? "text-success"
+                                : "text-danger"
+                            }`}
+                          >
+                            {item.type === "income" ? "+" : "-"}
+                            {rupiah(item.amount)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </div>
+            );
+          })()}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="light" onClick={() => setEStatementModalOpen(false)}>
+            Tutup
+          </Button>
+          <Button color="primary" onClick={() => window.print()}>
+            <i className="ri-printer-line me-1"></i>
+            Cetak / Simpan PDF
+          </Button>
+        </ModalFooter>
       </Modal>
 
       <Modal isOpen={editModal.isOpen} toggle={closeEditModal} centered size="lg" className="sadar-history-modal">

@@ -13,6 +13,7 @@ const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const path = require('path');
 const fs = require('fs');
+const zlib = require('zlib');
 
 const config = require('./config');
 const swaggerSpec = require('./config/swagger');
@@ -100,6 +101,44 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));               // Parse JSON body
 app.use(express.urlencoded({ extended: true }));         // Parse URL-encoded body
 app.use(morgan(config.env === 'production' ? 'combined' : 'dev')); // Logging
+
+// Lightweight native Gzip/Brotli JSON compression for faster API & mobile sync
+app.use((req, res, next) => {
+  if (req.path.startsWith('/downloads') || req.path.startsWith('/uploads')) {
+    return next();
+  }
+  const acceptEncoding = String(req.headers['accept-encoding'] || '');
+  if (!acceptEncoding.includes('gzip') && !acceptEncoding.includes('br')) {
+    return next();
+  }
+  const origJson = res.json.bind(res);
+  res.json = (body) => {
+    try {
+      const jsonStr = JSON.stringify(body);
+      const buf = Buffer.from(jsonStr, 'utf8');
+      if (buf.length < 1024 || res.headersSent) {
+        return origJson(body);
+      }
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Vary', 'Accept-Encoding');
+      if (acceptEncoding.includes('br')) {
+        const compressed = zlib.brotliCompressSync(buf, {
+          params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 4 },
+        });
+        res.setHeader('Content-Encoding', 'br');
+        res.setHeader('Content-Length', String(compressed.length));
+        return res.send(compressed);
+      }
+      const compressed = zlib.gzipSync(buf, { level: 6 });
+      res.setHeader('Content-Encoding', 'gzip');
+      res.setHeader('Content-Length', String(compressed.length));
+      return res.send(compressed);
+    } catch (_) {
+      return origJson(body);
+    }
+  };
+  return next();
+});
 
 app.use('/api/v1', (_req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -206,7 +245,7 @@ app.get('/', (req, res) => {
     success: true,
     message: 'SADAR Finance API',
     data: {
-      version: '1.0.0',
+      version: '2.0.0',
       environment: config.env,
       docs: '/api-docs',
       health: '/health',
@@ -221,7 +260,7 @@ app.get('/health', (_req, res) => {
     success: true,
     message: 'SADAR Finance API is running',
     data: {
-      version: '1.0.0',
+      version: '2.0.0',
       environment: config.env,
       timestamp: new Date().toISOString(),
     },

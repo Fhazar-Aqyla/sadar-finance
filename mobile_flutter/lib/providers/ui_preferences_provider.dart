@@ -8,6 +8,7 @@ class UiPreferencesState {
   final bool onboardingSeen;
   final bool biometricLockEnabled;
   final bool privacyShieldEnabled;
+  final bool pushNotificationsEnabled;
   final bool initialized;
 
   const UiPreferencesState({
@@ -16,6 +17,7 @@ class UiPreferencesState {
     this.onboardingSeen = false,
     this.biometricLockEnabled = false,
     this.privacyShieldEnabled = true,
+    this.pushNotificationsEnabled = true,
     this.initialized = false,
   });
 
@@ -27,6 +29,7 @@ class UiPreferencesState {
     bool? onboardingSeen,
     bool? biometricLockEnabled,
     bool? privacyShieldEnabled,
+    bool? pushNotificationsEnabled,
     bool? initialized,
   }) {
     return UiPreferencesState(
@@ -35,6 +38,8 @@ class UiPreferencesState {
       onboardingSeen: onboardingSeen ?? this.onboardingSeen,
       biometricLockEnabled: biometricLockEnabled ?? this.biometricLockEnabled,
       privacyShieldEnabled: privacyShieldEnabled ?? this.privacyShieldEnabled,
+      pushNotificationsEnabled:
+          pushNotificationsEnabled ?? this.pushNotificationsEnabled,
       initialized: initialized ?? this.initialized,
     );
   }
@@ -46,6 +51,7 @@ class UiPreferencesNotifier extends StateNotifier<UiPreferencesState> {
   static const _onboardingKey = 'sadar_onboarding_seen_v1';
   static const _biometricLockKey = 'sadar_biometric_lock_enabled';
   static const _privacyShieldKey = 'sadar_privacy_shield_enabled';
+  static const _pushNotifKey = 'sadar_push_notifications_enabled';
   static String _tourKey(String userId) => 'sadar_tour_seen_$userId';
 
   UiPreferencesNotifier() : super(const UiPreferencesState()) {
@@ -60,17 +66,27 @@ class UiPreferencesNotifier extends StateNotifier<UiPreferencesState> {
       final onboarding = prefs.getBool(_onboardingKey) ?? false;
       final biometricLock = prefs.getBool(_biometricLockKey) ?? false;
       final privacyShield = prefs.getBool(_privacyShieldKey) ?? true;
+      final pushNotif = prefs.getBool(_pushNotifKey) ?? true;
       state = UiPreferencesState(
         themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
         hideBalances: hide,
         onboardingSeen: onboarding,
         biometricLockEnabled: biometricLock,
         privacyShieldEnabled: privacyShield,
+        pushNotificationsEnabled: pushNotif,
         initialized: true,
       );
     } catch (_) {
       state = state.copyWith(initialized: true);
     }
+  }
+
+  Future<void> setPushNotificationsEnabled(bool enabled) async {
+    state = state.copyWith(pushNotificationsEnabled: enabled);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_pushNotifKey, enabled);
+    } catch (_) {}
   }
 
   Future<void> setPrivacyShieldEnabled(bool enabled) async {

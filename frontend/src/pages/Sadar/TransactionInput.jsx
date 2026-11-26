@@ -462,6 +462,28 @@ const TransactionInput = () => {
         amount: Number(form.amount),
       };
 
+      // Smart Duplicate Transaction Guard (V 2.0)
+      try {
+        const recentRows = await transactionApi.list({ limit: 25 }).catch(() => []);
+        const targetDateKey = String(form.transactionDate || "").slice(0, 10);
+        const targetTitle = String(payload.description || "").trim().toLowerCase();
+        const isDup = (recentRows || []).some((r) => {
+          const rDate = String(r.transaction_date || r.transactionDate || r.date || "").slice(0, 10);
+          const rTitle = String(r.description || r.merchant || "").trim().toLowerCase();
+          const rAmt = Number(r.amount || 0);
+          return rDate === targetDateKey && rAmt === payload.amount && rTitle === targetTitle;
+        });
+        if (isDup) {
+          const proceed = window.confirm(
+            `Transaksi Serupa Terdeteksi!\n\nPengeluaran "${payload.description || "Tanpa Nama"}" sebesar ${currencyFormatter.format(payload.amount)} pada tanggal ${targetDateKey} sudah tercatat sebelumnya.\n\nTetap simpan transaksi ini?`
+          );
+          if (!proceed) {
+            setIsSaving(false);
+            return;
+          }
+        }
+      } catch (_) {}
+
       const scanId = mode === "ocr" ? getScanId(scanResult) : manualScanId;
       if (scanId) {
         await ocrApi.confirmTransaction(scanId, payload);

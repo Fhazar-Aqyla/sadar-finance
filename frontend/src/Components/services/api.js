@@ -275,6 +275,11 @@ export const appApi = {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then(unwrapData),
+  adminSystemStatus: () =>
+    apiClient.get("/app/admin/system-status").then(unwrapData),
+  adminUpdateVersion: (payload) =>
+    apiClient.put("/app/admin/version", payload).then(unwrapData),
+  adminUsers: () => apiClient.get("/app/admin/users").then(unwrapData),
 };
 
 export const plansApi = {

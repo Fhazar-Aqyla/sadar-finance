@@ -32,37 +32,24 @@ class SplashScreen extends StatelessWidget {
         ),
         child: SafeArea(
           child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SadarLogo(
-                    variant: SadarLogoVariant.adaptive,
-                    height: 38,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 520),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.scale(
+                    scale: 0.90 + (0.10 * value),
+                    child: child,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Kelola Keuangan Pribadi Lebih Sadar',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.textSecondaryOf(context),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 36),
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primaryOf(context),
-                      ),
-                    ),
-                  ),
-                ],
+                );
+              },
+              child: const SadarLogo(
+                variant: SadarLogoVariant.adaptive,
+                height: 38,
+                showFinanceSubtitle: true,
+                alignment: CrossAxisAlignment.center,
               ),
             ),
           ),

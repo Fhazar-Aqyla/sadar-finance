@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../app.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/services/google_auth_helper.dart';
+import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/services/app_update_service.dart';
@@ -784,6 +785,75 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                   onChanged: (v) => ref
                       .read(uiPreferencesProvider.notifier)
                       .setPrivacyShieldEnabled(v),
+                ),
+                const Divider(),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(
+                    Icons.notifications_active_outlined,
+                    color: AppColors.accent,
+                  ),
+                  title: Text(
+                    'Push Notification Android (Bilah Status)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Tampilkan pop-up notifikasi untuk broadcast, peringatan budget 50/30/20, dan tagihan jatuh tempo',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  value: uiPrefs.pushNotificationsEnabled,
+                  onChanged: (v) async {
+                    if (v) {
+                      await PushNotificationService.requestPermission();
+                    }
+                    await ref
+                        .read(uiPreferencesProvider.notifier)
+                        .setPushNotificationsEnabled(v);
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    Icons.notification_important_outlined,
+                    color: primaryColor,
+                  ),
+                  title: Text(
+                    'Kirim Tes Push Notification',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Uji coba pop-up notifikasi bilah status SADAR Finance di HP Anda',
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+                  trailing: const Icon(Icons.send_rounded, size: 18),
+                  onTap: () async {
+                    final shown =
+                        await PushNotificationService.showNotification(
+                      id: 9999,
+                      title: 'SADAR Finance V 2.0 Aktif!',
+                      body:
+                          'Push Notification Android berhasil terhubung. Peringatan budget 50/30/20, tagihan rutin, dan pengumuman siap memantau keuanganmu.',
+                    );
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor:
+                            shown ? AppColors.success : AppColors.warning,
+                        content: Text(
+                          shown
+                              ? 'Push Notification berhasil dikirim ke bilah status HP Anda!'
+                              : 'Izin notifikasi belum aktif di pengaturan Android.',
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

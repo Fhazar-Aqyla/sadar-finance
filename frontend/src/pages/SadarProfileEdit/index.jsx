@@ -1297,7 +1297,7 @@ const ProfileEdit = () => {
                           <i
                             className={
                               profile.confirmPassword &&
-                              profile.newPassword === profile.confirmPassword
+                                profile.newPassword === profile.confirmPassword
                                 ? "ri-checkbox-circle-fill text-success"
                                 : "ri-circle-line text-muted"
                             }

@@ -395,46 +395,37 @@ class ProfileAccountScreen extends ConsumerWidget {
                   onChanged: (v) => setModalState(() => active = v),
                 ),
                 const SizedBox(height: 8),
-                Row(
+                TextField(
+                  controller: badgeCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Label Badge',
+                    hintText: 'PENGUMUMAN & FITUR BARU',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Tipe Tema Broadcast',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondaryOf(ctx),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: badgeCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Label Badge',
-                          hintText: 'PENGUMUMAN & FITUR BARU',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue:
-                            ['info', 'promo', 'maintenance'].contains(type)
-                                ? type
-                                : 'info',
-                        decoration: const InputDecoration(
-                          labelText: 'Tipe Tema',
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'info',
-                            child: Text('Info (Teal/Navy)'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'promo',
-                            child: Text('Promo (Hijau)'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'maintenance',
-                            child: Text('Penting (Amber)'),
-                          ),
-                        ],
-                        onChanged: (v) =>
-                            setModalState(() => type = v ?? 'info'),
-                      ),
-                    ),
-                  ],
+                    ('info', 'Info (Teal/Navy)'),
+                    ('promo', 'Promo (Hijau)'),
+                    ('maintenance', 'Penting (Amber)'),
+                  ].map((opt) {
+                    return ChoiceChip(
+                      label: Text(opt.$2),
+                      selected: type == opt.$1,
+                      onSelected: (_) => setModalState(() => type = opt.$1),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -1100,6 +1091,150 @@ class ProfileAccountScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 16),
+
+            // 3b. Posisi Kekayaan Bersih (Net Worth Tracker — Item 7)
+            Builder(
+              builder: (_) {
+                final totalCash = finance.totalBalance;
+                final totalGoals = finance.savingsGoals.fold<double>(
+                  0,
+                  (s, g) => s + g.currentAmount,
+                );
+                final totalReceivables = finance.debts
+                    .where((d) => d.isReceivable && !d.isSettled)
+                    .fold<double>(0, (s, d) => s + d.amount);
+                final totalPayables = finance.debts
+                    .where((d) => !d.isReceivable && !d.isSettled)
+                    .fold<double>(0, (s, d) => s + d.amount);
+                final netWorth =
+                    totalCash + totalGoals + totalReceivables - totalPayables;
+
+                return SadarCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SectionHeader(
+                        title: 'Posisi Kekayaan Bersih (Net Worth)',
+                        subtitle:
+                            'Total Saldo Akun + Tabungan Impian + Piutang − Utang',
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        hidden
+                            ? 'Rp •••••••••'
+                            : AppFormatters.rupiah(netWorth),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: netWorth >= 0
+                              ? AppColors.accentOf(context)
+                              : AppColors.danger,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.subtleOf(context),
+                          borderRadius: BorderRadius.circular(12),
+                          border:
+                              Border.all(color: AppColors.borderOf(context)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Kas & Tabungan',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      color: textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    hidden
+                                        ? 'Rp ••••'
+                                        : AppFormatters.compactRupiah(
+                                            totalCash + totalGoals,
+                                          ),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: textPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Piutang (+)',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      color: textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    hidden
+                                        ? 'Rp ••••'
+                                        : AppFormatters.compactRupiah(
+                                            totalReceivables,
+                                          ),
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.success,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Utang (-)',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      color: textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    hidden
+                                        ? 'Rp ••••'
+                                        : AppFormatters.compactRupiah(
+                                            totalPayables,
+                                          ),
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.danger,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 16),
 

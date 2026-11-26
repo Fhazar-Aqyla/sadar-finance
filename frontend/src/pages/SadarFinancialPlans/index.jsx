@@ -91,6 +91,7 @@ const SadarFinancialPlans = () => {
     amount: "",
     isReceivable: true,
     note: "",
+    dueDate: "",
   });
 
   // Split Bill Calculator state
@@ -307,6 +308,7 @@ const SadarFinancialPlans = () => {
       amount: amt,
       isReceivable: Boolean(newDebt.isReceivable),
       note: newDebt.note.trim(),
+      dueDate: newDebt.dueDate ? new Date(`${newDebt.dueDate}T12:00:00`).toISOString() : null,
       isSettled: false,
       createdAt: new Date().toISOString(),
     };
@@ -323,6 +325,7 @@ const SadarFinancialPlans = () => {
       amount: "",
       isReceivable: true,
       note: "",
+      dueDate: "",
     });
     setNotice({
       color: "success",
@@ -405,7 +408,7 @@ const SadarFinancialPlans = () => {
                   className={`fw-semibold ${activeTab === "recurring" ? "active text-primary" : "text-muted"}`}
                   onClick={() => setActiveTab("recurring")}
                 >
-                  <i className="ri-calendar-Check-line me-1"></i>
+                  <i className="ri-calendar-check-line me-1"></i>
                   Jadwal Rutin ({recurringItems.length})
                 </NavLink>
               </NavItem>
@@ -699,6 +702,16 @@ const SadarFinancialPlans = () => {
                               <p className="small text-muted mb-0 mt-1">
                                 Nominal: <strong>{rupiah(d.amount)}</strong>
                                 {d.note ? ` - ${d.note}` : ""}
+                                {d.dueDate && (
+                                  <span className="ms-2 badge bg-info-subtle text-info">
+                                    Jatuh Tempo:{" "}
+                                    {new Intl.DateTimeFormat("id-ID", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    }).format(new Date(d.dueDate))}
+                                  </span>
+                                )}
                               </p>
                             </div>
                             <div className="d-flex align-items-center gap-2">
@@ -825,25 +838,58 @@ const SadarFinancialPlans = () => {
                         </span>
                       </div>
                     </div>
-                    <Button
-                      color="success"
-                      className="w-100"
-                      tag="a"
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`https://wa.me/?text=${encodeURIComponent(
-                        `Rincian Patungan *${splitBill.title}* (SADAR Finance):\n- Total + Pajak: ${rupiah(
-                          splitResult.totalWithTax
-                        )}\n- Jumlah Orang: ${
-                          splitResult.count
-                        } orang\n- *Patungan per Orang: ${rupiah(
-                          splitResult.perPerson
-                        )}*`
-                      )}`}
-                    >
-                      <i className="ri-whatsapp-line me-1"></i>
-                      Bagikan Rincian Patungan ke WhatsApp
-                    </Button>
+                    <div className="d-flex flex-column gap-2">
+                      <Button
+                        color="primary"
+                        className="w-100"
+                        onClick={async () => {
+                          if (splitResult.perPerson <= 0) return;
+                          const item = {
+                            id: `debt_${Date.now()}`,
+                            personName: `Patungan: ${splitBill.title || "Acara"}`,
+                            phone: "",
+                            amount: splitResult.perPerson,
+                            isReceivable: true,
+                            note: `Split Bill ${splitResult.count} orang (Total ${rupiah(splitResult.totalWithTax)})`,
+                            dueDate: null,
+                            isSettled: false,
+                            createdAt: new Date().toISOString(),
+                          };
+                          await persistPlans(
+                            savingsGoals,
+                            recurringItems,
+                            [item, ...debts],
+                            transfers
+                          );
+                          setNotice({
+                            color: "success",
+                            message: `Patungan "${splitBill.title}" (${rupiah(splitResult.perPerson)}/orang) berhasil ditambahkan ke daftar Piutang!`,
+                          });
+                        }}
+                      >
+                        <i className="ri-add-circle-line me-1"></i>
+                        1-Tap Simpan ke Daftar Piutang
+                      </Button>
+                      <Button
+                        color="success"
+                        className="w-100"
+                        tag="a"
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`https://wa.me/?text=${encodeURIComponent(
+                          `Rincian Patungan *${splitBill.title}* (SADAR Finance):\n- Total + Pajak: ${rupiah(
+                            splitResult.totalWithTax
+                          )}\n- Jumlah Orang: ${
+                            splitResult.count
+                          } orang\n- *Patungan per Orang: ${rupiah(
+                            splitResult.perPerson
+                          )}*`
+                        )}`}
+                      >
+                        <i className="ri-whatsapp-line me-1"></i>
+                        Bagikan Rincian Patungan ke WhatsApp
+                      </Button>
+                    </div>
                   </div>
                 </Col>
               </Row>
@@ -1215,6 +1261,16 @@ const SadarFinancialPlans = () => {
                   ...d,
                   amount: onlyDigits(e.target.value),
                 }))
+              }
+            />
+          </div>
+          <div className="mb-3">
+            <Label>Tanggal Jatuh Tempo (Opsional)</Label>
+            <Input
+              type="date"
+              value={newDebt.dueDate || ""}
+              onChange={(e) =>
+                setNewDebt((d) => ({ ...d, dueDate: e.target.value }))
               }
             />
           </div>

@@ -2,14 +2,21 @@ package com.sadarfinance.sadar_finance
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -17,11 +24,17 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterFragmentActivity() {
     private val locationChannelName = "com.sadarfinance.sadar_finance/location"
+    private val notificationChannelName = "com.sadarfinance.sadar_finance/notifications"
+    private val pushChannelId = "sadar_finance_push_v2"
     private val locationPermissionRequestCode = 7401
+    private val notifPermissionRequestCode = 7402
     private var pendingLocationResult: MethodChannel.Result? = null
+    private var pendingNotifResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        ensureNotificationChannel()
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, locationChannelName)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
@@ -43,6 +56,97 @@ class MainActivity : FlutterFragmentActivity() {
                     else -> result.notImplemented()
                 }
             }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, notificationChannelName)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "requestPermission" -> {
+                        ensureNotificationChannel()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            val granted = ContextCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                            if (granted) {
+                                result.success(true)
+                            } else {
+                                pendingNotifResult = result
+                                ActivityCompat.requestPermissions(
+                                    this,
+                                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                                    notifPermissionRequestCode
+                                )
+                            }
+                        } else {
+                            result.success(true)
+                        }
+                    }
+                    "showNotification" -> {
+                        val id = (call.argument<Number>("id") ?: 1001).toInt()
+                        val title = call.argument<String>("title") ?: "SADAR Finance"
+                        val body = call.argument<String>("body") ?: ""
+                        val shown = showNativePushNotification(id, title, body)
+                        result.success(shown)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+    }
+
+    private fun ensureNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel = NotificationChannel(
+                pushChannelId,
+                "Notifikasi & Peringatan SADAR Finance",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Peringatan anggaran 50/30/20, tagihan rutin, piutang, dan pengumuman resmi SADAR Finance"
+                enableVibration(true)
+                enableLights(true)
+            }
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun showNativePushNotification(id: Int, title: String, body: String): Boolean {
+        return try {
+            ensureNotificationChannel()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val granted = ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+                if (!granted) return false
+            }
+
+            val launchIntent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val pendingFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+            val pendingIntent = PendingIntent.getActivity(this, id, launchIntent, pendingFlags)
+
+            val notification = NotificationCompat.Builder(this, pushChannelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            NotificationManagerCompat.from(this).notify(id, notification)
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     private fun hasLocationPermission(): Boolean {
@@ -66,6 +170,14 @@ class MainActivity : FlutterFragmentActivity() {
                 } else {
                     res.error("PERMISSION_DENIED", "Izin lokasi GPS tidak diberikan.", null)
                 }
+            }
+        } else if (requestCode == notifPermissionRequestCode) {
+            val res = pendingNotifResult
+            pendingNotifResult = null
+            if (res != null) {
+                val granted = grantResults.isNotEmpty() &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED
+                res.success(granted)
             }
         }
     }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/bank_data.dart';
 import '../../../core/constants/category_helpers.dart';
+import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/transaction_model.dart';
@@ -15,6 +16,7 @@ import '../../widgets/app_tour_dialog.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/sadar_card.dart';
 import '../../widgets/sadar_logo.dart';
+import '../../widgets/sadar_skeleton.dart';
 import '../../widgets/streak_leaderboard_sheet.dart';
 import '../profile/app_settings_screen.dart';
 
@@ -41,6 +43,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       }
       await _maybeShowTourGuide(auth.user?.id);
       await _maybeCheckSilentOta();
+      if (mounted) {
+        await PushNotificationService.evaluateAndDispatch(
+          ref.read(financeProvider),
+          enabled: ref.read(uiPreferencesProvider).pushNotificationsEnabled,
+        );
+      }
     });
   }
 
@@ -458,7 +466,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ..._buildActiveBroadcastBanners(finance),
                   _buildQuickActions(),
                   const SizedBox(height: 16),
-                  if (finance.accounts.isNotEmpty) ...[
+                  if (finance.isLoading &&
+                      finance.accounts.isEmpty &&
+                      finance.transactions.isEmpty) ...[
+                    const DashboardSkeletonSection(),
+                    const SizedBox(height: 16),
+                  ] else if (finance.accounts.isNotEmpty) ...[
                     _buildAccountsCarousel(finance, uiPrefs.hideBalances),
                     const SizedBox(height: 16),
                   ] else if (!finance.isLoading) ...[
@@ -758,6 +771,44 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                     : const Color(0xFF5EEAD4),
                               ),
                             ),
+                          ),
+                          const SizedBox(height: 8),
+                          Builder(
+                            builder: (_) {
+                              final now = DateTime.now();
+                              final daysInMonth =
+                                  DateTime(now.year, now.month + 1, 0).day;
+                              final remainingDays =
+                                  (daysInMonth - now.day + 1).clamp(1, 31);
+                              final remainingBudget =
+                                  (budgetLimit - finance.currentMonthExpense)
+                                      .clamp(0.0, double.infinity);
+                              final safePerDay =
+                                  remainingBudget / remainingDays;
+                              return Row(
+                                children: [
+                                  const Icon(
+                                    Icons.shield_outlined,
+                                    size: 13.5,
+                                    color: Color(0xFF5EEAD4),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      remainingBudget > 0
+                                          ? 'Batas aman harian: ${hidden ? "Rp ••••" : AppFormatters.compactRupiah(safePerDay)}/hari ($remainingDays hari tersisa)'
+                                          : 'Pagu budget bulan ini telah terpakai penuh',
+                                      style: TextStyle(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.9),
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ],
                         const SizedBox(height: 14),
